@@ -11,7 +11,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:textAlignment="center"
+        android:textSize="24dp"
+        android:text="준비중\n검색 메뉴를 사용해 주세요"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

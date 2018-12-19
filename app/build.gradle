@@ -19,6 +19,7 @@ android {
 }
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
     google()
 }
 
@@ -33,4 +34,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation files('C:/Users/Junhea/Documents/GitHub/MangaViewAndroid/libs/jsoup-1.11.3.jar')
+    implementation 'com.github.okaybroda:ImageZoom:1.1.0'
 }

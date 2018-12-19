@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onItemClick(View v, int position) {
                     // start intent : Episode viewer
+
                     Title selected = searchAdapter.getItem(position);
                     System.out.println("onItemClick position: " + position);
                     Intent episodeView= new Intent(context, EpisodeActivity.class);

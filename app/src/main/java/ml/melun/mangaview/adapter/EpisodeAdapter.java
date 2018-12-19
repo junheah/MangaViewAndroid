@@ -18,6 +18,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
+    private int clicked = -1;
 
     // data is passed into the constructor
     public EpisodeAdapter(Context context, ArrayList<Manga> data) {
@@ -38,6 +39,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         String episode = mData.get(position).getName();
         holder.episode.setText(episode);
+        //if(position==clicked) holder.
     }
 
     // total number of rows

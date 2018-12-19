@@ -19,6 +19,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     private ArrayList<String> imgs;
     private LayoutInflater mInflater;
     private Context mainContext;
+    private StripAdapter.ItemClickListener mClickListener;
 
     // data is passed into the constructor
     public StripAdapter(Context context, ArrayList<String> data) {
@@ -55,12 +56,27 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     public String getItem(int index){return imgs.get(index);}
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView frame;
         ViewHolder(View itemView) {
             super(itemView);
             frame = itemView.findViewById(R.id.frame);
+            itemView.setOnClickListener(this);
         }
+        @Override
+        public void onClick(View view) {
+            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+        }
+    }
+
+    // allows clicks events to be caught
+    public void setClickListener(StripAdapter.ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
     }
 
 }

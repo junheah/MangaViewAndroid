@@ -1,5 +1,7 @@
 package ml.melun.mangaview.adapter;
 import android.content.Context;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +26,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     // data is passed into the constructor
     public TitleAdapter(Context context, ArrayList<Title> data) {
         this.mInflater = LayoutInflater.from(context);
-        mainContext =context;
+        mainContext = context;
         this.mData = data;
     }
 
@@ -55,17 +57,21 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView name;
         ImageView thumb;
+        ConstraintLayout layout;
 
         ViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.Title);
             thumb = itemView.findViewById(R.id.Thumb);
+            layout = itemView.findViewById(R.id.title_item);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            if (mClickListener != null){
+                mClickListener.onItemClick(view, getAdapterPosition());
+            }
         }
     }
 

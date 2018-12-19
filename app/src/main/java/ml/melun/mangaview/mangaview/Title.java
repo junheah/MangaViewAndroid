@@ -31,6 +31,15 @@ public class Title {
             e.printStackTrace();
         }
     }
+    public Boolean clicked(){
+        if(selected) return true;
+        else return false;
+    }
+    public void click(){
+        if(selected) selected=false;
+        else selected = true;
+    }
+    private Boolean selected = false;
     private String name;
     private String thumb;
     private ArrayList<Manga> eps;
