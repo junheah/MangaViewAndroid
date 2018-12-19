@@ -21,7 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EpisodeActivity"></activity>
+        <activity android:name=".EpisodeActivity" />
+        <activity android:name=".ViewerActivity"></activity>
     </application>
 
 </manifest>

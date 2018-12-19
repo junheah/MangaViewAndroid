@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -24,7 +25,6 @@ import ml.melun.mangaview.mangaview.Title;
 
 public class EpisodeActivity extends AppCompatActivity {
     //global variables
-    TextView titleText;
     ProgressDialog pd;
     Title title;
     EpisodeAdapter episodeAdapter;
@@ -37,9 +37,7 @@ public class EpisodeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
         title = new Title(intent.getStringExtra("title"),null);
-
-        titleText = this.findViewById(R.id.Title);
-        titleText.setText(title.getName());
+        getSupportActionBar().setTitle(title.getName());
         episodeList = this.findViewById(R.id.EpisodeList);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
         getEpisodes g = new getEpisodes();
@@ -72,9 +70,10 @@ public class EpisodeActivity extends AppCompatActivity {
                     // start intent : Episode viewer
                     Manga selected = episodeAdapter.getItem(position);
                     System.out.println(selected.getId());
-//                    Intent episodeView = new Intent(context, EpisodeActivity.class);
-//                    episodeView.putExtra("title", selected.getName());
-//                    startActivity(episodeView);
+                    Intent viewer = new Intent(context, ViewerActivity.class);
+                    viewer.putExtra("id", selected.getId());
+                    viewer.putExtra("name",selected.getName());
+                    startActivity(viewer);
                 }
 //
 //                @Override

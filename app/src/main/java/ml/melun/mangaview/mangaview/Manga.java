@@ -15,6 +15,7 @@ public class Manga {
     public String getName() {
         return name;
     }
+    public String getImg(int index){return imgs.get(index);}
     public void fetch() {
         imgs = new ArrayList<>();
         //get images
