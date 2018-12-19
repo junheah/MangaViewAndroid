@@ -20,7 +20,18 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <ViewFlipper
+        android:id="@+id/contentHolder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <include layout="@layout/content_main" />
+
+        <include layout="@layout/content_search" />
+
+    </ViewFlipper>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

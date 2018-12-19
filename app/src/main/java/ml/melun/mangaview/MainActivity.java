@@ -1,9 +1,14 @@
 package ml.melun.mangaview;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,15 +18,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ViewFlipper;
 
 import java.util.ArrayList;
 
-import ml.melun.mangaview.mangaview.Manga;
+import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    //variables
+    private ViewFlipper contentHolder;
+    private EditText searchBox;
+    private Button searchBtn;
+    public Context context = this;
+    ProgressDialog pd;
+    Search search;
+    TitleAdapter searchAdapter;
+    RecyclerView searchResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +66,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //custom var init starts here
+        contentHolder = this.findViewById(R.id.contentHolder);
+
         //code starts here
-        test t = new test();
-        t.execute();
+        refreshViews(0);
     }
 
     @Override
@@ -91,57 +111,85 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_main) {
+            // Handle the main action
+            contentHolder.setDisplayedChild(0);
+        } else if (id == R.id.nav_search) {
+            // Handle the search action
+            contentHolder.setDisplayedChild(1);
         }
-
+        refreshViews(id);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+    private void refreshViews(int id){
+        //set views according to selected layout
+        if(id==R.id.nav_main){
+            //main content
+        }else if(id==R.id.nav_search){
+            //search content
+            searchBox = this.findViewById(R.id.searchBox);
+            searchBtn = this.findViewById(R.id.searchBtn);
+            searchResult = this.findViewById(R.id.searchResult);
+            searchResult.setLayoutManager(new LinearLayoutManager(this));
+            searchBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String query = searchBox.getText().toString();
+                    if(query.length()>0) {
+                        searchManga sm = new searchManga();
+                        sm.execute(query);
+                    }
+                }
+            });
+        }
+    }
 
-    private class test extends AsyncTask<Void,Void,Void>{
+    private class searchManga extends AsyncTask<String,String,String>{
         protected void onPreExecute(){
             super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("로드중");
+            pd.setCancelable(false);
+            pd.show();
         }
-        protected Void doInBackground(Void... params){
-            String query = "학교";
-            Search a = new Search(query);
-            ArrayList<Title> titles = a.getResult();
-            int i=0;
-            for(Title t:titles) {
-                System.out.println(i+ ". " + t.getName()+"  |  " + t.getThumb());
-                i++;
-            }
-            int index = 0;
-            Title selected = titles.get(index);
-            selected.fetchEps();
-            ArrayList<Manga> mlist = selected.getEps();
-            for(Manga m:mlist) {
-                System.out.println(m.getId()+ ". " + m.getName());
-            }
-
-            index = 0;
-            Manga man = mlist.get(index);
-            man.fetch();
-            for(String link:man.getImgs()) {
-                System.out.println(link);
-            }
+        protected String doInBackground(String... params){
+            String query = params[0];
+            search = new Search(query);
+            ArrayList<Title> titles = search.getResult();
+//            int i=0;
+//            for(Title t:titles) {
+//                System.out.println(i+ ". " + t.getName()+"  |  " + t.getThumb());
+//                i++;
+//            }
+            searchAdapter = new TitleAdapter(context,titles);
             return null;
         }
-        protected void onPostExecute(){
-
+        @Override
+        protected void onPostExecute(String res){
+            super.onPostExecute(res);
+            searchResult.setAdapter(searchAdapter);
+            searchAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
+                @Override
+                public void onItemClick(View v, int position) {
+                    // start intent : Episode viewer
+                    Title selected = searchAdapter.getItem(position);
+                    System.out.println("onItemClick position: " + position);
+                    Intent episodeView= new Intent(context, EpisodeActivity.class);
+                    episodeView.putExtra("title",selected.getName());
+                    startActivity(episodeView);
+                }
+//
+//                @Override
+//                public void onItemLongClick(int position, View v) {
+//                    Log.d(TAG, "onItemLongClick pos = " + position);
+//                }
+            });
+            if (pd.isShowing()){
+                pd.dismiss();
+            }
         }
     }
 }
