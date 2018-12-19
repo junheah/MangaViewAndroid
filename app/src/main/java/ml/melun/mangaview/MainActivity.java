@@ -3,6 +3,9 @@ package ml.melun.mangaview;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -20,9 +23,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Search;
@@ -40,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     Search search;
     TitleAdapter searchAdapter;
     RecyclerView searchResult;
+    private int version;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +81,15 @@ public class MainActivity extends AppCompatActivity
 
         //custom var init starts here
         contentHolder = this.findViewById(R.id.contentHolder);
+        try {
+            PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         //code starts here
+
         refreshViews(0);
     }
 
@@ -117,6 +137,18 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_search) {
             // Handle the search action
             contentHolder.setDisplayedChild(1);
+        }else{
+            //don't refresh views
+            if(id==R.id.nav_update){
+                //check update
+                updateCheck u = new updateCheck();
+                u.execute();
+            }else if(id==R.id.nav_share){
+
+            }
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
         }
         refreshViews(id);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,6 +219,84 @@ public class MainActivity extends AppCompatActivity
 //                    Log.d(TAG, "onItemLongClick pos = " + position);
 //                }
             });
+            if (pd.isShowing()){
+                pd.dismiss();
+            }
+        }
+    }
+
+    public String httpsGet(String urlin){
+        HttpsURLConnection connection = null;
+        BufferedReader reader = null;
+        try {
+            URL url = new URL(urlin);
+            connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept-Encoding", "*");
+            connection.setRequestProperty("Accept", "*");
+            connection.connect();
+            InputStream stream = connection.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(stream));
+            StringBuffer buffer = new StringBuffer();
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line);
+            }
+            return buffer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private class updateCheck extends AsyncTask<Void, Integer, Integer> {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(MainActivity.this);
+            pd.setMessage("업데이트 확인중");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        protected Integer doInBackground(Void... params) {
+            try {
+                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/version.json");
+                JSONObject data = new JSONObject(rawdata);
+                int lver = data.getInt("version");
+                String link = data.getString("link");
+                if(version<lver){
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                    startActivity(browserIntent);
+                    return 1;
+                }
+            }catch(Exception e){
+                return -1;
+            }return 0;
+        }
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            switch(result){
+                case -1:
+                    Toast.makeText(getApplicationContext(), "오류가 발생했습니다. 나중에 다시 시도해 주세요.", Toast.LENGTH_LONG).show();
+                    break;
+                case 0:
+                    Toast.makeText(getApplicationContext(), "최신버전 입니다.", Toast.LENGTH_LONG).show();
+                    break;
+                case 1:
+                    Toast.makeText(getApplicationContext(), "새로운 버전을 찾았습니다. 다운로드 페이지로 이동합니다.", Toast.LENGTH_LONG).show();
+                    break;
+            }
             if (pd.isShowing()){
                 pd.dismiss();
             }

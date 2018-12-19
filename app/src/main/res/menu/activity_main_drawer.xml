@@ -9,19 +9,18 @@
             android:title="Main" />
         <item
             android:id="@+id/nav_search"
-            android:title="Search" />
+            android:title="검색" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="기타">
         <menu>
+            <item
+                android:id="@+id/nav_update"
+                android:title="업데이트 확인" />
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="공유" />
         </menu>
     </item>
 

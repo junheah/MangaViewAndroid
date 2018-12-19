@@ -32,6 +32,7 @@ public class ViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
 
+        getSupportActionBar().hide();
         try {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");

@@ -41,7 +41,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         //set image to holder view
         Glide.with(mainContext)
                 .load(image)
-                .apply(new RequestOptions().placeholder(R.drawable.placeholder))
+                .apply(new RequestOptions().dontTransform().placeholder(R.drawable.placeholder))
                 .into(holder.frame);
     }
 
