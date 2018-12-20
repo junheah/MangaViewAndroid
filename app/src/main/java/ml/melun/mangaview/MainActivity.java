@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity
     TitleAdapter searchAdapter, recentAdapter;
     RecyclerView searchResult, recentResult;
     private int version;
-    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +196,7 @@ public class MainActivity extends AppCompatActivity
                     System.out.println("onItemClick position: " + position);
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title", selected.getName());
+                    episodeView.putExtra("thumb",selected.getThumb());
                     startActivity(episodeView);
                 }
             });
@@ -236,6 +236,7 @@ public class MainActivity extends AppCompatActivity
                     System.out.println("onItemClick position: " + position);
                     Intent episodeView= new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title",selected.getName());
+                    episodeView.putExtra("thumb",selected.getThumb());
                     startActivity(episodeView);
                 }
 //

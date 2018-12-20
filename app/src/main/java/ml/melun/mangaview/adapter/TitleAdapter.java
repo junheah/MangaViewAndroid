@@ -1,8 +1,11 @@
 package ml.melun.mangaview.adapter;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +26,13 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private ItemClickListener mClickListener;
     private Context mainContext;
 
+
     // data is passed into the constructor
     public TitleAdapter(Context context, ArrayList<Title> data) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = data;
+
     }
 
     // inflates the row layout from xml when needed
@@ -57,13 +62,11 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView name;
         ImageView thumb;
-        ConstraintLayout layout;
 
         ViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.Title);
             thumb = itemView.findViewById(R.id.Thumb);
-            layout = itemView.findViewById(R.id.title_item);
             itemView.setOnClickListener(this);
         }
 

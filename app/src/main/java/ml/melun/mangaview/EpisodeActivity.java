@@ -36,8 +36,8 @@ public class EpisodeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
-        title = new Title(intent.getStringExtra("title"),null);
-        getSupportActionBar().setTitle(title.getName());
+        title = new Title(intent.getStringExtra("title"),intent.getStringExtra("thumb"));
+        //getSupportActionBar().setTitle(title.getName());
         episodeList = this.findViewById(R.id.EpisodeList);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
         getEpisodes g = new getEpisodes();
@@ -56,7 +56,8 @@ public class EpisodeActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             title.fetchEps();
             ArrayList<Manga> episodes = title.getEps();
-            episodeAdapter = new EpisodeAdapter(context, episodes);
+            episodes.add(0,new Manga(0,""));
+            episodeAdapter = new EpisodeAdapter(context, episodes, title);
             return null;
         }
 
