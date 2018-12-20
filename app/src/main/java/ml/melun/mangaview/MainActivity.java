@@ -3,6 +3,7 @@ package ml.melun.mangaview;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -43,6 +44,7 @@ import ml.melun.mangaview.mangaview.Title;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    Preference p;
     //variables
     private ViewFlipper contentHolder;
     private EditText searchBox;
@@ -50,9 +52,10 @@ public class MainActivity extends AppCompatActivity
     public Context context = this;
     ProgressDialog pd;
     Search search;
-    TitleAdapter searchAdapter;
-    RecyclerView searchResult;
+    TitleAdapter searchAdapter, recentAdapter;
+    RecyclerView searchResult, recentResult;
     private int version;
+    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,9 +90,10 @@ public class MainActivity extends AppCompatActivity
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-
+        //SharedPreferences preferences = getSharedPreferences("mangaView",MODE_PRIVATE);
+        p = new Preference();
+        p.init(this);
         //code starts here
-
         refreshViews(0);
     }
 
@@ -137,6 +141,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_search) {
             // Handle the search action
             contentHolder.setDisplayedChild(1);
+        }else if(id==R.id.nav_recent){
+            // Handle the recent action
+            contentHolder.setDisplayedChild(2);
         }else{
             //don't refresh views
             if(id==R.id.nav_update){
@@ -176,6 +183,23 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             });
+        }else if(id==R.id.nav_recent){
+            recentResult = this.findViewById(R.id.recentList);
+            recentAdapter = new TitleAdapter(context,p.getRecent());
+            recentResult.setLayoutManager(new LinearLayoutManager(this));
+            recentResult.setAdapter(recentAdapter);
+            recentAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
+                @Override
+                public void onItemClick(View v, int position) {
+                    // start intent : Episode viewer
+                    Title selected = recentAdapter.getItem(position);
+                    p.addRecent(selected);
+                    System.out.println("onItemClick position: " + position);
+                    Intent episodeView = new Intent(context, EpisodeActivity.class);
+                    episodeView.putExtra("title", selected.getName());
+                    startActivity(episodeView);
+                }
+            });
         }
     }
 
@@ -207,8 +231,8 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onItemClick(View v, int position) {
                     // start intent : Episode viewer
-
                     Title selected = searchAdapter.getItem(position);
+                    p.addRecent(selected);
                     System.out.println("onItemClick position: " + position);
                     Intent episodeView= new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title",selected.getName());

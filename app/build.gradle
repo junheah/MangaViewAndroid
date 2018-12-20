@@ -16,10 +16,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildToolsVersion '27.0.3'
 }
 repositories {
     mavenCentral()
-    maven { url "https://jitpack.io" }
+    //maven { url "https://jitpack.io" }
+    //jcenter()
     google()
 }
 
@@ -34,5 +36,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation files('C:/Users/Junhea/Documents/GitHub/MangaViewAndroid/libs/jsoup-1.11.3.jar')
-    implementation 'com.github.okaybroda:ImageZoom:1.1.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    //implementation 'com.github.okaybroda:ImageZoom:1.1.0'
+   // implementation 'com.jsibbold:zoomage:1.2.0'
 }

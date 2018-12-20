@@ -10,6 +10,9 @@
         <item
             android:id="@+id/nav_search"
             android:title="검색" />
+        <item
+            android:id="@+id/nav_recent"
+            android:title="최근 기록" />
     </group>
 
     <item android:title="기타">

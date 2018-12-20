@@ -11,10 +11,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-import com.viven.imagezoom.ImageZoomHelper;
+//import com.viven.imagezoom.ImageZoomHelper;
 
 import java.util.ArrayList;
 
@@ -32,15 +33,17 @@ public class ViewerActivity extends AppCompatActivity {
     ProgressDialog pd;
     Context context = this;
     StripAdapter stripAdapter;
-    ImageZoomHelper imageZoomHelper;
+    //ImageZoomHelper imageZoomHelper;
     ActionBar toolbar;
+    //WindowManager.LayoutParams attrs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
 
+
         toolbar = getSupportActionBar();
-        imageZoomHelper = new ImageZoomHelper(this);
+        //imageZoomHelper = new ImageZoomHelper(this);
         try {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");
@@ -49,7 +52,7 @@ public class ViewerActivity extends AppCompatActivity {
             manga = new Manga(id, name);
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
-            ImageZoomHelper.setViewZoomable(findViewById(R.id.strip));
+            //ImageZoomHelper.setViewZoomable(findViewById(R.id.strip));
             LinearLayoutManager manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
@@ -60,13 +63,22 @@ public class ViewerActivity extends AppCompatActivity {
         }
     }
     public void toggleToolbar(){
-        if(toolbar.isShowing()) toolbar.hide();
-        else toolbar.show();
+        //attrs = getWindow().getAttributes();
+        if(toolbar.isShowing()){
+            //attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            toolbar.hide();
+
+        }
+        else {
+            //attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            toolbar.show();
+        }
+        //getWindow().setAttributes(attrs);
     }
 
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
-    }
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
+//    }
 
     private class loadImages extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {

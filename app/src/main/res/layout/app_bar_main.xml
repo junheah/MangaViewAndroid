@@ -29,6 +29,7 @@
         <include layout="@layout/content_main" />
 
         <include layout="@layout/content_search" />
+        <include layout="@layout/content_recent"/>
 
     </ViewFlipper>
 
