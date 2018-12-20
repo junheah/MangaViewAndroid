@@ -8,7 +8,7 @@
 *.ctxt
 
 # Mobile Tools for Java (J2ME)
-.mtj.tmp/.idea/.gradle/
+.mtj.tmp/
 
 # Package Files #
 *.war
