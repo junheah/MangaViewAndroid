@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -47,14 +48,17 @@ public class MainActivity extends AppCompatActivity
     Preference p;
     //variables
     private ViewFlipper contentHolder;
+    TextView noresult;
     private EditText searchBox;
     private Button searchBtn;
     public Context context = this;
     ProgressDialog pd;
     Search search;
-    TitleAdapter searchAdapter, recentAdapter;
-    RecyclerView searchResult, recentResult;
+    TitleAdapter searchAdapter, recentAdapter, favoriteAdapter;
+    RecyclerView searchResult, recentResult, favoriteResult;
     private int version;
+    int mode = 0;
+    int selectedPosition=-1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity
         u.execute();
     }
 
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -140,12 +145,19 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_main) {
             // Handle the main action
             contentHolder.setDisplayedChild(0);
+            mode = 0;
         } else if (id == R.id.nav_search) {
             // Handle the search action
             contentHolder.setDisplayedChild(1);
-        }else if(id==R.id.nav_recent){
+            mode = 1;
+        }else if(id==R.id.nav_recent) {
             // Handle the recent action
             contentHolder.setDisplayedChild(2);
+            mode = 2;
+        }else if(id==R.id.nav_favorite){
+            // Handle the favorite action
+            contentHolder.setDisplayedChild(3);
+            mode = 3;
         }else{
             //don't refresh views
             if(id==R.id.nav_update){
@@ -173,6 +185,7 @@ public class MainActivity extends AppCompatActivity
             //main content
         }else if(id==R.id.nav_search){
             //search content
+            noresult = this.findViewById(R.id.noResult);
             searchBox = this.findViewById(R.id.searchBox);
             searchBtn = this.findViewById(R.id.searchBtn);
             searchResult = this.findViewById(R.id.searchResult);
@@ -197,14 +210,54 @@ public class MainActivity extends AppCompatActivity
                 public void onItemClick(View v, int position) {
                     // start intent : Episode viewer
                     Title selected = recentAdapter.getItem(position);
+                    selectedPosition = position;
                     p.addRecent(selected);
-                    System.out.println("onItemClick position: " + position);
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title", selected.getName());
                     episodeView.putExtra("thumb",selected.getThumb());
-                    startActivity(episodeView);
+                    episodeView.putExtra("recent",true);
+                    startActivityForResult(episodeView,2);
                 }
             });
+        }else if(id==R.id.nav_favorite){
+            favoriteResult = this.findViewById(R.id.favoriteList);
+            favoriteAdapter = new TitleAdapter(context,p.getFavorite());
+            favoriteResult.setLayoutManager(new LinearLayoutManager(this));
+            favoriteResult.setAdapter(favoriteAdapter);
+            favoriteAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
+                @Override
+                public void onItemClick(View v, int position) {
+                    // start intent : Episode viewer
+                    Title selected = favoriteAdapter.getItem(position);
+                    p.addRecent(selected);
+                    //start intent for result : has to know if favorite has been removed or not
+                    Intent episodeView = new Intent(context, EpisodeActivity.class);
+                    episodeView.putExtra("title", selected.getName());
+                    episodeView.putExtra("thumb",selected.getThumb());
+                    episodeView.putExtra("favorite",true);
+                    selectedPosition = position;
+                    startActivityForResult(episodeView,1);
+                }
+            });
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK){
+            switch (requestCode){
+                case 1:
+                    //favorite result
+                    Boolean favorite_after = data.getBooleanExtra("favorite",true);
+                    if(!favorite_after) favoriteAdapter.notifyItemRemoved(selectedPosition);
+                    break;
+                case 2:
+                    //recent result
+                    for(int i= selectedPosition; i>0; i--){
+                        recentAdapter.notifyItemMoved(i,i-1);
+                    }
+                    break;
+
+            }
         }
     }
 
@@ -220,18 +273,18 @@ public class MainActivity extends AppCompatActivity
             String query = params[0];
             search = new Search(query);
             ArrayList<Title> titles = search.getResult();
-//            int i=0;
-//            for(Title t:titles) {
-//                System.out.println(i+ ". " + t.getName()+"  |  " + t.getThumb());
-//                i++;
-//            }
-            searchAdapter = new TitleAdapter(context,titles);
+            searchAdapter = new TitleAdapter(context, titles);
             return null;
         }
         @Override
         protected void onPostExecute(String res){
             super.onPostExecute(res);
             searchResult.setAdapter(searchAdapter);
+            if(searchAdapter.getItemCount()>0) {
+                noresult.setVisibility(View.GONE);
+            }else{
+                noresult.setVisibility(View.VISIBLE);
+            }
             searchAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position) {
@@ -244,11 +297,6 @@ public class MainActivity extends AppCompatActivity
                     episodeView.putExtra("thumb",selected.getThumb());
                     startActivity(episodeView);
                 }
-//
-//                @Override
-//                public void onItemLongClick(int position, View v) {
-//                    Log.d(TAG, "onItemLongClick pos = " + position);
-//                }
             });
             if (pd.isShowing()){
                 pd.dismiss();

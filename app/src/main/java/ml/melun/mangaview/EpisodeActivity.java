@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,16 +31,27 @@ public class EpisodeActivity extends AppCompatActivity {
     EpisodeAdapter episodeAdapter;
     Context context = this;
     RecyclerView episodeList;
-
+    Preference p;
+    Boolean favoriteResult = false;
+    Boolean recentResult = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
         title = new Title(intent.getStringExtra("title"),intent.getStringExtra("thumb"));
+        p = new Preference();
+        favoriteResult = intent.getBooleanExtra("favorite",false);
+        recentResult = intent.getBooleanExtra("recent",false);
         //getSupportActionBar().setTitle(title.getName());
         episodeList = this.findViewById(R.id.EpisodeList);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
+
+        if(recentResult){
+            Intent resultIntent = new Intent();
+            setResult(RESULT_OK,resultIntent);
+        }
+
         getEpisodes g = new getEpisodes();
         g.execute();
     }
@@ -64,6 +76,7 @@ public class EpisodeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
+            episodeAdapter.setFavorite(p.findFavorite(title)>-1);
             episodeList.setAdapter(episodeAdapter);
             episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
                 @Override
@@ -76,12 +89,19 @@ public class EpisodeActivity extends AppCompatActivity {
                     viewer.putExtra("name",selected.getName());
                     startActivity(viewer);
                 }
-//
-//                @Override
-//                public void onItemLongClick(int position, View v) {
-//                    Log.d(TAG, "onItemLongClick pos = " + position);
-//                }
+                @Override
+                public void onStarClick(View v){
+                    //star click handler
+                    episodeAdapter.setFavorite(p.toggleFavorite(title));
+                    if(favoriteResult){
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("favorite", p.findFavorite(title)>-1);
+                        setResult(RESULT_OK, resultIntent);
+
+                    }
+                }
             });
+
             if (pd.isShowing()) {
                 pd.dismiss();
             }

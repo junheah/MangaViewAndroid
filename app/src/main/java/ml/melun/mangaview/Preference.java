@@ -18,8 +18,10 @@ public class Preference {
     static SharedPreferences sharedPref;
     static Context context;
     static ArrayList<Title> recent;
-    SharedPreferences.Editor prefsEditor;
+    static ArrayList<Title> favorite;
+    static SharedPreferences.Editor prefsEditor;
     public Preference(){
+        //
     }
     public void init(Context mcontext){
         sharedPref = mcontext.getSharedPreferences("mangaView",Context.MODE_PRIVATE);
@@ -28,7 +30,9 @@ public class Preference {
         try {
             Gson gson = new Gson();
             recent = gson.fromJson(sharedPref.getString("recent", ""),new TypeToken<ArrayList<Title>>(){}.getType());
-            if(recent==null) recent = new ArrayList<Title>();
+            if(recent==null) recent = new ArrayList<>();
+            favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<Title>>(){}.getType());
+            if(favorite==null) favorite = new ArrayList<>();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -43,6 +47,32 @@ public class Preference {
         prefsEditor.commit();
     }
 
+    public Boolean toggleFavorite(Title title){
+        int index = findFavorite(title);
+        if(index==-1){
+            favorite.add(title);
+            Gson gson = new Gson();
+            prefsEditor.putString("favorite", gson.toJson(favorite));
+            prefsEditor.commit();
+            return true;
+        }else{
+            favorite.remove(index);
+            Gson gson = new Gson();
+            prefsEditor.putString("favorite", gson.toJson(favorite));
+            prefsEditor.commit();
+            return false;
+        }
+    }
+    public int findFavorite(Title title){
+        for(int i=0; i<favorite.size();i++){
+            if(title.getName().matches(favorite.get(i).getName())) return i;
+        }
+        return -1;
+    }
+
+    public ArrayList<Title> getFavorite(){
+        return favorite;
+    }
     private int getIndexOf(Title title){
         String targetT = title.getName();
         for(int i=0; i<recent.size(); i++){

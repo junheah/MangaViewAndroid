@@ -27,7 +27,7 @@ public class Title {
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .get();
             for(Element e:items.select("div.slot")) {
-                eps.add(0,new Manga(Integer.parseInt(e.attr("data-wrid")),e.selectFirst("div.title").text()));
+                eps.add(new Manga(Integer.parseInt(e.attr("data-wrid")),e.selectFirst("div.title").text()));
             }
         }catch(Exception e) {
             e.printStackTrace();

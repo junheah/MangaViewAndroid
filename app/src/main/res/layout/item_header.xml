@@ -33,12 +33,14 @@
 
     <ImageButton
         android:id="@+id/FavoriteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="4dp"
+        android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="?android:attr/selectableItemBackground"
-        app:srcCompat="@android:drawable/btn_star_big_off" />
+        app:srcCompat="@drawable/star_off" />
 </android.support.constraint.ConstraintLayout>
