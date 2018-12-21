@@ -1,4 +1,4 @@
-# 망가쇼미 전용 만화뷰어 # 
+# 망가쇼미 전용 만화뷰어 앱 # 
 
 [최신 버전 다운로드 (apk)](https://github.com/junheah/MangaViewAndroid/releases/download/7/mangaViewer_release_007.apk)
 
