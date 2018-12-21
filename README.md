@@ -2,4 +2,4 @@
 
 # 망가쇼미 전용 만화뷰어 # 
 
-##[최신 릴리즈 다운로드](https://github.com/junheah/MangaViewAndroid/releases/download/3/mangaViewer_release_003.apk)##
+[##최신 릴리즈 다운로드##](https://github.com/junheah/MangaViewAndroid/releases/download/3/mangaViewer_release_003.apk)
