@@ -26,8 +26,8 @@ public class Search {
                 Elements items = search.select("div.post-row");
                 if(items.size()<1) break;
                 for (Element item : items) {
-                    String ntmp = removeParenthesis(item.selectFirst("div.post-subject").selectFirst("a").text());
-                    String ttmp = removeParenthesis(item.selectFirst("div.img-wrap").attr("style").split("\\(")[1].split("\\)")[0]);
+                    String ntmp = removeParenthesis(item.selectFirst("div.manga-subject").selectFirst("a").text());
+                    String ttmp = removeParenthesis(item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
                     result.add(new Title(ntmp, ttmp));
                 }
                 if(items.size()==30) page++;
