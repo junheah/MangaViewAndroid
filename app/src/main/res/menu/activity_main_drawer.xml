@@ -21,9 +21,8 @@
                 android:id="@+id/nav_update"
                 android:title="업데이트 확인" />
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="공유" />
+                android:id="@+id/nav_kakao"
+                android:title="오픈 카톡 참가" />
         </menu>
     </item>
 

@@ -94,6 +94,9 @@ public class MainActivity extends AppCompatActivity
         p.init(this);
         //code starts here
         refreshViews(0);
+        //check update upon startup
+        updateCheck u = new updateCheck();
+        u.execute();
     }
 
     @Override
@@ -149,8 +152,10 @@ public class MainActivity extends AppCompatActivity
                 //check update
                 updateCheck u = new updateCheck();
                 u.execute();
-            }else if(id==R.id.nav_share){
-
+            }else if(id==R.id.nav_kakao){
+                Toast.makeText(getApplicationContext(), "오픈톡방에 참가합니다.", Toast.LENGTH_LONG).show();
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
+                startActivity(browserIntent);
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
