@@ -47,10 +47,10 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public Boolean toggleFavorite(Title title){
+    public Boolean toggleFavorite(Title title, int position){
         int index = findFavorite(title);
         if(index==-1){
-            favorite.add(title);
+            favorite.add(position,title);
             Gson gson = new Gson();
             prefsEditor.putString("favorite", gson.toJson(favorite));
             prefsEditor.commit();

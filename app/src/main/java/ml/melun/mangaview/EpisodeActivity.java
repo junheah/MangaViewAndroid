@@ -34,6 +34,7 @@ public class EpisodeActivity extends AppCompatActivity {
     Preference p;
     Boolean favoriteResult = false;
     Boolean recentResult = false;
+    int position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +42,7 @@ public class EpisodeActivity extends AppCompatActivity {
         Intent intent = getIntent();
         title = new Title(intent.getStringExtra("title"),intent.getStringExtra("thumb"));
         p = new Preference();
+        position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
         //getSupportActionBar().setTitle(title.getName());
@@ -92,12 +94,11 @@ public class EpisodeActivity extends AppCompatActivity {
                 @Override
                 public void onStarClick(View v){
                     //star click handler
-                    episodeAdapter.setFavorite(p.toggleFavorite(title));
+                    episodeAdapter.setFavorite(p.toggleFavorite(title,position));
                     if(favoriteResult){
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("favorite", p.findFavorite(title)>-1);
                         setResult(RESULT_OK, resultIntent);
-
                     }
                 }
             });

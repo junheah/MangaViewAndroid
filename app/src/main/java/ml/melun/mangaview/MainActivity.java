@@ -232,6 +232,7 @@ public class MainActivity extends AppCompatActivity
                     p.addRecent(selected);
                     //start intent for result : has to know if favorite has been removed or not
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
+                    episodeView.putExtra("position", position);
                     episodeView.putExtra("title", selected.getName());
                     episodeView.putExtra("thumb",selected.getThumb());
                     episodeView.putExtra("favorite",true);
