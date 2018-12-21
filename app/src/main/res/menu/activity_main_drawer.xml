@@ -12,10 +12,13 @@
             android:title="검색" />
         <item
             android:id="@+id/nav_recent"
-            android:title="최근 본 만화" />
+            android:title="최근에 본 만화" />
         <item
             android:id="@+id/nav_favorite"
-            android:title="좋아요한 만화"/>
+            android:title="좋아요 한 만화"/>
+        <item
+            android:id="@+id/nav_download"
+            android:title="저장된 만화"/>
     </group>
 
     <item android:title="기타">

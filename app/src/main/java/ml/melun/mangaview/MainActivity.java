@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "준비중", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -154,10 +154,13 @@ public class MainActivity extends AppCompatActivity
             // Handle the recent action
             contentHolder.setDisplayedChild(2);
             mode = 2;
-        }else if(id==R.id.nav_favorite){
+        }else if(id==R.id.nav_favorite) {
             // Handle the favorite action
             contentHolder.setDisplayedChild(3);
             mode = 3;
+        }else if(id==R.id.nav_download){
+            contentHolder.setDisplayedChild(4);
+            mode = 4;
         }else{
             //don't refresh views
             if(id==R.id.nav_update){
@@ -240,6 +243,8 @@ public class MainActivity extends AppCompatActivity
                     startActivityForResult(episodeView,1);
                 }
             });
+        }else if(id==R.id.nav_download){
+            //show downloaded manga list
         }
     }
     @Override

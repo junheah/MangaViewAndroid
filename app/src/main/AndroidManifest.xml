@@ -22,7 +22,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".EpisodeActivity" />
-        <activity android:name=".ViewerActivity"></activity>
+        <activity
+            android:name=".ViewerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

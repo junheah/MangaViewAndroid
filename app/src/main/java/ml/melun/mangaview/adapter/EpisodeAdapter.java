@@ -9,6 +9,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -116,15 +117,23 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView h_title;
         ImageView h_thumb;
         ImageButton h_star;
+        Button h_download;
         HeaderHolder(View itemView) {
             super(itemView);
             h_title = itemView.findViewById(R.id.HeaderTitle);
             h_thumb = itemView.findViewById(R.id.HeaderThumb);
             h_star = itemView.findViewById(R.id.FavoriteButton);
+            h_download = itemView.findViewById(R.id.HeaderDownload);
             h_star.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mClickListener.onStarClick(v);
+                }
+            });
+            h_download.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClickListener.onDownloadClick(v);
                 }
             });
         }
@@ -151,5 +160,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public interface ItemClickListener {
         void onItemClick(View view, int position);
         void onStarClick(View view);
+        void onDownloadClick(View view);
     }
 }

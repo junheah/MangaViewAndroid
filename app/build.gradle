@@ -20,7 +20,7 @@ android {
 }
 repositories {
     mavenCentral()
-    //maven { url "https://jitpack.io" }
+    maven { url "https://jitpack.io" }
     //jcenter()
     google()
 }
@@ -40,4 +40,6 @@ dependencies {
     // implementation 'com.jsibbold:zoomage:1.2.0'
     implementation files('C:/Users/junhea/Documents/GitHub/MangaViewAndroid/libs/jsoup-1.11.3.jar')
     implementation 'com.android.support:design:27.0.2'
+    implementation 'com.otaliastudios:zoomlayout:1.4.0'
+    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
 }

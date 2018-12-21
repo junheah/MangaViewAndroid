@@ -45,7 +45,6 @@ public class EpisodeActivity extends AppCompatActivity {
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
-        //getSupportActionBar().setTitle(title.getName());
         episodeList = this.findViewById(R.id.EpisodeList);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
 
@@ -100,6 +99,12 @@ public class EpisodeActivity extends AppCompatActivity {
                         resultIntent.putExtra("favorite", p.findFavorite(title)>-1);
                         setResult(RESULT_OK, resultIntent);
                     }
+                }
+                @Override
+                public void onDownloadClick(View v){
+                    //download manga
+                    System.out.println("download clicked");
+                    //
                 }
             });
 

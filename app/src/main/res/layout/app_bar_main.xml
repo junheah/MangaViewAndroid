@@ -26,10 +26,11 @@
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize">
 
-        <include layout="@layout/content_main" />
+        <include layout="@layout/content_main"/>
         <include layout="@layout/content_search"/>
         <include layout="@layout/content_recent"/>
         <include layout="@layout/content_favorite"/>
+        <include layout="@layout/content_download"/>
 
     </ViewFlipper>
 
