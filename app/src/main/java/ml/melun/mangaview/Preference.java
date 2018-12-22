@@ -40,8 +40,10 @@ public class Preference {
 
     public void addRecent(Title title){
         int position = getIndexOf(title);
-        if(position>-1) recent.remove(position);
-        recent.add(0,title);
+        if(position>-1) {
+            recent.add(recent.get(position));
+            recent.remove(position+1);
+        } else recent.add(0,title);
         writeRecent();
     }
     private int getIndexOf(Title title){
