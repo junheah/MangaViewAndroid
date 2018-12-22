@@ -21,39 +21,53 @@
         android:id="@+id/HeaderTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="TextView"
         android:textColor="@android:color/white"
         android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayoutCompat"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/HeaderThumb" />
 
-    <ImageButton
-        android:id="@+id/FavoriteButton"
-        android:layout_width="55dp"
+    <android.support.v7.widget.LinearLayoutCompat
+        android:id="@+id/linearLayoutCompat"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:padding="4dp"
-        android:scaleType="centerCrop"
+        android:orientation="horizontal"
+        android:padding="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/star_off" />
+        app:layout_constraintStart_toEndOf="@+id/HeaderThumb">
 
-    <Button
-        android:id="@+id/HeaderDownload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="다운로드"
-        android:textColor="@android:color/white"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/FavoriteButton"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageButton
+            android:id="@+id/FavoriteButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="3dp"
+            android:padding="6dp"
+
+            android:background="@drawable/button_bg"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/star_off" />
+
+        <Button
+            android:id="@+id/HeaderDownload"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/button_bg"
+            android:text="다운로드"
+            android:textColor="@android:color/white"
+            android:enabled="false"
+            app:layout_constraintEnd_toStartOf="@+id/FavoriteButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </android.support.v7.widget.LinearLayoutCompat>
+
 </android.support.constraint.ConstraintLayout>

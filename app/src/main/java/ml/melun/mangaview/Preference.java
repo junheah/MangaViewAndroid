@@ -41,7 +41,7 @@ public class Preference {
     public void addRecent(Title title){
         int position = getIndexOf(title);
         if(position>-1) {
-            recent.add(recent.get(position));
+            recent.add(0,recent.get(position));
             recent.remove(position+1);
         } else recent.add(0,title);
         writeRecent();
