@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
@@ -32,7 +33,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private Context mainContext;
     Boolean favorite = false;
     TypedValue outValue;
-    private int selected = -1;
+    private int bookmark = -1;
     //header is in index 0
     Title header;
 
@@ -81,7 +82,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ViewHolder h = (ViewHolder) holder;
             String episode = mData.get(position).getName();
             h.episode.setText(episode);
-            if (position == selected)
+            if (position == bookmark)
                 h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
             else h.itemView.setBackgroundResource(outValue.resourceId);
         }
@@ -102,12 +103,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(selected!=-1){
-                        int pre = selected;
+                    if(bookmark!=-1){
+                        int pre = bookmark;
                         notifyItemChanged(pre);
                     }
-                    selected = getAdapterPosition();
-                    notifyItemChanged(selected);
+                    bookmark = getAdapterPosition();
+                    notifyItemChanged(bookmark);
                     mClickListener.onItemClick(v, getAdapterPosition());
                 }
             });
@@ -149,6 +150,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             favorite = b;
             notifyItemChanged(0);
         }
+    }
+
+    public void setBookmark(int i){
+        //THIS SHOULD BE SET TO INDEX, NOT ID!
+        bookmark = i;
     }
 
     // allows clicks events to be caught

@@ -34,7 +34,7 @@
     <ImageButton
         android:id="@+id/FavoriteButton"
         android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_height="50dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:background="?android:attr/selectableItemBackground"
@@ -53,6 +53,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:text="다운로드"
         android:textColor="@android:color/white"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/FavoriteButton"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

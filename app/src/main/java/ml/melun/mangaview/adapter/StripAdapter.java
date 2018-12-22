@@ -9,7 +9,6 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 

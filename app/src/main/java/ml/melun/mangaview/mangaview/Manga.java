@@ -38,6 +38,7 @@ public class Manga {
     public ArrayList<String> getImgs(){
         return imgs;
     }
+
     private int id;
     String name;
     private ArrayList<String> imgs;

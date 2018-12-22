@@ -36,12 +36,14 @@ public class ViewerActivity extends AppCompatActivity {
     RecyclerView strip;
     ProgressDialog pd;
     Context context = this;
+    Preference p;
     StripAdapter stripAdapter;
     //ImageZoomHelper imageZoomHelper;
     android.support.v7.widget.Toolbar toolbar;
     boolean toolbarshow = true;
     TextView toolbarTitle;
     AppBarLayout appbar;
+    int viewerBookmark;
     //WindowManager.LayoutParams attrs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +52,18 @@ public class ViewerActivity extends AppCompatActivity {
         toolbar = this.findViewById(R.id.viewerToolbar);
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
+        p = new Preference();
+        viewerBookmark = p.getViewerBookmark();
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");
             id = intent.getIntExtra("id",0);
-
             toolbarTitle.setText(name);
             manga = new Manga(id, name);
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
+
             //ImageZoomHelper.setViewZoomable(findViewById(R.id.strip));
             LinearLayoutManager manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -70,6 +74,7 @@ public class ViewerActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     public void toggleToolbar(){
         //attrs = getWindow().getAttributes();
         if(toolbarshow){
@@ -87,7 +92,9 @@ public class ViewerActivity extends AppCompatActivity {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
 //    }
 
+    public void setPosition(int i){
 
+    }
 
     private class loadImages extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
@@ -109,6 +116,33 @@ public class ViewerActivity extends AppCompatActivity {
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
             strip.setAdapter(stripAdapter);
+            if(viewerBookmark!=-1){
+                strip.scrollToPosition(viewerBookmark);
+                System.out.println("Viewer bookmark " + viewerBookmark);
+            }
+            strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if(newState==RecyclerView.SCROLL_STATE_IDLE){
+                        int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
+                        System.out.println("scroll state change" + firstVisible);
+                        if(firstVisible!=viewerBookmark) {
+                            p.setViewerBookmark(firstVisible);
+                            viewerBookmark=firstVisible;
+                        }
+                    }else if(newState==RecyclerView.SCROLL_STATE_DRAGGING){
+                        if(toolbarshow){
+                            toggleToolbar();
+                        }
+                    }
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+            });
             stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                 public void onItemClick(View v, int position) {
                     // show/hide toolbar

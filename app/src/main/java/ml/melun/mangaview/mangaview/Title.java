@@ -33,17 +33,16 @@ public class Title {
             e.printStackTrace();
         }
     }
-    public Boolean clicked(){
-        if(selected) return true;
-        else return false;
-    }
-    public void click(){
-        if(selected) selected=false;
-        else selected = true;
-    }
-    private Boolean selected = false;
+    public int getBookmark(){ return bookmark;}
+    public void setBookmark(int id){bookmark = id;}
+    public void setPageBookmark(int index){pageBookmark=index;}
+    public int getPageBookmark(){return pageBookmark;}
+
     private String name;
     private String thumb;
     private ArrayList<Manga> eps;
+    private int bookmark=-1;
+    private int pageBookmark=-1;
+    private ArrayList<Integer> viewed;
 }
 
