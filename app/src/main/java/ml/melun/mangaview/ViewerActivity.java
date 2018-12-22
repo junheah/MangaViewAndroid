@@ -38,13 +38,11 @@ public class ViewerActivity extends AppCompatActivity {
     Context context = this;
     Preference p;
     StripAdapter stripAdapter;
-    //ImageZoomHelper imageZoomHelper;
     android.support.v7.widget.Toolbar toolbar;
     boolean toolbarshow = true;
     TextView toolbarTitle;
     AppBarLayout appbar;
     int viewerBookmark;
-    //WindowManager.LayoutParams attrs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +51,13 @@ public class ViewerActivity extends AppCompatActivity {
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         p = new Preference();
-        viewerBookmark = p.getViewerBookmark();
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");
             id = intent.getIntExtra("id",0);
             toolbarTitle.setText(name);
+            viewerBookmark = p.getViewerBookmark(id);
             manga = new Manga(id, name);
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
@@ -126,9 +124,16 @@ public class ViewerActivity extends AppCompatActivity {
                     super.onScrollStateChanged(recyclerView, newState);
                     if(newState==RecyclerView.SCROLL_STATE_IDLE){
                         int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
-                        System.out.println("scroll state change" + firstVisible);
+                        int lastVisible = ((LinearLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
+                        if(firstVisible==0) p.removeViewerBookmark(id);
+                        if(lastVisible==stripAdapter.getItemCount()-1) {
+                            p.removeViewerBookmark(id);
+                            if(!toolbarshow){
+                                toggleToolbar();
+                            }
+                        }
                         if(firstVisible!=viewerBookmark) {
-                            p.setViewerBookmark(firstVisible);
+                            p.setViewerBookmark(id,firstVisible);
                             viewerBookmark=firstVisible;
                         }
                     }else if(newState==RecyclerView.SCROLL_STATE_DRAGGING){

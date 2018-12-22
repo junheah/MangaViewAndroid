@@ -17,9 +17,11 @@ import ml.melun.mangaview.mangaview.Title;
 public class Preference {
     static SharedPreferences sharedPref;
     static Context context;
+    //static ArrayList<Title> recent;
     static ArrayList<Title> recent;
     static ArrayList<Title> favorite;
     static SharedPreferences.Editor prefsEditor;
+    static JSONObject pagebookmark;
     public Preference(){
         //
     }
@@ -30,9 +32,11 @@ public class Preference {
         try {
             Gson gson = new Gson();
             recent = gson.fromJson(sharedPref.getString("recent", ""),new TypeToken<ArrayList<Title>>(){}.getType());
-            if(recent==null) recent = new ArrayList<>();
+
             favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<Title>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
+            //pagebookmark = {id:page}
+            pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -61,13 +65,6 @@ public class Preference {
     public int getBookmark(){
         return recent.get(0).getBookmark();
     }
-    public void setViewerBookmark(int index){
-        recent.get(0).setPageBookmark(index);
-        writeRecent();
-    }
-    public int getViewerBookmark(){
-        return recent.get(0).getPageBookmark();
-    }
 
     private void writeRecent(){
         Gson gson = new Gson();
@@ -75,6 +72,33 @@ public class Preference {
         prefsEditor.commit();
     }
 
+
+    public void setViewerBookmark(int id,int index){
+        if(index>0) {
+            try {
+                pagebookmark.put(id + "", index);
+            } catch (Exception e) {
+                //
+            }
+            writeViewerBookmark();
+        }
+    }
+    public int getViewerBookmark(int id){
+        try {
+            return pagebookmark.getInt(id + "");
+        }catch(Exception e){
+            //
+        }
+        return 0;
+    }
+    public void removeViewerBookmark(int id){
+        pagebookmark.remove(id+"");
+        writeViewerBookmark();
+    }
+    private void writeViewerBookmark(){
+        prefsEditor.putString("bookmark", pagebookmark.toString());
+        prefsEditor.commit();
+    }
 
     public Boolean toggleFavorite(Title title, int position){
         int index = findFavorite(title);
@@ -105,6 +129,10 @@ public class Preference {
 
     public ArrayList<Title> getRecent(){
         return recent;
+    }
+
+    public Boolean isViewed(int id){
+        return pagebookmark.has(id+"");
     }
 
 }

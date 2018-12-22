@@ -4,11 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
@@ -38,11 +40,14 @@ public class EpisodeActivity extends AppCompatActivity {
     int position;
     int bookmarkId = -1;
     int bookmarkIndex = -1;
+    FloatingActionButton upBtn;
+    Boolean upBtnVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
+        upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
         title = new Title(intent.getStringExtra("title"),intent.getStringExtra("thumb"));
         p = new Preference();
         bookmarkId = p.getBookmark();
@@ -51,11 +56,11 @@ public class EpisodeActivity extends AppCompatActivity {
         recentResult = intent.getBooleanExtra("recent",false);
         episodeList = this.findViewById(R.id.EpisodeList);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
+        ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
         if(recentResult){
             Intent resultIntent = new Intent();
             setResult(RESULT_OK,resultIntent);
         }
-
         getEpisodes g = new getEpisodes();
         g.execute();
     }
@@ -98,7 +103,14 @@ public class EpisodeActivity extends AppCompatActivity {
             episodeAdapter.setFavorite(p.findFavorite(title)>-1);
             episodeAdapter.setBookmark(bookmarkIndex);
             episodeList.setAdapter(episodeAdapter);
-            if(bookmarkIndex>8) episodeList.scrollToPosition(bookmarkIndex);
+            if(bookmarkIndex>8){
+                episodeList.scrollToPosition(bookmarkIndex);
+                upBtn.setAlpha(1.0f);
+                upBtnVisible = true;
+            }else{
+                upBtn.setAlpha(0.0f);
+                upBtnVisible = false;
+            }
 
             //todo: 맨위로 스크롤 할수 있는 방법 제공 : ex) 액션바 터치했을때
 //            getActionBarView().setOnClickListener(new View.OnClickListener() {
@@ -107,6 +119,28 @@ public class EpisodeActivity extends AppCompatActivity {
 //                    System.out.println("hellllllllloi");
 //                }
 //            });
+            episodeList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    int firstVisible = ((LinearLayoutManager) episodeList.getLayoutManager()).findFirstVisibleItemPosition();
+                    if(firstVisible>0 && !upBtnVisible){
+                        upBtn.animate().alpha(1.0f);
+                        upBtnVisible = true;
+                    } else if(firstVisible==0 && upBtnVisible){
+                        upBtn.animate().alpha(0.0f);
+                        upBtnVisible = false;
+                    }
+                }
+            });
+            upBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    episodeList.scrollToPosition(0);
+                    upBtn.animate().alpha(0.0f);
+                    upBtnVisible=false;
+                }
+            });
             episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position) {

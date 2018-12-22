@@ -5,49 +5,22 @@
       <map>
         <entry key="imageWizard">
           <value>
+            <PersistentState />
+          </value>
+        </entry>
+        <entry key="vectorWizard">
+          <value>
             <PersistentState>
               <option name="children">
                 <map>
-                  <entry key="imageAssetPanel">
+                  <entry key="vectorAssetStep">
                     <value>
                       <PersistentState>
-                        <option name="children">
-                          <map>
-                            <entry key="actionbar">
-                              <value>
-                                <PersistentState>
-                                  <option name="children">
-                                    <map>
-                                      <entry key="image">
-                                        <value>
-                                          <PersistentState>
-                                            <option name="values">
-                                              <map>
-                                                <entry key="trimmed" value="true" />
-                                              </map>
-                                            </option>
-                                          </PersistentState>
-                                        </value>
-                                      </entry>
-                                    </map>
-                                  </option>
-                                  <option name="values">
-                                    <map>
-                                      <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="D:\downloads\star_off.png" />
-                                      <entry key="outputName" value="star_off" />
-                                      <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="ff8caa" />
-                                    </map>
-                                  </option>
-                                </PersistentState>
-                              </value>
-                            </entry>
-                          </map>
-                        </option>
                         <option name="values">
                           <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="up_arrow" />
+                            <entry key="sourceFile" value="C:\Users\Junhea\Downloads\iconfinder_arrow-up-01_186407.svg" />
                           </map>
                         </option>
                       </PersistentState>

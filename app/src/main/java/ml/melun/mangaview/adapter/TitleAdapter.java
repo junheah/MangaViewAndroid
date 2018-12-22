@@ -32,7 +32,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = data;
-
     }
 
     // inflates the row layout from xml when needed

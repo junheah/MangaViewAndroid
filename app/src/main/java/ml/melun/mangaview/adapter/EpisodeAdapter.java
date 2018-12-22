@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
@@ -76,15 +77,18 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h.h_title.setText(title);
             if(favorite) h.h_star.setImageResource(R.drawable.star_on);
             else h.h_star.setImageResource(R.drawable.star_off);
-            Glide.with(mainContext).load(thumb).into(h.h_thumb);
-
+            Glide.with(mainContext)
+                    .load(thumb)
+                    .apply(new RequestOptions().dontTransform())
+                    .into(h.h_thumb);
         }else {
             ViewHolder h = (ViewHolder) holder;
             String episode = mData.get(position).getName();
             h.episode.setText(episode);
-            if (position == bookmark)
+            if (position == bookmark) {
                 h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
-            else h.itemView.setBackgroundResource(outValue.resourceId);
+            }
+            else h.itemView.setBackgroundResource(R.drawable.item_bg);
         }
     }
 
@@ -117,7 +121,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public class HeaderHolder extends RecyclerView.ViewHolder{
         TextView h_title;
         ImageView h_thumb;
-        ImageButton h_star;
+        ImageView h_star;
         Button h_download;
         HeaderHolder(View itemView) {
             super(itemView);
