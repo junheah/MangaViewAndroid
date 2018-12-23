@@ -53,7 +53,7 @@ public class Preference {
     private int getIndexOf(Title title){
         String targetT = title.getName();
         for(int i=0; i<recent.size(); i++){
-            if(targetT.matches(recent.get(i).getName())) return i;
+            if(match(targetT,recent.get(i).getName())) return i;
         }
         return -1;
     }
@@ -118,7 +118,7 @@ public class Preference {
     }
     public int findFavorite(Title title){
         for(int i=0; i<favorite.size();i++){
-            if(title.getName().matches(favorite.get(i).getName())) return i;
+            if(match(title.getName(),favorite.get(i).getName())) return i;
         }
         return -1;
     }
@@ -133,6 +133,24 @@ public class Preference {
 
     public Boolean isViewed(int id){
         return pagebookmark.has(id+"");
+    }
+
+
+    public Boolean match(String s1, String s2){
+        return filterString(s1).matches(filterString(s2));
+    }
+    public String filterString(String instr){
+        int i = instr.indexOf('(');
+        int j = instr.indexOf(')');
+        int m = instr.indexOf('?');
+        if(i>-1||j>-1||m>-1){
+            char[] tmp = instr.toCharArray();
+            if(i>-1) tmp[i] = ' ';
+            if(j>-1) tmp[j] = ' ';
+            if(m>-1) tmp[m] = ' ';
+            instr = String.valueOf(tmp);
+        }
+        return instr;
     }
 
 }

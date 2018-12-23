@@ -26,8 +26,8 @@ public class Search {
                 Elements items = search.select("div.post-row");
                 if(items.size()<1) break;
                 for (Element item : items) {
-                    String ntmp = removeParenthesis(item.selectFirst("div.manga-subject").selectFirst("a").text());
-                    String ttmp = removeParenthesis(item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
+                    String ntmp = (item.selectFirst("div.manga-subject").selectFirst("a").text());
+                    String ttmp = (item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
                     result.add(new Title(ntmp, ttmp));
                 }
                 if(items.size()==30) page++;
@@ -37,13 +37,15 @@ public class Search {
             e.printStackTrace();
         }
     }
-    public String removeParenthesis(String input){
+    public String filter(String input){
         int i = input.indexOf('(');
         int j = input.indexOf(')');
-        if(i>-1||j>-1){
+        int m = input.indexOf('?');
+        if(i>-1||j>-1||m>-1){
             char[] tmp = input.toCharArray();
             if(i>-1) tmp[i] = ' ';
             if(j>-1) tmp[j] = ' ';
+            if(m>-1) tmp[m] = ' ';
             input = String.valueOf(tmp);
         }
         return input;

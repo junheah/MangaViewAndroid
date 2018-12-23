@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     private int version;
     int mode = 0;
     int selectedPosition=-1;
+    Downloader downloader;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +102,9 @@ public class MainActivity extends AppCompatActivity
         refreshViews(0);
         //check update upon startup
         updateCheck u = new updateCheck();
-        u.execute();
+        u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        downloader = new Downloader();
+        downloader.init();
     }
 
 
@@ -166,7 +170,7 @@ public class MainActivity extends AppCompatActivity
             if(id==R.id.nav_update){
                 //check update
                 updateCheck u = new updateCheck();
-                u.execute();
+                u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }else if(id==R.id.nav_kakao){
                 Toast.makeText(getApplicationContext(), "오픈톡방에 참가합니다.", Toast.LENGTH_LONG).show();
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
@@ -298,6 +302,7 @@ public class MainActivity extends AppCompatActivity
                     Title selected = searchAdapter.getItem(position);
                     p.addRecent(selected);
                     System.out.println("onItemClick position: " + position);
+
                     Intent episodeView= new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title",selected.getName());
                     episodeView.putExtra("thumb",selected.getThumb());

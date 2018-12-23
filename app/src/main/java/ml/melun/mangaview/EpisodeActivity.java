@@ -2,10 +2,12 @@ package ml.melun.mangaview;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,10 +44,12 @@ public class EpisodeActivity extends AppCompatActivity {
     int bookmarkIndex = -1;
     FloatingActionButton upBtn;
     Boolean upBtnVisible = false;
+    Downloader downloader;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
+        downloader =  new Downloader();
         Intent intent = getIntent();
         upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
         title = new Title(intent.getStringExtra("title"),intent.getStringExtra("thumb"));
@@ -62,7 +66,7 @@ public class EpisodeActivity extends AppCompatActivity {
             setResult(RESULT_OK,resultIntent);
         }
         getEpisodes g = new getEpisodes();
-        g.execute();
+        g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
     public View getActionBarView() {
         Window window = getWindow();
@@ -111,8 +115,6 @@ public class EpisodeActivity extends AppCompatActivity {
                 upBtn.setAlpha(0.0f);
                 upBtnVisible = false;
             }
-
-            //todo: 맨위로 스크롤 할수 있는 방법 제공 : ex) 액션바 터치했을때
 //            getActionBarView().setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
@@ -167,7 +169,26 @@ public class EpisodeActivity extends AppCompatActivity {
                 public void onDownloadClick(View v){
                     //download manga
                     System.out.println("download clicked");
-                    //
+                    //ask for confirmation
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    //Yes button clicked
+                                    downloader.queueTitle(title);
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(title.getName()+ " 을(를) 다운로드 하시겠습니까?\n[총 "+title.getEpsCount()+"화]\n*테스트 중, 저장위치: /sdcard/MangaView/saveTest/").setPositiveButton("예!", dialogClickListener)
+                            .setNegativeButton("그건좀..", dialogClickListener).show();
                 }
             });
 

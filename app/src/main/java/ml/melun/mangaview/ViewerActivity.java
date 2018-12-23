@@ -67,7 +67,7 @@ public class ViewerActivity extends AppCompatActivity {
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             loadImages l = new loadImages();
-            l.execute();
+            l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }catch(Exception e){
             e.printStackTrace();
         }

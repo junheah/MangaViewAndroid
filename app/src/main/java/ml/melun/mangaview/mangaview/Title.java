@@ -33,10 +33,9 @@ public class Title {
             e.printStackTrace();
         }
     }
+    public int getEpsCount(){ return eps.size();}
     public int getBookmark(){ return bookmark;}
     public void setBookmark(int id){bookmark = id;}
-    public void setPageBookmark(int index){pageBookmark=index;}
-    public int getPageBookmark(){return pageBookmark;}
 
     private String name;
     private String thumb;
