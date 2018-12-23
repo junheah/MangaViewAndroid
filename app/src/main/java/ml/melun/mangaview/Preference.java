@@ -32,7 +32,7 @@ public class Preference {
         try {
             Gson gson = new Gson();
             recent = gson.fromJson(sharedPref.getString("recent", ""),new TypeToken<ArrayList<Title>>(){}.getType());
-
+            if(recent==null) recent = new ArrayList<>();
             favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<Title>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
             //pagebookmark = {id:page}
