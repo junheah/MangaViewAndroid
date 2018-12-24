@@ -26,17 +26,16 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Downloader {
-    static String homeDir = "/sdcard/MangaView/saveTest/";
+    static String homeDir = "/sdcard/MangaView/saved/";
     static downloadTitle dt;
     static ArrayList<Title> titles;
 
     public Downloader(){
         //static
+        if(titles==null) titles = new ArrayList<>();
+        if(dt==null) dt = new downloadTitle();
     }
-    public void init(){
-        titles = new ArrayList<>();
-        dt = new downloadTitle();
-    }
+
     public void queueTitle(Title title){
         if(dt.getStatus() == AsyncTask.Status.PENDING || dt.getStatus() == AsyncTask.Status.FINISHED) {
             dt = new downloadTitle();
@@ -57,18 +56,17 @@ public class Downloader {
             while(titles.size()>0) {
                 //System.out.println("pp queued downloads : "+ titles.size());
                 Title title = titles.get(0);
-                //System.out.println("pp now downloading : "+title.getName());
-                title.fetchEps();
+                //System.out.println("pp now downloading : "+ title.getName());
+                if(title.getEps()==null) title.fetchEps();
                 ArrayList<Manga> mangas = title.getEps();
                 for(int h=0;h<mangas.size();h++) {
                     Manga target = mangas.get(h);
-                    String targetDir = homeDir + filterString(title.getName()+'/'+filterString(target.getName())+'/');
+                    String targetDir = homeDir + filterString(title.getName())+'/'+filterString(target.getName())+'/';
                     File dir = new File(targetDir);
                     if (!dir.exists()) dir.mkdirs();
                     target.fetch();
                     ArrayList<String> urls = target.getImgs();
                     for (int i = 0; i < urls.size(); i++) {
-
                         try {
                             URL url = new URL(urls.get(i));
                             if(url.getProtocol().toLowerCase().matches("https")) {

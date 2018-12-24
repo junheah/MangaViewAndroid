@@ -1,5 +1,7 @@
 package ml.melun.mangaview.mangaview;
 import java.util.ArrayList;
+
+import org.json.JSONObject;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -37,6 +39,16 @@ public class Manga {
     }
     public ArrayList<String> getImgs(){
         return imgs;
+    }
+    public String toString(){
+        JSONObject tmp = new JSONObject();
+        try {
+            tmp.put("id", id);
+            tmp.put("name", name);
+        }catch (Exception e){
+
+        }
+        return tmp.toString();
     }
 
     private int id;

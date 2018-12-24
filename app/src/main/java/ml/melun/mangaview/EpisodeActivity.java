@@ -20,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 
 import ml.melun.mangaview.R;
@@ -44,12 +46,11 @@ public class EpisodeActivity extends AppCompatActivity {
     int bookmarkIndex = -1;
     FloatingActionButton upBtn;
     Boolean upBtnVisible = false;
-    Downloader downloader;
+    ArrayList<Manga> episodes;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
-        downloader =  new Downloader();
         Intent intent = getIntent();
         upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
         title = new Title(intent.getStringExtra("title"),intent.getStringExtra("thumb"));
@@ -68,12 +69,6 @@ public class EpisodeActivity extends AppCompatActivity {
         getEpisodes g = new getEpisodes();
         g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
-    public View getActionBarView() {
-        Window window = getWindow();
-        View v = window.getDecorView();
-        int resId = getResources().getIdentifier("action_bar_container", "id", "android");
-        return v.findViewById(resId);
-    }
 
     private class getEpisodes extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
@@ -86,7 +81,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
         protected Integer doInBackground(Void... params) {
             title.fetchEps();
-            ArrayList<Manga> episodes = title.getEps();
+            episodes = title.getEps();
             episodes.add(0,new Manga(0,""));
             //find bookmark
             if(bookmarkId!=-1){
@@ -127,10 +122,12 @@ public class EpisodeActivity extends AppCompatActivity {
                     super.onScrolled(recyclerView, dx, dy);
                     int firstVisible = ((LinearLayoutManager) episodeList.getLayoutManager()).findFirstVisibleItemPosition();
                     if(firstVisible>0 && !upBtnVisible){
+                        upBtn.animate().translationX(0);
                         upBtn.animate().alpha(1.0f);
                         upBtnVisible = true;
                     } else if(firstVisible==0 && upBtnVisible){
                         upBtn.animate().alpha(0.0f);
+                        upBtn.animate().translationX(upBtn.getWidth());
                         upBtnVisible = false;
                     }
                 }
@@ -138,9 +135,12 @@ public class EpisodeActivity extends AppCompatActivity {
             upBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    episodeList.scrollToPosition(0);
-                    upBtn.animate().alpha(0.0f);
-                    upBtnVisible=false;
+                    if(upBtnVisible) {
+                        episodeList.scrollToPosition(0);
+                        upBtn.animate().alpha(0.0f);
+                        upBtn.animate().translationX(upBtn.getWidth());
+                        upBtnVisible = false;
+                    }
                 }
             });
             episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
@@ -167,28 +167,17 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onDownloadClick(View v){
-                    //download manga
-                    System.out.println("download clicked");
-                    //ask for confirmation
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which){
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    //Yes button clicked
-                                    downloader.queueTitle(title);
-                                    break;
+                    //start download activity
+                    Intent download = new Intent(context, DownloadActivity.class);
+                    JSONArray mangas = new JSONArray();
+                    //index 0 contains header : blank Manga
+                    for(int i=1; i<episodes.size();i++) {
+                        mangas.put(episodes.get(i).toString());
+                    }
+                    download.putExtra("list",mangas.toString());
+                    download.putExtra("name",title.getName());
+                    startActivity(download);
 
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    //No button clicked
-                                    break;
-                            }
-                        }
-                    };
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setMessage(title.getName()+ " 을(를) 다운로드 하시겠습니까?\n[총 "+title.getEpsCount()+"화]\n*테스트 중, 저장위치: /sdcard/MangaView/saveTest/").setPositiveButton("예!", dialogClickListener)
-                            .setNegativeButton("그건좀..", dialogClickListener).show();
                 }
             });
 

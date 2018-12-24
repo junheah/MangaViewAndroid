@@ -1,5 +1,8 @@
 package ml.melun.mangaview.mangaview;
 import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -36,6 +39,18 @@ public class Title {
     public int getEpsCount(){ return eps.size();}
     public int getBookmark(){ return bookmark;}
     public void setBookmark(int id){bookmark = id;}
+
+    public void setEps(JSONArray list){
+        eps = new ArrayList<>();
+        for(int i=0; i<list.length(); i++){
+            try{
+                JSONObject tmp = new JSONObject(list.get(i).toString());
+                eps.add(new Manga(tmp.getInt("id"),tmp.getString("name")));
+            }catch (Exception e){
+
+            }
+        }
+    }
 
     private String name;
     private String thumb;

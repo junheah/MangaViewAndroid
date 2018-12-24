@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity
         updateCheck u = new updateCheck();
         u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         downloader = new Downloader();
-        downloader.init();
     }
 
 
