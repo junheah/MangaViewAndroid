@@ -1,5 +1,6 @@
 package ml.melun.mangaview;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -9,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,8 +51,12 @@ public class DownloadActivity extends AppCompatActivity {
         dl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                title.setEps(adapter.getSelected());
-                downloadClick();
+                if(adapter.getSelected().length()>0) {
+                    title.setEps(adapter.getSelected());
+                    downloadClick();
+                }else{
+                    Toast.makeText(getApplication(),"1개 이상의 화를 선택해 주세요", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         Button dlAll = findViewById(R.id.dl_all_btn);
@@ -75,6 +81,7 @@ public class DownloadActivity extends AppCompatActivity {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
                         downloader.queueTitle(title);
+                        Toast.makeText(getApplication(),"다운로드를 시작합니다. 진행률은 저장된 만화 탭에서 확인 가능합니다.", Toast.LENGTH_LONG).show();
                         finish();
                         break;
 
@@ -86,7 +93,7 @@ public class DownloadActivity extends AppCompatActivity {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(title.getName()+ " 을(를) 다운로드 하시겠습니까?\n[총 "+title.getEpsCount()+"화]\n*테스트 중, 저장위치: /sdcard/MangaView/saved/").setPositiveButton("예!", dialogClickListener)
-                .setNegativeButton("그건좀..", dialogClickListener).show();
+        builder.setMessage(title.getName()+ " 을(를) 다운로드 하시겠습니까?\n[ 총 "+title.getEpsCount()+"화 ]").setPositiveButton("네", dialogClickListener)
+                .setNegativeButton("아니오", dialogClickListener).show();
     }
 }

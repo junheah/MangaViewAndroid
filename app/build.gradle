@@ -11,7 +11,7 @@ android {
         applicationId "ml.melun.mangaview"
         minSdkVersion 18
         targetSdkVersion 27
-        versionName "1.2.0"
+        versionName "1.2.1"
         versionCode code
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -55,6 +55,5 @@ dependencies {
 //    implementation 'com.otaliastudios:zoomlayout:1.4.0'
 //    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     implementation 'com.android.support:cardview-v7:27.1.1'
-    implementation "com.tonyodev.fetch2:fetch2:2.3.4"
 
 }

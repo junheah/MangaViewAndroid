@@ -177,7 +177,6 @@ public class EpisodeActivity extends AppCompatActivity {
                     download.putExtra("list",mangas.toString());
                     download.putExtra("name",title.getName());
                     startActivity(download);
-
                 }
             });
 

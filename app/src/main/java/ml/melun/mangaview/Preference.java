@@ -22,6 +22,7 @@ public class Preference {
     static ArrayList<Title> favorite;
     static SharedPreferences.Editor prefsEditor;
     static JSONObject pagebookmark;
+
     public Preference(){
         //
     }

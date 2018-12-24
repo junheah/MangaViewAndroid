@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_version"
+        android:orderInCategory="150"
+        android:title="Version"
+        android:enabled="false"
+        app:showAsAction="never"/>
 </menu>

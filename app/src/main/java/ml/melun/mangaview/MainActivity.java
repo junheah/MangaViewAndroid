@@ -1,18 +1,26 @@
 package ml.melun.mangaview;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -42,6 +51,10 @@ import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -50,7 +63,6 @@ public class MainActivity extends AppCompatActivity
     private ViewFlipper contentHolder;
     TextView noresult;
     private EditText searchBox;
-    private Button searchBtn;
     public Context context = this;
     ProgressDialog pd;
     Search search;
@@ -60,6 +72,12 @@ public class MainActivity extends AppCompatActivity
     int mode = 0;
     int selectedPosition=-1;
     Downloader downloader;
+    TextView statNo, statName, stat;
+    int dlstatus=0;
+    int dlProgress;
+    ProgressBar dlBar;
+    ConstraintLayout dlStatContainer;
+    MenuItem versionItem;
 
 
     @Override
@@ -98,13 +116,31 @@ public class MainActivity extends AppCompatActivity
         //SharedPreferences preferences = getSharedPreferences("mangaView",MODE_PRIVATE);
         p = new Preference();
         p.init(this);
+        dlStatContainer = findViewById(R.id.statusContainter);
         //code starts here
-        refreshViews(0);
+        downloader = new Downloader();
+        refreshViews(R.id.nav_download);
+        refreshViews(R.id.nav_main);
+        versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
+        versionItem.setTitle("v."+version);
+        //check for permission
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if(permissionCheck== PackageManager.PERMISSION_DENIED){
+            // 권한 없음
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE},
+                        132322);
+            }
+        }else{
+            //
+        }
+
         //check update upon startup
         updateCheck u = new updateCheck();
         u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        downloader = new Downloader();
     }
+
 
 
     @Override
@@ -193,17 +229,20 @@ public class MainActivity extends AppCompatActivity
             //search content
             noresult = this.findViewById(R.id.noResult);
             searchBox = this.findViewById(R.id.searchBox);
-            searchBtn = this.findViewById(R.id.searchBtn);
             searchResult = this.findViewById(R.id.searchResult);
             searchResult.setLayoutManager(new LinearLayoutManager(this));
-            searchBtn.setOnClickListener(new View.OnClickListener() {
+            searchBox.setOnKeyListener(new View.OnKeyListener() {
                 @Override
-                public void onClick(View view) {
-                    String query = searchBox.getText().toString();
-                    if(query.length()>0) {
-                        searchManga sm = new searchManga();
-                        sm.execute(query);
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if(event.getAction()==KeyEvent.ACTION_DOWN && keyCode ==KeyEvent.KEYCODE_ENTER){
+                        String query = searchBox.getText().toString();
+                        if(query.length()>0) {
+                            searchManga sm = new searchManga();
+                            sm.execute(query);
+                        }
+                        return true;
                     }
+                    return false;
                 }
             });
         }else if(id==R.id.nav_recent){
@@ -247,7 +286,71 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }else if(id==R.id.nav_download){
+            stat = findViewById(R.id.statusText);
+            statNo = findViewById(R.id.statusNo);
+            statName = findViewById(R.id.statusTitle);
+            dlBar = findViewById(R.id.statusProgress);
             //show downloaded manga list
+            downloader.addListener(new Downloader.Listener() {
+                @Override
+                public void changeNameStr(final String name) {
+                    statName.post(new Runnable() {
+                        public void run() {
+                            statName.setText(name);
+                        }
+                    });
+                }
+
+                @Override
+                public void changeNo(final int n) {
+                    statNo.post(new Runnable() {
+                        public void run() {
+                            statNo.setText(n+" in queue");
+                        }
+                    });
+                }
+
+                @Override
+                public void processStatus(int s) {
+                    if(dlstatus!=s){
+                        dlstatus = s;
+                        switch(s) {
+                            case 0:
+                                stat.post(new Runnable() {
+                                    public void run() {
+                                        stat.setText("idle");
+                                        Toast.makeText(getApplication(),"모든 다운로드가 완료되었습니다.", Toast.LENGTH_LONG).show();
+                                        dlStatContainer.setVisibility(View.GONE);
+                                    }
+                                });
+                                //collapse download status container
+                                break;
+                            case 1:
+                                stat.post(new Runnable() {
+                                    public void run() {
+                                        dlStatContainer.setVisibility(View.VISIBLE);
+                                        stat.setText("downloading");
+                                    }
+                                });
+                                //open download status container
+                                break;
+                        }
+                    }
+                }
+
+                @Override
+                public void setProgress(int p) {
+                    if(dlProgress!=p){
+                        dlProgress = p;
+                        dlBar.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                dlBar.setProgress(dlProgress);
+                            }
+                        });
+                    }
+                }
+            });
         }
     }
     @Override
