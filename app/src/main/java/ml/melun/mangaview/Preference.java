@@ -23,6 +23,8 @@ public class Preference {
     static SharedPreferences.Editor prefsEditor;
     static JSONObject pagebookmark;
 
+
+    //Offline manga has id of -1
     public Preference(){
         //
     }
@@ -75,20 +77,24 @@ public class Preference {
 
 
     public void setViewerBookmark(int id,int index){
-        if(index>0) {
-            try {
-                pagebookmark.put(id + "", index);
-            } catch (Exception e) {
-                //
+        if(id>-1) {
+            if (index > 0) {
+                try {
+                    pagebookmark.put(id + "", index);
+                } catch (Exception e) {
+                    //
+                }
+                writeViewerBookmark();
             }
-            writeViewerBookmark();
         }
     }
     public int getViewerBookmark(int id){
-        try {
-            return pagebookmark.getInt(id + "");
-        }catch(Exception e){
-            //
+        if(id>-1) {
+            try {
+                return pagebookmark.getInt(id + "");
+            } catch (Exception e) {
+                //
+            }
         }
         return 0;
     }

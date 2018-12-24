@@ -22,6 +22,7 @@ import android.widget.Toolbar;
 //import com.viven.imagezoom.ImageZoomHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.EpisodeAdapter;
@@ -43,6 +44,7 @@ public class ViewerActivity extends AppCompatActivity {
     TextView toolbarTitle;
     AppBarLayout appbar;
     int viewerBookmark;
+    String[] localImgs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +58,7 @@ public class ViewerActivity extends AppCompatActivity {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");
             id = intent.getIntExtra("id",0);
+            localImgs = intent.getStringArrayExtra("localImgs");
             toolbarTitle.setText(name);
             viewerBookmark = p.getViewerBookmark(id);
             manga = new Manga(id, name);
@@ -66,8 +69,52 @@ public class ViewerActivity extends AppCompatActivity {
             LinearLayoutManager manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
-            loadImages l = new loadImages();
-            l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            if(localImgs!=null||id<0){
+                //load local imgs
+                ArrayList<String> imgs = new ArrayList<>(Arrays.asList(localImgs));
+                stripAdapter = new StripAdapter(context,imgs);
+                strip.setAdapter(stripAdapter);
+                stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
+                    public void onItemClick(View v, int position) {
+                        // show/hide toolbar
+                        toggleToolbar();
+                    }
+                });
+            }else {
+                loadImages l = new loadImages();
+                l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+
+            strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if(newState==RecyclerView.SCROLL_STATE_IDLE){
+                        int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
+                        int lastVisible = ((LinearLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
+                        if(firstVisible==0) p.removeViewerBookmark(id);
+                        if(lastVisible==stripAdapter.getItemCount()-1) {
+                            p.removeViewerBookmark(id);
+                        }
+                        if(firstVisible!=viewerBookmark) {
+                            p.setViewerBookmark(id,firstVisible);
+                            viewerBookmark=firstVisible;
+                        }
+                        if((!strip.canScrollVertically(1))&&!toolbarshow){
+                            toggleToolbar();
+                        }
+                    }else if(newState==RecyclerView.SCROLL_STATE_DRAGGING){
+                        if(toolbarshow){
+                            toggleToolbar();
+                        }
+                    }
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+            });
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -118,36 +165,7 @@ public class ViewerActivity extends AppCompatActivity {
                 strip.scrollToPosition(viewerBookmark);
                 System.out.println("Viewer bookmark " + viewerBookmark);
             }
-            strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-                    if(newState==RecyclerView.SCROLL_STATE_IDLE){
-                        int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
-                        int lastVisible = ((LinearLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
-                        if(firstVisible==0) p.removeViewerBookmark(id);
-                        if(lastVisible==stripAdapter.getItemCount()-1) {
-                            p.removeViewerBookmark(id);
-                            if(!toolbarshow){
-                                toggleToolbar();
-                            }
-                        }
-                        if(firstVisible!=viewerBookmark) {
-                            p.setViewerBookmark(id,firstVisible);
-                            viewerBookmark=firstVisible;
-                        }
-                    }else if(newState==RecyclerView.SCROLL_STATE_DRAGGING){
-                        if(toolbarshow){
-                            toggleToolbar();
-                        }
-                    }
-                }
 
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                }
-            });
             stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                 public void onItemClick(View v, int position) {
                     // show/hide toolbar

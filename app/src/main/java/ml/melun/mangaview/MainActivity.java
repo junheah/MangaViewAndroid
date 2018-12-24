@@ -40,13 +40,16 @@ import android.widget.ViewFlipper;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import ml.melun.mangaview.adapter.OfflineTitleApapter;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     ProgressDialog pd;
     Search search;
     TitleAdapter searchAdapter, recentAdapter, favoriteAdapter;
-    RecyclerView searchResult, recentResult, favoriteResult;
+    RecyclerView searchResult, recentResult, favoriteResult, savedList;
     private int version;
     int mode = 0;
     int selectedPosition=-1;
@@ -78,6 +81,7 @@ public class MainActivity extends AppCompatActivity
     ProgressBar dlBar;
     ConstraintLayout dlStatContainer;
     MenuItem versionItem;
+    String homeDirStr ="/sdcard/MangaView/saved/";
 
 
     @Override
@@ -119,7 +123,6 @@ public class MainActivity extends AppCompatActivity
         dlStatContainer = findViewById(R.id.statusContainter);
         //code starts here
         downloader = new Downloader();
-        refreshViews(R.id.nav_download);
         refreshViews(R.id.nav_main);
         versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
         versionItem.setTitle("v."+version);
@@ -135,6 +138,73 @@ public class MainActivity extends AppCompatActivity
         }else{
             //
         }
+
+        stat = findViewById(R.id.statusText);
+        statNo = findViewById(R.id.statusNo);
+        statName = findViewById(R.id.statusTitle);
+        dlBar = findViewById(R.id.statusProgress);
+        savedList = findViewById(R.id.savedList);
+        //show downloaded manga list
+        downloader.addListener(new Downloader.Listener() {
+            @Override
+            public void changeNameStr(final String name) {
+                statName.post(new Runnable() {
+                    public void run() {
+                        statName.setText(name);
+                    }
+                });
+            }
+
+            @Override
+            public void changeNo(final int n) {
+                statNo.post(new Runnable() {
+                    public void run() {
+                        statNo.setText(n+" in queue");
+                    }
+                });
+            }
+
+            @Override
+            public void processStatus(int s) {
+                if(dlstatus!=s){
+                    dlstatus = s;
+                    switch(s) {
+                        case 0:
+                            stat.post(new Runnable() {
+                                public void run() {
+                                    stat.setText("idle");
+                                    Toast.makeText(getApplication(),"모든 다운로드가 완료되었습니다.", Toast.LENGTH_LONG).show();
+                                    dlStatContainer.setVisibility(View.GONE);
+                                }
+                            });
+                            //collapse download status container
+                            break;
+                        case 1:
+                            stat.post(new Runnable() {
+                                public void run() {
+                                    dlStatContainer.setVisibility(View.VISIBLE);
+                                    stat.setText("downloading");
+                                }
+                            });
+                            //open download status container
+                            break;
+                    }
+                }
+            }
+
+            @Override
+            public void setProgress(int p) {
+                if(dlProgress!=p){
+                    dlProgress = p;
+                    dlBar.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            dlBar.setProgress(dlProgress);
+                        }
+                    });
+                }
+            }
+        });
 
         //check update upon startup
         updateCheck u = new updateCheck();
@@ -286,71 +356,23 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }else if(id==R.id.nav_download){
-            stat = findViewById(R.id.statusText);
-            statNo = findViewById(R.id.statusNo);
-            statName = findViewById(R.id.statusTitle);
-            dlBar = findViewById(R.id.statusProgress);
-            //show downloaded manga list
-            downloader.addListener(new Downloader.Listener() {
+            //downloaded list
+            //그냥 코드 개더러워져도 액티비티 한개로 다할거임.. 귀찮고 이미 더러움...
+            //원래 viewFlipper 도 비효율적이라 바꿔야지 했는데 이미 늦음
+            System.out.println(getSavedTitles());
+            final OfflineTitleApapter offAdapter = new OfflineTitleApapter(context,getSavedTitles());
+            savedList.setLayoutManager(new LinearLayoutManager(this));
+            savedList.setAdapter(offAdapter);
+            offAdapter.setClickListener(new OfflineTitleApapter.ItemClickListener() {
                 @Override
-                public void changeNameStr(final String name) {
-                    statName.post(new Runnable() {
-                        public void run() {
-                            statName.setText(name);
-                        }
-                    });
-                }
-
-                @Override
-                public void changeNo(final int n) {
-                    statNo.post(new Runnable() {
-                        public void run() {
-                            statNo.setText(n+" in queue");
-                        }
-                    });
-                }
-
-                @Override
-                public void processStatus(int s) {
-                    if(dlstatus!=s){
-                        dlstatus = s;
-                        switch(s) {
-                            case 0:
-                                stat.post(new Runnable() {
-                                    public void run() {
-                                        stat.setText("idle");
-                                        Toast.makeText(getApplication(),"모든 다운로드가 완료되었습니다.", Toast.LENGTH_LONG).show();
-                                        dlStatContainer.setVisibility(View.GONE);
-                                    }
-                                });
-                                //collapse download status container
-                                break;
-                            case 1:
-                                stat.post(new Runnable() {
-                                    public void run() {
-                                        dlStatContainer.setVisibility(View.VISIBLE);
-                                        stat.setText("downloading");
-                                    }
-                                });
-                                //open download status container
-                                break;
-                        }
-                    }
-                }
-
-                @Override
-                public void setProgress(int p) {
-                    if(dlProgress!=p){
-                        dlProgress = p;
-                        dlBar.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                dlBar.setProgress(dlProgress);
-                            }
-                        });
-                    }
+                public void onItemClick(View v, int position) {
+                    Intent i = new Intent(context, OfflineEpisodeActivity.class);
+                    i.putExtra("title",offAdapter.getItem(position));
+                    i.putExtra("homeDir",homeDirStr);
+                    startActivity(i);
                 }
             });
+
         }
     }
     @Override
@@ -415,6 +437,17 @@ public class MainActivity extends AppCompatActivity
                 pd.dismiss();
             }
         }
+    }
+    public ArrayList<String> getSavedTitles(){
+        ArrayList<String> savedTitles = new ArrayList<>();
+        File homeDir = new File(homeDirStr);
+        if(homeDir.exists()){
+            File[] files = homeDir.listFiles();
+            for(File f:files){
+                if(f.isDirectory()) savedTitles.add(f.getName());
+            }
+        }
+        return savedTitles;
     }
 
     public String httpsGet(String urlin){
