@@ -46,7 +46,14 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
         String title = mData.get(position).getName();
         String thumb = mData.get(position).getThumb();
+        String author = mData.get(position).getAuthor();
+        String tags ="";
+        for(String s:mData.get(position).getTags()){
+            tags+=s+" ";
+        }
         holder.name.setText(title);
+        holder.author.setText(author);
+        holder.tags.setText(tags);
         Glide.with(mainContext).load(thumb).into(holder.thumb);
     }
 
@@ -61,11 +68,15 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView name;
         ImageView thumb;
+        TextView author;
+        TextView tags;
 
         ViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.Title);
             thumb = itemView.findViewById(R.id.Thumb);
+            author =itemView.findViewById(R.id.TitleAuthor);
+            tags = itemView.findViewById(R.id.TitleTag);
             itemView.setOnClickListener(this);
         }
 

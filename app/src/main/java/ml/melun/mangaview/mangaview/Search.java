@@ -5,6 +5,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Search {
     public Search(String q) {
@@ -28,7 +29,15 @@ public class Search {
                 for (Element item : items) {
                     String ntmp = (item.selectFirst("div.manga-subject").selectFirst("a").text());
                     String ttmp = (item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
-                    result.add(new Title(ntmp, ttmp));
+                    String atmp = "";
+                    try{
+                        atmp = item.selectFirst("div.author").selectFirst("div").text();
+                    }catch (Exception e){}
+                    List<String> tags = new ArrayList<>();
+                    try {
+                        tags = item.selectFirst("div.tags").select("a").eachText();
+                    }catch (Exception e){}
+                    result.add(new Title(ntmp, ttmp, atmp, tags));
                 }
                 if(items.size()==30) page++;
                 else break;

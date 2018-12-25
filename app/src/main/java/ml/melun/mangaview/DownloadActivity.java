@@ -15,6 +15,9 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ml.melun.mangaview.adapter.SelectEpisodeAdapter;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -33,7 +36,7 @@ public class DownloadActivity extends AppCompatActivity {
         Intent intent = getIntent();
         downloader = new Downloader();
         try {
-            title = new Title(intent.getStringExtra("name"), "");
+            title = new Title(intent.getStringExtra("name"), "","",new ArrayList<String>());
             episodes = new JSONArray(intent.getStringExtra("list"));
             eplist.setLayoutManager(new LinearLayoutManager(this));
             adapter = new SelectEpisodeAdapter(getApplicationContext(),episodes);

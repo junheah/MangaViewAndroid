@@ -1,5 +1,6 @@
 package ml.melun.mangaview.mangaview;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -9,9 +10,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Title {
-    public Title(String n, String t) {
+    public Title(String n, String t, String a, List<String> tg) {
         name = n;
         thumb = t;
+        author = a;
+        tags = tg;
     }
     public String getName() {
         return name;
@@ -36,9 +39,17 @@ public class Title {
             e.printStackTrace();
         }
     }
+    public String getAuthor(){
+        if(author==null) return "";
+        return author;
+    }
     public int getEpsCount(){ return eps.size();}
     public int getBookmark(){ return bookmark;}
     public void setBookmark(int id){bookmark = id;}
+    public List<String> getTags(){
+        if(tags==null) return new ArrayList<>();
+        return tags;
+    }
 
     public void setEps(JSONArray list){
         eps = new ArrayList<>();
@@ -56,7 +67,8 @@ public class Title {
     private String thumb;
     private ArrayList<Manga> eps;
     private int bookmark=-1;
-    private int pageBookmark=-1;
     private ArrayList<Integer> viewed;
+    String author;
+    List<String> tags;
 }
 

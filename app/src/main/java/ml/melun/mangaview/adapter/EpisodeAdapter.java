@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private int bookmark = -1;
     //header is in index 0
     Title header;
+    TagAdapter ta;
+    LinearLayoutManager lm;
 
     // data is passed into the constructor
     public EpisodeAdapter(Context context, ArrayList<Manga> data, Title title) {
@@ -46,6 +50,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.header = title;
         outValue = new TypedValue();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+        if(title.getTags()!=null) {
+            ta = new TagAdapter(context, title.getTags());
+            lm = new LinearLayoutManager(context);
+            lm.setOrientation(LinearLayoutManager.HORIZONTAL);
+        }
     }
 
     @Override
@@ -75,6 +84,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             String title = header.getName();
             String thumb = header.getThumb();
             h.h_title.setText(title);
+            h.h_author.setText(header.getAuthor());
             if(favorite) h.h_star.setImageResource(R.drawable.star_on);
             else h.h_star.setImageResource(R.drawable.star_off);
             Glide.with(mainContext)
@@ -119,16 +129,19 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
     public class HeaderHolder extends RecyclerView.ViewHolder{
-        TextView h_title;
+        TextView h_title, h_author;
         ImageView h_thumb;
         ImageView h_star;
         Button h_download;
+        RecyclerView h_tags;
         HeaderHolder(View itemView) {
             super(itemView);
             h_title = itemView.findViewById(R.id.HeaderTitle);
             h_thumb = itemView.findViewById(R.id.HeaderThumb);
             h_star = itemView.findViewById(R.id.FavoriteButton);
             h_download = itemView.findViewById(R.id.HeaderDownload);
+            h_tags = itemView.findViewById(R.id.tagsContainer);
+            h_author = itemView.findViewById(R.id.HeaderAuthor);
             h_star.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -141,6 +154,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     mClickListener.onDownloadClick(v);
                 }
             });
+            if(ta!=null) {
+                h_tags.setLayoutManager(lm);
+                h_tags.setAdapter(ta);
+            }
         }
     }
 

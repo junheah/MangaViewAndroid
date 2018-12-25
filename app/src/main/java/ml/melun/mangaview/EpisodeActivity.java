@@ -23,6 +23,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.EpisodeAdapter;
@@ -53,7 +54,10 @@ public class EpisodeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
         upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
-        title = new Title(intent.getStringExtra("title"),intent.getStringExtra("thumb"));
+        title = new Title(intent.getStringExtra("title")
+                ,intent.getStringExtra("thumb")
+                ,intent.getStringExtra("author")
+                ,intent.getStringArrayListExtra("tags"));
         p = new Preference();
         bookmarkId = p.getBookmark();
         position = intent.getIntExtra("position",0);

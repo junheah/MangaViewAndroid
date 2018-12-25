@@ -330,6 +330,8 @@ public class MainActivity extends AppCompatActivity
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title", selected.getName());
                     episodeView.putExtra("thumb",selected.getThumb());
+                    episodeView.putExtra("author",selected.getAuthor());
+                    episodeView.putExtra("tags",new ArrayList<String>(selected.getTags()));
                     episodeView.putExtra("recent",true);
                     startActivityForResult(episodeView,2);
                 }
@@ -349,6 +351,8 @@ public class MainActivity extends AppCompatActivity
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("position", position);
                     episodeView.putExtra("title", selected.getName());
+                    episodeView.putExtra("author",selected.getAuthor());
+                    episodeView.putExtra("tags",new ArrayList<String>(selected.getTags()));
                     episodeView.putExtra("thumb",selected.getThumb());
                     episodeView.putExtra("favorite",true);
                     selectedPosition = position;
@@ -430,6 +434,8 @@ public class MainActivity extends AppCompatActivity
                     Intent episodeView= new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title",selected.getName());
                     episodeView.putExtra("thumb",selected.getThumb());
+                    episodeView.putExtra("author",selected.getAuthor());
+                    episodeView.putExtra("tags",new ArrayList<String>(selected.getTags()));
                     startActivity(episodeView);
                 }
             });
