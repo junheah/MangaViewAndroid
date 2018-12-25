@@ -21,7 +21,7 @@ public class Search {
             int page = 0;
             while(true) {
                 Document search = Jsoup.connect("https://mangashow.me/bbs/search.php?stx=" + query + "&page="+page)
-                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                         .get();
                 System.out.println(search.toString());
                 Elements items = search.select("div.post-row");
