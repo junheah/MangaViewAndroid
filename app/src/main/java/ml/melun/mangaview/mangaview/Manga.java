@@ -25,6 +25,15 @@ public class Manga {
         return name;
     }
     public String getImg(int index){return imgs.get(index);}
+    public void addThumb(String src){
+        thumb = src;
+    }
+
+    public String getThumb() {
+        if(thumb == null) return "";
+        return thumb;
+    }
+
     public void fetch() {
         imgs = new ArrayList<>();
         int tries = 0;
@@ -91,6 +100,23 @@ public class Manga {
         }
         return null;
     }
+    private void fetchTitle(){
+        try {
+            Document doc = Jsoup.connect("https://mangashow.me/bbs/board.php?bo_table=msm_manga&wr_id=" + id)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+                    .get();
+            String encoded = doc.selectFirst("div.more-btn").selectFirst("a").attr("href");
+            String t_str = java.net.URLDecoder.decode(encoded, "UTF-8");
+            title = new Title(t_str.substring(t_str.lastIndexOf('=') + 1),"","",new ArrayList<String>());
+        }catch (Exception e){
+
+        }
+    }
+    public Title getTitle(){
+        //if(title!=null) return title;
+        fetchTitle();
+        return title;
+    }
 
     public ArrayList<String> getImgs(){
         return imgs;
@@ -109,5 +135,7 @@ public class Manga {
     private int id;
     String name;
     private ArrayList<String> imgs;
+    String thumb;
+    Title title;
 }
 

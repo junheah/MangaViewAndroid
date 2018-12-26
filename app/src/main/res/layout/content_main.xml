@@ -12,7 +12,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="준비중\n검색 메뉴를 사용해 주세요"
+        android:text="개발중..\n이 탭에서 열람한 만화는\n사용자 기록에 저장되지 않습니다"
         android:textAlignment="center"
         android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
