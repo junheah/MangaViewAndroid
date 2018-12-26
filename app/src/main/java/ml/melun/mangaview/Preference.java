@@ -22,6 +22,8 @@ public class Preference {
     static ArrayList<Title> favorite;
     static SharedPreferences.Editor prefsEditor;
     static JSONObject pagebookmark;
+    static String homeDir;
+    static Boolean volumeControl;
 
 
     //Offline manga has id of -1
@@ -38,11 +40,33 @@ public class Preference {
             if(recent==null) recent = new ArrayList<>();
             favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<Title>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
+            homeDir = sharedPref.getString("homeDir","/sdcard/MangaView/saved");
+            volumeControl = sharedPref.getBoolean("volumeControl",false);
             //pagebookmark = {id:page}
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static Boolean getVolumeControl() {
+        return volumeControl;
+    }
+
+    public static void setVolumeControl(Boolean volumeControl) {
+        Preference.volumeControl = volumeControl;
+        prefsEditor.putBoolean("volumeControl", volumeControl);
+        prefsEditor.commit();
+    }
+
+    public static String getHomeDir() {
+        return homeDir;
+    }
+
+    public static void setHomeDir(String homeDir) {
+        Preference.homeDir = homeDir;
+        prefsEditor.putString("homeDir", homeDir);
+        prefsEditor.commit();
     }
 
     public void addRecent(Title title){
@@ -67,6 +91,11 @@ public class Preference {
     }
     public int getBookmark(){
         return recent.get(0).getBookmark();
+    }
+
+    public void resetBookmark(){
+        recent = new ArrayList<>();
+        writeRecent();
     }
 
     private void writeRecent(){
@@ -100,6 +129,12 @@ public class Preference {
     }
     public void removeViewerBookmark(int id){
         pagebookmark.remove(id+"");
+        writeViewerBookmark();
+    }
+    public void resetViewerBookmark(){
+        try {
+            pagebookmark = new JSONObject("{}");
+        }catch (Exception e){}
         writeViewerBookmark();
     }
     private void writeViewerBookmark(){

@@ -30,6 +30,9 @@
                 android:id="@+id/nav_kakao"
                 android:title="오픈 카톡 참가" />
             <item
+                android:id="@+id/nav_settings"
+                android:title="설정"/>
+            <item
                 android:id="@+id/nav_version_display"
                 android:title="Version"
                 android:enabled="false"/>
