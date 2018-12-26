@@ -17,6 +17,14 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     Context mcontext;
     List<String> tags;
     LayoutInflater mInflater;
+    private tagOnclick mClickListener;
+
+    public TagAdapter(Context m, List<String> t) {
+        mcontext = m;
+        tags = t;
+        this.mInflater = LayoutInflater.from(m);
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -26,7 +34,7 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        tagHolder h =(tagHolder) holder;
+        tagHolder h = (tagHolder) holder;
         h.tag.setText(tags.get(position));
     }
 
@@ -35,10 +43,8 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return tags.size();
     }
 
-    public TagAdapter(Context m, List<String> t) {
-        mcontext = m;
-        tags = t;
-        this.mInflater = LayoutInflater.from(m);
+    public void setClickListener(tagOnclick t){
+        this.mClickListener = t;
     }
 
     class tagHolder extends RecyclerView.ViewHolder{
@@ -46,10 +52,16 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         public tagHolder(View itemView) {
             super(itemView);
             tag = itemView.findViewById(R.id.tag);
+            tag.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClickListener.onClick(tags.get(getAdapterPosition()));
+                }
+            });
         }
     }
     public interface tagOnclick{
-        void onClick(View view);
+        void onClick(String tag);
     }
 }
 

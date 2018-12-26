@@ -27,6 +27,7 @@ import java.util.Arrays;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.EpisodeAdapter;
+import ml.melun.mangaview.adapter.TagAdapter;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
@@ -181,6 +182,12 @@ public class EpisodeActivity extends AppCompatActivity {
                     download.putExtra("list",mangas.toString());
                     download.putExtra("name",title.getName());
                     startActivity(download);
+                }
+            });
+            episodeAdapter.setTagClickListener(new TagAdapter.tagOnclick() {
+                @Override
+                public void onClick(String tag) {
+                    System.out.println("ppppppp"+tag);
                 }
             });
 

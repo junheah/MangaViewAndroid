@@ -183,6 +183,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.mClickListener = itemClickListener;
     }
 
+    public void setTagClickListener(TagAdapter.tagOnclick t){
+        ta.setClickListener(t);
+    }
+
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);

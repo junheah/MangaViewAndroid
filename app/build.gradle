@@ -15,17 +15,14 @@ android {
         versionCode code
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        setProperty("archivesBaseName", "mangaViewer_$code")
     }
-
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    task('increaseVersionCode') << {
-        setUpdatedVersionCode()
     }
     buildToolsVersion '27.0.3'
 }

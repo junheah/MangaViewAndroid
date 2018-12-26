@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     ProgressDialog pd;
     Search search;
     TitleAdapter searchAdapter, recentAdapter, favoriteAdapter;
-    RecyclerView searchResult, recentResult, favoriteResult, savedList;
+    RecyclerView searchResult, recentResult, favoriteResult, savedList, mainRecycler;
     private int version;
     int mode = 0;
     int selectedPosition=-1;
@@ -295,6 +295,9 @@ public class MainActivity extends AppCompatActivity
         //set views according to selected layout
         if(id==R.id.nav_main){
             //main content
+            mainRecycler = this.findViewById(R.id.main_recycler);
+
+
         }else if(id==R.id.nav_search){
             //search content
             noresult = this.findViewById(R.id.noResult);
@@ -308,7 +311,7 @@ public class MainActivity extends AppCompatActivity
                         String query = searchBox.getText().toString();
                         if(query.length()>0) {
                             searchManga sm = new searchManga();
-                            sm.execute(query);
+                            sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,query);
                         }
                         return true;
                     }
@@ -533,4 +536,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
+
 }
