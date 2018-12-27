@@ -25,7 +25,8 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Downloader {
-    static String homeDir = "/sdcard/MangaView/saved/";
+    static Preference p;
+    static String homeDir;
     static downloadTitle dt;
     static ArrayList<Title> titles;
     static Listener listener;
@@ -36,11 +37,13 @@ public class Downloader {
         //static
         if(titles==null) titles = new ArrayList<>();
         if(dt==null) dt = new downloadTitle();
+        if(p==null) p = new Preference();
     }
     //pocess status no.
     // 0=idle 1=downloading
 
     public void queueTitle(Title title){
+        homeDir = p.getHomeDir();
         if(dt.getStatus() == AsyncTask.Status.PENDING || dt.getStatus() == AsyncTask.Status.FINISHED) {
             dt = new downloadTitle();
             titles.add(title);
@@ -72,7 +75,7 @@ public class Downloader {
                 float stepSize = 1000/mangas.size();
                 for(int h=0;h<mangas.size();h++) {
                     Manga target = mangas.get(h);
-                    String targetDir = homeDir + filterString(title.getName())+'/'+filterString(target.getName())+'/';
+                    String targetDir = homeDir+'/' + filterString(title.getName())+'/'+filterString(target.getName())+'/';
                     File dir = new File(targetDir);
                     if (!dir.exists()) dir.mkdirs();
                     target.fetch();
@@ -132,6 +135,10 @@ public class Downloader {
     public void setStatus(){ if(listener!=null) listener.processStatus(status); }
     public void sendQueue(int n){ if(listener!=null) listener.changeNo(n); }
     public void sendProgress(int p){ if(listener!=null) listener.setProgress(p);}
+
+    public static int getStatus() {
+        return status;
+    }
 
     public void addListener(Listener l){
         listener = l;

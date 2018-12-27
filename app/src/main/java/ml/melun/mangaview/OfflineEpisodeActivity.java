@@ -33,8 +33,8 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
         title = i.getStringExtra("title");
         homeDirStr = i.getStringExtra("homeDir");
         offEpsList = findViewById(R.id.offEpsiodeList);
-        System.out.println(homeDirStr+title+'/');
-        episodeFiles = new File(homeDirStr+title).listFiles();
+        System.out.println(homeDirStr+'/'+title+'/');
+        episodeFiles = new File(homeDirStr+'/'+title).listFiles();
         Arrays.sort(episodeFiles);
         for(File f:episodeFiles){
             if(f.isDirectory()) {

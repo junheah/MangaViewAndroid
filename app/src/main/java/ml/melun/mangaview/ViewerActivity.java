@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -45,6 +46,9 @@ public class ViewerActivity extends AppCompatActivity {
     AppBarLayout appbar;
     int viewerBookmark;
     String[] localImgs;
+    Boolean volumeControl;
+    int pageForVolume;
+    LinearLayoutManager manager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +57,7 @@ public class ViewerActivity extends AppCompatActivity {
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         p = new Preference();
+        volumeControl = p.getVolumeControl();
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             Intent intent = getIntent();
@@ -66,7 +71,7 @@ public class ViewerActivity extends AppCompatActivity {
             strip = this.findViewById(R.id.strip);
 
             //ImageZoomHelper.setViewZoomable(findViewById(R.id.strip));
-            LinearLayoutManager manager = new LinearLayoutManager(this);
+            manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             if(localImgs!=null||id<0){
@@ -118,6 +123,23 @@ public class ViewerActivity extends AppCompatActivity {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if(volumeControl && (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN ||keyCode==KeyEvent.KEYCODE_VOLUME_UP)) {
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
+                if(viewerBookmark<stripAdapter.getItemCount()-1)strip.scrollToPosition(++viewerBookmark);
+            } else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                if(viewerBookmark>0) strip.scrollToPosition(--viewerBookmark);
+            }
+            if(viewerBookmark>0&&viewerBookmark<stripAdapter.getItemCount()-1) {
+                p.setViewerBookmark(id, viewerBookmark);
+            }else p.removeViewerBookmark(id);
+            if(toolbarshow) toggleToolbar();
+            return true;
+        }
+        return super.onKeyDown(keyCode,event);
     }
 
     public void toggleToolbar(){

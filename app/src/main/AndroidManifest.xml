@@ -28,7 +28,9 @@
             android:name=".ViewerActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".DownloadActivity" />
-        <activity android:name=".OfflineEpisodeActivity"></activity>
+        <activity android:name=".OfflineEpisodeActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".FolderSelectActivity"></activity>
     </application>
 
 </manifest>

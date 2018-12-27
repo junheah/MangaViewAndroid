@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity
     ProgressBar dlBar;
     ConstraintLayout dlStatContainer;
     MenuItem versionItem;
-    String homeDirStr ="/sdcard/MangaView/saved/";
+    String homeDirStr;
 
 
     @Override
@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity
         //SharedPreferences preferences = getSharedPreferences("mangaView",MODE_PRIVATE);
         p = new Preference();
         p.init(this);
+        homeDirStr = p.getHomeDir();
         dlStatContainer = findViewById(R.id.statusContainter);
         //code starts here
         downloader = new Downloader();
@@ -282,6 +283,10 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(getApplicationContext(), "오픈톡방에 참가합니다.", Toast.LENGTH_LONG).show();
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
                 startActivity(browserIntent);
+            }else if(id==R.id.nav_settings){
+                Intent settingIntent = new Intent(context, SettingsActivity.class);
+                startActivity(settingIntent);
+                return true;
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
@@ -470,6 +475,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
     public ArrayList<String> getSavedTitles(){
+        homeDirStr = p.getHomeDir();
         ArrayList<String> savedTitles = new ArrayList<>();
         File homeDir = new File(homeDirStr);
         if(homeDir.exists()){
