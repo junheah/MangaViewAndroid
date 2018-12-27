@@ -302,6 +302,7 @@ public class MainActivity extends AppCompatActivity
         //set views according to selected layout
         if(id==R.id.nav_main){
             //main content
+            // 최근 추가된 만화
             mainRecycler = this.findViewById(R.id.main_recycler);
             mainAdapter mainadapter = new mainAdapter(context);
             mainRecycler.setLayoutManager(new LinearLayoutManager(context));
@@ -320,10 +321,15 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 @Override
-                public void clickedTag() {
+                public void clickedTag(String t) {
 
                 }
             });
+            // 이름 별
+
+            // 발행 별
+            // 태그 별
+
 
         }else if(id==R.id.nav_search){
             //search content
