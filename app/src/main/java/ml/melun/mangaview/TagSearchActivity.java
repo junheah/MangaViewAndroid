@@ -4,12 +4,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import org.w3c.dom.Text;
 
@@ -24,12 +28,12 @@ public class TagSearchActivity extends AppCompatActivity {
     int mode;
     String query;
     TitleAdapter adapter;
-    Boolean searching = false;
     Context context;
     ProgressDialog pd;
     Search search;
     TextView noresult;
     Preference p;
+    SwipyRefreshLayout swipe;
 
 
     @Override
@@ -45,38 +49,30 @@ public class TagSearchActivity extends AppCompatActivity {
         query = i.getStringExtra("query");
         mode = i.getIntExtra("mode",0);
         p = new Preference();
+        swipe = this.findViewById(R.id.tagSearchSwipe);
 
         getSupportActionBar().setTitle("검색 결과");
         adapter = new TitleAdapter(context);
         search  = new Search(query, mode);
+        swipe.setRefreshing(true);
         searchManga sm = new searchManga();
-        sm.execute();
+        sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        searchResult.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if(!searchResult.canScrollVertically(1)&&!searching){
-                    if(!search.isLast()){
-                        searching = true;
-                        System.out.println("ddddddddddddddddddsearch");
-                        searchManga sm = new searchManga();
-                        sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    }
-                }
+            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+                if(!search.isLast()) {
+                    searchManga sm = new searchManga();
+                    sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else swipe.setRefreshing(false);
             }
         });
-
     }
 
 
     private class searchManga extends AsyncTask<String,String,String> {
         protected void onPreExecute(){
             super.onPreExecute();
-            pd = new ProgressDialog(context);
-            pd.setMessage("로드중");
-            pd.setCancelable(false);
-            pd.show();
         }
         protected String doInBackground(String... params){
             search.fetch();
@@ -113,11 +109,7 @@ public class TagSearchActivity extends AppCompatActivity {
             }else{
                 noresult.setVisibility(View.VISIBLE);
             }
-
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
-            searching = false;
+            swipe.setRefreshing(false);
         }
     }
 

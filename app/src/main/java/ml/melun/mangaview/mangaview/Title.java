@@ -35,6 +35,19 @@ public class Title {
             for(Element e:items.select("div.slot")) {
                 eps.add(new Manga(Integer.parseInt(e.attr("data-wrid")),e.selectFirst("div.title").text()));
             }
+            if(thumb.length()==0){
+                thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
+                System.out.println("ppppp"+thumb);
+            }
+            if(author.length()==0){
+                author = items.selectFirst("a.author").text();
+            }
+            if(tags.size()==0){
+                for(Element e:items.selectFirst("div.manga-tags").select("a.tag")){
+                    tags.add(e.text());
+                }
+            }
+
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -43,6 +56,23 @@ public class Title {
         if(author==null) return "";
         return author;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public void setThumb(String thumb) {
+        this.thumb = thumb;
+    }
+
     public int getEpsCount(){ return eps.size();}
     public int getBookmark(){ return bookmark;}
     public void setBookmark(int id){bookmark = id;}

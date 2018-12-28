@@ -54,4 +54,7 @@ dependencies {
     //    implementation 'com.otaliastudios:zoomlayout:1.4.0'
     //    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     implementation 'com.android.support:cardview-v7:27.1.1'
+    implementation 'com.github.omadahealth:swipy:1.2.3@aar'
+    implementation 'jp.wasabeef:glide-transformations:4.0.1'
+    implementation 'com.lyft:scissors:1.1.1'
 }

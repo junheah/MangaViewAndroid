@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -24,6 +29,7 @@ import android.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.EpisodeAdapter;
@@ -43,20 +49,27 @@ public class ViewerActivity extends AppCompatActivity {
     android.support.v7.widget.Toolbar toolbar;
     boolean toolbarshow = true;
     TextView toolbarTitle;
-    AppBarLayout appbar;
+    AppBarLayout appbar, appbarBottom;
     int viewerBookmark;
     String[] localImgs;
     Boolean volumeControl;
     int pageForVolume;
     LinearLayoutManager manager;
+    ImageButton next, prev;
+    ArrayList<Manga> eps;
+    int index;
+    Title title;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
+        next = this.findViewById(R.id.toolbar_next);
+        prev = this.findViewById(R.id.toolbar_previous);
         toolbar = this.findViewById(R.id.viewerToolbar);
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         p = new Preference();
+        appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         volumeControl = p.getVolumeControl();
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
@@ -76,6 +89,7 @@ public class ViewerActivity extends AppCompatActivity {
             strip.setLayoutManager(manager);
             if(localImgs!=null||id<0){
                 //load local imgs
+                appbarBottom.setVisibility(View.GONE);
                 ArrayList<String> imgs = new ArrayList<>(Arrays.asList(localImgs));
                 stripAdapter = new StripAdapter(context,imgs);
                 strip.setAdapter(stripAdapter);
@@ -86,10 +100,8 @@ public class ViewerActivity extends AppCompatActivity {
                     }
                 });
             }else {
-                loadImages l = new loadImages();
-                l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                refresh();
             }
-
             strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -120,10 +132,59 @@ public class ViewerActivity extends AppCompatActivity {
                     super.onScrolled(recyclerView, dx, dy);
                 }
             });
+
+
         }catch(Exception e){
             e.printStackTrace();
         }
+//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long idLong) {
+//                index = position;
+//                manga = eps.get(index);
+//                id = manga.getId();
+//                toolbarTitle.setText(manga.getName());
+//                refresh();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(index>0) {
+                    index--;
+                    manga = eps.get(index);
+                    id = manga.getId();
+                    refresh();
+                }
+            }
+        });
+        prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(index<eps.size()-1) {
+                    index++;
+                    manga = eps.get(index);
+                    id = manga.getId();
+                    refresh();
+                }
+            }
+        });
+
     }
+
+    void refresh(){
+        if(stripAdapter!=null) stripAdapter.removeAll();
+        loadImages l = new loadImages();
+        l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
     {
@@ -146,10 +207,12 @@ public class ViewerActivity extends AppCompatActivity {
         //attrs = getWindow().getAttributes();
         if(toolbarshow){
             appbar.animate().translationY(-appbar.getHeight());
+            appbarBottom.animate().translationY(+appbarBottom.getHeight());
             toolbarshow=false;
         }
         else {
             appbar.animate().translationY(0);
+            appbarBottom.animate().translationY(0);
             toolbarshow=true;
         }
         //getWindow().setAttributes(attrs);
@@ -158,10 +221,6 @@ public class ViewerActivity extends AppCompatActivity {
 //    public boolean dispatchTouchEvent(MotionEvent ev) {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
 //    }
-
-    public void setPosition(int i){
-
-    }
 
     private class loadImages extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
@@ -194,9 +253,32 @@ public class ViewerActivity extends AppCompatActivity {
                     toggleToolbar();
                 }
             });
+            eps = manga.getEps();
+            List<String> epsName = new ArrayList<>();
+            for(int i=0; i<eps.size(); i++){
+                if(eps.get(i).getId()==id){
+                    index = i;
+                }
+                epsName.add(eps.get(i).getName());
+            }
+            toolbarTitle.setText(manga.getName());
+
+//            spinner.setAdapter(new ArrayAdapter<String>(context,
+//                    android.R.layout.simple_spinner_item, epsName));
+            //set button enabled
+            if(index==0) next.setEnabled(false);
+            else next.setEnabled(true);
+            if(index==eps.size()-1) prev.setEnabled(false);
+            else prev.setEnabled(true);
+
+            strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
+            if(title == null) title = manga.getTitle();
+            p.addRecent(title);
+            p.setBookmark(id);
             if (pd.isShowing()) {
                 pd.dismiss();
             }
+
         }
     }
 }

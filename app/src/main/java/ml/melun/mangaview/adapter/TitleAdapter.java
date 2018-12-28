@@ -52,6 +52,10 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         mData.addAll(t);
         notifyItemRangeInserted(oSize,t.size());
     }
+    public void moveItemToTop(int from){
+        mData.add(0, mData.get(from));
+        mData.remove(from+1);
+    }
 
     // binds the data to the TextView in each row
     @Override

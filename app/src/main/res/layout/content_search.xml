@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/searchResult" />
+        app:layout_constraintTop_toTopOf="@+id/searchSwipe" />
 
     <EditText
         android:id="@+id/searchBox"
@@ -40,12 +40,19 @@
         tools:text="검색어" />
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/searchResult"
+    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:scrollbars="vertical"
+        android:id="@+id/searchSwipe"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchBox" />
+        app:layout_constraintTop_toBottomOf="@+id/searchBox"
+        app:srl_direction="bottom">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/searchResult"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            />
+    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 </android.support.constraint.ConstraintLayout>

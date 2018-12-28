@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 import ml.melun.mangaview.mangaview.Title;
 
@@ -77,6 +78,13 @@ public class Preference {
         } else recent.add(0,title);
         writeRecent();
     }
+    public void updateRecentData(String name, String thumb, String author,List<String> tags){
+        recent.get(0).setName(name);
+        recent.get(0).setThumb(thumb);
+        recent.get(0).setAuthor(author);
+        recent.get(0).setTags(tags);
+        writeRecent();
+    }
     private int getIndexOf(Title title){
         String targetT = title.getName();
         for(int i=0; i<recent.size(); i++){
@@ -84,6 +92,7 @@ public class Preference {
         }
         return -1;
     }
+
     public void setBookmark(int id){
         //always set bookmark at index 0 : to view episodes, title has to be added to index 0
         recent.get(0).setBookmark(id);

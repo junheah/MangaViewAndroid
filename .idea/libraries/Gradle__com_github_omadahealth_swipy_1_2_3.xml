@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.omadahealth:swipy-1.2.3">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/swipy-1.2.3.aar/ab2eaab1060e10490ca670f5a9d14387/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/swipy-1.2.3.aar/ab2eaab1060e10490ca670f5a9d14387/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.omadahealth/swipy/1.2.3/26d3335b8535ec1d652d6134fa8df2b9d3169877/swipy-1.2.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

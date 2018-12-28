@@ -12,6 +12,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
+import jp.wasabeef.glide.transformations.CropTransformation;
 import ml.melun.mangaview.R;
 
 public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
@@ -26,6 +27,10 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.imgs = data;
+    }
+    public void removeAll(){
+        imgs.clear();
+        notifyDataSetChanged();
     }
 
     // inflates the row layout from xml when needed

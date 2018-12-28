@@ -34,20 +34,70 @@ public class Manga {
         return thumb;
     }
 
+
     public void fetch() {
         imgs = new ArrayList<>();
+        eps = new ArrayList<>();
         int tries = 0;
         //get images
         while(imgs.size()==0 && tries < 3) {
-            String imgStr =findImgStr("https://mangashow.me/bbs/board.php?bo_table=msm_manga&wr_id=" + id);
-            //get string inside double quotes : 1,3,5,7,9,...
-            if(imgStr!=null) {
-                String[] imgStrs = imgStr.split("\"");
-                //remove backslash
-                for (int i = 1; i < imgStrs.length; i += 2) {
-                    imgs.add(imgStrs[i].replace("\\",""));
+            HttpsURLConnection connection = null;
+            BufferedReader reader = null;
+            try {
+                URL url = new URL("https://mangashow.me/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                connection = (HttpsURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Accept-Encoding", "*");
+                connection.setRequestProperty("Accept", "*");
+                connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+                connection.connect();
+                InputStream stream = connection.getInputStream();
+                reader = new BufferedReader(new InputStreamReader(stream));
+                //StringBuffer buffer = new StringBuffer();
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    if(line.contains("var img_list")) {
+                        String imgStr = line;
+                        if(imgStr!=null) {
+                            String[] imgStrs = imgStr.split("\"");
+                            //remove backslash
+                            for (int i = 1; i < imgStrs.length; i += 2) {
+                                imgs.add(imgStrs[i].replace("\\",""));
+                            }
+                        }
+                    }else if(line.contains("var only_chapter")){
+                        String epsStr = line;
+                        String[] epsStrs = epsStr.split("\"");
+                        //remove backslash
+                        for (int i = 3; i < epsStrs.length; i += 4) {
+                            eps.add(new Manga(Integer.parseInt(epsStrs[i]),epsStrs[i-2]));
+                        }
+                    }else if(line.contains("<h1>")){
+                        name = line.substring(line.indexOf('>')+1,line.lastIndexOf('<')-1);
+                    }else if(line.contains("manga_name") && title==null){
+                        String name = line.substring(line.indexOf("manga_name")+11,line.indexOf("class=")-2);
+                        title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>());
+                    }
+                    if(imgs.size()>0 && eps.size()>0) break;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+
+            //get string inside double quotes : 1,3,5,7,9,...
+
             /*
             Document items = Jsoup.connect("https://mangashow.me/bbs/board.php?bo_table=msm_manga&wr_id=" + id)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
@@ -65,56 +115,11 @@ public class Manga {
 
     }
 
-    public String findImgStr(String urlin){
-        HttpsURLConnection connection = null;
-        BufferedReader reader = null;
-        try {
-            URL url = new URL(urlin);
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept-Encoding", "*");
-            connection.setRequestProperty("Accept", "*");
-            connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-            connection.connect();
-            InputStream stream = connection.getInputStream();
-            reader = new BufferedReader(new InputStreamReader(stream));
-            //StringBuffer buffer = new StringBuffer();
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                if(line.contains("var img_list")) break;
-            }
-            return line;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+    public ArrayList<Manga> getEps() {
+        return eps;
     }
-    private void fetchTitle(){
-        try {
-            Document doc = Jsoup.connect("https://mangashow.me/bbs/board.php?bo_table=msm_manga&wr_id=" + id)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-                    .get();
-            String encoded = doc.selectFirst("div.more-btn").selectFirst("a").attr("href");
-            String t_str = java.net.URLDecoder.decode(encoded, "UTF-8");
-            title = new Title(t_str.substring(t_str.lastIndexOf('=') + 1),"","",new ArrayList<String>());
-        }catch (Exception e){
 
-        }
-    }
-    public Title getTitle(){
-        //if(title!=null) return title;
-        fetchTitle();
+    public Title getTitle() {
         return title;
     }
 
@@ -134,6 +139,7 @@ public class Manga {
 
     private int id;
     String name;
+    ArrayList<Manga> eps;
     private ArrayList<String> imgs;
     String thumb;
     Title title;

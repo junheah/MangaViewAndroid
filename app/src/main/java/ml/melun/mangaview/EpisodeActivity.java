@@ -193,7 +193,8 @@ public class EpisodeActivity extends AppCompatActivity {
                     startActivity(i);
                 }
             });
-
+            //if title data is updated, add data
+            p.updateRecentData(title.getName(),title.getThumb(),title.getAuthor(),title.getTags());
             if (pd.isShowing()) {
                 pd.dismiss();
             }

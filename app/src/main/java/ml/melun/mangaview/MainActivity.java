@@ -37,6 +37,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -80,11 +83,11 @@ public class MainActivity extends AppCompatActivity
     TextView statNo, statName, stat;
     int dlstatus=0;
     int dlProgress;
-    Boolean searching = false;
     ProgressBar dlBar;
     ConstraintLayout dlStatContainer;
     MenuItem versionItem;
     String homeDirStr;
+    SwipyRefreshLayout swipe;
 
 
     @Override
@@ -121,6 +124,7 @@ public class MainActivity extends AppCompatActivity
         refreshViews(R.id.nav_main);
         versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
         versionItem.setTitle("v."+version);
+        swipe = this.findViewById(R.id.searchSwipe);
         //check for permission
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -354,7 +358,7 @@ public class MainActivity extends AppCompatActivity
                     if(event.getAction()==KeyEvent.ACTION_DOWN && keyCode ==KeyEvent.KEYCODE_ENTER){
                         String query = searchBox.getText().toString();
                         if(query.length()>0) {
-                            searching = true;
+                            swipe.setRefreshing(true);
                             if(searchAdapter != null) searchAdapter.removeAll();
                             else searchAdapter = new TitleAdapter(context);
                             search = new Search(query,0);
@@ -366,17 +370,16 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }
             });
-            searchResult.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
                 @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-                    if(!searchResult.canScrollVertically(1)&&!searching){
-                        if(!search.isLast()){
-                            searching = true;
-                            System.out.println("ddddddddddddddddddsearch");
+                public void onRefresh(SwipyRefreshLayoutDirection direction) {
+                    if(search==null) swipe.setRefreshing(false);
+                    else {
+                        if (!search.isLast()) {
                             searchManga sm = new searchManga();
                             sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        }
+                        } else swipe.setRefreshing(false);
                     }
                 }
             });
@@ -457,6 +460,7 @@ public class MainActivity extends AppCompatActivity
                     break;
                 case 2:
                     //recent result
+                    recentAdapter.moveItemToTop(selectedPosition);
                     for(int i= selectedPosition; i>0; i--){
                         recentAdapter.notifyItemMoved(i,i-1);
                     }
@@ -469,10 +473,6 @@ public class MainActivity extends AppCompatActivity
     private class searchManga extends AsyncTask<String,String,String>{
         protected void onPreExecute(){
             super.onPreExecute();
-            pd = new ProgressDialog(MainActivity.this);
-            pd.setMessage("로드중");
-            pd.setCancelable(false);
-            pd.show();
         }
         protected String doInBackground(String... params){
             search.fetch();
@@ -510,10 +510,7 @@ public class MainActivity extends AppCompatActivity
                 noresult.setVisibility(View.VISIBLE);
             }
 
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
-            searching = false;
+            swipe.setRefreshing(false);
         }
     }
     public ArrayList<String> getSavedTitles(){
