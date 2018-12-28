@@ -1,5 +1,6 @@
 package ml.melun.mangaview.adapter;
 
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -13,23 +14,36 @@ import java.util.List;
 
 import ml.melun.mangaview.R;
 
-public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     Context mcontext;
     List<String> tags;
     LayoutInflater mInflater;
     private tagOnclick mClickListener;
+    int type;
 
-    public TagAdapter(Context m, List<String> t) {
+    public mainTagAdapter(Context m, List<String> t , int type) {
         mcontext = m;
         tags = t;
+        this.type = type;
         this.mInflater = LayoutInflater.from(m);
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.item_tag, parent, false);
+        View view = null;
+        switch (type){
+            case 0:
+                view = mInflater.inflate(R.layout.item_main_tag, parent, false);
+                break;
+            case 1:
+                view = mInflater.inflate(R.layout.item_main_name, parent, false);
+                break;
+            case 2:
+                view = mInflater.inflate(R.layout.item_main_tag, parent, false);
+                break;
+        }
         return new tagHolder(view);
     }
 
@@ -53,18 +67,28 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         CardView card;
         public tagHolder(View itemView) {
             super(itemView);
-            card = itemView.findViewById(R.id.tagCard);
-            tag = itemView.findViewById(R.id.tag);
+            switch (type){
+                case 0:
+                case 2:
+                    card = itemView.findViewById(R.id.mainTagCard);
+                    tag = itemView.findViewById(R.id.main_tag_text);
+                    break;
+                case 1:
+                    card = itemView.findViewById(R.id.mainNameCard);
+                    tag = itemView.findViewById(R.id.main_name_text);
+                    break;
+            }
+
             card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onClick(tags.get(getAdapterPosition()));
+                    mClickListener.onClick(getAdapterPosition(), tags.get(getAdapterPosition()));
                 }
             });
         }
     }
     public interface tagOnclick{
-        void onClick(String tag);
+        void onClick(int position, String value);
     }
 }
 

@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity
     TextView statNo, statName, stat;
     int dlstatus=0;
     int dlProgress;
+    Boolean searching = false;
     ProgressBar dlBar;
     ConstraintLayout dlStatContainer;
     MenuItem versionItem;
@@ -92,15 +93,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "준비중", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -322,13 +314,31 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void clickedTag(String t) {
+                    System.out.println(t);
+                    Intent i = new Intent(context, TagSearchActivity.class);
+                    i.putExtra("query",t);
+                    i.putExtra("mode",2);
+                    startActivity(i);
+                }
 
+                @Override
+                public void clickedName(int t) {
+                    System.out.println(t);
+                    Intent i = new Intent(context, TagSearchActivity.class);
+                    i.putExtra("query",t+"");
+                    i.putExtra("mode",3);
+                    startActivity(i);
+                }
+
+                @Override
+                public void clickedRelease(int t) {
+                    System.out.println(t);
+                    Intent i = new Intent(context, TagSearchActivity.class);
+                    i.putExtra("query",t+"");
+                    i.putExtra("mode",4);
+                    startActivity(i);
                 }
             });
-            // 이름 별
-
-            // 발행 별
-            // 태그 별
 
 
         }else if(id==R.id.nav_search){
@@ -337,23 +347,43 @@ public class MainActivity extends AppCompatActivity
             searchBox = this.findViewById(R.id.searchBox);
             searchResult = this.findViewById(R.id.searchResult);
             searchResult.setLayoutManager(new LinearLayoutManager(this));
+
             searchBox.setOnKeyListener(new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
                     if(event.getAction()==KeyEvent.ACTION_DOWN && keyCode ==KeyEvent.KEYCODE_ENTER){
                         String query = searchBox.getText().toString();
                         if(query.length()>0) {
+                            searching = true;
+                            if(searchAdapter != null) searchAdapter.removeAll();
+                            else searchAdapter = new TitleAdapter(context);
+                            search = new Search(query,0);
                             searchManga sm = new searchManga();
-                            sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,query);
+                            sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         }
                         return true;
                     }
                     return false;
                 }
             });
+            searchResult.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if(!searchResult.canScrollVertically(1)&&!searching){
+                        if(!search.isLast()){
+                            searching = true;
+                            System.out.println("ddddddddddddddddddsearch");
+                            searchManga sm = new searchManga();
+                            sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        }
+                    }
+                }
+            });
         }else if(id==R.id.nav_recent){
             recentResult = this.findViewById(R.id.recentList);
-            recentAdapter = new TitleAdapter(context,p.getRecent());
+            recentAdapter = new TitleAdapter(context);
+            recentAdapter.addData(p.getRecent());
             recentResult.setLayoutManager(new LinearLayoutManager(this));
             recentResult.setAdapter(recentAdapter);
             recentAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
@@ -374,7 +404,8 @@ public class MainActivity extends AppCompatActivity
             });
         }else if(id==R.id.nav_favorite){
             favoriteResult = this.findViewById(R.id.favoriteList);
-            favoriteAdapter = new TitleAdapter(context,p.getFavorite());
+            favoriteAdapter = new TitleAdapter(context);
+            favoriteAdapter.addData(p.getFavorite());
             favoriteResult.setLayoutManager(new LinearLayoutManager(this));
             favoriteResult.setAdapter(favoriteAdapter);
             favoriteAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
@@ -444,40 +475,45 @@ public class MainActivity extends AppCompatActivity
             pd.show();
         }
         protected String doInBackground(String... params){
-            String query = params[0];
-            search = new Search(query);
-            ArrayList<Title> titles = search.getResult();
-            searchAdapter = new TitleAdapter(context, titles);
+            search.fetch();
             return null;
         }
         @Override
         protected void onPostExecute(String res){
             super.onPostExecute(res);
-            searchResult.setAdapter(searchAdapter);
+            if(searchAdapter.getItemCount()==0) {
+                searchAdapter.addData(search.getResult());
+                searchResult.setAdapter(searchAdapter);
+                searchAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
+                    @Override
+                    public void onItemClick(View v, int position) {
+                        // start intent : Episode viewer
+                        Title selected = searchAdapter.getItem(position);
+                        p.addRecent(selected);
+                        System.out.println("onItemClick position: " + position);
+
+                        Intent episodeView = new Intent(context, EpisodeActivity.class);
+                        episodeView.putExtra("title", selected.getName());
+                        episodeView.putExtra("thumb", selected.getThumb());
+                        episodeView.putExtra("author", selected.getAuthor());
+                        episodeView.putExtra("tags", new ArrayList<String>(selected.getTags()));
+                        startActivity(episodeView);
+                    }
+                });
+            }else{
+                searchAdapter.addData(search.getResult());
+            }
+
             if(searchAdapter.getItemCount()>0) {
                 noresult.setVisibility(View.GONE);
             }else{
                 noresult.setVisibility(View.VISIBLE);
             }
-            searchAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
-                @Override
-                public void onItemClick(View v, int position) {
-                    // start intent : Episode viewer
-                    Title selected = searchAdapter.getItem(position);
-                    p.addRecent(selected);
-                    System.out.println("onItemClick position: " + position);
 
-                    Intent episodeView= new Intent(context, EpisodeActivity.class);
-                    episodeView.putExtra("title",selected.getName());
-                    episodeView.putExtra("thumb",selected.getThumb());
-                    episodeView.putExtra("author",selected.getAuthor());
-                    episodeView.putExtra("tags",new ArrayList<String>(selected.getTags()));
-                    startActivity(episodeView);
-                }
-            });
             if (pd.isShowing()){
                 pd.dismiss();
             }
+            searching = false;
         }
     }
     public ArrayList<String> getSavedTitles(){

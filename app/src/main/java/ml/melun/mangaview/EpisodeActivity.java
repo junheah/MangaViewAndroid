@@ -187,7 +187,10 @@ public class EpisodeActivity extends AppCompatActivity {
             episodeAdapter.setTagClickListener(new TagAdapter.tagOnclick() {
                 @Override
                 public void onClick(String tag) {
-                    System.out.println("ppppppp"+tag);
+                    Intent i = new Intent(context, TagSearchActivity.class);
+                    i.putExtra("query",tag);
+                    i.putExtra("mode",2);
+                    startActivity(i);
                 }
             });
 

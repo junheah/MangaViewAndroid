@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Title;
@@ -28,10 +29,16 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
 
     // data is passed into the constructor
-    public TitleAdapter(Context context, ArrayList<Title> data) {
+    public TitleAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
-        this.mData = data;
+        this.mData = new ArrayList<>();
+    }
+    public void removeAll(){
+        int originSize = mData.size();
+        mData.clear();
+        System.out.println("pppppppppp"+mData.size());
+        notifyItemRangeRemoved(0,originSize);
     }
 
     // inflates the row layout from xml when needed
@@ -39,6 +46,11 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.item_title, parent, false);
         return new ViewHolder(view);
+    }
+    public void addData(List<Title> t){
+        int oSize = mData.size();
+        mData.addAll(t);
+        notifyItemRangeInserted(oSize,t.size());
     }
 
     // binds the data to the TextView in each row

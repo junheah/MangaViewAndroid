@@ -30,7 +30,8 @@
         <activity android:name=".DownloadActivity" />
         <activity android:name=".OfflineEpisodeActivity" />
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".FolderSelectActivity"></activity>
+        <activity android:name=".FolderSelectActivity" />
+        <activity android:name=".TagSearchActivity"></activity>
     </application>
 
 </manifest>

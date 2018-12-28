@@ -105,11 +105,17 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            System.out.println("ppppppppppppppppnewfetchworks!");
+            System.out.println("fetch update success");
             //notifyDataSetChanged();
-            notifyItemChanged(0);
-            notifyItemRangeInserted(1,mData.size()-1);
-            loaded = true;
+            if(mData.size()==0){
+                mData.add(new Manga(0,"결과 없음"));
+                notifyItemChanged(0);
+                loaded = false;
+            }else {
+                notifyItemChanged(0);
+                notifyItemRangeInserted(1, mData.size() - 1);
+                loaded = true;
+            }
         }
     }
 }
