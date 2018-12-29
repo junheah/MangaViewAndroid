@@ -3,6 +3,7 @@ package ml.melun.mangaview.adapter;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Updated;
@@ -29,6 +31,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     LayoutInflater mInflater;
     Boolean loaded = false;
     onclick monclick;
+    Boolean dark;
 
     public mainUpdatedAdapter(Context c) {
         super();
@@ -38,6 +41,8 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.mInflater = LayoutInflater.from(c);
         Fetch fetch = new Fetch();
         fetch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        dark = new Preference().getDarkTheme();
+
         //fetch data with async
         //data initialize
     }
@@ -54,6 +59,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         viewHolder h = (viewHolder) holder;
         h.title.setText(mData.get(position).getName());
         Glide.with(context).load(mData.get(position).getThumb()).into(h.thumb);
+
     }
 
 
@@ -82,6 +88,9 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 }
             });
+            if(dark){
+                card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
+            }
 
         }
     }

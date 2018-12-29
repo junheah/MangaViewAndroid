@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -27,6 +28,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     TypedValue outValue;
     Boolean[] selected;
     ItemClickListener mClickListener;
+    Boolean dark;
 
     // data is passed into the constructor
     public SelectEpisodeAdapter(Context context, JSONArray list) {
@@ -36,6 +38,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         outValue = new TypedValue();
         selected = new Boolean[list.length()];
         Arrays.fill(selected,Boolean.FALSE);
+        dark = new Preference().getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
     }
 
@@ -54,8 +57,12 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
             String episode = new JSONObject(data.getString(position)).getString("name");
             h.episode.setText(episode);
             if (selected[position]) {
-                h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
-            } else h.itemView.setBackgroundResource(R.drawable.item_bg);
+                if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
+                else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
+            } else {
+                if(dark)h.itemView.setBackgroundResource(R.drawable.button_bg);
+                else h.itemView.setBackgroundResource(R.drawable.item_bg);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

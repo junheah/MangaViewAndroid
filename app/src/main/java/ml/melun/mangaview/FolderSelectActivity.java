@@ -27,9 +27,10 @@ public class FolderSelectActivity extends AppCompatActivity {
     ActionBar actionBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder_select);
-        p= new Preference();
         currentDir = p.getHomeDir();
         dirList = this.findViewById(R.id.dirList);
         select = this.findViewById(R.id.dirSelectBtn);

@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#000000</color>
-    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimaryDark">#d8d8d8</color>
     <color name="colorAccent">#af56ff</color>
     <color name="selected">#e1d3ef</color>
+    <color name="selectedDark">#362d3f</color>
+    <color name="colorText">#121212</color>
+    <color name="colorBackground">#ffffff</color>
+
+
+    <color name="colorDarkBackground">#2c2c2c</color>
+    <color name="nav_enable">#a2a2a2</color>
+    <color name="nav_disable">#565656</color>
+    <color name="colorDarkWindowBackground">#222222</color>
+    <color name="colorDarkItem">#333333</color>
 </resources>

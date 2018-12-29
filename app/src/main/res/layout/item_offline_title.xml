@@ -14,16 +14,17 @@
     <!--android:background="?android:attr/selectableItemBackground">-->
 
     <android.support.v7.widget.CardView
+        android:id="@+id/offlineTitleCard"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         app:cardCornerRadius="0dp"
         app:cardElevation="4dp"
         android:layout_margin="5dp"
-        android:background="?android:attr/selectableItemBackground">
+        android:foreground="?android:attr/selectableItemBackground">
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?android:attr/selectableItemBackground">
+            android:foreground="?android:attr/selectableItemBackground">
 
             <TextView
                 android:id="@+id/off_title"

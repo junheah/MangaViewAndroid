@@ -23,14 +23,17 @@ public class SettingsActivity extends AppCompatActivity {
     //
     Downloader d;
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd;
-    Switch s_volumeKey_switch;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll;
+    Switch s_volumeKey_switch, s_dark_switch, s_scroll_switch;
     Preference p;
+    Boolean dark;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        dark = p.getDarkTheme();
+        if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        p = new Preference();
         d = new Downloader();
         context = this;
         s_setHomeDir = this.findViewById(R.id.setting_dir);
@@ -73,8 +76,9 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                     }
                 };
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder;
+                if(dark) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+                else builder = new AlertDialog.Builder(context);
                 builder.setMessage("최근 본 만화, 북마크 및 모든 만화 열람 기록이 사라집니다. 계속 하시겠습니까?\n(좋아요, 저장한 만화 제외)").setPositiveButton("네", dialogClickListener)
                         .setNegativeButton("아니오", dialogClickListener).show();
             }
@@ -92,6 +96,38 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 p.setVolumeControl(isChecked);
+            }
+        });
+
+        s_dark = this.findViewById(R.id.setting_dark);
+        s_dark_switch = this.findViewById(R.id.setting_dark_switch);
+        s_dark_switch.setChecked(p.getDarkTheme());
+        s_dark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_dark_switch.toggle();
+            }
+        });
+        s_dark_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setDarkTheme(isChecked);
+            }
+        });
+
+        s_scroll = this.findViewById(R.id.setting_scroll);
+        s_scroll_switch = this.findViewById(R.id.setting_scroll_switch);
+        s_scroll_switch.setChecked(p.getScrollViewer());
+        s_scroll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_scroll_switch.toggle();
+            }
+        });
+        s_scroll_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setScrollViewer(isChecked);
             }
         });
     }

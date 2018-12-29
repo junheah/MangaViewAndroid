@@ -25,12 +25,16 @@
         <Button
             android:layout_weight="1"
             android:id="@+id/dl_btn"
+            android:background="@drawable/button_bg"
+            android:foreground="?android:attr/selectableItemBackground"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="선택 다운로드"
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
+            android:background="@drawable/button_bg"
+            android:foreground="?android:attr/selectableItemBackground"
             android:layout_weight="1"
             android:id="@+id/dl_all_btn"
             android:layout_width="wrap_content"

@@ -49,8 +49,13 @@ public class EpisodeActivity extends AppCompatActivity {
     FloatingActionButton upBtn;
     Boolean upBtnVisible = false;
     ArrayList<Manga> episodes;
+    Boolean dark;
+    Intent viewer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        dark = p.getDarkTheme();
+        if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
@@ -59,7 +64,6 @@ public class EpisodeActivity extends AppCompatActivity {
                 ,intent.getStringExtra("thumb")
                 ,intent.getStringExtra("author")
                 ,intent.getStringArrayListExtra("tags"));
-        p = new Preference();
         bookmarkId = p.getBookmark();
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
@@ -78,7 +82,8 @@ public class EpisodeActivity extends AppCompatActivity {
     private class getEpisodes extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
-            pd = new ProgressDialog(EpisodeActivity.this);
+            if(dark) pd = new ProgressDialog(EpisodeActivity.this, R.style.darkDialog);
+            else pd = new ProgressDialog(EpisodeActivity.this);
             pd.setMessage("로드중");
             pd.setCancelable(false);
             pd.show();
@@ -154,8 +159,10 @@ public class EpisodeActivity extends AppCompatActivity {
                     // start intent : Episode viewer
                     Manga selected = episodeAdapter.getItem(position);
                     System.out.println(selected.getId());
-                    Intent viewer = new Intent(context, ViewerActivity.class);
+
                     p.setBookmark(selected.getId());
+                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
+                    else viewer = new Intent(context, ViewerActivity2.class);
                     viewer.putExtra("id", selected.getId());
                     viewer.putExtra("name",selected.getName());
                     startActivity(viewer);

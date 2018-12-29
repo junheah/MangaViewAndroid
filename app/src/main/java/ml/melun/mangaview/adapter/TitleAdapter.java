@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -26,11 +28,13 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
+    Boolean dark = false;
 
 
 
     // data is passed into the constructor
     public TitleAdapter(Context context) {
+        dark = new Preference().getDarkTheme();
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
@@ -71,7 +75,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.name.setText(title);
         holder.author.setText(author);
         holder.tags.setText(tags);
-        Glide.with(mainContext).load(thumb).into(holder.thumb);
+        if(thumb.length()>1) Glide.with(mainContext).load(thumb).into(holder.thumb);
     }
 
     // total number of rows
@@ -82,11 +86,12 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder{
         TextView name;
         ImageView thumb;
         TextView author;
         TextView tags;
+        CardView card;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -94,14 +99,18 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             thumb = itemView.findViewById(R.id.Thumb);
             author =itemView.findViewById(R.id.TitleAuthor);
             tags = itemView.findViewById(R.id.TitleTag);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null){
-                mClickListener.onItemClick(view, getAdapterPosition());
+            card = itemView.findViewById(R.id.titleCard);
+            if(dark){
+                card.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
             }
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClickListener.onItemClick(getAdapterPosition());
+                }
+            });
+
+
         }
     }
 
@@ -117,6 +126,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(int position);
     }
 }

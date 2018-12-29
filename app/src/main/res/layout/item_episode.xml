@@ -5,12 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@drawable/item_bg">
-
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?android:attr/selectableItemBackground">
+    android:background="@drawable/item_bg"
+    android:foreground="?android:attr/selectableItemBackground">
         <TextView
             android:id="@+id/episode"
             android:layout_width="match_parent"
@@ -24,5 +20,4 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

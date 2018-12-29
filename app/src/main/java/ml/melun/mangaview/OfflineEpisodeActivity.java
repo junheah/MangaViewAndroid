@@ -22,8 +22,11 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
     ArrayList<String> episodes;
     Context context;
     File[] episodeFiles;
+    Preference p;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_episode);
 

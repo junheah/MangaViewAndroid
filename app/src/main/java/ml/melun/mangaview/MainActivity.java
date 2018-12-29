@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -88,14 +90,23 @@ public class MainActivity extends AppCompatActivity
     MenuItem versionItem;
     String homeDirStr;
     SwipyRefreshLayout swipe;
+    Boolean dark = p.getDarkTheme();
+    Intent viewer;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        p.init(this);
+        dark = p.getDarkTheme();
+        if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.colorDark));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -105,6 +116,23 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        if(dark) {
+            int[][] states = new int[][]{
+                    new int[]{-android.R.attr.state_enabled}, // disabled
+                    new int[]{android.R.attr.state_enabled}, // enabled
+                    new int[]{-android.R.attr.state_checked}, // unchecked
+                    new int[]{android.R.attr.state_pressed}  // pressed
+            };
+
+            int[] colors = new int[]{
+                    Color.parseColor("#565656"),
+                    Color.parseColor("#a2a2a2"),
+                    Color.WHITE,
+                    Color.WHITE
+            };
+            ColorStateList colorStateList = new ColorStateList(states, colors);
+            navigationView.setItemTextColor(colorStateList);
+        }
 
         //custom var init starts here
         contentHolder = this.findViewById(R.id.contentHolder);
@@ -115,8 +143,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
         //SharedPreferences preferences = getSharedPreferences("mangaView",MODE_PRIVATE);
-        p = new Preference();
-        p.init(this);
+
         homeDirStr = p.getHomeDir();
         dlStatContainer = findViewById(R.id.statusContainter);
         //code starts here
@@ -310,7 +337,8 @@ public class MainActivity extends AppCompatActivity
                     //getTitleFromManga intentStarter = new getTitleFromManga();
                     //intentStarter.execute(m);
 
-                    Intent viewer = new Intent(context, ViewerActivity.class);
+                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
+                    else viewer = new Intent(context, ViewerActivity2.class);
                     viewer.putExtra("name",m.getName());
                     viewer.putExtra("id",m.getId());
                     startActivity(viewer);
@@ -391,7 +419,7 @@ public class MainActivity extends AppCompatActivity
             recentResult.setAdapter(recentAdapter);
             recentAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                 @Override
-                public void onItemClick(View v, int position) {
+                public void onItemClick(int position) {
                     // start intent : Episode viewer
                     Title selected = recentAdapter.getItem(position);
                     selectedPosition = position;
@@ -413,7 +441,7 @@ public class MainActivity extends AppCompatActivity
             favoriteResult.setAdapter(favoriteAdapter);
             favoriteAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                 @Override
-                public void onItemClick(View v, int position) {
+                public void onItemClick(int position) {
                     // start intent : Episode viewer
                     Title selected = favoriteAdapter.getItem(position);
                     p.addRecent(selected);
@@ -486,7 +514,7 @@ public class MainActivity extends AppCompatActivity
                 searchResult.setAdapter(searchAdapter);
                 searchAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
-                    public void onItemClick(View v, int position) {
+                    public void onItemClick(int position) {
                         // start intent : Episode viewer
                         Title selected = searchAdapter.getItem(position);
                         p.addRecent(selected);
@@ -564,7 +592,8 @@ public class MainActivity extends AppCompatActivity
     private class updateCheck extends AsyncTask<Void, Integer, Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
-            pd = new ProgressDialog(MainActivity.this);
+            if(dark) pd = new ProgressDialog(MainActivity.this, R.style.darkDialog);
+            else pd = new ProgressDialog(MainActivity.this);
             pd.setMessage("업데이트 확인중");
             pd.setCancelable(false);
             pd.show();
@@ -609,7 +638,8 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pd = new ProgressDialog(MainActivity.this);
+            if(dark) pd = new ProgressDialog(MainActivity.this, R.style.darkDialog);
+            else pd = new ProgressDialog(MainActivity.this);
             pd.setMessage("로드중");
             pd.setCancelable(false);
             pd.show();

@@ -31,7 +31,8 @@
         <activity android:name=".OfflineEpisodeActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".FolderSelectActivity" />
-        <activity android:name=".TagSearchActivity"></activity>
+        <activity android:name=".TagSearchActivity" />
+        <activity android:name=".ViewerActivity2"></activity>
     </application>
 
 </manifest>

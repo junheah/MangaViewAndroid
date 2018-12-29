@@ -3,6 +3,7 @@ package ml.melun.mangaview.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 
 public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -21,12 +23,14 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     LayoutInflater mInflater;
     private tagOnclick mClickListener;
     int type;
+    Boolean dark;
 
     public mainTagAdapter(Context m, List<String> t , int type) {
         mcontext = m;
         tags = t;
         this.type = type;
         this.mInflater = LayoutInflater.from(m);
+        dark = new Preference().getDarkTheme();
     }
 
     @NonNull
@@ -77,6 +81,9 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     card = itemView.findViewById(R.id.mainNameCard);
                     tag = itemView.findViewById(R.id.main_name_text);
                     break;
+            }
+            if(dark){
+                card.setBackgroundColor(ContextCompat.getColor(mcontext, R.color.colorDarkBackground));
             }
 
             card.setOnClickListener(new View.OnClickListener() {

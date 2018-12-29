@@ -63,8 +63,11 @@ public class ViewerActivity extends AppCompatActivity {
     Title title;
     Boolean autoCut = false;
     ArrayList<String> imgs;
+    Boolean dark;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        dark = p.getDarkTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
         next = this.findViewById(R.id.toolbar_next);
@@ -72,7 +75,6 @@ public class ViewerActivity extends AppCompatActivity {
         toolbar = this.findViewById(R.id.viewerToolbar);
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
-        p = new Preference();
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         volumeControl = p.getVolumeControl();
         cut = this.findViewById(R.id.autoCutBtn);
@@ -88,7 +90,6 @@ public class ViewerActivity extends AppCompatActivity {
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
 
-            //ImageZoomHelper.setViewZoomable(findViewById(R.id.strip));
             manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
@@ -246,7 +247,8 @@ public class ViewerActivity extends AppCompatActivity {
     private class loadImages extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
-            pd = new ProgressDialog(context);
+            if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
+            else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
             pd.setCancelable(false);
             pd.show();

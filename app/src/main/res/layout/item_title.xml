@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.LinearLayoutCompat
-    android:id="@+id/title_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,16 +14,16 @@
         <!--android:background="?android:attr/selectableItemBackground">-->
 
         <android.support.v7.widget.CardView
+            android:id="@+id/titleCard"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             app:cardCornerRadius="10dp"
             app:cardElevation="5dp"
             android:layout_margin="8dp"
-            android:background="?android:attr/selectableItemBackground">
+            android:foreground="?android:attr/selectableItemBackground">
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?android:attr/selectableItemBackground">
+                android:layout_height="match_parent">
 
                 <ImageView
                     android:id="@+id/Thumb"

@@ -38,6 +38,8 @@ public class TagSearchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_search);
         context = this;
@@ -48,7 +50,6 @@ public class TagSearchActivity extends AppCompatActivity {
         Intent i = getIntent();
         query = i.getStringExtra("query");
         mode = i.getIntExtra("mode",0);
-        p = new Preference();
         swipe = this.findViewById(R.id.tagSearchSwipe);
 
         getSupportActionBar().setTitle("검색 결과");
@@ -86,7 +87,7 @@ public class TagSearchActivity extends AppCompatActivity {
                 searchResult.setAdapter(adapter);
                 adapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
-                    public void onItemClick(View v, int position) {
+                    public void onItemClick(int position) {
                         // start intent : Episode viewer
                         Title selected = adapter.getItem(position);
                         p.addRecent(selected);

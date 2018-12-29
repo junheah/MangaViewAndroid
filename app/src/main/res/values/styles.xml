@@ -4,7 +4,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
@@ -12,6 +12,26 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+    <style name="AppThemeDarkNoTitle" parent="AppThemeDark">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="AppThemeDark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorHint">#a6a6a6</item>
+        <item name="android:editTextColor">#FFFFFF</item>
+        <item name="android:itemBackground">@color/colorDarkWindowBackground</item>
+        <item name="android:windowBackground">@color/colorDarkWindowBackground</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="darkDialog" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:background">#202020</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

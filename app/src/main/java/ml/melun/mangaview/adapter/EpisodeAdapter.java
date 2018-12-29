@@ -41,6 +41,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     Title header;
     TagAdapter ta;
     LinearLayoutManager lm;
+    Boolean dark;
 
     // data is passed into the constructor
     public EpisodeAdapter(Context context, ArrayList<Manga> data, Title title) {
@@ -49,6 +50,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.mData = data;
         this.header = title;
         outValue = new TypedValue();
+        dark = new Preference().getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         if(title.getTags()!=null) {
             ta = new TagAdapter(context, title.getTags());
@@ -96,9 +98,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             String episode = mData.get(position).getName();
             h.episode.setText(episode);
             if (position == bookmark) {
-                h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
+                if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
+                else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
             }
-            else h.itemView.setBackgroundResource(R.drawable.item_bg);
+            else{
+                if(dark) h.itemView.setBackgroundResource(R.drawable.button_bg);
+                else h.itemView.setBackgroundResource(R.drawable.item_bg);
+            }
         }
     }
 
@@ -158,6 +164,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 h_tags.setLayoutManager(lm);
                 h_tags.setAdapter(ta);
             }
+            if(dark) h_tags.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
         }
     }
 

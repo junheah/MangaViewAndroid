@@ -25,7 +25,8 @@ public class Preference {
     static JSONObject pagebookmark;
     static String homeDir;
     static Boolean volumeControl;
-
+    static Boolean darkTheme;
+    static Boolean scrollViewer;
 
     //Offline manga has id of -1
     public Preference(){
@@ -45,9 +46,31 @@ public class Preference {
             volumeControl = sharedPref.getBoolean("volumeControl",false);
             //pagebookmark = {id:page}
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
+            darkTheme = sharedPref.getBoolean("darkTheme", false);
+            scrollViewer = sharedPref.getBoolean("scrollViewer",true);
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static Boolean getScrollViewer() {
+        return scrollViewer;
+    }
+
+    public static void setScrollViewer(Boolean scrollViewer) {
+        Preference.scrollViewer = scrollViewer;
+        prefsEditor.putBoolean("scrollViewer", scrollViewer);
+        prefsEditor.commit();
+    }
+
+    public static Boolean getDarkTheme() {
+        return darkTheme;
+    }
+
+    public static void setDarkTheme(Boolean darkTheme) {
+        Preference.darkTheme = darkTheme;
+        prefsEditor.putBoolean("darkTheme", darkTheme);
+        prefsEditor.commit();
     }
 
     public static Boolean getVolumeControl() {

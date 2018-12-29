@@ -27,9 +27,14 @@ public class DownloadActivity extends AppCompatActivity {
     JSONArray episodes;
     SelectEpisodeAdapter adapter;
     RecyclerView eplist;
+    Preference p;
+    Boolean dark;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        dark = p.getDarkTheme();
+        if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
         eplist = this.findViewById(R.id.dl_eplist);
@@ -94,8 +99,9 @@ public class DownloadActivity extends AppCompatActivity {
                 }
             }
         };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder;
+        if(dark) builder = new AlertDialog.Builder(this,R.style.darkDialog);
+        else builder = new AlertDialog.Builder(this);
         builder.setMessage(title.getName()+ " 을(를) 다운로드 하시겠습니까?\n[ 총 "+title.getEpsCount()+"화 ]").setPositiveButton("네", dialogClickListener)
                 .setNegativeButton("아니오", dialogClickListener).show();
     }
