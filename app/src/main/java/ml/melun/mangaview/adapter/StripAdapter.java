@@ -9,11 +9,13 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SizeReadyCallback;
 
 import java.util.ArrayList;
 
-import jp.wasabeef.glide.transformations.CropTransformation;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.transformation.MangaCrop;
+import ml.melun.mangaview.transformation.MangaCrop2;
 
 public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
 
@@ -21,12 +23,14 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     private LayoutInflater mInflater;
     private Context mainContext;
     private StripAdapter.ItemClickListener mClickListener;
+    Boolean autoCut = false;
 
     // data is passed into the constructor
-    public StripAdapter(Context context, ArrayList<String> data) {
+    public StripAdapter(Context context, ArrayList<String> data, Boolean cut) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.imgs = data;
+        autoCut = cut;
     }
     public void removeAll(){
         imgs.clear();
@@ -42,19 +46,28 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
 
     // binds the data to the TextView in each row
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        String image = imgs.get(position);
-        //set image to holder view
-        Glide.with(mainContext)
-                .load(image)
-                .apply(new RequestOptions().dontTransform().placeholder(R.drawable.placeholder))
+    public void onBindViewHolder(final ViewHolder holder, int pos) {
+        if(autoCut) {
+            int position = pos / 2;
+            int type = pos % 2;
+            String image = imgs.get(position);
+            //set image to holder view
+            Glide.with(mainContext)
+                    .load(image)
+                    .apply(new RequestOptions().bitmapTransform(new MangaCrop(holder.frame.getContext(), type)).placeholder(R.drawable.placeholder))
+                    .into(holder.frame);
+        }
+        else Glide.with(mainContext)
+                .load(imgs.get(pos))
+                .apply(new RequestOptions().placeholder(R.drawable.placeholder))
                 .into(holder.frame);
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return imgs.size();
+        if(autoCut) return imgs.size()*2;
+        else return imgs.size();
     }
 
 

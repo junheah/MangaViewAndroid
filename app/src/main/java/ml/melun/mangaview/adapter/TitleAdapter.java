@@ -28,6 +28,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private Context mainContext;
 
 
+
     // data is passed into the constructor
     public TitleAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);

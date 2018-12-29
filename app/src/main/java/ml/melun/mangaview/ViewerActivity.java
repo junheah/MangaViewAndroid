@@ -19,6 +19,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -56,9 +57,12 @@ public class ViewerActivity extends AppCompatActivity {
     int pageForVolume;
     LinearLayoutManager manager;
     ImageButton next, prev;
+    Button cut;
     ArrayList<Manga> eps;
     int index;
     Title title;
+    Boolean autoCut = false;
+    ArrayList<String> imgs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +75,7 @@ public class ViewerActivity extends AppCompatActivity {
         p = new Preference();
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         volumeControl = p.getVolumeControl();
+        cut = this.findViewById(R.id.autoCutBtn);
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             Intent intent = getIntent();
@@ -90,8 +95,8 @@ public class ViewerActivity extends AppCompatActivity {
             if(localImgs!=null||id<0){
                 //load local imgs
                 appbarBottom.setVisibility(View.GONE);
-                ArrayList<String> imgs = new ArrayList<>(Arrays.asList(localImgs));
-                stripAdapter = new StripAdapter(context,imgs);
+                imgs = new ArrayList<>(Arrays.asList(localImgs));
+                stripAdapter = new StripAdapter(context,imgs, autoCut);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                     public void onItemClick(View v, int position) {
@@ -109,14 +114,19 @@ public class ViewerActivity extends AppCompatActivity {
                     if(newState==RecyclerView.SCROLL_STATE_IDLE){
                         int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
                         int lastVisible = ((LinearLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
-                        if(firstVisible==0) p.removeViewerBookmark(id);
-                        if(lastVisible==stripAdapter.getItemCount()-1) {
-                            p.removeViewerBookmark(id);
+
+                        if(!autoCut) {
+                            //bookmark handler
+                            if (firstVisible == 0) p.removeViewerBookmark(id);
+                            if (lastVisible == stripAdapter.getItemCount() - 1) {
+                                p.removeViewerBookmark(id);
+                            }
+                            if (firstVisible != viewerBookmark) {
+                                p.setViewerBookmark(id, firstVisible);
+                                viewerBookmark = firstVisible;
+                            }
                         }
-                        if(firstVisible!=viewerBookmark) {
-                            p.setViewerBookmark(id,firstVisible);
-                            viewerBookmark=firstVisible;
-                        }
+
                         if((!strip.canScrollVertically(1))&&!toolbarshow){
                             toggleToolbar();
                         }
@@ -132,26 +142,9 @@ public class ViewerActivity extends AppCompatActivity {
                     super.onScrolled(recyclerView, dx, dy);
                 }
             });
-
-
         }catch(Exception e){
             e.printStackTrace();
         }
-//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long idLong) {
-//                index = position;
-//                manga = eps.get(index);
-//                id = manga.getId();
-//                toolbarTitle.setText(manga.getName());
-//                refresh();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
 
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,6 +166,12 @@ public class ViewerActivity extends AppCompatActivity {
                     id = manga.getId();
                     refresh();
                 }
+            }
+        });
+        cut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleAutoCut();
             }
         });
 
@@ -218,6 +217,28 @@ public class ViewerActivity extends AppCompatActivity {
         //getWindow().setAttributes(attrs);
     }
 
+    public void toggleAutoCut(){
+        if(autoCut){
+            autoCut = false;
+            cut.setBackgroundResource(R.drawable.button_bg);
+            viewerBookmark = p.getViewerBookmark(id);
+        } else{
+            autoCut = true;
+            cut.setBackgroundResource(R.drawable.button_bg_on);
+            viewerBookmark = 0;
+        }
+        stripAdapter = new StripAdapter(context,imgs, autoCut);
+        strip.setAdapter(stripAdapter);
+        stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
+            public void onItemClick(View v, int position) {
+                // show/hide toolbar
+                toggleToolbar();
+            }
+        });
+
+        strip.getLayoutManager().scrollToPosition(0);
+    }
+
 //    public boolean dispatchTouchEvent(MotionEvent ev) {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
 //    }
@@ -233,8 +254,8 @@ public class ViewerActivity extends AppCompatActivity {
 
         protected Integer doInBackground(Void... params) {
             manga.fetch();
-            ArrayList<String> imgs = manga.getImgs();
-            stripAdapter = new StripAdapter(context,imgs);
+            imgs = manga.getImgs();
+            stripAdapter = new StripAdapter(context,imgs, autoCut);
             return null;
         }
 
@@ -271,7 +292,8 @@ public class ViewerActivity extends AppCompatActivity {
             if(index==eps.size()-1) prev.setEnabled(false);
             else prev.setEnabled(true);
 
-            strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
+            if(!autoCut) strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
+
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
             p.setBookmark(id);
