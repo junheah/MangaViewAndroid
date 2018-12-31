@@ -51,6 +51,26 @@ public class EpisodeActivity extends AppCompatActivity {
     ArrayList<Manga> episodes;
     Boolean dark;
     Intent viewer;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode== RESULT_OK && requestCode==0){
+            int newid = data.getIntExtra("id", -1);
+            if(newid>-1 && newid!=bookmarkId){
+                bookmarkId = newid;
+                //find index of bookmark;
+                for(int i=0; i< episodes.size(); i++){
+                    if(episodes.get(i).getId()==bookmarkId){
+                        bookmarkIndex=i;
+                        break;
+                    }
+                }
+                episodeAdapter.setBookmark(bookmarkIndex);
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference();
@@ -78,6 +98,17 @@ public class EpisodeActivity extends AppCompatActivity {
         getEpisodes g = new getEpisodes();
         g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if(requestCode==0){
+//            if(bookmarkId != p.getBookmark()){
+//                bookmarkId = p.getBookmark();
+//                episodeAdapter.setBookmark(bookmarkId);
+//            }
+//        }
+//    }
 
     private class getEpisodes extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
@@ -165,7 +196,7 @@ public class EpisodeActivity extends AppCompatActivity {
                     else viewer = new Intent(context, ViewerActivity2.class);
                     viewer.putExtra("id", selected.getId());
                     viewer.putExtra("name",selected.getName());
-                    startActivity(viewer);
+                    startActivityForResult(viewer,0);
                 }
                 @Override
                 public void onStarClick(View v){

@@ -23,6 +23,7 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
     Context context;
     File[] episodeFiles;
     Preference p;
+    Intent viewer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference();
@@ -59,7 +60,8 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
                 for(int i=0; i<imgs.length;i++){
                     imgPaths[i] = imgs[i].getAbsolutePath();
                 }
-                Intent viewer = new Intent(context, ViewerActivity.class);
+                if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
+                else viewer = new Intent(context, ViewerActivity2.class);
                 viewer.putExtra("name",ep);
                 viewer.putExtra("id",-1);
                 viewer.putExtra("localImgs",imgPaths);

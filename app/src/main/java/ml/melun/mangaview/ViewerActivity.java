@@ -64,6 +64,7 @@ public class ViewerActivity extends AppCompatActivity {
     Boolean autoCut = false;
     ArrayList<String> imgs;
     Boolean dark;
+    Intent result;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference();
@@ -89,13 +90,13 @@ public class ViewerActivity extends AppCompatActivity {
             manga = new Manga(id, name);
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
-
             manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             if(localImgs!=null||id<0){
                 //load local imgs
                 appbarBottom.setVisibility(View.GONE);
+
                 imgs = new ArrayList<>(Arrays.asList(localImgs));
                 stripAdapter = new StripAdapter(context,imgs, autoCut);
                 strip.setAdapter(stripAdapter);
@@ -116,16 +117,18 @@ public class ViewerActivity extends AppCompatActivity {
                         int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
                         int lastVisible = ((LinearLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
 
-                        if(!autoCut) {
-                            //bookmark handler
-                            if (firstVisible == 0) p.removeViewerBookmark(id);
-                            if (lastVisible == stripAdapter.getItemCount() - 1) {
-                                p.removeViewerBookmark(id);
-                            }
-                            if (firstVisible != viewerBookmark) {
-                                p.setViewerBookmark(id, firstVisible);
-                                viewerBookmark = firstVisible;
-                            }
+                        if(autoCut){
+                            firstVisible /=2;
+                            lastVisible /=2;
+                        }
+                        //bookmark handler
+                        if (firstVisible == 0) p.removeViewerBookmark(id);
+                        if (lastVisible == stripAdapter.getItemCount() - 1) {
+                            p.removeViewerBookmark(id);
+                        }
+                        if (firstVisible != viewerBookmark) {
+                            p.setViewerBookmark(id, firstVisible);
+                            viewerBookmark = firstVisible;
                         }
 
                         if((!strip.canScrollVertically(1))&&!toolbarshow){
@@ -226,7 +229,7 @@ public class ViewerActivity extends AppCompatActivity {
         } else{
             autoCut = true;
             cut.setBackgroundResource(R.drawable.button_bg_on);
-            viewerBookmark = 0;
+            viewerBookmark = p.getViewerBookmark(id)*2;
         }
         stripAdapter = new StripAdapter(context,imgs, autoCut);
         strip.setAdapter(stripAdapter);
@@ -237,8 +240,10 @@ public class ViewerActivity extends AppCompatActivity {
             }
         });
 
-        strip.getLayoutManager().scrollToPosition(0);
+        strip.getLayoutManager().scrollToPosition(viewerBookmark);
     }
+
+
 
 //    public boolean dispatchTouchEvent(MotionEvent ev) {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
@@ -295,10 +300,14 @@ public class ViewerActivity extends AppCompatActivity {
             else prev.setEnabled(true);
 
             if(!autoCut) strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
+            else strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id)*2);
 
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
             p.setBookmark(id);
+            result = new Intent();
+            result.putExtra("id",id);
+            setResult(RESULT_OK, result);
             if (pd.isShowing()) {
                 pd.dismiss();
             }

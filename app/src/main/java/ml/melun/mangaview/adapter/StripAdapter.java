@@ -9,13 +9,11 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.SizeReadyCallback;
 
 import java.util.ArrayList;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.transformation.MangaCrop;
-import ml.melun.mangaview.transformation.MangaCrop2;
 
 public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
 
@@ -46,7 +44,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
 
     // binds the data to the TextView in each row
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int pos) {
+    public void onBindViewHolder(final ViewHolder holder, final int pos) {
         if(autoCut) {
             int position = pos / 2;
             int type = pos % 2;
@@ -54,12 +52,12 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
             //set image to holder view
             Glide.with(mainContext)
                     .load(image)
-                    .apply(new RequestOptions().bitmapTransform(new MangaCrop(holder.frame.getContext(), type)).placeholder(R.drawable.placeholder))
+                    .apply(new RequestOptions().dontTransform().bitmapTransform(new MangaCrop(holder.frame.getContext(), type)).placeholder(R.drawable.placeholder))
                     .into(holder.frame);
         }
         else Glide.with(mainContext)
                 .load(imgs.get(pos))
-                .apply(new RequestOptions().placeholder(R.drawable.placeholder))
+                .apply(new RequestOptions().dontTransform().placeholder(R.drawable.placeholder))
                 .into(holder.frame);
     }
 

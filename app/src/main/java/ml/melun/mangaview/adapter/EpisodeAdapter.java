@@ -182,7 +182,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void setBookmark(int i){
         //THIS SHOULD BE SET TO INDEX, NOT ID!
-        bookmark = i;
+        if(i!=bookmark){
+            int tmp = bookmark;
+            bookmark = i;
+            notifyItemChanged(tmp);
+            notifyItemChanged(bookmark);
+        }
     }
 
     // allows clicks events to be caught

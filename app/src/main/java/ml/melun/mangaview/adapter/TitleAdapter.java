@@ -75,7 +75,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.name.setText(title);
         holder.author.setText(author);
         holder.tags.setText(tags);
-        if(thumb.length()>1) Glide.with(mainContext).load(thumb).into(holder.thumb);
+        if(thumb.length()>1)Glide.with(mainContext).load(thumb).into(holder.thumb);
+        else holder.thumb.setImageBitmap(null);
     }
 
     // total number of rows
