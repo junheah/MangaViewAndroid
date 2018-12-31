@@ -31,12 +31,19 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/viewerSwipe"
+        app:srl_direction="top">
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/strip"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
             />
+    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/viewerAppbarBottom"

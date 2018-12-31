@@ -28,6 +28,9 @@ import android.widget.Toolbar;
 
 //import com.viven.imagezoom.ImageZoomHelper;
 
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,6 +68,7 @@ public class ViewerActivity extends AppCompatActivity {
     ArrayList<String> imgs;
     Boolean dark;
     Intent result;
+    SwipyRefreshLayout swipe;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference();
@@ -78,6 +82,7 @@ public class ViewerActivity extends AppCompatActivity {
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         volumeControl = p.getVolumeControl();
+        swipe = this.findViewById(R.id.viewerSwipe);
         cut = this.findViewById(R.id.autoCutBtn);
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
@@ -178,6 +183,12 @@ public class ViewerActivity extends AppCompatActivity {
                 toggleAutoCut();
             }
         });
+        swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+                refresh();
+            }
+        });
 
     }
 
@@ -252,6 +263,7 @@ public class ViewerActivity extends AppCompatActivity {
     private class loadImages extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
+
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
             else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
@@ -298,6 +310,7 @@ public class ViewerActivity extends AppCompatActivity {
             else next.setEnabled(true);
             if(index==eps.size()-1) prev.setEnabled(false);
             else prev.setEnabled(true);
+            swipe.setRefreshing(false);
 
             if(!autoCut) strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
             else strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id)*2);

@@ -336,6 +336,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             result.putExtra("id",id);
             setResult(RESULT_OK, result);
 
+
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
             p.setBookmark(id);
