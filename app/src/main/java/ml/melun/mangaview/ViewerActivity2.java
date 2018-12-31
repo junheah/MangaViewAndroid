@@ -72,6 +72,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         p = new Preference();
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
+        else setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer2);
 
