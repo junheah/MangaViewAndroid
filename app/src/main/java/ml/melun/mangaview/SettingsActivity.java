@@ -9,7 +9,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -23,8 +25,9 @@ public class SettingsActivity extends AppCompatActivity {
     //
     Downloader d;
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll;
-    Switch s_volumeKey_switch, s_dark_switch, s_scroll_switch;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll, s_reverse, s_dataSave, s_tab;
+    Spinner s_tab_spinner;
+    Switch s_volumeKey_switch, s_dark_switch, s_scroll_switch, s_reverse_switch, s_dataSave_switch;
     Preference p;
     Boolean dark;
     @Override
@@ -128,6 +131,54 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 p.setScrollViewer(isChecked);
+            }
+        });
+
+        s_reverse = this.findViewById(R.id.setting_reverse);
+        s_reverse_switch = this.findViewById(R.id.setting_reverse_switch);
+        s_reverse_switch.setChecked(p.getReverse());
+        s_reverse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_reverse_switch.toggle();
+            }
+        });
+        s_reverse_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setReverse(isChecked);
+            }
+        });
+
+        s_dataSave = this.findViewById(R.id.setting_dataSave);
+        s_dataSave_switch = this.findViewById(R.id.setting_dataSave_switch);
+        s_dataSave_switch.setChecked(p.getDataSave());
+        s_dataSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_dataSave_switch.toggle();
+            }
+        });
+        s_dataSave_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setDataSave(isChecked);
+            }
+        });
+
+        s_tab = this.findViewById(R.id.setting_startTab);
+        s_tab_spinner = this.findViewById(R.id.setting_startTab_spinner);
+        if(dark) s_tab_spinner.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        s_tab_spinner.setSelection(p.getStartTab());
+        s_tab_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                p.setStartTab(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //
             }
         });
     }

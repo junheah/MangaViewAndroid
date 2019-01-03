@@ -12,6 +12,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.transformation.MangaCrop;
 
@@ -22,6 +23,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     private Context mainContext;
     private StripAdapter.ItemClickListener mClickListener;
     Boolean autoCut = false;
+    Boolean reverse;
 
     // data is passed into the constructor
     public StripAdapter(Context context, ArrayList<String> data, Boolean cut) {
@@ -29,6 +31,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         mainContext = context;
         this.imgs = data;
         autoCut = cut;
+        reverse = new Preference().getReverse();
     }
     public void removeAll(){
         imgs.clear();
@@ -48,6 +51,10 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         if(autoCut) {
             int position = pos / 2;
             int type = pos % 2;
+            if(reverse){
+                if(type==0) type = 1;
+                else if(type == 1) type = 0;
+            }
             String image = imgs.get(position);
             //set image to holder view
             Glide.with(mainContext)

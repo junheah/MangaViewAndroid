@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,7 +53,21 @@ public class TagSearchActivity extends AppCompatActivity {
         mode = i.getIntExtra("mode",0);
         swipe = this.findViewById(R.id.tagSearchSwipe);
 
-        getSupportActionBar().setTitle("검색 결과");
+        ActionBar ab = getSupportActionBar();
+        switch(mode){
+            case 0:
+                break;
+            case 1:
+                ab.setTitle("작가: "+query);
+                break;
+            case 2:
+                ab.setTitle("태그: "+query);
+                break;
+            case 3:
+            case 4:
+                ab.setTitle("검색 결과");
+                break;
+        }
         adapter = new TitleAdapter(context);
         search  = new Search(query, mode);
         swipe.setRefreshing(true);

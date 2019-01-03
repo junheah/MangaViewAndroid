@@ -13,6 +13,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -66,6 +67,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Bitmap imgCache;
     Boolean toolbarshow =true;
     Intent result;
+    Boolean reverse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +85,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom2);
         volumeControl = p.getVolumeControl();
+        reverse = p.getReverse();
         frame = this.findViewById(R.id.viewer_image);
         pageBtn = this.findViewById(R.id.autoCutBtn);
         pageBtn.setText("");
@@ -175,7 +178,9 @@ public class ViewerActivity2 extends AppCompatActivity {
             type = 1;
             int width = imgCache.getWidth();
             int height = imgCache.getHeight();
-            frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
+
+            if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
+            else frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
         }else{
             //is single page OR unidentified
             //add page
@@ -196,7 +201,8 @@ public class ViewerActivity2 extends AppCompatActivity {
                             if(width>height){
                                 imgCache = bitmap;
                                 type=0;
-                                frame.setImageBitmap(Bitmap.createBitmap(bitmap,width/2,0,width/2,height));
+                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(bitmap,0,0,width/2,height));
+                                else frame.setImageBitmap(Bitmap.createBitmap(bitmap,width/2,0,width/2,height));
                             }else{
                                 type=-1;
                                 frame.setImageBitmap(bitmap);
@@ -216,7 +222,8 @@ public class ViewerActivity2 extends AppCompatActivity {
             type = 0;
             int width = imgCache.getWidth();
             int height = imgCache.getHeight();
-            frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
+            if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
+            else frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
         }else{
             //is single page OR unidentified
             //decrease page
@@ -237,7 +244,8 @@ public class ViewerActivity2 extends AppCompatActivity {
                             if(width>height){
                                 imgCache = bitmap;
                                 type=1;
-                                frame.setImageBitmap(Bitmap.createBitmap(bitmap,0,0,width/2,height));
+                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(bitmap, width/2, 0, width / 2, height));
+                                else frame.setImageBitmap(Bitmap.createBitmap(bitmap,0,0,width/2,height));
                             }else{
                                 type=-1;
                                 frame.setImageBitmap(bitmap);
@@ -268,7 +276,8 @@ public class ViewerActivity2 extends AppCompatActivity {
                         if(width>height){
                             imgCache = bitmap;
                             type=0;
-                            frame.setImageBitmap(Bitmap.createBitmap(bitmap,width/2,0,width/2,height));
+                            if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
+                            else frame.setImageBitmap(Bitmap.createBitmap(bitmap,width/2,0,width/2,height));
                         }else{
                             type=-1;
                             frame.setImageBitmap(bitmap);
@@ -295,6 +304,20 @@ public class ViewerActivity2 extends AppCompatActivity {
             toolbarshow=true;
         }
         //getWindow().setAttributes(attrs);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if(volumeControl && (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN ||keyCode==KeyEvent.KEYCODE_VOLUME_UP)) {
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
+                nextPage();
+            } else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                prevPage();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode,event);
     }
 
     private class loadImages extends AsyncTask<Void,Void,Integer> {

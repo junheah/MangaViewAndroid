@@ -31,7 +31,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     LayoutInflater mInflater;
     Boolean loaded = false;
     onclick monclick;
-    Boolean dark;
+    Boolean dark, save;
 
     public mainUpdatedAdapter(Context c) {
         super();
@@ -42,6 +42,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         Fetch fetch = new Fetch();
         fetch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         dark = new Preference().getDarkTheme();
+        save = new Preference().getDataSave();
 
         //fetch data with async
         //data initialize
@@ -58,8 +59,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         viewHolder h = (viewHolder) holder;
         h.title.setText(mData.get(position).getName());
-        Glide.with(context).load(mData.get(position).getThumb()).into(h.thumb);
-
+        if(!save) Glide.with(context).load(mData.get(position).getThumb()).into(h.thumb);
     }
 
 
@@ -83,7 +83,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(loaded){
+                    if(loaded ){
                         monclick.onclick(mData.get(getAdapterPosition()));
                     }
                 }

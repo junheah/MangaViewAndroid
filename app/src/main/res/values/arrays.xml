@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="searchModes">
+        <item>제목</item>
+        <item>작가</item>
+    </string-array>
+    <string-array name="tabs">
+        <item>메인</item>
+        <item>검색</item>
+        <item>최근에 본 만화</item>
+        <item>좋아요 한 만화</item>
+        <item>저장된 만화</item>
+    </string-array>
+</resources>

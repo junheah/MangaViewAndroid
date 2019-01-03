@@ -35,7 +35,6 @@ repositories {
 
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     implementation 'com.android.support:support-v4:27.1.1'
@@ -49,7 +48,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     //implementation 'com.github.okaybroda:ImageZoom:1.1.0'
     // implementation 'com.jsibbold:zoomage:1.2.0'
-    implementation files('C:/Users/junhea/Documents/GitHub/MangaViewAndroid/libs/jsoup-1.11.3.jar')
     implementation 'com.android.support:design:27.0.2'
     //    implementation 'com.otaliastudios:zoomlayout:1.4.0'
     //    implementation 'com.github.chrisbanes:PhotoView:2.0.0'
@@ -57,4 +55,5 @@ dependencies {
     implementation 'com.github.omadahealth:swipy:1.2.3@aar'
     //implementation 'jp.wasabeef:glide-transformations:4.0.1'
     //implementation 'com.lyft:scissors:1.1.1'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }

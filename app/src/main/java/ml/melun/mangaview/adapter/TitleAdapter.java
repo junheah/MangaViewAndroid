@@ -29,12 +29,14 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private ItemClickListener mClickListener;
     private Context mainContext;
     Boolean dark = false;
+    Boolean save;
 
 
 
     // data is passed into the constructor
     public TitleAdapter(Context context) {
         dark = new Preference().getDarkTheme();
+        save = new Preference().getDataSave();
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
@@ -75,7 +77,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.name.setText(title);
         holder.author.setText(author);
         holder.tags.setText(tags);
-        if(thumb.length()>1)Glide.with(mainContext).load(thumb).into(holder.thumb);
+        if(thumb.length()>1 && !save)Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
     }
 

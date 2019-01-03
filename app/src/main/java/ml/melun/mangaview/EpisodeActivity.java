@@ -199,7 +199,7 @@ public class EpisodeActivity extends AppCompatActivity {
                     startActivityForResult(viewer,0);
                 }
                 @Override
-                public void onStarClick(View v){
+                public void onStarClick(){
                     //star click handler
                     episodeAdapter.setFavorite(p.toggleFavorite(title,position));
                     if(favoriteResult){
@@ -208,8 +208,19 @@ public class EpisodeActivity extends AppCompatActivity {
                         setResult(RESULT_OK, resultIntent);
                     }
                 }
+
                 @Override
-                public void onDownloadClick(View v){
+                public void onAuthorClick() {
+                    if(title.getAuthor().length()>0){
+                        Intent i = new Intent(context, TagSearchActivity.class);
+                        i.putExtra("query",title.getAuthor());
+                        i.putExtra("mode",1);
+                        startActivity(i);
+                    }
+                }
+
+                @Override
+                public void onDownloadClick(){
                     //start download activity
                     Intent download = new Intent(context, DownloadActivity.class);
                     JSONArray mangas = new JSONArray();

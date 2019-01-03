@@ -42,6 +42,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     TagAdapter ta;
     LinearLayoutManager lm;
     Boolean dark;
+    Boolean save;
 
     // data is passed into the constructor
     public EpisodeAdapter(Context context, ArrayList<Manga> data, Title title) {
@@ -51,6 +52,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.header = title;
         outValue = new TypedValue();
         dark = new Preference().getDarkTheme();
+        save = new Preference().getDataSave();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         if(title.getTags()!=null) {
             ta = new TagAdapter(context, title.getTags());
@@ -89,7 +91,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h.h_author.setText(header.getAuthor());
             if(favorite) h.h_star.setImageResource(R.drawable.star_on);
             else h.h_star.setImageResource(R.drawable.star_off);
-            Glide.with(mainContext)
+            if(!save) Glide.with(mainContext)
                     .load(thumb)
                     .apply(new RequestOptions().dontTransform())
                     .into(h.h_thumb);
@@ -151,13 +153,19 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h_star.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onStarClick(v);
+                    mClickListener.onStarClick();
                 }
             });
             h_download.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onDownloadClick(v);
+                    mClickListener.onDownloadClick();
+                }
+            });
+            h_author.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClickListener.onAuthorClick();
                 }
             });
             if(ta!=null) {
@@ -202,7 +210,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);
-        void onStarClick(View view);
-        void onDownloadClick(View view);
+        void onStarClick();
+        void onDownloadClick();
+        void onAuthorClick();
     }
 }

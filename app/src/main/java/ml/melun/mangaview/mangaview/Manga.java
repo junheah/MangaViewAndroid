@@ -73,7 +73,7 @@ public class Manga {
                             eps.add(new Manga(Integer.parseInt(epsStrs[i]),epsStrs[i-2]));
                         }
                     }else if(line.contains("<h1>")){
-                        name = line.substring(line.indexOf('>')+1,line.lastIndexOf('<')-1);
+                        name = line.substring(line.indexOf('>')+1,line.lastIndexOf('<'));
                     }else if(line.contains("manga_name") && title==null){
                         String name = line.substring(line.indexOf("manga_name")+11,line.indexOf("class=")-2);
                         title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>());

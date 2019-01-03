@@ -35,6 +35,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity
     SwipyRefreshLayout swipe;
     Boolean dark = p.getDarkTheme();
     Intent viewer;
+    Spinner searchMode;
 
 
     @Override
@@ -148,7 +150,7 @@ public class MainActivity extends AppCompatActivity
         dlStatContainer = findViewById(R.id.statusContainter);
         //code starts here
         downloader = new Downloader();
-        refreshViews(R.id.nav_main);
+
         versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
         versionItem.setTitle("v."+version);
         swipe = this.findViewById(R.id.searchSwipe);
@@ -232,6 +234,27 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //set startTab and refresh views
+        int startTab = p.getStartTab();
+        contentHolder.setDisplayedChild(startTab);
+        switch (startTab){
+            case 0:
+                refreshViews(R.id.nav_main);
+                break;
+            case 1:
+                refreshViews(R.id.nav_search);
+                break;
+            case 2:
+                refreshViews(R.id.nav_recent);
+                break;
+            case 3:
+                refreshViews(R.id.nav_favorite);
+                break;
+            case 4:
+                refreshViews(R.id.nav_download);
+                break;
+        }
+
         //check update upon startup
         updateCheck u = new updateCheck();
         u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -265,9 +288,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent settingIntent = new Intent(context, SettingsActivity.class);
+            startActivity(settingIntent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -379,6 +403,8 @@ public class MainActivity extends AppCompatActivity
             searchBox = this.findViewById(R.id.searchBox);
             searchResult = this.findViewById(R.id.searchResult);
             searchResult.setLayoutManager(new LinearLayoutManager(this));
+            searchMode = this.findViewById(R.id.searchMode);
+            if(dark) searchMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
 
             searchBox.setOnKeyListener(new View.OnKeyListener() {
                 @Override
@@ -389,7 +415,7 @@ public class MainActivity extends AppCompatActivity
                             swipe.setRefreshing(true);
                             if(searchAdapter != null) searchAdapter.removeAll();
                             else searchAdapter = new TitleAdapter(context);
-                            search = new Search(query,0);
+                            search = new Search(query,searchMode.getSelectedItemPosition());
                             searchManga sm = new searchManga();
                             sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         }

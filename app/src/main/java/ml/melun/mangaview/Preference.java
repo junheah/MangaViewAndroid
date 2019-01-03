@@ -27,6 +27,9 @@ public class Preference {
     static Boolean volumeControl;
     static Boolean darkTheme;
     static Boolean scrollViewer;
+    static Boolean reverse;
+    static Boolean dataSave;
+    static int startTab;
 
     //Offline manga has id of -1
     public Preference(){
@@ -48,9 +51,42 @@ public class Preference {
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
             darkTheme = sharedPref.getBoolean("darkTheme", false);
             scrollViewer = sharedPref.getBoolean("scrollViewer",true);
+            reverse = sharedPref.getBoolean("pageReverse",false);
+            dataSave = sharedPref.getBoolean("dataSave", false);
+            startTab = sharedPref.getInt("startTab", 0);
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static int getStartTab() {
+        return startTab;
+    }
+
+    public static void setStartTab(int startTab) {
+        Preference.startTab = startTab;
+        prefsEditor.putInt("startTab", startTab);
+        prefsEditor.commit();
+    }
+
+    public static Boolean getDataSave() {
+        return dataSave;
+    }
+
+    public static void setDataSave(Boolean dataSave) {
+        Preference.dataSave = dataSave;
+        prefsEditor.putBoolean("dataSave", dataSave);
+        prefsEditor.commit();
+    }
+
+    public static Boolean getReverse() {
+        return reverse;
+    }
+
+    public static void setReverse(Boolean reverse) {
+        Preference.reverse = reverse;
+        prefsEditor.putBoolean("pageReverse", reverse);
+        prefsEditor.commit();
     }
 
     public static Boolean getScrollViewer() {
