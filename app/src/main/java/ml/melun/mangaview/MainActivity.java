@@ -300,7 +300,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.nav_main) {
             // Handle the main action
             contentHolder.setDisplayedChild(0);
@@ -392,6 +391,13 @@ public class MainActivity extends AppCompatActivity
                     Intent i = new Intent(context, TagSearchActivity.class);
                     i.putExtra("query",t+"");
                     i.putExtra("mode",4);
+                    startActivity(i);
+                }
+
+                @Override
+                public void clickedMoreUpdated() {
+                    Intent i = new Intent(context, TagSearchActivity.class);
+                    i.putExtra("mode",5);
                     startActivity(i);
                 }
             });

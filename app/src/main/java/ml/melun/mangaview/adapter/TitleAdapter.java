@@ -44,7 +44,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public void removeAll(){
         int originSize = mData.size();
         mData.clear();
-        System.out.println("pppppppppp"+mData.size());
         notifyItemRangeRemoved(0,originSize);
     }
 

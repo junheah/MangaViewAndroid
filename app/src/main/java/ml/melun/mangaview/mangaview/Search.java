@@ -80,19 +80,19 @@ public class Search {
             }
         }
     }
-    public String filter(String input){
-        int i = input.indexOf('(');
-        int j = input.indexOf(')');
-        int m = input.indexOf('?');
-        if(i>-1||j>-1||m>-1){
-            char[] tmp = input.toCharArray();
-            if(i>-1) tmp[i] = ' ';
-            if(j>-1) tmp[j] = ' ';
-            if(m>-1) tmp[m] = ' ';
-            input = String.valueOf(tmp);
-        }
-        return input;
-    }
+//    public String filter(String input){
+//        int i = input.indexOf('(');
+//        int j = input.indexOf(')');
+//        int m = input.indexOf('?');
+//        if(i>-1||j>-1||m>-1){
+//            char[] tmp = input.toCharArray();
+//            if(i>-1) tmp[i] = ' ';
+//            if(j>-1) tmp[j] = ' ';
+//            if(m>-1) tmp[m] = ' ';
+//            input = String.valueOf(tmp);
+//        }
+//        return input;
+//    }
 
     public ArrayList<Title> getResult(){
         return result;

@@ -56,7 +56,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="4dp"
                     android:textColor="@android:color/darker_gray"
-                    android:text="TextView"
+                    android:text=""
                     android:textSize="12dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/Thumb"
@@ -71,7 +71,7 @@
                     android:layout_marginTop="4dp"
                     android:textColor="@color/colorAccent"
                     android:textSize="10dp"
-                    android:text="TextView"
+                    android:text=""
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/Thumb"
                     app:layout_constraintTop_toBottomOf="@+id/TitleAuthor" />

@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         switch (position){
             case 0:
                 recyclerHolder rh = (recyclerHolder) holder;
-                rh.title.setText("최근 추가된 만화");
+                rh.title.setText("최근 추가된 만화 +");
                 break;
             case 2:
                 tagHolder th = (tagHolder) holder;
@@ -112,6 +113,12 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onclick(Manga m) {
                     mainClickListener.clickedManga(m);
+                }
+            });
+            title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mainClickListener.clickedMoreUpdated();
                 }
             });
         }
@@ -181,6 +188,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void clickedTag(String t);
         void clickedName(int t);
         void clickedRelease(int t);
+        void clickedMoreUpdated();
     }
 
 

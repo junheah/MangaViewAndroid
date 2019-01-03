@@ -8,7 +8,6 @@
 
 
     <android.support.v7.widget.RecyclerView
-        android:layout_marginTop="12dp"
         android:id="@+id/main_tag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,15 +15,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_tag_title" />
+
     <TextView
         android:id="@+id/main_tag_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
+        android:paddingBottom="12dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="12dp"
+        android:paddingStart="8dp"
         android:text="TextView"
         android:textSize="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
