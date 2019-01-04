@@ -11,5 +11,6 @@ public class LicenseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_license);
+        getSupportActionBar().setTitle("오픈소스 라이선스");
     }
 }
