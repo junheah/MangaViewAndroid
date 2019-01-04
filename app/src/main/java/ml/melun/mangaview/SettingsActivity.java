@@ -181,6 +181,15 @@ public class SettingsActivity extends AppCompatActivity {
                 //
             }
         });
+
+
+        this.findViewById(R.id.setting_license).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent l = new Intent(context,LicenseActivity.class);
+                startActivity(l);
+            }
+        });
     }
 
     @Override

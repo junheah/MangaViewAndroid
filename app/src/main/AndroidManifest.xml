@@ -32,7 +32,8 @@
         <activity android:name=".SettingsActivity" />
         <activity android:name=".FolderSelectActivity" />
         <activity android:name=".TagSearchActivity" />
-        <activity android:name=".ViewerActivity2"></activity>
+        <activity android:name=".ViewerActivity2" />
+        <activity android:name=".LicenseActivity"></activity>
     </application>
 
 </manifest>
