@@ -2,7 +2,9 @@ package ml.melun.mangaview;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -11,11 +13,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,7 +55,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Manga manga;
     ImageButton next, prev;
     android.support.v7.widget.Toolbar toolbar;
-    Button pageBtn, nextPageBtn, prevPageBtn;
+    Button pageBtn, nextPageBtn, prevPageBtn, touchToggleBtn;
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
     Boolean volumeControl;
@@ -62,12 +67,13 @@ public class ViewerActivity2 extends AppCompatActivity {
     int index;
     Title title;
     ImageView frame;
-    Boolean twoPage = false;
     int type=-1;
     Bitmap imgCache;
     Boolean toolbarshow =true;
     Intent result;
     Boolean reverse;
+    Boolean touch = true;
+    AlertDialog.Builder alert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +97,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         pageBtn.setText("");
         nextPageBtn = this.findViewById(R.id.nextPageBtn);
         prevPageBtn = this.findViewById(R.id.prevPageBtn);
+        touchToggleBtn = this.findViewById(R.id.touchToggleBtn);
 
         Intent intent = getIntent();
         name = intent.getStringExtra("name");
@@ -119,14 +126,58 @@ public class ViewerActivity2 extends AppCompatActivity {
         nextPageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                nextPage();
+                if(touch) nextPage();
+            }
+        });
+        prevPageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(touch) prevPage();
+            }
+        });
+        touchToggleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(touch) {
+                    touch = false;
+                    touchToggleBtn.setBackgroundResource(R.drawable.button_bg_on);
+                }
+                else{
+                    touch = true;
+                    touchToggleBtn.setBackgroundResource(R.drawable.button_bg);
+                }
             }
         });
 
-       prevPageBtn.setOnClickListener(new View.OnClickListener() {
+        pageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                prevPage();
+                if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
+                else alert = new AlertDialog.Builder(context);
+
+                alert.setTitle("페이지 선택\n(1~"+imgs.size()+")");
+                final EditText input = new EditText(context);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                input.setRawInputType(Configuration.KEYBOARD_12KEY);
+                alert.setView(input);
+                alert.setPositiveButton("이동", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        //이동 시
+                        if(input.getText().length()>0) {
+                            int page = Integer.parseInt(input.getText().toString());
+                            if (page < 1) page = 1;
+                            if (page > imgs.size()) page = imgs.size();
+                            viewerBookmark = page - 1;
+                            refreshImage();
+                        }
+                    }
+                });
+                alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        //취소 시
+                    }
+                });
+                alert.show();
             }
         });
 
@@ -159,8 +210,9 @@ public class ViewerActivity2 extends AppCompatActivity {
         View.OnLongClickListener tbToggle = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                //touched = true;
                 toggleToolbar();
-                return false;
+                return true;
             }
         };
         nextPageBtn.setOnLongClickListener(tbToggle);
@@ -289,6 +341,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void updatePageIndex(){
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
+        if(viewerBookmark==imgs.size()-1 && !toolbarshow) toggleToolbar();
     }
 
     public void toggleToolbar(){

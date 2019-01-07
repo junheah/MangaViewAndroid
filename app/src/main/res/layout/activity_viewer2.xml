@@ -76,7 +76,7 @@
             app:contentInsetStart="0dp"
             app:contentInsetLeft="0dp"
             app:popupTheme="@style/AppTheme.PopupOverlay">
-            <include layout="@layout/viewer_toolbar_bottom"/>
+            <include layout="@layout/viewer_toolbar_bottom2"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 

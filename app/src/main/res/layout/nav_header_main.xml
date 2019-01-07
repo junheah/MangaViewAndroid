@@ -24,7 +24,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:text="만화뷰어" />
+        android:text="망가뷰어"
+        android:textColor="@android:color/white" />
 
 </LinearLayout>
