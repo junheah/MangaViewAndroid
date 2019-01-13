@@ -1,4 +1,7 @@
 package ml.melun.mangaview.mangaview;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +41,7 @@ public class Manga {
     public void fetch() {
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
+        comments = new ArrayList<>();
         int tries = 0;
         //get images
         while(imgs.size()==0 && tries < 3) {
@@ -55,7 +59,11 @@ public class Manga {
                 reader = new BufferedReader(new InputStreamReader(stream));
                 //StringBuffer buffer = new StringBuffer();
                 String line = "";
+                String raw = "";
+
                 while ((line = reader.readLine()) != null) {
+                    //save as raw html for jsoup
+                    raw += line;
                     if(line.contains("var img_list")) {
                         String imgStr = line;
                         if(imgStr!=null) {
@@ -78,7 +86,24 @@ public class Manga {
                         String name = line.substring(line.indexOf("manga_name")+11,line.indexOf("class=")-2);
                         title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>());
                     }
-                    if(imgs.size()>0 && eps.size()>0) break;
+
+                    //if(imgs.size()>0 && eps.size()>0) break;
+                }
+
+                //jsoup parsing
+                Document doc = Jsoup.parse(raw);
+                Elements cs = doc.select("section.comment-media").last().select("div.media");
+                System.out.println(cs.size());
+                for(Element c:cs){
+                    String icon, user, timestamp, content;
+                    Elements i = c.select("img");
+                    if(!i.isEmpty()) {
+                        icon = i.get(0).attr("src");
+                    }else icon = "";
+                    user = c.selectFirst("span.member").text();
+                    timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
+                    content = c.selectFirst("div.media-content").selectFirst("textarea").text();
+                    comments.add(new Comment(user, timestamp, icon, content));
                 }
 
             } catch (Exception e) {
@@ -112,7 +137,6 @@ public class Manga {
             //now its contained inside javascript var
             tries++;
         }
-
     }
 
     public ArrayList<Manga> getEps() {
@@ -126,6 +150,7 @@ public class Manga {
     public ArrayList<String> getImgs(){
         return imgs;
     }
+    public ArrayList<Comment> getComments(){ return comments; }
     public String toString(){
         JSONObject tmp = new JSONObject();
         try {
@@ -140,8 +165,10 @@ public class Manga {
     private int id;
     String name;
     ArrayList<Manga> eps;
-    private ArrayList<String> imgs;
+    ArrayList<String> imgs;
+    ArrayList<Comment> comments;
     String thumb;
     Title title;
+
 }
 

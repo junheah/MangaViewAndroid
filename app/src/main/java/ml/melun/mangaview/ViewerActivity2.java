@@ -46,6 +46,8 @@ import ml.melun.mangaview.transformation.MangaCrop;
 import ml.melun.mangaview.transformation.MangaCropLeft;
 import ml.melun.mangaview.transformation.MangaCropRight;
 
+
+//todo: preload images
 public class ViewerActivity2 extends AppCompatActivity {
     Preference p;
     Boolean dark;
@@ -68,7 +70,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Title title;
     ImageView frame;
     int type=-1;
-    Bitmap imgCache;
+    Bitmap imgCache, preloadImg;
     Boolean toolbarshow =true;
     Intent result;
     Boolean reverse;

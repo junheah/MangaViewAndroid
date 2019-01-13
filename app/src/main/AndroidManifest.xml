@@ -32,7 +32,11 @@
         <activity android:name=".FolderSelectActivity" />
         <activity android:name=".TagSearchActivity" />
         <activity android:name=".ViewerActivity2" />
-        <activity android:name=".LicenseActivity"></activity>
+        <activity android:name=".LicenseActivity" />
+        <activity
+            android:name=".CommentsActivity"
+            android:label="@string/title_activity_comments"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

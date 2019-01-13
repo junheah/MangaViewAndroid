@@ -28,6 +28,7 @@ import android.widget.Toolbar;
 
 //import com.viven.imagezoom.ImageZoomHelper;
 
+import com.google.gson.Gson;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -69,6 +70,7 @@ public class ViewerActivity extends AppCompatActivity {
     Boolean dark;
     Intent result;
     SwipyRefreshLayout swipe;
+    ImageButton commentBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference();
@@ -84,6 +86,7 @@ public class ViewerActivity extends AppCompatActivity {
         volumeControl = p.getVolumeControl();
         swipe = this.findViewById(R.id.viewerSwipe);
         cut = this.findViewById(R.id.autoCutBtn);
+        commentBtn = this.findViewById(R.id.commentButton);
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             Intent intent = getIntent();
@@ -101,7 +104,7 @@ public class ViewerActivity extends AppCompatActivity {
             if(localImgs!=null||id<0){
                 //load local imgs
                 appbarBottom.setVisibility(View.GONE);
-
+                commentBtn.setVisibility(View.GONE);
                 imgs = new ArrayList<>(Arrays.asList(localImgs));
                 stripAdapter = new StripAdapter(context,imgs, autoCut);
                 strip.setAdapter(stripAdapter);
@@ -114,6 +117,16 @@ public class ViewerActivity extends AppCompatActivity {
             }else {
                 refresh();
             }
+            commentBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent commentActivity = new Intent(context, CommentsActivity.class);
+                    //create gson and put extra
+                    Gson gson = new Gson();
+                    commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
+                    startActivity(commentActivity);
+                }
+            });
             strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
