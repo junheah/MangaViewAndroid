@@ -73,6 +73,10 @@ public class TagSearchActivity extends AppCompatActivity {
                 break;
             case 5:
                 ab.setTitle("최근 추가됨");
+                break;
+            case 6:
+                ab.setTitle("검색결과");
+                break;
         }
 
         if(mode == 5){

@@ -1,6 +1,7 @@
 package ml.melun.mangaview.adapter;
 
 import android.content.Context;
+import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,11 +45,15 @@ public class commentsAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.item_comment,parent,false);
         }
         Comment c = data.get(position);
+        ConstraintLayout layout = convertView.findViewById(R.id.comment_layout);
         ImageView icon = convertView.findViewById(R.id.comment_icon);
         TextView content = convertView.findViewById(R.id.comment_content);
         TextView timeStamp = convertView.findViewById(R.id.comment_time);
         TextView user = convertView.findViewById(R.id.comment_user);
+
+        layout.setPadding(60*c.getIndent(),0,0,0);
         if(c.getIcon().length()>1 && !save) Glide.with(context).load(c.getIcon()).into(icon);
+        else icon.setImageResource(R.drawable.user);
         content.setText(c.getContent());
         timeStamp.setText(c.getTimestamp());
         user.setText(c.getUser());

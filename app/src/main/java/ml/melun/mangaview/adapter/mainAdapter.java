@@ -45,7 +45,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 "역사","요리","음악","이세계","일상","전생","추리","판타지","하렘","학원","호러");
         tadapter = new mainTagAdapter(main, tags, 0);
         List<String> names = Arrays.asList("ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ",
-                "ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ");
+                "ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ","A-Z","0-9");
         nadapter = new mainTagAdapter(main, names, 1);
         radapter = new mainTagAdapter(main, Arrays.asList("미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"), 2);
     }

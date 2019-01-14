@@ -11,4 +11,8 @@
         <item>좋아요 한 만화</item>
         <item>저장된 만화</item>
     </string-array>
+    <string-array name="searchMethods">
+        <item>AND</item>
+        <item>OR</item>
+    </string-array>
 </resources>

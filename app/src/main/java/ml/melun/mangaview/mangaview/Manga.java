@@ -96,6 +96,7 @@ public class Manga {
                 System.out.println(cs.size());
                 for(Element c:cs){
                     String icon, user, timestamp, content;
+                    int indent;
                     Elements i = c.select("img");
                     if(!i.isEmpty()) {
                         icon = i.get(0).attr("src");
@@ -103,7 +104,14 @@ public class Manga {
                     user = c.selectFirst("span.member").text();
                     timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
                     content = c.selectFirst("div.media-content").selectFirst("textarea").text();
-                    comments.add(new Comment(user, timestamp, icon, content));
+                    String indentStr = c.attr("style");
+                    System.out.println(indentStr);
+                    if(indentStr.length()>0) {
+                        String indentStrSplit = indentStr.split(":")[1].split("px")[0];
+                        int indentRaw = Integer.parseInt(indentStrSplit);
+                        indent = indentRaw / 64;
+                    }else indent = 0;
+                    comments.add(new Comment(user, timestamp, icon, content,indent));
                 }
 
             } catch (Exception e) {

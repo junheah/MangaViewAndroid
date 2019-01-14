@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ml.melun.mangaview.Preference;
@@ -20,10 +22,13 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     Context mcontext;
     List<String> tags;
+    Boolean[] selected;
     LayoutInflater mInflater;
     private tagOnclick mClickListener;
     int type;
     Boolean dark;
+    Boolean singleSelect = false;
+    int selection = -1;
 
     public mainTagAdapter(Context m, List<String> t , int type) {
         mcontext = m;
@@ -31,6 +36,11 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.type = type;
         this.mInflater = LayoutInflater.from(m);
         dark = new Preference().getDarkTheme();
+        selected = new Boolean[t.size()];
+        Arrays.fill(selected,Boolean.FALSE);
+    }
+    public void setSingleSelect(Boolean b){
+        singleSelect = b;
     }
 
     @NonNull
@@ -50,11 +60,56 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         return new tagHolder(view);
     }
+    public void toggleSelect(int position){
+        if(singleSelect){
+            if(position == selection) selection = -1;
+            else{
+                if(selection>-1){
+                    int tmp = selection;
+                    selection = position;
+                    notifyItemChanged(tmp);
+                }else{
+                    selection = position;
+                }
+                notifyItemChanged(position);
+            }
+        }
+
+
+        if(selected[position]) selected[position] = false;
+        else selected[position] = true;
+        notifyItemChanged(position);
+    }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         tagHolder h = (tagHolder) holder;
         h.tag.setText(tags.get(position));
+        if(singleSelect){
+            if(selection==position){
+                if (dark)
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.selectedDark));
+                else
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.selected));
+            }else{
+                if (dark)
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.colorDarkBackground));
+                else
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.colorBackground));
+            }
+        }else {
+            if (selected[position]) {
+                if (dark)
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.selectedDark));
+                else
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.selected));
+            } else {
+                if (dark)
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.colorDarkBackground));
+                else
+                    h.card.setCardBackgroundColor(ContextCompat.getColor(mcontext, R.color.colorBackground));
+            }
+        }
     }
 
     @Override
@@ -82,9 +137,7 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     tag = itemView.findViewById(R.id.main_name_text);
                     break;
             }
-            if(dark){
-                card.setBackgroundColor(ContextCompat.getColor(mcontext, R.color.colorDarkBackground));
-            }
+
 
             card.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -93,6 +146,31 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
         }
+    }
+    public String getSelectedValues(){
+        String res = "";
+        for(int i=0; i<tags.size(); i++){
+            if(selected[i]){
+                if(res.length()>0) res += ","+tags.get(i);
+                else res = tags.get(i);
+            }
+        }
+        return res;
+    }
+    public String getSelectedIndex(){
+        String res = "";
+        if(singleSelect) {
+            if(selection>-1) return selection + "";
+            else return "";
+        }
+
+        for(int i=0; i<tags.size(); i++){
+            if(selected[i]){
+                if(res.length()>0) res += ","+i;
+                else res = ""+i;
+            }
+        }
+        return res;
     }
     public interface tagOnclick{
         void onClick(int position, String value);

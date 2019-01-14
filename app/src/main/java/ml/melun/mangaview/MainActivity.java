@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity
     Preference p;
     //variables
     private ViewFlipper contentHolder;
+    FloatingActionButton advSearchBtn;
     TextView noresult;
     private EditText searchBox;
     public Context context = this;
@@ -410,7 +411,16 @@ public class MainActivity extends AppCompatActivity
             searchResult = this.findViewById(R.id.searchResult);
             searchResult.setLayoutManager(new LinearLayoutManager(this));
             searchMode = this.findViewById(R.id.searchMode);
+            advSearchBtn = this.findViewById(R.id.advSearchBtn);
             if(dark) searchMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+
+            advSearchBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent advSearch = new Intent(context, AdvSearchActivity.class);
+                    startActivity(advSearch);
+                }
+            });
 
             searchBox.setOnKeyListener(new View.OnKeyListener() {
                 @Override

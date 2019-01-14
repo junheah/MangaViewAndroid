@@ -36,7 +36,9 @@
         <activity
             android:name=".CommentsActivity"
             android:label="@string/title_activity_comments"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".AdvSearchActivity"
+            android:label="고급 검색"></activity>
     </application>
 
 </manifest>
