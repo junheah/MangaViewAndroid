@@ -35,6 +35,7 @@ import com.bumptech.glide.request.target.CustomViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +56,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     String name;
     int id;
     Manga manga;
-    ImageButton next, prev;
+    ImageButton next, prev, commentBtn;
     android.support.v7.widget.Toolbar toolbar;
     Button pageBtn, nextPageBtn, prevPageBtn, touchToggleBtn;
     AppBarLayout appbar, appbarBottom;
@@ -100,6 +101,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         nextPageBtn = this.findViewById(R.id.nextPageBtn);
         prevPageBtn = this.findViewById(R.id.prevPageBtn);
         touchToggleBtn = this.findViewById(R.id.touchToggleBtn);
+        commentBtn = this.findViewById(R.id.commentButton);
 
         Intent intent = getIntent();
         name = intent.getStringExtra("name");
@@ -117,6 +119,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             imgs = new ArrayList<>(Arrays.asList(localImgs));
             types = new ArrayList<>();
             for(int i=0; i<imgs.size()*2;i++) types.add(-1);
+            commentBtn.setVisibility(View.GONE);
             refreshImage();
         }else{
             //if online
@@ -219,6 +222,17 @@ public class ViewerActivity2 extends AppCompatActivity {
         };
         nextPageBtn.setOnLongClickListener(tbToggle);
         prevPageBtn.setOnLongClickListener(tbToggle);
+
+        commentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent commentActivity = new Intent(context, CommentsActivity.class);
+                //create gson and put extra
+                Gson gson = new Gson();
+                commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
+                startActivity(commentActivity);
+            }
+        });
 
     }
 
