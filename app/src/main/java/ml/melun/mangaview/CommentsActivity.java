@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -17,6 +18,7 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirec
 
 import java.util.ArrayList;
 
+import ml.melun.mangaview.adapter.commentsAdapter;
 import ml.melun.mangaview.mangaview.Comment;
 import ml.melun.mangaview.mangaview.Manga;
 
@@ -24,38 +26,43 @@ public class CommentsActivity extends AppCompatActivity {
     Intent intent;
     Context context;
     ArrayList<Comment> comments;
-    SwipyRefreshLayout swipe;
+    //SwipyRefreshLayout swipe;
     ListView list;
+    commentsAdapter adapter;
+    Preference p;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p = new Preference();
+        if(p.getDarkTheme()) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         context = this;
-        swipe = this.findViewById(R.id.commentSwipe);
+        //swipe = this.findViewById(R.id.commentSwipe);
         list = this.findViewById(R.id.commentList);
         intent = getIntent();
+
 
 
         String gsonData = intent.getStringExtra("comments");
         if(gsonData.length()>0){
             Gson gson = new Gson();
             comments = gson.fromJson(gsonData,new TypeToken<ArrayList<Comment>>(){}.getType());
-            for(Comment comment: comments){
-                System.out.println(comment.getContent());
-            }
+            adapter = new commentsAdapter(context, comments);
+            list.setAdapter(adapter);
+            ((TextView)toolbar.findViewById(R.id.comments_title)).setText("댓글 ["+comments.size()+"]");
         }else{
             //no comments
+            toolbar.setTitle("댓글 없음");
         }
-        swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                refresh();
-            }
-        });
+//        swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+//                refresh();
+//            }
+//        });
     }
 
     public void refresh(){

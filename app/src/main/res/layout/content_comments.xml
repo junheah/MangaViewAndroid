@@ -7,16 +7,16 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".CommentsActivity"
     tools:showIn="@layout/activity_comments">
-    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/commentSwipe">
+    <!--<com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/commentSwipe">-->
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/commentList">
         </ListView>
 
-    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+    <!--</com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>-->
 
 </android.support.constraint.ConstraintLayout>
