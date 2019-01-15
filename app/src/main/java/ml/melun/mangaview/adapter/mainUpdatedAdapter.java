@@ -14,20 +14,17 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import org.w3c.dom.Text;
-
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
-import ml.melun.mangaview.mangaview.Updated;
+import ml.melun.mangaview.mangaview.MainPage;
 
 public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     ArrayList<Manga> mData;
     Context context;
-    Fetch fetch;
     LayoutInflater mInflater;
     Boolean loaded = false;
     onclick monclick;
@@ -39,8 +36,6 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         mData = new ArrayList<>();
         mData.add(new Manga(0,"로드중..."));
         this.mInflater = LayoutInflater.from(c);
-        Fetch fetch = new Fetch();
-        fetch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         dark = new Preference().getDarkTheme();
         save = new Preference().getDataSave();
 
@@ -98,33 +93,17 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.monclick = o;
     }
 
-    private class Fetch extends AsyncTask<Void, Integer, Integer> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+    public void setData(ArrayList<Manga> data){
+        mData = data;
+        if(mData.size()==0){
+            mData.add(new Manga(0,"결과 없음"));
+            notifyItemChanged(0);
+            loaded = false;
+        }else {
+            notifyItemChanged(0);
+            notifyItemRangeInserted(1, mData.size() - 1);
+            loaded = true;
         }
 
-        @Override
-        protected Integer doInBackground(Void... params) {
-            Updated u = new Updated();
-            mData = u.getResult();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
-            System.out.println("fetch update success");
-            //notifyDataSetChanged();
-            if(mData.size()==0){
-                mData.add(new Manga(0,"결과 없음"));
-                notifyItemChanged(0);
-                loaded = false;
-            }else {
-                notifyItemChanged(0);
-                notifyItemRangeInserted(1, mData.size() - 1);
-                loaded = true;
-            }
-        }
     }
 }

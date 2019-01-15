@@ -51,6 +51,7 @@ import javax.net.ssl.HttpsURLConnection;
 import ml.melun.mangaview.adapter.OfflineTitleApapter;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.mainAdapter;
+import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -667,39 +668,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private class getTitleFromManga extends AsyncTask<Manga,Integer,Manga>{
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            if(dark) pd = new ProgressDialog(MainActivity.this, R.style.darkDialog);
-            else pd = new ProgressDialog(MainActivity.this);
-            pd.setMessage("로드중");
-            pd.setCancelable(false);
-            pd.show();
-        }
 
-        @Override
-        protected Manga doInBackground(Manga... mangas) {
-            Manga target = mangas[0];
-            //target.getTitle();
-            return target;
-        }
-
-        @Override
-        protected void onPostExecute(Manga manga) {
-            super.onPostExecute(manga);
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
-            //start intent
-            Intent viewer = new Intent(context, ViewerActivity.class);
-            viewer.putExtra("name",manga.getName());
-            viewer.putExtra("id",manga.getId());
-            //Title title = manga.getTitle();
-
-            //p.addRecent(title);
-            startActivity(viewer);
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package ml.melun.mangaview.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -86,6 +87,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         ViewHolder(View itemView) {
             super(itemView);
             episode = itemView.findViewById(R.id.episode);
+            if(dark) episode.setTextColor(Color.WHITE);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
