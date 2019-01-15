@@ -5,7 +5,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Search {
@@ -15,17 +14,45 @@ public class Search {
     * 2 : 태그
     * 3 : 글자
     * 4 : 발행
-    * 6 : null
+    * 5 : null
     * 6 : 종합
      */
     public Search(String q, int mode) {
         query = q;
         this.mode = mode;
+        //if(mode==6) query = "";
     }
 
     public Boolean isLast() {
         return last;
     }
+    // not used in android version since we use seperate TagSearch activity
+    // which requires mode and single query value
+    /*
+    String q0= "", q1 = "", q2 = "", q3 = "";
+    
+    public void addQuery(int i, String q) {
+    	switch(i) {
+    	case 0:
+    		if(q0.length()>0) q0 += ","+q;
+    		else q0 = q;
+    		break;
+    	case 1:
+    		if(q1.length()>0) q1 += ","+q;
+    		else q1 = q;
+    		break;
+    	case 2:
+    		if(q2.length()>0) q2 += ","+q;
+    		else q2 = q;
+    		break;
+    	case 3:
+    		if(q3.length()>0) q3 += ","+q;
+    		else q3 = q;
+    		break;
+    	}
+    	
+    }
+    */
 
     public void fetch() {
         result = new ArrayList<>();
@@ -52,7 +79,7 @@ public class Search {
                         searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&sfl=2&stx=";
                         break;
                     case 6:
-                        searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&";
+                        searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&search_type=";
                         break;
                 }
 

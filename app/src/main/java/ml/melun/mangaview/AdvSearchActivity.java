@@ -28,7 +28,7 @@ public class AdvSearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         preference = new Preference();
-        if(preference.getDarkTheme()) setTheme(R.style.AppThemeDarkNoTitle);
+        if(preference.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adv_search);
         context = this;
@@ -61,7 +61,7 @@ public class AdvSearchActivity extends AppCompatActivity {
                 "러브코미디","로맨스","먹방","미스테리","백합","붕탁","순정","스릴러","스포츠","시대","애니화","액션",
                 "역사","요리","음악","이세계","일상","전생","추리","판타지","하렘","학원","호러");
         na = new mainTagAdapter(context, names,1);
-        na.setSingleSelect(true);
+        //na.setSingleSelect(true);
         ra = new mainTagAdapter(context, releases, 2);
         ta = new mainTagAdapter(context, tags, 0);
 
