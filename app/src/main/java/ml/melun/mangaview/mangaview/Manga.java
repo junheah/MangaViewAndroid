@@ -42,6 +42,7 @@ public class Manga {
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
         comments = new ArrayList<>();
+        bcomments = new ArrayList<>();
         int tries = 0;
         //get images
         while(imgs.size()==0 && tries < 3) {
@@ -96,7 +97,7 @@ public class Manga {
                 System.out.println(cs.size());
                 for(Element c:cs){
                     String icon, user, timestamp, content;
-                    int indent;
+                    int indent, likes;
                     Elements i = c.select("img");
                     if(!i.isEmpty()) {
                         icon = i.get(0).attr("src");
@@ -105,14 +106,33 @@ public class Manga {
                     timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
                     content = c.selectFirst("div.media-content").selectFirst("textarea").text();
                     String indentStr = c.attr("style");
-                    System.out.println(indentStr);
                     if(indentStr.length()>0) {
                         String indentStrSplit = indentStr.split(":")[1].split("px")[0];
                         int indentRaw = Integer.parseInt(indentStrSplit);
                         indent = indentRaw / 64;
                     }else indent = 0;
-                    comments.add(new Comment(user, timestamp, icon, content,indent));
+                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
+                    comments.add(new Comment(user, timestamp, icon, content,indent, likes));
                 }
+
+                cs = doc.select("section.comment-media.best-comment").last().select("div.media");
+                System.out.println(cs.size());
+                for(Element c:cs){
+                    String icon, user, timestamp, content;
+                    int indent, likes;
+                    Elements i = c.select("img");
+                    if(!i.isEmpty()) {
+                        icon = i.get(0).attr("src");
+                    }else icon = "";
+                    user = c.selectFirst("span.member").text();
+                    timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
+                    content = c.selectFirst("div.commtent-content").text();
+                    String indentStr = c.attr("style");
+                    indent = 0;
+                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
+                    bcomments.add(new Comment(user, timestamp, icon, content,indent, likes));
+                }
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -159,6 +179,9 @@ public class Manga {
         return imgs;
     }
     public ArrayList<Comment> getComments(){ return comments; }
+
+    public ArrayList<Comment> getBestComments() { return bcomments; }
+
     public String toString(){
         JSONObject tmp = new JSONObject();
         try {
@@ -174,7 +197,7 @@ public class Manga {
     String name;
     ArrayList<Manga> eps;
     ArrayList<String> imgs;
-    ArrayList<Comment> comments;
+    ArrayList<Comment> comments, bcomments;
     String thumb;
     Title title;
 

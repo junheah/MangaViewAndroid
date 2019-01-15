@@ -5,26 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.Toolbar;
 
 //import com.viven.imagezoom.ImageZoomHelper;
 
@@ -36,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ml.melun.mangaview.R;
-import ml.melun.mangaview.adapter.EpisodeAdapter;
 import ml.melun.mangaview.adapter.StripAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
@@ -124,6 +111,7 @@ public class ViewerActivity extends AppCompatActivity {
                     //create gson and put extra
                     Gson gson = new Gson();
                     commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
+                    commentActivity.putExtra("bestComments", gson.toJson(manga.getBestComments()));
                     startActivity(commentActivity);
                 }
             });

@@ -34,11 +34,12 @@
         <activity android:name=".ViewerActivity2" />
         <activity android:name=".LicenseActivity" />
         <activity
+            android:name=".AdvSearchActivity"
+            android:label="고급 검색" />
+        <activity
             android:name=".CommentsActivity"
-            android:label="@string/title_activity_comments"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".AdvSearchActivity"
-            android:label="고급 검색"></activity>
+            android:label="댓글"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

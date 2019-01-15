@@ -50,6 +50,7 @@ public class commentsAdapter extends BaseAdapter {
         TextView content = convertView.findViewById(R.id.comment_content);
         TextView timeStamp = convertView.findViewById(R.id.comment_time);
         TextView user = convertView.findViewById(R.id.comment_user);
+        TextView likes = convertView.findViewById(R.id.comment_likes);
 
         layout.setPadding(60*c.getIndent(),0,0,0);
         if(c.getIcon().length()>1 && !save) Glide.with(context).load(c.getIcon()).into(icon);
@@ -57,6 +58,8 @@ public class commentsAdapter extends BaseAdapter {
         content.setText(c.getContent());
         timeStamp.setText(c.getTimestamp());
         user.setText(c.getUser());
+        if(c.getLikes()>0) likes.setText(""+c.getLikes());
+        else likes.setText("");
         return convertView;
     }
 

@@ -169,4 +169,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
     </string>
     <string name="title_activity_comments">CommentsActivity</string>
+    <string name="title_activity_test">testActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
