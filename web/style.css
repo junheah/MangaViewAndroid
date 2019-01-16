@@ -1,3 +1,14 @@
+::-webkit-scrollbar {
+    width: 8px;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #505050;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #606060;
+}
 button.download{
     border: none;
     text-decoration: none;
@@ -7,7 +18,7 @@ button.download{
     background-color: #d321d3;
 }
 button.download:hover{
-    background-color: #975faf;
+    background-color: #c64bc6;
     color: white;
 }
 button{
@@ -53,6 +64,10 @@ pre{
     line-height: 1.5em;
     margin:20px;
 }
+a{
+    color:#d321d3;
+    text-decoration: none;
+}
 h1{
     margin: 2px;
     font-size: 2.5em;
@@ -71,12 +86,25 @@ div.content{
     width:100%;
 }
 div.footer{
-    position: fixed;
+    /* position: fixed; */
     /* background-color: white; */
     width: 100%;
-    height: 50px;
-    left: 0;
-    bottom: 0;
-    color: white;
+
+    margin:0;
+    padding:10px;
     text-align: center;
+    background-color: #190519;
+    left: 0;
+    top: 0;
+    color: #544054;
+    text-align: center;
+}
+table.table-downloads{
+    text-align: center;
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td{
+    padding:10px;
+    border-bottom: 1px solid #333333;
 }

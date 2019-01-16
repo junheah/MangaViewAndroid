@@ -8,6 +8,15 @@
         <link rel="icon" href="web/favicon.png">
         <link rel="stylesheet" type="text/css" href="web/style.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css">
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-48545626-3"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-48545626-3');
+        </script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script>
         var downloadlink = "";
@@ -34,11 +43,11 @@
             $(".changelog").text(release.body);
             $("div.button-container").fadeIn('slow');
             $("div.content").fadeIn('slow');
+            $("div.footer").fadeIn('slow');
           });
         }
         window.onload = function() {
             $("div.title").fadeIn('slow');
-            $("div.footer").fadeIn('slow');
             GetLatestReleaseInfo();
         }
         </script>
@@ -51,15 +60,19 @@
                 <p> 망가쇼미 안드로이드 뷰어 </p>
             </div>
             <br>
-            <div class="button-container" style="display:none;">
+            <div class="button-container" style="display:none;width:auto;">
                 <button class="download" onclick="location.href = releaselink;">
                     <div class="dlbtn">
                         <p>다운로드</p>
                         <p class="release-name"></p>
                     </div>
                 </button>
+                <br>
+                <button style="margin:0;" onclick="location.href='releases.html';">이전 버전</button>
                 <p class="release-info"></p>
+                <br>
             </div>
+
         </div>
 
         <div class="content" style="display:none;">
@@ -73,6 +86,7 @@
         </div>
         <div class="footer" style="display:none;">
             <!-- footer -->
+            <p style="display:inline-block;">powered by</p><a style="display:inline-block;" href="https://github.com/">Github</a>
         </div>
     </body>
 </html>
