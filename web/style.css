@@ -9,7 +9,7 @@ button.download{
     transition-duration: 0.5s;
     background-color: white;
     color: white;
-    background-color: #c02dff;
+    background-color: #d321d3;
 }
 button.download:hover{
     background-color: #975faf;
@@ -31,7 +31,7 @@ div.header{
     text-align: center;
 }
 div.button-container{
-    
+
 }
 body{
     font-family: 'NanumSquare', sans-serif;
