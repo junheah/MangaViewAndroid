@@ -3,7 +3,7 @@ button.download{
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 1.8em;
+    font-size: 1.7em;
     margin: 8px 2px;
     -webkit-transition-duration: 0.5s; /* Safari */
     transition-duration: 0.5s;
@@ -17,13 +17,14 @@ button.download:hover{
 }
 p{
     margin:5px;
-}
-p.release-name{
-    font-size: 0.5em;
+    font-size: 1.1em;
 }
 p.release-info{
+    padding:15px;
     font-size: 1em;
-    margin:15px
+}
+p.release-name{
+    font-size: 0.6em;
 }
 div.dlbtn{
     padding: 10px 40px;
@@ -38,4 +39,5 @@ body{
 }
 h1{
     margin: 2px;
+    font-size: 2.5em;
 }
