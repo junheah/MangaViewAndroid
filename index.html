@@ -11,9 +11,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script>
         var downloadlink = "";
-        function downloadClick(){
-            location.href = downloadlink;
-        }
+        var releaselink = "";
         function GetLatestReleaseInfo() {
           $.getJSON("https://api.github.com/repos/junheah/MangaViewAndroid/releases/latest").done(function(release) {
             var asset = release.assets[0];
@@ -27,16 +25,20 @@
             } else {
               timeAgo = (dateDiff / oneDay).toFixed(0) + " 일 전";
             }
+            releaselink = release.html_url;
             var releaseInfo = timeAgo + "에 업데이트 되었고 " + downloadCount.toLocaleString() +" 번 다운로드 되었습니다.";
             $(".download").attr("href", asset.browser_download_url);
             downloadlink = asset.browser_download_url;
             $(".release-name").text("apk " +release.name);
             $(".release-info").text(releaseInfo);
+            $(".changelog").text(release.body);
             $("div.button-container").fadeIn('slow');
+            $("div.content").fadeIn('slow');
           });
         }
         window.onload = function() {
             $("div.title").fadeIn('slow');
+            $("div.footer").fadeIn('slow');
             GetLatestReleaseInfo();
         }
         </script>
@@ -50,14 +52,27 @@
             </div>
             <br>
             <div class="button-container" style="display:none;">
-                <button class="download" onclick="downloadClick();">
+                <button class="download" onclick="location.href = releaselink;">
                     <div class="dlbtn">
                         <p>다운로드</p>
-                        <p class="release-name">⠀</p>
+                        <p class="release-name"></p>
                     </div>
                 </button>
                 <p class="release-info"></p>
             </div>
+        </div>
+
+        <div class="content" style="display:none;">
+            <!-- put body content here -->
+            <h1> 체인지 로그 </h1>
+            <pre class="changelog"></pre>
+            <br>
+            <button onclick="location.href = releaselink;"> 깃허브 릴리즈 </button>
+            <button onclick="location.href = 'https://github.com/junheah/MangaViewAndroid/';"> 소스코드 </button>
+            <button onclick="location.href = 'https://blog.naver.com/imaginaly';"> 블로그 </button>
+        </div>
+        <div class="footer" style="display:none;">
+            <!-- footer -->
         </div>
     </body>
 </html>
