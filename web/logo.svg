@@ -2,23 +2,24 @@
     <style>
         @keyframes m {
           0%   {transform: translateY(100%)}
-          25%  {transform: translateY(60%)}
-          50%  {transform: translateY(30%)}
-          75%  {transform: translateY(10%);}
           100% {transform: translateY(0)}
         }
         .m {
-          animation: m 0.8s linear;
+          animation: m 0.8s ease-out;
         }
         @keyframes v {
           0%   {transform: translateY(-100%)}
-          25%  {transform: translateY(-60%)}
-          50%  {transform: translateY(-30%)}
-          75%  {transform: translateY(-10%);}
           100% {transform: translateY(0)}
         }
         .v {
-          animation: v 0.8s linear;
+          animation: v 0.8s ease-out;
+        }
+        @keyframes shadow {
+          0%   {transform: translateY(-30%)}
+          100% {transform: translateY(0)}
+        }
+        .shadow {
+          animation: shadow 0.8s ease-out;
         }
     </style>
     <g class="m">
@@ -27,7 +28,7 @@
     <g class="v">
         <polygon fill="#ffffff" stroke-width="0" points = "285 0, 360 220, 410 220, 480 0, 430 0, 385 170, 335 0"/>
     </g>
-    <g class="alpha layer">
+    <g class="shadow">
         <rect fill="#00000" fill-opacity="0.2" x="0" y="0" width="480" height="110"></rect>
     </g>
 </svg>
