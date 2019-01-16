@@ -1,27 +1,20 @@
 ::-webkit-scrollbar {
-    width: 8px;
-}
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #505050;
-}
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #606060;
+    width: 0px;
 }
 button.download{
     border: none;
-    text-decoration: none;
     font-size: 1.7em;
     margin: 8px 2px;
     padding:0;
     background-color: #d321d3;
 }
 button.download:hover{
-    background-color: #c64bc6;
+    background-color: #871c87;
     color: white;
 }
 button{
+    font-family: 'NanumSquare', sans-serif;
+    text-decoration: none;
     margin-left: 10px;
     padding:10px;
     text-align: center;
@@ -51,12 +44,15 @@ div.dlbtn{
 }
 div.header{
     text-align: center;
+    align-items: center;
+    width:100%;
 }
-body{
+body, html{
     font-family: 'NanumSquare', sans-serif;
     background-color: black;
     color: white;
     margin:0;
+    overflow-x:hidden;
 }
 pre{
     font-family: 'NanumSquare', sans-serif;
@@ -107,4 +103,35 @@ table.table-downloads{
 th, td{
     padding:10px;
     border-bottom: 1px solid #333333;
+}
+@keyframes m {
+  0%   {transform: translateX(-100px)}
+  25%  {transform: translateX(-60px)}
+  50%  {transform: translateX(-30px)}
+  75%  {transform: translateX(-10px);}
+  100% {transform: translateX(0)}
+}
+.m {
+  animation: m 1s linear;
+}
+@keyframes v {
+  0%   {transform: translateX(100px)}
+  25%  {transform: translateX(60px)}
+  50%  {transform: translateX(30px)}
+  75%  {transform: translateX(10px);}
+  100% {transform: translateX(0)}
+}
+.v {
+  animation: v 1s linear;
+}
+div.logo-container{
+    width: 100%;
+    padding-top:120px;
+    padding-bottom:90px;
+    max-width:31.5em;
+}
+svg.logo{
+    width: 100%;
+    height: auto;
+
 }

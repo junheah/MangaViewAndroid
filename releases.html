@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>Manga View Android</title>
-        <meta name="description" content="망가쇼미 안드로이드 뷰어">
+        <meta name="description" content="망가쇼미 안드로이드 뷰어 - 릴리즈">
         <meta name="author" content="junheah">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,51 +22,58 @@
         <script>
         var downloadlink = "";
         var releaselink = "";
-        function GetReleases(repo) {
-            $.getJSON("https://api.github.com/repos/" + repo + "/releases").done(function (json) {
-                previousUpdatedAt = moment();
-
-                for (var i = 0; i < json.length; i++) {
-                    var release = json[i];
-                    if (release.assets.length === 0) {
-                        continue;
-                    }
-                    var asset = release.assets[0];
-                    var fileSize = Math.round(asset.size / 1024);
-                    var downloadCount = 0;
-                    for (var i2 = 0; i2 < release.assets.length; i2++) {
-                        downloadCount += release.assets[i2].download_count;
-                    }
-                    var updatedAt = moment(asset.updated_at);
-                    previousUpdatedAt = updatedAt;
-                    $(".table-downloads tbody")
-                        .append($("<tr>")
-                            .append($("<td>")
-                                .append($("<a>")
-                                    .attr("href", release.html_url)
-                                    .text(release.tag_name)
+        var page=0;
+        var last=false;
+        function GetReleases() {
+            if(!last){
+                ++page;
+                $.getJSON("https://api.github.com/repos/junheah/MangaViewAndroid/releases?page="+page).done(function (json) {
+                    previousUpdatedAt = moment();
+                    if(json.length<30) last = true;
+                    for (var i = 0; i < json.length; i++) {
+                        var release = json[i];
+                        if (release.assets.length === 0) {
+                            continue;
+                        }
+                        var asset = release.assets[0];
+                        var fileSize = Math.round(asset.size / 1024);
+                        var downloadCount = 0;
+                        for (var i2 = 0; i2 < release.assets.length; i2++) {
+                            downloadCount += release.assets[i2].download_count;
+                        }
+                        var updatedAt = moment(asset.updated_at);
+                        previousUpdatedAt = updatedAt;
+                        $(".table-downloads tbody")
+                            .append($("<tr>")
+                                .append($("<td>")
+                                    .append($("<a>")
+                                        .attr("href", release.html_url)
+                                        .text(release.tag_name)
+                                    )
+                                    .append(release.prerelease ? "<div class=\"float-right\"><span class=\"badge badge-danger\">Pre-release</span></div>" : "")
                                 )
-                                .append(release.prerelease ? "<div class=\"float-right\"><span class=\"badge badge-danger\">Pre-release</span></div>" : "")
-                            )
-                            .append($("<td>")
-                                .text(fileSize.toLocaleString() + " KB")
-                            )
-                            .append($("<td>")
-                                .text(downloadCount.toLocaleString())
-                            )
-                            .append($("<td>")
-                                .text(moment(asset.updated_at).format("YYYY-MM-DD HH:mm"))
-                            )
-                            .append($("<td>")
-                                .append($("<button>")
-                                    .attr("onclick", "location.href='"+asset.browser_download_url+"';")
-                                    .text("다운로드")
+                                .append($("<td>")
+                                    .text(fileSize.toLocaleString() + " KB")
                                 )
-                            )
-                        );
-                }
-                $("table-downloads").fadeIn();
-            });
+                                .append($("<td>")
+                                    .text(downloadCount.toLocaleString())
+                                )
+                                .append($("<td>")
+                                    .text(moment(asset.updated_at).format("YYYY-MM-DD HH:mm"))
+                                )
+                                .append($("<td>")
+                                    .append($("<button>")
+                                        .attr("onclick", "location.href='"+asset.browser_download_url+"';")
+                                        .text("다운로드")
+                                    )
+                                )
+                            );
+                    }
+                    $("table-downloads").fadeIn();
+                    if(last) document.getElementById("more").style.display = "none";
+                    else document.getElementById("more").disabled = false;
+                });
+            }
         }
 
         function GetParameterByName(name, url) {
@@ -79,16 +86,19 @@
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
         window.onload = function() {
-            $("div.title").fadeIn('slow');
-            $("div.content").fadeIn('slow');
-            $("div.footer").fadeIn('slow');
-            GetReleases("junheah/MangaViewAndroid");
+            setTimeout(function (){
+                $("div.title").fadeIn('slow');
+                $("div.content").fadeIn('slow');
+                $("div.footer").fadeIn('slow');
+                GetReleases();
+            }, 800);
         }
         </script>
     </head>
     <body>
         <div class="header" onclick="location.href = 'index.html';">
-            <img style="width:100%;max-width:31.5em;padding-top:120px;padding-bottom:90px" src="web/logo.svg"/>
+            <img style="width:100%;max-width:31.5em;padding-top:120px;padding-bottom:80px" src="web/logo.svg"/>
+            <br>
             <div class="title" style="display:none;">
                 <h1> Manga View Android </h1>
                 <p> 망가쇼미 안드로이드 뷰어 </p>
@@ -97,16 +107,16 @@
         </div>
 
         <div class="content" style="display:none;">
-            <h1> 최근 릴리즈 </h1>
+            <h1> 모든 릴리즈 </h1>
             <br>
             <!-- put body content here -->
             <table class="table-downloads">
                 <thead>
                     <tr>
-                        <th>버전코드</th>
+                        <th>버전 코드</th>
                         <th>크기</th>
                         <th>다운로드 횟수</th>
-                        <th>날짜</th>
+                        <th>게시 날짜</th>
                         <th>-</th>
                     </tr>
                 </thead>
@@ -114,7 +124,7 @@
                 </tbody>
             </table>
             <center>
-                <button style="margin-top:20px;" onclick="location.href='https://github.com/junheah/MangaViewAndroid/releases'">더보기</button>
+                <button style="margin-top:20px;" id="more" disabled="true" onclick="GetReleases(); this.disabled=true;">더보기</button>
             </center>
         </div>
         <div class="footer" style="display:none;">
