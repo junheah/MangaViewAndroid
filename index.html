@@ -1,1 +1,60 @@
-<h1>title</h1>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="web/style.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+        var downloadlink = "";
+        function downloadClick(){
+            location.href = downloadlink;
+        }
+        function GetLatestReleaseInfo() {
+          $.getJSON("https://api.github.com/repos/junheah/MangaViewAndroid/releases/latest").done(function(release) {
+            var asset = release.assets[0];
+            var downloadCount = 0;
+            for (var i = 0; i < release.assets.length; i++) {
+              downloadCount += release.assets[i].download_count;
+            }
+            var oneHour = 60 * 60 * 1000;
+            var oneDay = 24 * oneHour;
+            var dateDiff = new Date() - new Date(asset.updated_at);
+            var timeAgo;
+            if (dateDiff < oneDay) {
+              timeAgo = (dateDiff / oneHour).toFixed(0) + " 시간 전";
+            } else {
+              timeAgo = (dateDiff / oneDay).toFixed(0) + " 일 전";
+            }
+            var releaseInfo = timeAgo + "에 업데이트 되었고 " + downloadCount.toLocaleString() +" 번 다운로드 되었습니다.";
+            $(".download").attr("href", asset.browser_download_url);
+            downloadlink = asset.browser_download_url;
+            $(".release-name").text("apk " +release.name);
+            $(".release-info").text(releaseInfo);
+            $("div.button-container").fadeIn('slow');
+          });
+        }
+        $( document ).ready(function() {
+            $("div.title").fadeIn('slow');
+            GetLatestReleaseInfo();
+        });
+        </script>
+    </head>
+    <body>
+        <div class="header">
+            <img style="width:300px;margin-top:50px;" src="web/logo.png"></img>
+            <div class="title">
+                <h1> Manga View Android </h1>
+                <p> 망가쇼미 안드로이드 뷰어 </p>
+            </div>
+            <br>
+            <div class="button-container" style="display:none;">
+                <button class="download" onclick="downloadClick();">
+                    <div class="dlbtn">
+                        <p>다운로드</p>
+                        <p class="release-name">⠀</p>
+                    </div>
+                </button>
+                <p class="release-info"></p>
+            </div>
+        </div>
+    </body>
+</html>

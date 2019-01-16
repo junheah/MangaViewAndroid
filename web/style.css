@@ -1,1 +1,43 @@
-
+button.download{
+    border: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 30px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.5s; /* Safari */
+    transition-duration: 0.5s;
+    background-color: white;
+    color: white;
+    background-color: #c02dff;
+}
+button.download:hover{
+    background-color: #975faf;
+    color: white;
+}
+p{
+    margin:5px;
+}
+p.release-name{
+    font-size: 12px;
+}
+p.release-info{
+    margin: 20px;
+}
+div.dlbtn{
+    padding: 10px 40px;
+}
+div.header{
+    text-align: center;
+}
+div.button-container{
+    
+}
+body{
+    font-family: 'NanumSquare', sans-serif;
+    background-color: black;
+    color: white;
+}
+h1{
+    margin: 2px;
+}
