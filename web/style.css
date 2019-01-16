@@ -3,8 +3,8 @@ button.download{
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 30px;
-    margin: 4px 2px;
+    font-size: large;
+    margin: 8px 2px;
     -webkit-transition-duration: 0.5s; /* Safari */
     transition-duration: 0.5s;
     background-color: white;
@@ -19,19 +19,17 @@ p{
     margin:5px;
 }
 p.release-name{
-    font-size: 12px;
+    font-size: small;
 }
 p.release-info{
-    margin: 20px;
+    font-size: medium;
+    margin:15px
 }
 div.dlbtn{
     padding: 10px 40px;
 }
 div.header{
     text-align: center;
-}
-div.button-container{
-
 }
 body{
     font-family: 'NanumSquare', sans-serif;
