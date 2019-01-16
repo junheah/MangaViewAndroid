@@ -3,7 +3,7 @@ button.download{
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: large;
+    font-size: 1.8em;
     margin: 8px 2px;
     -webkit-transition-duration: 0.5s; /* Safari */
     transition-duration: 0.5s;
@@ -19,10 +19,10 @@ p{
     margin:5px;
 }
 p.release-name{
-    font-size: small;
+    font-size: 0.5em;
 }
 p.release-info{
-    font-size: medium;
+    font-size: 1em;
     margin:15px
 }
 div.dlbtn{
