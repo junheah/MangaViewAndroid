@@ -24,7 +24,6 @@
         var releaselink = "";
         function GetReleases(repo) {
             $.getJSON("https://api.github.com/repos/" + repo + "/releases").done(function (json) {
-                var totalDownloadCount = 0;
                 previousUpdatedAt = moment();
 
                 for (var i = 0; i < json.length; i++) {
@@ -38,7 +37,6 @@
                     for (var i2 = 0; i2 < release.assets.length; i2++) {
                         downloadCount += release.assets[i2].download_count;
                     }
-                    totalDownloadCount += downloadCount;
                     var updatedAt = moment(asset.updated_at);
                     previousUpdatedAt = updatedAt;
                     $(".table-downloads tbody")
@@ -104,20 +102,24 @@
             <!-- put body content here -->
             <table class="table-downloads">
                 <thead>
-                <tr>
-                    <th>버전코드</th>
-                    <th>크기</th>
-                    <th>다운로드 횟수</th>
-                    <th>날짜</th>
-                    <th>-</th>
-                </tr>
+                    <tr>
+                        <th>버전코드</th>
+                        <th>크기</th>
+                        <th>다운로드 횟수</th>
+                        <th>날짜</th>
+                        <th>-</th>
+                    </tr>
                 </thead>
                 <tbody>
                 </tbody>
-            </div>
+            </table>
+            <center>
+                <button style="margin-top:20px;" onclick="location.href='https://github.com/junheah/MangaViewAndroid/releases'">더보기</button>
+            </center>
         </div>
         <div class="footer" style="display:none;">
             <!-- footer -->
+            <p style="display:inline-block;">powered by</p><a style="display:inline-block;" href="https://github.com/">Github</a>
         </div>
     </body>
 </html>

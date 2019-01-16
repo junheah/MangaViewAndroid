@@ -35,7 +35,7 @@
               timeAgo = (dateDiff / oneDay).toFixed(0) + " 일 전";
             }
             releaselink = release.html_url;
-            var releaseInfo = timeAgo + "에 업데이트 되었고 " + downloadCount.toLocaleString() +" 번 다운로드 되었습니다.";
+            var releaseInfo = timeAgo + "에 업데이트, " + downloadCount.toLocaleString() +" 회 다운로드 되었습니다.";
             $(".download").attr("href", asset.browser_download_url);
             downloadlink = asset.browser_download_url;
             $(".release-name").text("apk " +release.name);

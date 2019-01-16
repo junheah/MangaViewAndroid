@@ -88,8 +88,8 @@ div.content{
 div.footer{
     /* position: fixed; */
     /* background-color: white; */
+    box-sizing: border-box;
     width: 100%;
-
     margin:0;
     padding:10px;
     text-align: center;
