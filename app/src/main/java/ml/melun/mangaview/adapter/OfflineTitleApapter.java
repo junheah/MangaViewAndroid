@@ -33,7 +33,7 @@ public class OfflineTitleApapter extends RecyclerView.Adapter<OfflineTitleApapte
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.titles = data;
-        dark = new Preference().getDarkTheme();
+        dark = new Preference(context).getDarkTheme();
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

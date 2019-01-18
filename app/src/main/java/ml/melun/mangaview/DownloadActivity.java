@@ -32,16 +32,16 @@ public class DownloadActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference();
+        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_download);
         eplist = this.findViewById(R.id.dl_eplist);
         Intent intent = getIntent();
-        downloader = new Downloader();
+        downloader = new Downloader(this);
         try {
-            title = new Title(intent.getStringExtra("name"), "","",new ArrayList<String>());
+            title = new Title(intent.getStringExtra("name"), "","",new ArrayList<String>(),-1);
             episodes = new JSONArray(intent.getStringExtra("list"));
             eplist.setLayoutManager(new LinearLayoutManager(this));
             adapter = new SelectEpisodeAdapter(getApplicationContext(),episodes);

@@ -33,8 +33,8 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         super();
         context = main;
         mData = new ArrayList<>();
-        save = new Preference().getDataSave();
-        dark = new Preference().getDarkTheme();
+        save = new Preference(main).getDataSave();
+        dark = new Preference(main).getDarkTheme();
         this.mInflater = LayoutInflater.from(main);
     }
 
@@ -59,6 +59,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         viewHolder h = (viewHolder) holder;
         Manga m = mData.get(position);
         h.text.setText(m.getName());
+        h.date.setText(m.getDate());
         if(m.getThumb().length()>1 && !save) Glide.with(context).load(m.getThumb()).into(h.thumb);
         else h.thumb.setImageBitmap(null);
     }
@@ -69,12 +70,13 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class viewHolder extends RecyclerView.ViewHolder{
-        TextView text;
+        TextView text, date;
         ImageView thumb;
         CardView card;
         public viewHolder(View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.Title);
+            date = itemView.findViewById(R.id.TitleAuthor);
             card = itemView.findViewById(R.id.titleCard);
             thumb = itemView.findViewById(R.id.Thumb);
             if(dark){

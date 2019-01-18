@@ -35,8 +35,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     // data is passed into the constructor
     public TitleAdapter(Context context) {
-        dark = new Preference().getDarkTheme();
-        save = new Preference().getDataSave();
+        dark = new Preference(context).getDarkTheme();
+        save = new Preference(context).getDataSave();
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();

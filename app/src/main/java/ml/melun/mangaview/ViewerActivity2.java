@@ -80,7 +80,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference();
+        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
@@ -109,7 +109,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         String[] localImgs = intent.getStringArrayExtra("localImgs");
         toolbarTitle.setText(name);
         viewerBookmark = p.getViewerBookmark(id);
-        manga = new Manga(id, name);
+        manga = new Manga(id, name, "");
 
         if(localImgs!=null||id<0) {
             //load local imgs

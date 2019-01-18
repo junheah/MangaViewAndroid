@@ -34,6 +34,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
+    String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
     Boolean favorite = false;
     TypedValue outValue;
     private int bookmark = -1;
@@ -51,8 +52,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.mData = data;
         this.header = title;
         outValue = new TypedValue();
-        dark = new Preference().getDarkTheme();
-        save = new Preference().getDataSave();
+        dark = new Preference(context).getDarkTheme();
+        save = new Preference(context).getDataSave();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         if(title.getTags()!=null) {
             ta = new TagAdapter(context, title.getTags());
@@ -87,8 +88,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             HeaderHolder h = (HeaderHolder) holder;
             String title = header.getName();
             String thumb = header.getThumb();
+            int release = header.getRelease();
             h.h_title.setText(title);
             h.h_author.setText(header.getAuthor());
+            if(release>-1) h.h_release.setText(releases[release]);
+            else h.h_release.setText("");
             if(favorite) h.h_star.setImageResource(R.drawable.star_on);
             else h.h_star.setImageResource(R.drawable.star_off);
             if(!save) Glide.with(mainContext)
@@ -97,8 +101,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .into(h.h_thumb);
         }else {
             ViewHolder h = (ViewHolder) holder;
-            String episode = mData.get(position).getName();
-            h.episode.setText(episode);
+            h.episode.setText(mData.get(position).getName());
+            h.date.setText(mData.get(position).getDate());
             if (position == bookmark) {
                 if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
                 else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
@@ -118,10 +122,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView episode;
+        TextView episode,date;
         ViewHolder(View itemView) {
             super(itemView);
             episode = itemView.findViewById(R.id.episode);
+            date = itemView.findViewById(R.id.date);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -137,7 +142,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
     public class HeaderHolder extends RecyclerView.ViewHolder{
-        TextView h_title, h_author;
+        TextView h_title, h_author, h_release;
         ImageView h_thumb;
         ImageView h_star;
         Button h_download;
@@ -149,7 +154,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h_star = itemView.findViewById(R.id.FavoriteButton);
             h_download = itemView.findViewById(R.id.HeaderDownload);
             h_tags = itemView.findViewById(R.id.tagsContainer);
-            h_author = itemView.findViewById(R.id.HeaderAuthor);
+            h_author = itemView.findViewById(R.id.headerAuthor);
+            h_release = itemView.findViewById(R.id.HeaderRelease);
             h_star.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

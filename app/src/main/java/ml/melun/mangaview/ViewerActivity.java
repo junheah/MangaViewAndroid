@@ -60,7 +60,7 @@ public class ViewerActivity extends AppCompatActivity {
     ImageButton commentBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference();
+        p = new Preference(this);
         dark = p.getDarkTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
@@ -82,7 +82,7 @@ public class ViewerActivity extends AppCompatActivity {
             localImgs = intent.getStringArrayExtra("localImgs");
             toolbarTitle.setText(name);
             viewerBookmark = p.getViewerBookmark(id);
-            manga = new Manga(id, name);
+            manga = new Manga(id, name, "");
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);

@@ -33,8 +33,8 @@ public class Preference {
     static int startTab;
 
     //Offline manga has id of -1
-    public Preference(){
-        //
+    public Preference(Context context){
+        if(this.context==null) init(context);
     }
     public void init(Context mcontext){
         sharedPref = mcontext.getSharedPreferences("mangaView",Context.MODE_PRIVATE);

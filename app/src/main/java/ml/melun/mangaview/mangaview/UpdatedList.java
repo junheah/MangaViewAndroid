@@ -28,7 +28,8 @@ public class UpdatedList {
                     String ttmp = (item.selectFirst("div.thumb").attr("style").split("\\(")[1].split("\\)")[0]);
                     String ntmp = item.selectFirst("div.subject").text().replace('\n',' ');
                     int itmp = Integer.parseInt(item.selectFirst("div.data-container").attr("data-wrid"));
-                    Manga tmp = new Manga(itmp,ntmp);
+                    String dtmp = item.select("div.desc").get(1).text();
+                    Manga tmp = new Manga(itmp,ntmp,dtmp);
                     tmp.addThumb(ttmp);
                     result.add(tmp);
                 }

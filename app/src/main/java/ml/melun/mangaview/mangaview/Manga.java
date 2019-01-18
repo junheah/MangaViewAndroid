@@ -17,9 +17,10 @@ import org.jsoup.select.Elements;
 import javax.net.ssl.HttpsURLConnection;
 
 public class Manga {
-    public Manga(int i, String n) {
+    public Manga(int i, String n, String d) {
         id = i;
         name = n;
+        date = d;
     }
     public int getId() {
         return id;
@@ -30,6 +31,9 @@ public class Manga {
     public String getImg(int index){return imgs.get(index);}
     public void addThumb(String src){
         thumb = src;
+    }
+    public String getDate() {
+        return date;
     }
 
     public String getThumb() {
@@ -45,7 +49,7 @@ public class Manga {
         bcomments = new ArrayList<>();
         int tries = 0;
         //get images
-        while(imgs.size()==0 && tries < 3) {
+        while(imgs.size()==0 && tries < 2) {
             HttpsURLConnection connection = null;
             BufferedReader reader = null;
             try {
@@ -79,13 +83,13 @@ public class Manga {
                         String[] epsStrs = epsStr.split("\"");
                         //remove backslash
                         for (int i = 3; i < epsStrs.length; i += 4) {
-                            eps.add(new Manga(Integer.parseInt(epsStrs[i]),epsStrs[i-2]));
+                            eps.add(new Manga(Integer.parseInt(epsStrs[i]),epsStrs[i-2],""));
                         }
                     }else if(line.contains("<h1>")){
                         name = line.substring(line.indexOf('>')+1,line.lastIndexOf('<'));
                     }else if(line.contains("manga_name") && title==null){
                         String name = line.substring(line.indexOf("manga_name")+11,line.indexOf("class=")-2);
-                        title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>());
+                        title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>(), -1);
                     }
 
                     //if(imgs.size()>0 && eps.size()>0) break;
@@ -187,6 +191,7 @@ public class Manga {
         try {
             tmp.put("id", id);
             tmp.put("name", name);
+            tmp.put("date", date);
         }catch (Exception e){
 
         }
@@ -200,6 +205,7 @@ public class Manga {
     ArrayList<Comment> comments, bcomments;
     String thumb;
     Title title;
+    String date;
 
 }
 

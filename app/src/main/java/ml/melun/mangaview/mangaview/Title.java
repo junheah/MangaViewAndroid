@@ -10,11 +10,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Title {
-    public Title(String n, String t, String a, List<String> tg) {
+    public Title(String n, String t, String a, List<String> tg, int r) {
         name = n;
         thumb = t;
         author = a;
         tags = tg;
+        release = r;
     }
     public String getName() {
         return name;
@@ -25,6 +26,8 @@ public class Title {
     public ArrayList<Manga> getEps(){
         return eps;
     }
+    public int getRelease() { return release; }
+
     public void fetchEps() {
         //fetch episodes
         try {
@@ -33,7 +36,9 @@ public class Title {
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .get();
             for(Element e:items.select("div.slot")) {
-                eps.add(new Manga(Integer.parseInt(e.attr("data-wrid")),e.selectFirst("div.title").text()));
+                eps.add(new Manga(Integer.parseInt(e.attr("data-wrid"))
+                        ,e.selectFirst("div.title").text()
+                        ,e.selectFirst("div.addedAt").text().split(" ")[0]));
             }
             if(thumb.length()==0){
                 thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
@@ -45,6 +50,14 @@ public class Title {
             if(tags.size()==0){
                 for(Element e:items.selectFirst("div.manga-tags").select("a.tag")){
                     tags.add(e.text());
+                }
+            }
+            if(release<0){
+                try{
+                    String releaseRaw =  items.selectFirst("div.manga-thumbnail").selectFirst("a.publish_type").attr("href");
+                    release = Integer.parseInt(releaseRaw.substring(releaseRaw.lastIndexOf('=') + 1));
+                }catch (Exception e){
+
                 }
             }
 
@@ -86,7 +99,7 @@ public class Title {
         for(int i=0; i<list.length(); i++){
             try{
                 JSONObject tmp = new JSONObject(list.get(i).toString());
-                eps.add(new Manga(tmp.getInt("id"),tmp.getString("name")));
+                eps.add(new Manga(tmp.getInt("id"),tmp.getString("name"),""));
             }catch (Exception e){
 
             }
@@ -100,5 +113,6 @@ public class Title {
     private ArrayList<Integer> viewed;
     String author;
     List<String> tags;
+    int release;
 }
 

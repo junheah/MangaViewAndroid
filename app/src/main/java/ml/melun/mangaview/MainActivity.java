@@ -85,14 +85,14 @@ public class MainActivity extends AppCompatActivity
     MenuItem versionItem;
     String homeDirStr;
     SwipyRefreshLayout swipe;
-    Boolean dark = p.getDarkTheme();
+    Boolean dark;
     Intent viewer;
     Spinner searchMode;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference();
+        p = new Preference(this);
         p.init(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity
         homeDirStr = p.getHomeDir();
         dlStatContainer = findViewById(R.id.statusContainter);
         //code starts here
-        downloader = new Downloader();
+        downloader = new Downloader(this);
 
         versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
         versionItem.setTitle("v."+version);
@@ -464,6 +464,7 @@ public class MainActivity extends AppCompatActivity
                     episodeView.putExtra("thumb",selected.getThumb());
                     episodeView.putExtra("author",selected.getAuthor());
                     episodeView.putExtra("tags",new ArrayList<String>(selected.getTags()));
+                    episodeView.putExtra("release",selected.getRelease());
                     episodeView.putExtra("recent",true);
                     startActivityForResult(episodeView,2);
                 }

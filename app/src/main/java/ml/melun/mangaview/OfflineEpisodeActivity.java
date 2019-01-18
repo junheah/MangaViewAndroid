@@ -26,7 +26,7 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
     Intent viewer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference();
+        p = new Preference(this);
         if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_offline_episode);

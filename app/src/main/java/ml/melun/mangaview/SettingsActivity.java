@@ -32,12 +32,12 @@ public class SettingsActivity extends AppCompatActivity {
     Boolean dark;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference();
+        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        d = new Downloader();
+        d = new Downloader(this);
         context = this;
         s_setHomeDir = this.findViewById(R.id.setting_dir);
         s_setHomeDir.setOnClickListener(new View.OnClickListener() {

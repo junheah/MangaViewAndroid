@@ -37,7 +37,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public mainAdapter(Context main) {
         super();
         mainContext = main;
-        dark = new Preference().getDarkTheme();
+        dark = new Preference(mainContext).getDarkTheme();
         this.mInflater = LayoutInflater.from(main);
         this.itemInflater = LayoutInflater.from(main);
 
@@ -63,7 +63,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
         ranking = new ArrayList<>();
-        ranking.add(new Manga(-1,"로드중.."));
+        ranking.add(new Manga(-1,"로드중..",""));
 
 
         //fetch main page data
@@ -142,7 +142,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             notifyItemRangeInserted(6, 5 + ranking.size());
             loaded = true;
         }else{
-            ranking.add(new Manga(-1,"결과없음"));
+            ranking.add(new Manga(-1,"결과없음",""));
             notifyItemChanged(6);
             loaded = false;
         }

@@ -35,7 +35,7 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         tags = t;
         this.type = type;
         this.mInflater = LayoutInflater.from(m);
-        dark = new Preference().getDarkTheme();
+        dark = new Preference(m).getDarkTheme();
         selected = new Boolean[t.size()];
         Arrays.fill(selected,Boolean.FALSE);
     }

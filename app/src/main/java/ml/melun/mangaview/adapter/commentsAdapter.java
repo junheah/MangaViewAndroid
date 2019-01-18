@@ -27,8 +27,8 @@ public class commentsAdapter extends BaseAdapter {
     Boolean save;
     public commentsAdapter(Context context, ArrayList<Comment> data) {
         super();
-        this.dark = new Preference().getDarkTheme();
-        this.save = new Preference().getDataSave();
+        this.dark = new Preference(context).getDarkTheme();
+        this.save = new Preference(context).getDataSave();
         this.context = context;
         this.data = data;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

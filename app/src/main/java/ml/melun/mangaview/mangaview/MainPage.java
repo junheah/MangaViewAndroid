@@ -22,7 +22,7 @@ public class MainPage {
                 int tmp_id = Integer.parseInt(tmp_idStr[tmp_idStr.length-1]);
                 String tmp_thumb = e.selectFirst("img").attr("src").toString();
                 String tmp_title = e.selectFirst("img").attr("alt").toString();
-                Manga tmp = new Manga(tmp_id,tmp_title);
+                Manga tmp = new Manga(tmp_id,tmp_title,"");
                 tmp.addThumb(tmp_thumb);
                 recent.add(tmp);
             }
@@ -31,7 +31,7 @@ public class MainPage {
                 String[] tmp_link = e.selectFirst("a").attr("href").split("=");
                 int tmp_id = Integer.parseInt(tmp_link[tmp_link.length-1]);
                 String tmp_title = e.selectFirst("div.subject").text();
-                ranking.add(new Manga(tmp_id, tmp_title));
+                ranking.add(new Manga(tmp_id, tmp_title,""));
             }
         }catch (Exception e){
 

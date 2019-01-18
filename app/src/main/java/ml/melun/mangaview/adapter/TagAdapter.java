@@ -27,7 +27,7 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         mcontext = m;
         tags = t;
         this.mInflater = LayoutInflater.from(m);
-        dark = new Preference().getDarkTheme();
+        dark = new Preference(m).getDarkTheme();
     }
 
     @NonNull

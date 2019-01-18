@@ -31,7 +31,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         mainContext = context;
         this.imgs = data;
         autoCut = cut;
-        reverse = new Preference().getReverse();
+        reverse = new Preference(context).getReverse();
     }
     public void removeAll(){
         imgs.clear();

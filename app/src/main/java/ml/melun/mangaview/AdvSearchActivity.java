@@ -27,7 +27,7 @@ public class AdvSearchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        preference = new Preference();
+        preference = new Preference(this);
         if(preference.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adv_search);

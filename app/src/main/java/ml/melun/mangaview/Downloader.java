@@ -33,11 +33,11 @@ public class Downloader {
     static int status =0;
     static float progress = 0;
 
-    public Downloader(){
+    public Downloader(Context context){
         //static
         if(titles==null) titles = new ArrayList<>();
         if(dt==null) dt = new downloadTitle();
-        if(p==null) p = new Preference();
+        if(p==null) p = new Preference(context);
     }
     //pocess status no.
     // 0=idle 1=downloading

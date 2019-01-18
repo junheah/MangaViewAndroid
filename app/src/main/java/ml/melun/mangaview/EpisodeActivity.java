@@ -73,7 +73,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference();
+        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
@@ -83,7 +83,8 @@ public class EpisodeActivity extends AppCompatActivity {
         title = new Title(intent.getStringExtra("title")
                 ,intent.getStringExtra("thumb")
                 ,intent.getStringExtra("author")
-                ,intent.getStringArrayListExtra("tags"));
+                ,intent.getStringArrayListExtra("tags")
+                ,intent.getIntExtra("release",-1));
         bookmarkId = p.getBookmark();
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
@@ -123,7 +124,7 @@ public class EpisodeActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             title.fetchEps();
             episodes = title.getEps();
-            episodes.add(0,new Manga(0,""));
+            episodes.add(0,new Manga(0,"", ""));
             //find bookmark
             if(bookmarkId!=-1){
                 for(int i=0; i< episodes.size(); i++){
@@ -228,7 +229,7 @@ public class EpisodeActivity extends AppCompatActivity {
                     for(int i=1; i<episodes.size();i++) {
                         mangas.put(episodes.get(i).toString());
                     }
-                    download.putExtra("list",mangas.toString());
+                    download.putExtra("list", mangas.toString());
                     download.putExtra("name",title.getName());
                     startActivity(download);
                 }

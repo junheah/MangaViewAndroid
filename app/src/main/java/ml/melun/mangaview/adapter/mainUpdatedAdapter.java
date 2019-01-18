@@ -34,10 +34,10 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         super();
         context = c;
         mData = new ArrayList<>();
-        mData.add(new Manga(0,"로드중..."));
+        mData.add(new Manga(0,"로드중...",""));
         this.mInflater = LayoutInflater.from(c);
-        dark = new Preference().getDarkTheme();
-        save = new Preference().getDataSave();
+        dark = new Preference(c).getDarkTheme();
+        save = new Preference(c).getDataSave();
 
         //fetch data with async
         //data initialize
@@ -96,7 +96,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void setData(ArrayList<Manga> data){
         mData = data;
         if(mData.size()==0){
-            mData.add(new Manga(0,"결과 없음"));
+            mData.add(new Manga(0,"결과 없음",""));
             notifyItemChanged(0);
             loaded = false;
         }else {

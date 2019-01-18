@@ -39,7 +39,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         outValue = new TypedValue();
         selected = new Boolean[list.length()];
         Arrays.fill(selected,Boolean.FALSE);
-        dark = new Preference().getDarkTheme();
+        dark = new Preference(context).getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
     }
 
@@ -55,8 +55,9 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ViewHolder h = (ViewHolder) holder;
         try {
-            String episode = new JSONObject(data.getString(position)).getString("name");
-            h.episode.setText(episode);
+            JSONObject episode = new JSONObject(data.getString(position));
+            h.episode.setText(episode.getString("name"));
+            h.date.setText(episode.getString("date"));
             if (selected[position]) {
                 if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
                 else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
@@ -83,10 +84,11 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder{
-        TextView episode;
+        TextView episode, date;
         ViewHolder(View itemView) {
             super(itemView);
             episode = itemView.findViewById(R.id.episode);
+            date = itemView.findViewById(R.id.date);
             if(dark) episode.setTextColor(Color.WHITE);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

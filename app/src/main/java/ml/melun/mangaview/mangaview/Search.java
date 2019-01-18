@@ -104,7 +104,13 @@ public class Search {
                         tags = item.selectFirst("div.tags").select("a").eachText();
                     } catch (Exception e) {
                     }
-                    result.add(new Title(ntmp, ttmp, atmp, tags));
+                    int release = -1;
+                    try{
+                        release = Integer.parseInt(item.selectFirst("div.publish-type").attr("onclick").split("\\(")[1].split("\\)")[0]);
+                    }catch (Exception e){
+
+                    }
+                    result.add(new Title(ntmp, ttmp, atmp, tags, release));
                 }
                 if (items.size() < 30) last = true;
 
