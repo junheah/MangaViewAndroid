@@ -89,6 +89,7 @@ public class ViewerActivity extends AppCompatActivity {
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             if(localImgs!=null||id<0){
+                //todo: 화면분할 방식 바꿔서 오프라인에서도 작동하게
                 //load local imgs
                 appbarBottom.setVisibility(View.GONE);
                 commentBtn.setVisibility(View.GONE);

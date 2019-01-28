@@ -99,7 +99,7 @@ public class Title {
         for(int i=0; i<list.length(); i++){
             try{
                 JSONObject tmp = new JSONObject(list.get(i).toString());
-                eps.add(new Manga(tmp.getInt("id"),tmp.getString("name"),""));
+                eps.add(new Manga(tmp.getInt("id"),String.format("%04d", tmp.getInt("index"))+"."+tmp.getString("name"),""));
             }catch (Exception e){
 
             }

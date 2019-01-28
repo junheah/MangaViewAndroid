@@ -75,41 +75,40 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/HeaderThumb">
 
-            <android.support.v7.widget.LinearLayoutCompat
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
                 android:layout_margin="3dp"
-                android:background="@drawable/button_bg">
+                android:id="@+id/FavoriteButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/button_bg"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:padding="6dp"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/star_off" />
 
-                <ImageView
-                    android:id="@+id/FavoriteButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:padding="6dp"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/star_off" />
-            </android.support.v7.widget.LinearLayoutCompat>
 
-            <android.support.v7.widget.LinearLayoutCompat
+            <Button
+                android:id="@+id/HeaderDownload"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:layout_margin="3dp"
-                android:background="@drawable/button_bg">
-
-                <Button
-                    android:id="@+id/HeaderDownload"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:enabled="true"
-                    android:text="다운로드"
-                    android:textColor="@android:color/white"
-                    app:layout_constraintEnd_toStartOf="@+id/FavoriteButton"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </android.support.v7.widget.LinearLayoutCompat>
+                android:background="@drawable/button_bg"
+                android:enabled="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:text="다운로드"
+                android:layout_weight="1"
+                android:textColor="@android:color/white" />
+            <!--<Button-->
+                <!--android:layout_weight="1"-->
+                <!--android:id="@+id/HeaderSubscribe"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:background="@drawable/button_bg"-->
+                <!--android:foreground="?android:attr/selectableItemBackground"-->
+                <!--android:enabled="true"-->
+                <!--android:layout_margin="3dp"-->
+                <!--android:text="구독"-->
+                <!--android:textColor="@android:color/white" />-->
 
         </android.support.v7.widget.LinearLayoutCompat>
 

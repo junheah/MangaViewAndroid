@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -37,6 +38,7 @@ public class FolderSelectActivity extends AppCompatActivity {
         context = this;
         actionBar = getSupportActionBar();
         actionBar.setTitle(currentDir);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,6 +90,15 @@ public class FolderSelectActivity extends AppCompatActivity {
             }
         });
         dirList.setAdapter(arrayAdapter);
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public ArrayList<String> refresh(){

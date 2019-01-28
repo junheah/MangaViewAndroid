@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -78,6 +79,7 @@ public class TagSearchActivity extends AppCompatActivity {
                 ab.setTitle("검색결과");
                 break;
         }
+        ab.setDisplayHomeAsUpEnabled(true);
 
         if(mode == 5){
             uadapter = new UpdatedAdapter(context);
@@ -110,6 +112,14 @@ public class TagSearchActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 

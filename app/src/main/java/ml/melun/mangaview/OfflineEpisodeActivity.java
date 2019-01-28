@@ -2,10 +2,12 @@ package ml.melun.mangaview;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.io.File;
@@ -24,6 +26,7 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
     File[] episodeFiles;
     Preference p;
     Intent viewer;
+    ActionBar ab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference(this);
@@ -38,6 +41,7 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
         homeDirStr = i.getStringExtra("homeDir");
         offEpsList = findViewById(R.id.offEpsiodeList);
         System.out.println(homeDirStr+'/'+title+'/');
+        ab = getSupportActionBar();
         episodeFiles = new File(homeDirStr+'/'+title).listFiles();
         Arrays.sort(episodeFiles);
         for(File f:episodeFiles){
@@ -68,7 +72,16 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
                 startActivity(viewer);
             }
         });
+        ab.setTitle(title);
+        ab.setDisplayHomeAsUpEnabled(true);
     }
-
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

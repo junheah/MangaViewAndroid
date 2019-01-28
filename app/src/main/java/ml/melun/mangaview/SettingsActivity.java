@@ -8,6 +8,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
@@ -51,6 +52,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        s_getSd = this.findViewById(R.id.setting_externalSd);
 //        s_getSd.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -190,6 +192,14 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(l);
             }
         });
+    }
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

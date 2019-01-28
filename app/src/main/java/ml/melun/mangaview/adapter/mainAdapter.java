@@ -52,14 +52,9 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         release_lm.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         uadapter = new mainUpdatedAdapter(main);
-        List<String> tags = Arrays.asList("17","BL","GL","SF","TS","개그","게임","공포","도박","드라마","라노벨",
-                "러브코미디","로맨스","먹방","미스테리","백합","붕탁","순정","스릴러","스포츠","시대","애니화","액션",
-                "역사","요리","음악","이세계","일상","전생","추리","판타지","하렘","학원","호러");
-        tadapter = new mainTagAdapter(main, tags, 0);
-        List<String> names = Arrays.asList("ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ",
-                "ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ","A-Z","0-9");
-        nadapter = new mainTagAdapter(main, names, 1);
-        radapter = new mainTagAdapter(main, Arrays.asList("미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"), 2);
+        tadapter = new mainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_genre)), 0);
+        nadapter = new mainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_name)), 1);
+        radapter = new mainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_release)), 2);
 
 
         ranking = new ArrayList<>();

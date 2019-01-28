@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -54,12 +55,9 @@ public class AdvSearchActivity extends AppCompatActivity {
         rr.setLayoutManager(rm);
         tr.setLayoutManager(tm);
 
-        names = Arrays.asList("ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ",
-                "ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ","A-Z","0-9");
-        releases = Arrays.asList("미분류","주간","격주","월간","격월/비정기","단편","단행본","완결");
-        tags = Arrays.asList("17","BL","GL","SF","TS","개그","게임","공포","도박","드라마","라노벨",
-                "러브코미디","로맨스","먹방","미스테리","백합","붕탁","순정","스릴러","스포츠","시대","애니화","액션",
-                "역사","요리","음악","이세계","일상","전생","추리","판타지","하렘","학원","호러");
+        names = Arrays.asList(getResources().getStringArray(R.array.tag_name));
+        releases = Arrays.asList(getResources().getStringArray(R.array.tag_release));
+        tags = Arrays.asList(getResources().getStringArray(R.array.tag_genre));
         na = new mainTagAdapter(context, names,1);
         //na.setSingleSelect(true);
         ra = new mainTagAdapter(context, releases, 2);
@@ -102,9 +100,15 @@ public class AdvSearchActivity extends AppCompatActivity {
             }
         });
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
-
-
-
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

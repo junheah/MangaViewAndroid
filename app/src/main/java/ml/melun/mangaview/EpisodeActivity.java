@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
@@ -51,6 +52,16 @@ public class EpisodeActivity extends AppCompatActivity {
     ArrayList<Manga> episodes;
     Boolean dark;
     Intent viewer;
+    ActionBar actionBar;
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -95,6 +106,11 @@ public class EpisodeActivity extends AppCompatActivity {
         if(recentResult){
             Intent resultIntent = new Intent();
             setResult(RESULT_OK,resultIntent);
+        }
+        actionBar = getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setTitle(title.getName());
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
         getEpisodes g = new getEpisodes();
         g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
