@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -19,10 +20,13 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -77,6 +81,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Boolean reverse;
     Boolean touch = true;
     AlertDialog.Builder alert;
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +107,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         prevPageBtn = this.findViewById(R.id.prevPageBtn);
         touchToggleBtn = this.findViewById(R.id.touchToggleBtn);
         commentBtn = this.findViewById(R.id.commentButton);
+        spinner = this.findViewById(R.id.toolbar_spinner);
 
         Intent intent = getIntent();
         name = intent.getStringExtra("name");
@@ -428,6 +434,30 @@ public class ViewerActivity2 extends AppCompatActivity {
             result = new Intent();
             result.putExtra("id",id);
             setResult(RESULT_OK, result);
+
+            //refresh spinner
+            String[] tmp = new String[eps.size()];
+            for(int i=0;i<tmp.length;i++){ tmp[i] = Integer.toString(i+1); }
+            spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, tmp));
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
+                    int tmpi = eps.size()-position-1;
+                    if(index!=tmpi) {
+                        index = tmpi;
+                        manga = eps.get(index);
+                        id = manga.getId();
+                        loadImages l = new loadImages();
+                        l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    }
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            spinner.setSelection(eps.size()-index-1);
 
 
             if(title == null) title = manga.getTitle();

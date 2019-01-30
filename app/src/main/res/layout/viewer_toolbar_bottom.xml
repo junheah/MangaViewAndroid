@@ -19,17 +19,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Spinner
+        android:dropDownWidth="100dp"
+        android:id="@+id/toolbar_spinner"
+        android:layout_width="wrap_content"
+        android:paddingStart="13dp"
+        android:paddingEnd="13dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_next"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <ImageButton
         android:id="@+id/toolbar_previous"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
         android:src="@android:drawable/ic_media_previous"
         android:text="Button"
-        android:layout_margin="8dp"
-        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/toolbar_next"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_spinner"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
