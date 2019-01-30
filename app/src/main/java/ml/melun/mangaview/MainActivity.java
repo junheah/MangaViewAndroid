@@ -3,6 +3,7 @@ package ml.melun.mangaview;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     Preference p;
+    int startTab;
     //variables
     private ViewFlipper contentHolder;
     FloatingActionButton advSearchBtn;
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity
     Boolean dark;
     Intent viewer;
     Spinner searchMode;
+    NavigationView navigationView;
 
 
     @Override
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if(dark) {
             int[][] states = new int[][]{
@@ -142,7 +146,6 @@ public class MainActivity extends AppCompatActivity
 
         homeDirStr = p.getHomeDir();
         dlStatContainer = findViewById(R.id.statusContainter);
-        //code starts here
         downloader = new Downloader(this);
 
         versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
@@ -229,29 +232,30 @@ public class MainActivity extends AppCompatActivity
         });
 
         //set startTab and refresh views
-        int startTab = p.getStartTab();
+        startTab = p.getStartTab();
         contentHolder.setDisplayedChild(startTab);
-        switch (startTab){
-            case 0:
-                refreshViews(R.id.nav_main);
-                break;
-            case 1:
-                refreshViews(R.id.nav_search);
-                break;
-            case 2:
-                refreshViews(R.id.nav_recent);
-                break;
-            case 3:
-                refreshViews(R.id.nav_favorite);
-                break;
-            case 4:
-                refreshViews(R.id.nav_download);
-                break;
-        }
+        refreshViews(getTabId(startTab));
+        navigationView.getMenu().getItem(startTab).setChecked(true);
 
         //check update upon startup
         updateCheck u = new updateCheck();
         u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public int getTabId(int i){
+        switch(i){
+            case 0:
+                return(R.id.nav_main);
+            case 1:
+                return(R.id.nav_search);
+            case 2:
+                return(R.id.nav_recent);
+            case 3:
+                return(R.id.nav_favorite);
+            case 4:
+                return(R.id.nav_download);
+        }
+        return 0;
     }
 
 
@@ -262,7 +266,31 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if(contentHolder.getDisplayedChild()==startTab){
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Yes button clicked
+                                MainActivity.super.onBackPressed();
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder;
+                if(dark) builder = new AlertDialog.Builder(this,R.style.darkDialog);
+                else builder = new AlertDialog.Builder(this);
+                builder.setMessage("정말로 종료 하시겠습니까?").setPositiveButton("네", dialogClickListener)
+                        .setNegativeButton("아니오", dialogClickListener).show();
+            }else{
+                contentHolder.setDisplayedChild(startTab);
+                navigationView.getMenu().getItem(startTab).setChecked(true);
+                refreshViews(getTabId(startTab));
+            }
         }
     }
 
