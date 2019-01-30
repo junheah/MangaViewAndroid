@@ -93,8 +93,12 @@ public class Title {
         if(tags==null) return new ArrayList<>();
         return tags;
     }
-    public int getLatest(){
-
+    public Boolean isNew() throws Exception{
+        if(eps!=null){
+            return eps.get(0).getName().split(" ")[0].contains("NEW");
+        }else{
+            throw new Exception("not loaded");
+        }
     }
 
     public void setEps(JSONArray list){
@@ -117,6 +121,5 @@ public class Title {
     String author;
     List<String> tags;
     int release;
-    int latest;
 }
 

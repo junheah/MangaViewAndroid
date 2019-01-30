@@ -306,6 +306,7 @@ public class ViewerActivity extends AppCompatActivity {
             List<String> epsName = new ArrayList<>();
             for(int i=0; i<eps.size(); i++){
                 if(eps.get(i).getId()==id){
+                    System.out.println("ppp"+i);
                     index = i;
                 }
                 epsName.add(eps.get(i).getName());
@@ -325,18 +326,20 @@ public class ViewerActivity extends AppCompatActivity {
             else strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id)*2);
 
             //refresh spinner
-            String[] tmp = new String[eps.size()];
-            for(int i=0;i<tmp.length;i++){ tmp[i] = Integer.toString(i+1); }
-            spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, tmp));
+            spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, epsName));
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
                     ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
-                    int tmpi = eps.size()-position-1;
-                    if(index!=tmpi) {
-                        index = tmpi;
+                    System.out.println("pppp"+position);
+                    System.out.println("pppppppp"+index);
+                    if(index!= position) {
+                        index = position;
                         manga = eps.get(index);
                         id = manga.getId();
+                        System.out.println("pppp"+position);
+                        System.out.println("pppppppp"+index);
+
                         refresh();
                     }
                 }
@@ -345,7 +348,7 @@ public class ViewerActivity extends AppCompatActivity {
 
                 }
             });
-            spinner.setSelection(eps.size()-index-1);
+            spinner.setSelection(index);
 
             if(title == null) title = manga.getTitle();
             p.addRecent(title);

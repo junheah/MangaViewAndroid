@@ -4,9 +4,6 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        config {
-            storeFile file('D:/downloads/junheah_android_key.jks')
-        }
     }
     compileSdkVersion 27
     def date = new Date()

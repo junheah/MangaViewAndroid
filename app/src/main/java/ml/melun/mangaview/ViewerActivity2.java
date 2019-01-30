@@ -436,16 +436,15 @@ public class ViewerActivity2 extends AppCompatActivity {
             setResult(RESULT_OK, result);
 
             //refresh spinner
-            String[] tmp = new String[eps.size()];
-            for(int i=0;i<tmp.length;i++){ tmp[i] = Integer.toString(i+1); }
-            spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, tmp));
+            spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, epsName));
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
                     ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
-                    int tmpi = eps.size()-position-1;
-                    if(index!=tmpi) {
-                        index = tmpi;
+                    System.out.println("pppp"+position);
+                    System.out.println("pppppppp"+index);
+                    if(index!= position) {
+                        index = position;
                         manga = eps.get(index);
                         id = manga.getId();
                         loadImages l = new loadImages();
@@ -457,7 +456,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
                 }
             });
-            spinner.setSelection(eps.size()-index-1);
+            spinner.setSelection(index);
 
 
             if(title == null) title = manga.getTitle();
