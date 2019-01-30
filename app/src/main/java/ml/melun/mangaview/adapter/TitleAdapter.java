@@ -30,10 +30,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private Context mainContext;
     Boolean dark = false;
     Boolean save;
+    Boolean new = false;
 
-
-
-    // data is passed into the constructor
     public TitleAdapter(Context context) {
         dark = new Preference(context).getDarkTheme();
         save = new Preference(context).getDataSave();
@@ -47,7 +45,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         notifyItemRangeRemoved(0,originSize);
     }
 
-    // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.item_title, parent, false);
@@ -63,7 +60,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         mData.remove(from+1);
     }
 
-    // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         String title = mData.get(position).getName();
@@ -80,14 +76,11 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         else holder.thumb.setImageBitmap(null);
     }
 
-    // total number of rows
     @Override
     public int getItemCount() {
         return mData.size();
     }
 
-
-    // stores and recycles views as they are scrolled off screen
     class ViewHolder extends RecyclerView.ViewHolder{
         TextView name;
         ImageView thumb;
@@ -116,17 +109,14 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         }
     }
 
-    // convenience method for getting data at click position
     public Title getItem(int id) {
         return mData.get(id);
     }
 
-    // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
 
-    // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(int position);
     }

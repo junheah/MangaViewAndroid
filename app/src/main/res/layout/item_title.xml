@@ -36,6 +36,18 @@
                     />
 
                 <TextView
+                    android:visibility="gone"
+                    android:id="@+id/Loading"
+                    android:layout_width="80dp"
+                    android:layout_height="match_parent"
+                    android:text="로드중"
+                    android:background="@android:color/black"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+
+                <TextView
                     android:id="@+id/Title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
