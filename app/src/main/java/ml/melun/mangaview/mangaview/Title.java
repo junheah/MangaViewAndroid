@@ -93,6 +93,9 @@ public class Title {
         if(tags==null) return new ArrayList<>();
         return tags;
     }
+    public int getLatest(){
+
+    }
 
     public void setEps(JSONArray list){
         eps = new ArrayList<>();
@@ -114,5 +117,6 @@ public class Title {
     String author;
     List<String> tags;
     int release;
+    int latest;
 }
 
