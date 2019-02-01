@@ -250,18 +250,21 @@ public class Preference {
     public Boolean match(String s1, String s2){
         return filterString(s1).matches(filterString(s2));
     }
-    public String filterString(String instr){
-        int i = instr.indexOf('(');
-        int j = instr.indexOf(')');
-        int m = instr.indexOf('?');
-        if(i>-1||j>-1||m>-1){
-            char[] tmp = instr.toCharArray();
+    private String filterString(String input){
+        int i=0, j=0, m=0, k=0;
+        while(i>-1||j>-1||m>-1||k>-1){
+            i = input.indexOf('(');
+            j = input.indexOf(')');
+            m = input.indexOf('/');
+            k = input.indexOf('?');
+            char[] tmp = input.toCharArray();
             if(i>-1) tmp[i] = ' ';
             if(j>-1) tmp[j] = ' ';
             if(m>-1) tmp[m] = ' ';
-            instr = String.valueOf(tmp);
+            if(k>-1) tmp[k] = ' ';
+            input = String.valueOf(tmp);
         }
-        return instr;
+        return input;
     }
 
 }

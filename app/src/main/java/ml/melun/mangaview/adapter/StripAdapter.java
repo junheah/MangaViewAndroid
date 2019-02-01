@@ -19,7 +19,6 @@ import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.transformation.MangaCrop;
 
 public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
 

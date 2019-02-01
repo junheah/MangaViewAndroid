@@ -65,7 +65,7 @@
             android:layout_height="20dp"
             android:layout_margin="4dp"
             android:max="1000"
-            android:progress="1000"
+            android:progress="0"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

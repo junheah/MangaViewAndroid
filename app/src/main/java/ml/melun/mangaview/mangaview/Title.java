@@ -42,7 +42,6 @@ public class Title {
             }
             if(thumb.length()==0){
                 thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
-                System.out.println("ppppp"+thumb);
             }
             if(author.length()==0){
                 author = items.selectFirst("a.author").text();
@@ -106,7 +105,7 @@ public class Title {
         for(int i=0; i<list.length(); i++){
             try{
                 JSONObject tmp = new JSONObject(list.get(i).toString());
-                eps.add(new Manga(tmp.getInt("id"),String.format("%04d", tmp.getInt("index"))+"."+tmp.getString("name"),""));
+                eps.add(new Manga(tmp.getInt("id"),tmp.getString("name"),""));
             }catch (Exception e){
 
             }

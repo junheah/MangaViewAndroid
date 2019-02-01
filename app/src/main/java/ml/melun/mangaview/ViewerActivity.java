@@ -65,6 +65,7 @@ public class ViewerActivity extends AppCompatActivity {
     Spinner spinner;
     int seed;
     int epsCount = 0;
+    Boolean online;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference(this);
@@ -87,18 +88,19 @@ public class ViewerActivity extends AppCompatActivity {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");
             seed = intent.getIntExtra("seed", 0);
-            id = intent.getIntExtra("id",0);
+            id = intent.getIntExtra("id",-1);
+            System.out.println("ppppp"+id);
             localImgs = intent.getStringArrayExtra("localImgs");
             toolbarTitle.setText(name);
             viewerBookmark = p.getViewerBookmark(id);
             manga = new Manga(id, name, "");
+            online = intent.getBooleanExtra("online", true);
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
-            if(localImgs!=null||id<0){
-                //todo: 화면분할 방식 바꿔서 오프라인에서도 작동하게
+            if(!online){
                 //load local imgs
                 spinner.setVisibility(View.GONE);
                 prev.setVisibility(View.GONE);
@@ -114,6 +116,9 @@ public class ViewerActivity extends AppCompatActivity {
                         toggleToolbar();
                     }
                 });
+                if(id>-1){
+                    bookmarkRefresh();
+                }
             }else {
                 refresh();
             }
@@ -263,8 +268,15 @@ public class ViewerActivity extends AppCompatActivity {
                 toggleToolbar();
             }
         });
-
         strip.getLayoutManager().scrollToPosition(viewerBookmark);
+    }
+
+    public void bookmarkRefresh(){
+        if(viewerBookmark!=-1){
+            strip.scrollToPosition(viewerBookmark);
+        }
+        if(!autoCut) strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
+        else strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id)*2);
     }
 
 
@@ -296,10 +308,7 @@ public class ViewerActivity extends AppCompatActivity {
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
             strip.setAdapter(stripAdapter);
-            if(viewerBookmark!=-1){
-                strip.scrollToPosition(viewerBookmark);
-                System.out.println("Viewer bookmark " + viewerBookmark);
-            }
+
 
             stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                 public void onItemClick(View v, int position) {
@@ -311,7 +320,6 @@ public class ViewerActivity extends AppCompatActivity {
             List<String> epsName = new ArrayList<>();
             for(int i=0; i<eps.size(); i++){
                 if(eps.get(i).getId()==id){
-                    System.out.println("ppp"+i);
                     index = i;
                 }
                 epsName.add(eps.get(i).getName());
@@ -327,8 +335,7 @@ public class ViewerActivity extends AppCompatActivity {
             else prev.setEnabled(true);
             swipe.setRefreshing(false);
 
-            if(!autoCut) strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
-            else strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id)*2);
+
 
             //refresh spinner
             spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, epsName));
@@ -336,15 +343,10 @@ public class ViewerActivity extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
                     ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
-                    System.out.println("pppp"+position);
-                    System.out.println("pppppppp"+index);
                     if(index!= position) {
                         index = position;
                         manga = eps.get(index);
                         id = manga.getId();
-                        System.out.println("pppp"+position);
-                        System.out.println("pppppppp"+index);
-
                         refresh();
                     }
                 }
@@ -354,6 +356,8 @@ public class ViewerActivity extends AppCompatActivity {
                 }
             });
             spinner.setSelection(index);
+
+            bookmarkRefresh();
 
             if(title == null) title = manga.getTitle();
             p.addRecent(title);

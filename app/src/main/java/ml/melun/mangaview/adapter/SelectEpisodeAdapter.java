@@ -106,7 +106,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         for(int i=0; i<selected.length; i++){
             try {
                 if (selected[i]){
-                    tmp.put(new JSONObject(data.getString(i)).put("index",data.length()-i));
+                    tmp.put(new JSONObject(data.getString(i)));
                 }
             }catch (Exception e){
 

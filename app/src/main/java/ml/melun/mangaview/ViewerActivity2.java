@@ -4,16 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,16 +25,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.FitCenter;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 
@@ -48,7 +37,6 @@ import java.util.List;
 
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
-import ml.melun.mangaview.transformation.MangaCrop;
 
 
 //todo: preload images
@@ -82,6 +70,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     AlertDialog.Builder alert;
     Spinner spinner;
     int __seed=0;
+    Boolean online;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,13 +100,14 @@ public class ViewerActivity2 extends AppCompatActivity {
 
         Intent intent = getIntent();
         name = intent.getStringExtra("name");
-        id = intent.getIntExtra("id",0);
+        id = intent.getIntExtra("id",-1);
+        online = intent.getBooleanExtra("online",true);
         String[] localImgs = intent.getStringArrayExtra("localImgs");
         toolbarTitle.setText(name);
         viewerBookmark = p.getViewerBookmark(id);
         manga = new Manga(id, name, "");
 
-        if(localImgs!=null||id<0) {
+        if(!online) {
             //load local imgs
             //appbarBottom.setVisibility(View.GONE);
             next.setVisibility(View.GONE);
@@ -442,8 +432,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
                     ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
-                    System.out.println("pppp"+position);
-                    System.out.println("pppppppp"+index);
                     if(index!= position) {
                         index = position;
                         manga = eps.get(index);
