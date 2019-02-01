@@ -30,7 +30,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private Context mainContext;
     Boolean dark = false;
     Boolean save;
-    Boolean new = false;
+    Boolean updated = false;
 
     public TitleAdapter(Context context) {
         dark = new Preference(context).getDarkTheme();

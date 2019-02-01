@@ -386,6 +386,7 @@ public class MainActivity extends AppCompatActivity
                     else viewer = new Intent(context, ViewerActivity2.class);
                     viewer.putExtra("name",m.getName());
                     viewer.putExtra("id",m.getId());
+                    viewer.putExtra("seed", m.getSeed());
                     startActivity(viewer);
                 }
 
@@ -697,7 +698,7 @@ public class MainActivity extends AppCompatActivity
 
     public void checkNew(){
         //favorite adapter
-        favoriteAdapter.get
+
     }
 
 }

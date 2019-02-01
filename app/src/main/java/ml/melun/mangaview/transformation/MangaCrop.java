@@ -13,7 +13,8 @@ public class MangaCrop extends BitmapTransformation {
 
     Context mcontext;
     int type;
-    public MangaCrop(Context context, int t) {
+    int seed;
+    public MangaCrop(Context context, int t, int s) {
         super();
         mcontext = context;
         type = t;
@@ -37,6 +38,7 @@ public class MangaCrop extends BitmapTransformation {
         }
         else return toTransform;
     }
+
 
     @Override
     public void updateDiskCacheKey(@NonNull MessageDigest messageDigest) {

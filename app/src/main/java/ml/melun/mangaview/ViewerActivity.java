@@ -63,6 +63,7 @@ public class ViewerActivity extends AppCompatActivity {
     SwipyRefreshLayout swipe;
     ImageButton commentBtn;
     Spinner spinner;
+    int seed;
     int epsCount = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +86,7 @@ public class ViewerActivity extends AppCompatActivity {
         try {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");
+            seed = intent.getIntExtra("seed", 0);
             id = intent.getIntExtra("id",0);
             localImgs = intent.getStringArrayExtra("localImgs");
             toolbarTitle.setText(name);
@@ -99,10 +101,12 @@ public class ViewerActivity extends AppCompatActivity {
                 //todo: 화면분할 방식 바꿔서 오프라인에서도 작동하게
                 //load local imgs
                 spinner.setVisibility(View.GONE);
-                appbarBottom.setVisibility(View.GONE);
+                prev.setVisibility(View.GONE);
+                next.setVisibility(View.GONE);
+                spinner.setVisibility(View.GONE);
                 commentBtn.setVisibility(View.GONE);
                 imgs = new ArrayList<>(Arrays.asList(localImgs));
-                stripAdapter = new StripAdapter(context,imgs, autoCut);
+                stripAdapter = new StripAdapter(context,imgs, autoCut, seed);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                     public void onItemClick(View v, int position) {
@@ -251,7 +255,7 @@ public class ViewerActivity extends AppCompatActivity {
             cut.setBackgroundResource(R.drawable.button_bg_on);
             viewerBookmark = p.getViewerBookmark(id)*2;
         }
-        stripAdapter = new StripAdapter(context,imgs, autoCut);
+        stripAdapter = new StripAdapter(context,imgs, autoCut, seed);
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
             public void onItemClick(View v, int position) {
@@ -283,7 +287,8 @@ public class ViewerActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             manga.fetch();
             imgs = manga.getImgs();
-            stripAdapter = new StripAdapter(context,imgs, autoCut);
+            seed = manga.getSeed();
+            stripAdapter = new StripAdapter(context,imgs, autoCut, seed);
             return null;
         }
 

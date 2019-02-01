@@ -90,6 +90,9 @@ public class Manga {
                     }else if(line.contains("manga_name") && title==null){
                         String name = line.substring(line.indexOf("manga_name")+11,line.indexOf("class=")-2);
                         title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>(), -1);
+                    }else if(line.contains("var view_cnt")){
+                        String seedt = line.substring(0,line.length()-1);
+                        seed = Integer.parseInt(seedt.split(" ")[3]);
                     }
 
                     //if(imgs.size()>0 && eps.size()>0) break;
@@ -186,6 +189,11 @@ public class Manga {
 
     public ArrayList<Comment> getBestComments() { return bcomments; }
 
+    public int getSeed() {
+        System.out.println("mmmmmmmmmm"+seed);
+        return seed;
+    }
+
     public String toString(){
         JSONObject tmp = new JSONObject();
         try {
@@ -206,6 +214,6 @@ public class Manga {
     String thumb;
     Title title;
     String date;
-
+    int seed;
 }
 

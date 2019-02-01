@@ -188,6 +188,7 @@ public class TagSearchActivity extends AppCompatActivity {
                         else viewer = new Intent(context, ViewerActivity2.class);
                         viewer.putExtra("id", m.getId());
                         viewer.putExtra("name",m.getName());
+                        viewer.putExtra("seed", m.getSeed());
                         startActivityForResult(viewer,0);
                     }
                 });

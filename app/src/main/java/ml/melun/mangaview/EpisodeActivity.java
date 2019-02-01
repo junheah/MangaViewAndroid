@@ -213,6 +213,7 @@ public class EpisodeActivity extends AppCompatActivity {
                     else viewer = new Intent(context, ViewerActivity2.class);
                     viewer.putExtra("id", selected.getId());
                     viewer.putExtra("name",selected.getName());
+                    viewer.putExtra("seed", selected.getSeed());
                     startActivityForResult(viewer,0);
                 }
                 @Override

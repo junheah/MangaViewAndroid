@@ -117,4 +117,5 @@
   <com.android.tools.chunkio/>
   <com.android.tools.fakeadbserver/>
   <androidx.savedstate/>
+  <com.google.android.libraries.places/>
 </metadata>
