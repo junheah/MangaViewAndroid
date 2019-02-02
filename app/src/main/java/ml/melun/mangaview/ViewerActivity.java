@@ -108,7 +108,7 @@ public class ViewerActivity extends AppCompatActivity {
                 spinner.setVisibility(View.GONE);
                 commentBtn.setVisibility(View.GONE);
                 imgs = new ArrayList<>(Arrays.asList(localImgs));
-                stripAdapter = new StripAdapter(context,imgs, autoCut, seed);
+                stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                     public void onItemClick(View v, int position) {
@@ -260,7 +260,7 @@ public class ViewerActivity extends AppCompatActivity {
             cut.setBackgroundResource(R.drawable.button_bg_on);
             viewerBookmark = p.getViewerBookmark(id)*2;
         }
-        stripAdapter = new StripAdapter(context,imgs, autoCut, seed);
+        stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
             public void onItemClick(View v, int position) {
@@ -300,7 +300,7 @@ public class ViewerActivity extends AppCompatActivity {
             manga.fetch();
             imgs = manga.getImgs();
             seed = manga.getSeed();
-            stripAdapter = new StripAdapter(context,imgs, autoCut, seed);
+            stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
             return null;
         }
 
