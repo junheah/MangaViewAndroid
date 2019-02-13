@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -325,6 +326,10 @@ public class ViewerActivity extends AppCompatActivity {
                 epsName.add(eps.get(i).getName());
             }
             toolbarTitle.setText(manga.getName());
+            toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            toolbarTitle.setMarqueeRepeatLimit(-1);
+            toolbarTitle.setSingleLine(true);
+            toolbarTitle.setSelected(true);
 
 //            spinner.setAdapter(new ArrayAdapter<String>(context,
 //                    android.R.layout.simple_spinner_item, epsName));

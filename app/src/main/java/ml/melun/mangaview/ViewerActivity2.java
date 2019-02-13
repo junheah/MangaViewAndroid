@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -418,6 +419,10 @@ public class ViewerActivity2 extends AppCompatActivity {
                 epsName.add(eps.get(i).getName());
             }
             toolbarTitle.setText(manga.getName());
+            toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            toolbarTitle.setMarqueeRepeatLimit(-1);
+            toolbarTitle.setSingleLine(true);
+            toolbarTitle.setSelected(true);
 
             if(index==0) next.setEnabled(false);
             else next.setEnabled(true);

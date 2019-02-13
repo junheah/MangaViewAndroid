@@ -57,4 +57,5 @@ dependencies {
     //implementation 'jp.wasabeef:glide-transformations:4.0.1'
     //implementation 'com.lyft:scissors:1.1.1'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'org.mozilla:rhino:1.7R4'
 }

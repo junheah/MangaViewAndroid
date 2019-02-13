@@ -3,17 +3,22 @@ package ml.melun.mangaview;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -26,7 +31,7 @@ public class SettingsActivity extends AppCompatActivity {
     //
     Downloader d;
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll, s_reverse, s_dataSave, s_tab;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll, s_reverse, s_dataSave, s_tab, s_url;
     Spinner s_tab_spinner;
     Switch s_volumeKey_switch, s_dark_switch, s_scroll_switch, s_reverse_switch, s_dataSave_switch;
     Preference p;
@@ -192,7 +197,40 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(l);
             }
         });
+
+
+        this.findViewById(R.id.setting_url).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText input = new EditText(context);
+                input.setText(p.getUrl());
+                input.setHint("http://188.214.128.5");
+                new AlertDialog.Builder(context)
+                        .setTitle("URL 설정")
+                        .setView(input)
+                        .setPositiveButton("설정", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int button) {
+                                if(input.getText().length()>0) p.setUrl(input.getText().toString());
+                                else p.setUrl(input.getHint().toString());
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int button) {
+                                //do nothing
+                            }
+                        })
+                        .setNeutralButton("주소 확인 (트위터)", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/MSM64933093")));
+                            }
+                        })
+                        .show();
+            }
+        });
     }
+
+
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -205,7 +243,6 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         try{
             if(requestCode==2){
                 String tmp = data.getData().getPath();
