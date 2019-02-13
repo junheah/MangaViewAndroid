@@ -54,7 +54,7 @@ public class Search {
     }
     */
 
-    public void fetch() {
+    public void fetch(String base) {
         result = new ArrayList<>();
         if(!last) {
             try {
@@ -64,26 +64,25 @@ public class Search {
                 String searchUrl = "";
                 switch(mode){
                     case 0:
-                        searchUrl = "https://mangashow.me/bbs/search.php?stx=";
+                        searchUrl = base + "/bbs/search.php?stx=";
                         break;
                     case 1:
-                        searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&page=0&sfl=4&stx=";
+                        searchUrl = base + "/bbs/page.php?hid=manga_list&page=0&sfl=4&stx=";
                         break;
                     case 2:
-                        searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&sfl=3&stx=";
+                        searchUrl = base + "/bbs/page.php?hid=manga_list&sfl=3&stx=";
                         break;
                     case 3:
-                        searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&sfl=1&stx=";
+                        searchUrl = base + "/bbs/page.php?hid=manga_list&sfl=1&stx=";
                         break;
                     case 4:
-                        searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&sfl=2&stx=";
+                        searchUrl = base + "/bbs/page.php?hid=manga_list&sfl=2&stx=";
                         break;
                     case 6:
-                        searchUrl = "https://mangashow.me/bbs/page.php?hid=manga_list&search_type=";
+                        searchUrl = base + "/bbs/page.php?hid=manga_list&search_type=";
                         break;
                 }
 
-                System.out.println("ppppppppppp\n"+searchUrl+query);
                 Document search = Jsoup.connect(searchUrl + query + "&page=" + page)
                         .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                         .get();

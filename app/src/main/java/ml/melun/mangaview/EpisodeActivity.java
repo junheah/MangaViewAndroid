@@ -138,7 +138,7 @@ public class EpisodeActivity extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... params) {
-            title.fetchEps();
+            title.fetchEps(p.getUrl());
             episodes = title.getEps();
             episodes.add(0,new Manga(0,"", ""));
             //find bookmark

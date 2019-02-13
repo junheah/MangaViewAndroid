@@ -267,7 +267,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         @Override
         protected MainPage doInBackground(Void... params) {
-            MainPage u = new MainPage();
+            MainPage u = new MainPage(new Preference(mainContext).getUrl());
             return u;
         }
 

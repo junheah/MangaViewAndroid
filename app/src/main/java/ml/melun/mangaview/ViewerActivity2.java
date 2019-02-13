@@ -399,7 +399,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... params) {
-            manga.fetch();
+            manga.fetch(p.getUrl());
             imgs = manga.getImgs();
             d = new Decoder(manga.getSeed(), manga.getId());
             types=new ArrayList<>();

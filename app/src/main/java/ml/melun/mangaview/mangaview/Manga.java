@@ -1,11 +1,14 @@
 package ml.melun.mangaview.mangaview;
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import org.json.JSONObject;
@@ -16,7 +19,10 @@ import org.jsoup.select.Elements;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import ml.melun.mangaview.Preference;
+
 public class Manga {
+    String base;
     public Manga(int i, String n, String d) {
         id = i;
         name = n;
@@ -42,7 +48,7 @@ public class Manga {
     }
 
 
-    public void fetch() {
+    public void fetch(String base) {
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
         comments = new ArrayList<>();
@@ -50,17 +56,32 @@ public class Manga {
         int tries = 0;
         //get images
         while(imgs.size()==0 && tries < 2) {
-            HttpsURLConnection connection = null;
+            HttpURLConnection connection = null;
+            HttpsURLConnection sconnection = null;
             BufferedReader reader = null;
+            InputStream stream = null;
             try {
-                URL url = new URL("https://mangashow.me/bbs/board.php?bo_table=msm_manga&wr_id="+id);
-                connection = (HttpsURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Accept-Encoding", "*");
-                connection.setRequestProperty("Accept", "*");
-                connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-                connection.connect();
-                InputStream stream = connection.getInputStream();
+                URL url = new URL(base + "/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                switch(url.getProtocol()){
+                    case "http":
+                        connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        connection.setRequestProperty("Accept-Encoding", "*");
+                        connection.setRequestProperty("Accept", "*");
+                        connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+                        connection.connect();
+                        stream = connection.getInputStream();
+                        break;
+                    case "https":
+                        sconnection = (HttpsURLConnection) url.openConnection();
+                        sconnection.setRequestMethod("GET");
+                        sconnection.setRequestProperty("Accept-Encoding", "*");
+                        sconnection.setRequestProperty("Accept", "*");
+                        sconnection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+                        sconnection.connect();
+                        stream = sconnection.getInputStream();
+                        break;
+                }
                 reader = new BufferedReader(new InputStreamReader(stream));
                 //StringBuffer buffer = new StringBuffer();
                 String line = "";
@@ -144,8 +165,8 @@ public class Manga {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                if (connection != null) {
-                    connection.disconnect();
+                if (sconnection != null) {
+                    sconnection.disconnect();
                 }
                 try {
                     if (reader != null) {

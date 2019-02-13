@@ -298,7 +298,7 @@ public class ViewerActivity extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... params) {
-            manga.fetch();
+            manga.fetch(p.getUrl());
             imgs = manga.getImgs();
             seed = manga.getSeed();
             stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);

@@ -81,12 +81,12 @@ public class Downloader {
                 sendQueue(titles.size());
                 Title title = titles.get(0);
                 sendName(title.getName());
-                if(title.getEps()==null) title.fetchEps();
+                if(title.getEps()==null) title.fetchEps(p.getUrl());
                 ArrayList<Manga> mangas = title.getEps();
                 float stepSize = 1000/mangas.size();
                 for(int h=0;h<mangas.size();h++) {
                     Manga target = mangas.get(h);
-                    target.fetch();
+                    target.fetch(p.getUrl());
                     Decoder d = new Decoder(target.getSeed(), target.getId());
                     int index = getIndex(target.getEps(),target.getId());
                     ArrayList<String> urls = target.getImgs();

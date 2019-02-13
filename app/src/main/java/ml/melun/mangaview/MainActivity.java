@@ -565,7 +565,7 @@ public class MainActivity extends AppCompatActivity
             super.onPreExecute();
         }
         protected String doInBackground(String... params){
-            search.fetch();
+            search.fetch(p.getUrl());
             return null;
         }
         @Override

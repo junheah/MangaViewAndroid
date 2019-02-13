@@ -1,5 +1,7 @@
 package ml.melun.mangaview.mangaview;
 
+import android.content.Context;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,15 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import ml.melun.mangaview.Preference;
+
 
 public class MainPage {
     ArrayList<Manga> recent, ranking;
-    public MainPage(){
+    public MainPage(String url){
+
         recent = new ArrayList<>();
         ranking = new ArrayList<>();
 
         try{
-            Document doc = Jsoup.connect("https://mangashow.me")
+            Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .get();
             Elements list = doc.selectFirst("div.msm-post-gallery").select("div.post-row");

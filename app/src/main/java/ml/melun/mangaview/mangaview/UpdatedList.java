@@ -13,9 +13,9 @@ public class UpdatedList {
 
         //
     }
-    public void fetch(){
+    public void fetch(String base){
         result = new ArrayList<>();
-        String url = "https://mangashow.me/bbs/board.php?bo_table=msm_manga&page=";
+        String url = base + "/bbs/board.php?bo_table=msm_manga&page=";
         if(!last) {
             try {
                 page++;
