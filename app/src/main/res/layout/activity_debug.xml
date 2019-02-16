@@ -7,6 +7,7 @@
     tools:context=".DebugActivity">
 
     <ScrollView
+        android:id="@+id/debug_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -28,18 +29,25 @@
                 android:id="@+id/debug_pref"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="view sharedpref" />
+                android:layout_margin="10dp"
+                android:background="@drawable/item_bg"
+                android:text="sharedpref 보기" />
             <Button
                 android:id="@+id/debug_pref_edit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="edit sharedpref" />
+                android:text="sharedpref 편집" />
 
             <Button
                 android:id="@+id/debug_migrate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="북마크 이전" />
+            <Button
+                android:id="@+id/debug_removeEps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="저장된 객체들에서 화 목록 지우기" />
 
             <TextView
                 android:id="@+id/debug_out"
@@ -69,4 +77,5 @@
                 android:text="cancel" />
         </LinearLayout>
     </ScrollView>
+
 </android.support.constraint.ConstraintLayout>

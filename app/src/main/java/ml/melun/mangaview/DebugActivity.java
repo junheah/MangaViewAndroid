@@ -2,11 +2,15 @@ package ml.melun.mangaview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -23,6 +27,7 @@ import ml.melun.mangaview.mangaview.Title;
 public class DebugActivity extends AppCompatActivity {
     TextView output;
     Context context;
+    ScrollView scroll;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +35,7 @@ public class DebugActivity extends AppCompatActivity {
         Button pref =this.findViewById(R.id.debug_pref);
         output = this.findViewById(R.id.debug_out);
         context = this;
+        scroll = this.findViewById(R.id.debug_scroll);
         pref.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,6 +99,15 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
+        Button removeEps = this.findViewById(R.id.debug_removeEps);
+        removeEps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Preference(context).removeEpsFromData();
+                output.setText("작업 완료.");
+            }
+        });
+
     }
     String pref(){
         SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
@@ -140,4 +155,20 @@ public class DebugActivity extends AppCompatActivity {
     }
 
     String filter(String input){return input.replaceAll("(?<!\\\\)\\\\(?!\\\\)", "");}
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.debug_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.debug_up) {
+            scroll.fullScroll(View.FOCUS_UP);
+        }else if (id == R.id.debug_down){
+            scroll.fullScroll(View.FOCUS_DOWN);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

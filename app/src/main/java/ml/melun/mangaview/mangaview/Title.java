@@ -118,6 +118,7 @@ public class Title {
 
         return null;
     }
+    public void setBookmark(int b){bookmark = b;}
 
     private String name;
     private String thumb;

@@ -362,6 +362,7 @@ public class MainActivity extends AppCompatActivity
             }else if(id==R.id.nav_notice){
                 Intent noticesIntent = new Intent(context, NoticesActivity.class);
                 startActivity(noticesIntent);
+                return true;
             }else if(id==R.id.nav_kakao){
                 Toast.makeText(getApplicationContext(), "오픈톡방에 참가합니다.", Toast.LENGTH_LONG).show();
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));

@@ -55,6 +55,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     }
     public void addData(List<Title> t){
         int oSize = mData.size();
+        for(Title d:t){
+            d.setBookmark(p.getBookmark(d.getName()));
+        }
         mData.addAll(t);
         notifyItemRangeInserted(oSize,t.size());
     }
@@ -72,11 +75,13 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String title = mData.get(position).getName();
-        String thumb = mData.get(position).getThumb();
-        String author = mData.get(position).getAuthor();
+        Title data = mData.get(position);
+        String title = data.getName();
+        String thumb = data.getThumb();
+        String author = data.getAuthor();
         String tags ="";
-        for(String s:mData.get(position).getTags()){
+        int bookmark = data.getBookmark();
+        for(String s:data.getTags()){
             tags+=s+" ";
         }
         holder.name.setText(title);
@@ -84,9 +89,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.tags.setText(tags);
         if(thumb.length()>1 && !save)Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
-
-        if(p.getBookmark(mData.get(position).getName())>-1) holder.resume.setVisibility(View.VISIBLE);
+        if(bookmark>0) holder.resume.setVisibility(View.VISIBLE);
         else holder.resume.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -110,8 +115,11 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             tags = itemView.findViewById(R.id.TitleTag);
             card = itemView.findViewById(R.id.titleCard);
             resume = itemView.findViewById(R.id.resumeButton);
+
+
             if(dark){
                 card.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
+                resume.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.resumeDark));
             }
             card.setOnClickListener(new View.OnClickListener() {
                 @Override

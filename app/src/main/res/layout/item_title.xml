@@ -95,14 +95,13 @@
 
                 <Button
                     android:id="@+id/resumeButton"
-                    android:visibility="gone"
+                    android:textColor="@android:color/white"
                     android:layout_width="43dp"
                     android:layout_height="match_parent"
                     android:padding="0dp"
                     android:text="이\n어\n보\n기"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:textDirection="firstStrong"
-                    android:textColor="@android:color/white"
                     android:background="@android:color/darker_gray"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

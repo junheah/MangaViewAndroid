@@ -24,7 +24,7 @@ public class NoticesActivity extends AppCompatActivity {
     ArrayList<JSONObject> data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(dark = new Preference(this).getDarkTheme())setTheme(R.style.AppThemeDarkNoTitle);
+        if(dark = new Preference(this).getDarkTheme())setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notices);
         ActionBar actionBar = getSupportActionBar();

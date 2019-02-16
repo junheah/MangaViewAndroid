@@ -60,12 +60,12 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int pos) {
         holder.frame.setImageResource(R.drawable.placeholder);
+        holder.refresh.setVisibility(View.VISIBLE);
         if(autoCut) {
             final int position = pos / 2;
             final int type = pos % 2;
             String image = imgs.get(position);
             //set image to holder view
-            holder.refresh.setVisibility(View.VISIBLE);
             Glide.with(mainContext)
                     .asBitmap()
                     .load(image)

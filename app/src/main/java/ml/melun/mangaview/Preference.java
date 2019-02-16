@@ -6,14 +6,11 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Preference {
@@ -149,6 +146,7 @@ public class Preference {
     }
 
     public void addRecent(Title title){
+        title.removeEps();
         int position = getIndexOf(title);
         if(position>-1) {
             recent.add(0,recent.get(position));
@@ -304,5 +302,16 @@ public class Preference {
         }
         return input;
     }
+
+    //for debug
+    public void removeEpsFromData(){
+        for(Title t:recent){t.removeEps();}
+        for(Title t:favorite){t.removeEps();}
+        writeRecent();
+        Gson gson = new Gson();
+        prefsEditor.putString("favorite", gson.toJson(favorite));
+        prefsEditor.commit();
+    }
+
 
 }
