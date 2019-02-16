@@ -39,7 +39,9 @@
         <activity
             android:name=".CommentsActivity"
             android:label="댓글"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".DebugActivity" />
+        <activity android:name=".NoticesActivity"></activity>
     </application>
 
 </manifest>

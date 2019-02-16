@@ -139,6 +139,15 @@ public class TagSearchActivity extends AppCompatActivity {
                 searchResult.setAdapter(adapter);
                 adapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
+                    public void onResumeClick(int position, int id) {
+                        Intent viewer;
+                        if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
+                        else viewer = new Intent(context, ViewerActivity2.class);
+                        viewer.putExtra("id",id);
+                        startActivity(viewer);
+                    }
+
+                    @Override
                     public void onItemClick(int position) {
                         // start intent : Episode viewer
                         Title selected = adapter.getItem(position);
@@ -150,6 +159,11 @@ public class TagSearchActivity extends AppCompatActivity {
                         episodeView.putExtra("author", selected.getAuthor());
                         episodeView.putExtra("tags", new ArrayList<String>(selected.getTags()));
                         startActivity(episodeView);
+                    }
+
+                    @Override
+                    public void onLongClick(View view, int position) {
+
                     }
                 });
             }else{

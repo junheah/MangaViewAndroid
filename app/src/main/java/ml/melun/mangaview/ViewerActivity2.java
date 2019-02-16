@@ -40,7 +40,10 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
-
+/*todo: glide를 안쓰고 프리로딩 서비스를 만들어서, 현재 페이지가 갑자기 바뀌었을 때도 dynamic 하게 처리할 수 있도록 하던가,
+* 아니면 그냥 recycler 쓰던가 합시다
+* 아니면 처음에 포문으로 이미지를 전부 한번씩 글라이드로 로딩 하면 될수도? (이미지 뷰에 안넣어도 캐싱을 한다는 가정 하에) = 안됨
+*/
 //todo: preload images
 public class ViewerActivity2 extends AppCompatActivity {
     Preference p;
@@ -109,6 +112,10 @@ public class ViewerActivity2 extends AppCompatActivity {
         viewerBookmark = p.getViewerBookmark(id);
         manga = new Manga(id, name, "");
 
+        if(intent.getBooleanExtra("recent",false)){
+            Intent resultIntent = new Intent();
+            setResult(RESULT_OK,resultIntent);
+        }
         if(!online) {
             //load local imgs
             //appbarBottom.setVisibility(View.GONE);
@@ -298,7 +305,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             viewerBookmark--;
             final String image = imgs.get(viewerBookmark);
             //placeholder
-            //frame.setImageResource(R.drawable.placeholder);
+            frame.setImageResource(R.drawable.placeholder);
             Glide.with(context)
                     .asBitmap()
                     .load(image)
@@ -324,6 +331,22 @@ public class ViewerActivity2 extends AppCompatActivity {
         if(0==viewerBookmark) p.removeViewerBookmark(id);
         updatePageIndex();
 
+    }
+
+    void preload(){
+        for(int i=viewerBookmark; i<imgs.size(); i++){
+            String image = imgs.get(i);
+            Glide.with(context)
+                    .asBitmap()
+                    .load(image)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(Bitmap bitmap,
+                                                    Transition<? super Bitmap> transition) {
+                            //preload
+                        }
+                    });
+        }
     }
 
 
@@ -402,8 +425,6 @@ public class ViewerActivity2 extends AppCompatActivity {
             manga.fetch(p.getUrl());
             imgs = manga.getImgs();
             d = new Decoder(manga.getSeed(), manga.getId());
-            types=new ArrayList<>();
-            for(int i=0; i<imgs.size()*2;i++) types.add(-1);
             return null;
         }
 
@@ -454,9 +475,10 @@ public class ViewerActivity2 extends AppCompatActivity {
             spinner.setSelection(index);
 
 
+            preload();
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
-            p.setBookmark(id);
+            p.setBookmark(title.getName(),id);
             viewerBookmark = p.getViewerBookmark(id);
             refreshImage();
             if (pd.isShowing()) {

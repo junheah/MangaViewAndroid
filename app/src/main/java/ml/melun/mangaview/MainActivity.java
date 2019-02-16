@@ -2,9 +2,12 @@ package ml.melun.mangaview;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -18,8 +21,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
+import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -240,6 +245,9 @@ public class MainActivity extends AppCompatActivity
         //check update upon startup
         updateCheck u = new updateCheck();
         u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        //check for notice
+        noticeCheck n = new noticeCheck();
+        n.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public int getTabId(int i){
@@ -313,6 +321,10 @@ public class MainActivity extends AppCompatActivity
             Intent settingIntent = new Intent(context, SettingsActivity.class);
             startActivity(settingIntent);
             return true;
+        }else if(id == R.id.action_debug){
+            Intent debug = new Intent(context, DebugActivity.class);
+            startActivity(debug);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -343,10 +355,13 @@ public class MainActivity extends AppCompatActivity
             mode = 4;
         }else{
             //don't refresh views
-            if(id==R.id.nav_update){
+            if(id==R.id.nav_update) {
                 //check update
                 updateCheck u = new updateCheck();
                 u.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }else if(id==R.id.nav_notice){
+                Intent noticesIntent = new Intent(context, NoticesActivity.class);
+                startActivity(noticesIntent);
             }else if(id==R.id.nav_kakao){
                 Toast.makeText(getApplicationContext(), "오픈톡방에 참가합니다.", Toast.LENGTH_LONG).show();
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
@@ -422,7 +437,6 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
-
         }else if(id==R.id.nav_search){
             //search content
             noresult = this.findViewById(R.id.noResult);
@@ -480,6 +494,23 @@ public class MainActivity extends AppCompatActivity
             recentResult.setAdapter(recentAdapter);
             recentAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                 @Override
+                public void onLongClick(View view, int position) {
+                    //longclick
+                    popup(view, position, recentAdapter.getItem(position), 1);
+                }
+
+                @Override
+                public void onResumeClick(int position, int id) {
+                    selectedPosition = position;
+                    p.addRecent(recentAdapter.getItem(position));
+                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
+                    else viewer = new Intent(context, ViewerActivity2.class);
+                    viewer.putExtra("id",id);
+                    viewer.putExtra("recent",true);
+                    startActivityForResult(viewer, 2);
+                }
+
+                @Override
                 public void onItemClick(int position) {
                     // start intent : Episode viewer
                     Title selected = recentAdapter.getItem(position);
@@ -502,6 +533,19 @@ public class MainActivity extends AppCompatActivity
             favoriteResult.setLayoutManager(new LinearLayoutManager(this));
             favoriteResult.setAdapter(favoriteAdapter);
             favoriteAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
+                @Override
+                public void onResumeClick(int position, int id) {
+                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
+                    else viewer = new Intent(context, ViewerActivity2.class);
+                    viewer.putExtra("id",id);
+                    startActivity(viewer);
+                }
+
+                @Override
+                public void onLongClick(View view, int position) {
+                    popup(view, position, favoriteAdapter.getItem(position), 2);
+                }
+
                 @Override
                 public void onItemClick(int position) {
                     // start intent : Episode viewer
@@ -551,9 +595,6 @@ public class MainActivity extends AppCompatActivity
                 case 2:
                     //recent result
                     recentAdapter.moveItemToTop(selectedPosition);
-                    for(int i= selectedPosition; i>0; i--){
-                        recentAdapter.notifyItemMoved(i,i-1);
-                    }
                     break;
 
             }
@@ -575,6 +616,19 @@ public class MainActivity extends AppCompatActivity
                 searchAdapter.addData(search.getResult());
                 searchResult.setAdapter(searchAdapter);
                 searchAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
+                    @Override
+                    public void onLongClick(View view, int position) {
+                        //none
+                    }
+
+                    @Override
+                    public void onResumeClick(int position, int id) {
+                        if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
+                        else viewer = new Intent(context, ViewerActivity2.class);
+                        viewer.putExtra("id",id);
+                        startActivity(viewer);
+                    }
+
                     @Override
                     public void onItemClick(int position) {
                         // start intent : Episode viewer
@@ -654,11 +708,6 @@ public class MainActivity extends AppCompatActivity
     private class updateCheck extends AsyncTask<Void, Integer, Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
-            if(dark) pd = new ProgressDialog(MainActivity.this, R.style.darkDialog);
-            else pd = new ProgressDialog(MainActivity.this);
-            pd.setMessage("업데이트 확인중");
-            pd.setCancelable(false);
-            pd.show();
         }
 
         protected Integer doInBackground(Void... params) {
@@ -689,14 +738,123 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(getApplicationContext(), "새로운 버전을 찾았습니다. 다운로드 페이지로 이동합니다.", Toast.LENGTH_LONG).show();
                     break;
             }
-            if (pd.isShowing()){
-                pd.dismiss();
-            }
         }
     }
 
-    public void checkNew(){
+    private class noticeCheck extends AsyncTask<Void, Void, Integer> {
+        String title, content, date;
+        int nid = 0;
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+        protected Integer doInBackground(Void... params) {
+            try {
+                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/notice.json");
+                JSONObject data = new JSONObject(rawdata);
+                title = data.getString("title");
+                System.out.println("pppppp"+title);
+                content = data.getString("content");
+                date = data.getString("date");
+                nid = data.getInt("id");
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return 0;
+        }
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            if(nid>0) showNotice(nid,title,content,date);
+        }
+    }
+
+    void showNotice(int nid, String title, String content, String date){
+        //공지 표시
+        try {
+            SharedPreferences sharedPref = context.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
+            JSONObject notices = new JSONObject(sharedPref.getString("notices", "{}"));
+            try {
+                if (notices.getJSONObject(nid + "").getString("content").length() > 0) {
+                    //notice already exists
+                }
+            }catch (Exception e) {
+                JSONObject notice = new JSONObject();
+                notice.put("title", title).put("content", content).put("date", date);
+                notices.put(nid + "", notice);
+                sharedPref.edit().putString("notices", notices.toString()).commit();
+                //show notice
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //
+                    }
+                };
+                AlertDialog.Builder builder;
+                if (dark) builder = new AlertDialog.Builder(this, R.style.darkDialog);
+                else builder = new AlertDialog.Builder(this);
+                builder.setTitle("공지")
+                        .setMessage(title + "\n\n" + content)
+                        .setPositiveButton("확인", dialogClickListener)
+                        .show();
+            }
+        }catch (Exception e){e.printStackTrace();}
+    }
+
+    void checkNew(){
         //favorite adapter
+
+    }
+
+    void popup(View view, final int position, final Title title, final int m){
+        PopupMenu popup = new PopupMenu(MainActivity.this, view);
+        //Inflating the Popup using xml file
+
+        popup.getMenuInflater()
+                .inflate(R.menu.title_options, popup.getMenu());
+        switch(m){
+            case 0:
+                //검색
+                break;
+            case 1:
+                //최근
+                if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
+                else popup.getMenu().removeItem(R.id.favDel);
+                break;
+            case 2:
+                //좋아요
+                popup.getMenu().removeItem(R.id.favAdd);
+                popup.getMenu().removeItem(R.id.del);
+                break;
+        }
+
+        if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
+        else popup.getMenu().removeItem(R.id.favDel);
+
+
+        //registering popup with OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                switch(item.getItemId()){
+                    case R.id.del:
+                        //delete (only in recent)
+                        recentAdapter.remove(position);
+                        p.removeRecent(position);
+                        recentAdapter.notifyItemRemoved(position);
+                        break;
+                    case R.id.favAdd:
+                    case R.id.favDel:
+                        //toggle favorite
+                        p.toggleFavorite(title,0);
+                        if(m==2){
+                            favoriteAdapter.remove(position);
+                            favoriteAdapter.notifyItemRemoved(position);
+                        }
+                        break;
+                }
+                return true;
+            }
+        });
+
+        popup.show(); //showing popup menu
 
     }
 

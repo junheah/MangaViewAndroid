@@ -24,6 +24,7 @@ public class Preference {
     static ArrayList<Title> favorite;
     static SharedPreferences.Editor prefsEditor;
     static JSONObject pagebookmark;
+    static JSONObject bookmark;
     static String homeDir;
     static Boolean volumeControl;
     static Boolean darkTheme;
@@ -51,6 +52,7 @@ public class Preference {
             volumeControl = sharedPref.getBoolean("volumeControl",false);
             //pagebookmark = {id:page}
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
+            bookmark = new JSONObject(sharedPref.getString("bookmark2", "{}"));
             darkTheme = sharedPref.getBoolean("darkTheme", false);
             scrollViewer = sharedPref.getBoolean("scrollViewer",true);
             reverse = sharedPref.getBoolean("pageReverse",false);
@@ -141,6 +143,10 @@ public class Preference {
         prefsEditor.putString("homeDir", homeDir);
         prefsEditor.commit();
     }
+    public void removeRecent(int position){
+        recent.remove(position);
+        writeRecent();
+    }
 
     public void addRecent(Title title){
         int position = getIndexOf(title);
@@ -165,16 +171,35 @@ public class Preference {
         return -1;
     }
 
-    public void setBookmark(int id){
-        //always set bookmark at index 0 : to view episodes, title has to be added to index 0
-        recent.get(0).setBookmark(id);
-        writeRecent();
+    public void setBookmark(String title, int id){
+        try {
+            bookmark.put(title, id);
+        } catch (Exception e) {
+            //
+        }
+        writeBookmark();
     }
-    public int getBookmark(){
-        return recent.get(0).getBookmark();
+    public int getBookmark(String title){
+        //return recent.get(0).getBookmark();
+        try {
+            return  bookmark.getInt(title);
+        } catch (Exception e) {
+            //
+        }
+        return -1;
+    }
+    public void writeBookmark(){
+        prefsEditor.putString("bookmark2", bookmark.toString());
+        prefsEditor.commit();
     }
 
     public void resetBookmark(){
+        try {
+            bookmark = new JSONObject("{}");
+        }catch (Exception e){}
+        writeBookmark();
+    }
+    public void resetRecent(){
         recent = new ArrayList<>();
         writeRecent();
     }
@@ -226,6 +251,7 @@ public class Preference {
     public Boolean toggleFavorite(Title title, int position){
         int index = findFavorite(title);
         if(index==-1){
+            title.removeEps();
             favorite.add(position,title);
             Gson gson = new Gson();
             prefsEditor.putString("favorite", gson.toJson(favorite));

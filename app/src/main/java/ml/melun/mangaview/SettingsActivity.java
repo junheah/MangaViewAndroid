@@ -77,6 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 //Yes button clicked
                                 p.resetBookmark();
                                 p.resetViewerBookmark();
+                                p.resetRecent();
                                 Toast.makeText(context,"초기화 되었습니다.",Toast.LENGTH_LONG).show();
                                 break;
 
@@ -205,8 +206,10 @@ public class SettingsActivity extends AppCompatActivity {
                 final EditText input = new EditText(context);
                 input.setText(p.getUrl());
                 input.setHint("http://188.214.128.5");
-                new AlertDialog.Builder(context)
-                        .setTitle("URL 설정")
+                AlertDialog.Builder builder;
+                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                else builder = new AlertDialog.Builder(context);
+                builder.setTitle("URL 설정")
                         .setView(input)
                         .setPositiveButton("설정", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int button) {

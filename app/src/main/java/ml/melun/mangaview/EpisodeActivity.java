@@ -96,7 +96,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 ,intent.getStringExtra("author")
                 ,intent.getStringArrayListExtra("tags")
                 ,intent.getIntExtra("release",-1));
-        bookmarkId = p.getBookmark();
+        bookmarkId = p.getBookmark(title.getName());
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
@@ -208,7 +208,7 @@ public class EpisodeActivity extends AppCompatActivity {
                     Manga selected = episodeAdapter.getItem(position);
                     System.out.println(selected.getId());
 
-                    p.setBookmark(selected.getId());
+                    p.setBookmark(title.getName(),selected.getId());
                     if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
                     else viewer = new Intent(context, ViewerActivity2.class);
                     viewer.putExtra("id", selected.getId());

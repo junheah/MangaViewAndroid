@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
 
@@ -58,11 +59,13 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int pos) {
+        holder.frame.setImageResource(R.drawable.placeholder);
         if(autoCut) {
             final int position = pos / 2;
             final int type = pos % 2;
             String image = imgs.get(position);
             //set image to holder view
+            holder.refresh.setVisibility(View.VISIBLE);
             Glide.with(mainContext)
                     .asBitmap()
                     .load(image)
@@ -92,6 +95,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                                     holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap.getWidth(), 1, Bitmap.Config.ARGB_8888));
                                 }
                             }
+                            holder.refresh.setVisibility(View.GONE);
                         }
                     });
         }
@@ -105,6 +109,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                                                 Transition<? super Bitmap> transition) {
                         Bitmap decoded = d.decode(bitmap);
                         holder.frame.setImageBitmap(decoded);
+                        holder.refresh.setVisibility(View.GONE);
                     }
                 });
     }
@@ -123,14 +128,23 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView frame;
+        ImageButton refresh;
         ViewHolder(View itemView) {
             super(itemView);
             frame = itemView.findViewById(R.id.frame);
+            refresh = itemView.findViewById(R.id.refreshButton);
+            refresh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //refresh image
+                    notifyItemChanged(getAdapterPosition());
+                }
+            });
             itemView.setOnClickListener(this);
         }
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            if (mClickListener != null) mClickListener.onItemClick();
         }
     }
 
@@ -141,7 +155,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick();
     }
 
 

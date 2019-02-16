@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DebugActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/debug_clear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="clear output" />
+            <Button
+                android:id="@+id/debug_pref"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="view sharedpref" />
+            <Button
+                android:id="@+id/debug_pref_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="edit sharedpref" />
+
+            <Button
+                android:id="@+id/debug_migrate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="북마크 이전" />
+
+            <TextView
+                android:id="@+id/debug_out"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:longClickable="true"
+                android:text="output"
+                android:textIsSelectable="true" />
+            <EditText
+                android:visibility="gone"
+                android:id="@+id/debug_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textMultiLine"/>
+            <Button
+                android:visibility="gone"
+                android:id="@+id/debug_save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="save" />
+            <Button
+                android:visibility="gone"
+                android:id="@+id/debug_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="cancel" />
+        </LinearLayout>
+    </ScrollView>
+</android.support.constraint.ConstraintLayout>

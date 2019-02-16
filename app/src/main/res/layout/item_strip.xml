@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -18,4 +19,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:srcCompat="@drawable/placeholder"/>
+
+    <ImageButton
+        android:id="@+id/refreshButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:srcCompat="@drawable/baseline_refresh_black_48"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="5dp"
+        android:background="?android:attr/selectableItemBackground"/>
 </android.support.constraint.ConstraintLayout>

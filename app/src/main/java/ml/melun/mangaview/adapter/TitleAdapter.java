@@ -10,6 +10,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,10 +32,12 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     Boolean dark = false;
     Boolean save;
     Boolean updated = false;
+    Preference p;
 
     public TitleAdapter(Context context) {
-        dark = new Preference(context).getDarkTheme();
-        save = new Preference(context).getDataSave();
+        p = new Preference(context);
+        dark = p.getDarkTheme();
+        save = p.getDataSave();
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
@@ -58,6 +61,13 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public void moveItemToTop(int from){
         mData.add(0, mData.get(from));
         mData.remove(from+1);
+        for(int i= from; i>0; i--){
+            notifyItemMoved(i,i-1);
+        }
+    }
+
+    public void remove(int pos){
+        mData.remove(pos);
     }
 
     @Override
@@ -74,6 +84,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.tags.setText(tags);
         if(thumb.length()>1 && !save)Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
+
+        if(p.getBookmark(mData.get(position).getName())>-1) holder.resume.setVisibility(View.VISIBLE);
+        else holder.resume.setVisibility(View.GONE);
     }
 
     @Override
@@ -86,6 +99,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         ImageView thumb;
         TextView author;
         TextView tags;
+        Button resume;
         CardView card;
 
         ViewHolder(View itemView) {
@@ -95,6 +109,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             author =itemView.findViewById(R.id.TitleAuthor);
             tags = itemView.findViewById(R.id.TitleTag);
             card = itemView.findViewById(R.id.titleCard);
+            resume = itemView.findViewById(R.id.resumeButton);
             if(dark){
                 card.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
             }
@@ -102,6 +117,19 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     mClickListener.onItemClick(getAdapterPosition());
+                }
+            });
+            card.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mClickListener.onLongClick(v, getAdapterPosition());
+                    return true;
+                }
+            });
+            resume.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mData.get(getAdapterPosition()).getName()));
                 }
             });
 
@@ -119,5 +147,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     public interface ItemClickListener {
         void onItemClick(int position);
+        void onLongClick(View view, int position);
+        void onResumeClick(int position, int id);
     }
 }

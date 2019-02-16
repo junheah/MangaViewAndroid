@@ -27,6 +27,9 @@
                 android:id="@+id/nav_update"
                 android:title="업데이트 확인" />
             <item
+                android:id="@+id/nav_notice"
+                android:title="공지 사항" />
+            <item
                 android:id="@+id/nav_kakao"
                 android:title="오픈 카톡 참가" />
             <item

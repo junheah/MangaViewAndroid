@@ -84,10 +84,8 @@ public class Title {
     public void setThumb(String thumb) {
         this.thumb = thumb;
     }
-
-    public int getEpsCount(){ return eps.size();}
     public int getBookmark(){ return bookmark;}
-    public void setBookmark(int id){bookmark = id;}
+    public int getEpsCount(){ return eps.size();}
     public List<String> getTags(){
         if(tags==null) return new ArrayList<>();
         return tags;
@@ -110,6 +108,15 @@ public class Title {
 
             }
         }
+    }
+
+    public void removeEps(){
+        eps = new ArrayList<>();
+    }
+
+    public String toString(){
+
+        return null;
     }
 
     private String name;

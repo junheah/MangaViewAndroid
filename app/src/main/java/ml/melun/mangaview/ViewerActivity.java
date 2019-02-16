@@ -101,6 +101,10 @@ public class ViewerActivity extends AppCompatActivity {
             manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
+            if(intent.getBooleanExtra("recent",false)){
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK,resultIntent);
+            }
             if(!online){
                 //load local imgs
                 spinner.setVisibility(View.GONE);
@@ -112,7 +116,7 @@ public class ViewerActivity extends AppCompatActivity {
                 stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
-                    public void onItemClick(View v, int position) {
+                    public void onItemClick() {
                         // show/hide toolbar
                         toggleToolbar();
                     }
@@ -264,7 +268,7 @@ public class ViewerActivity extends AppCompatActivity {
         stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
-            public void onItemClick(View v, int position) {
+            public void onItemClick() {
                 // show/hide toolbar
                 toggleToolbar();
             }
@@ -312,7 +316,7 @@ public class ViewerActivity extends AppCompatActivity {
 
 
             stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
-                public void onItemClick(View v, int position) {
+                public void onItemClick() {
                     // show/hide toolbar
                     toggleToolbar();
                 }
@@ -366,7 +370,7 @@ public class ViewerActivity extends AppCompatActivity {
 
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
-            p.setBookmark(id);
+            p.setBookmark(title.getName(), id);
             result = new Intent();
             result.putExtra("id",id);
             setResult(RESULT_OK, result);
