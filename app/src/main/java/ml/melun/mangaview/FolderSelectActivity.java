@@ -33,6 +33,9 @@ public class FolderSelectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder_select);
         currentDir = p.getHomeDir();
+        File hd = new File(p.getHomeDir());
+        if(!hd.exists()) hd.mkdir();
+
         dirList = this.findViewById(R.id.dirList);
         select = this.findViewById(R.id.dirSelectBtn);
         context = this;
@@ -103,11 +106,15 @@ public class FolderSelectActivity extends AppCompatActivity {
 
     public ArrayList<String> refresh(){
         File[] files = new File(currentDir).listFiles();
-        Arrays.sort(files);
         ArrayList<String> tmp = new ArrayList<>();
         tmp.add("..");
-        for(File f: files){
-            if(f.isDirectory()) tmp.add(f.getName());
+        try {
+            Arrays.sort(files);
+            for (File f : files) {
+                if (f.isDirectory()) tmp.add(f.getName());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         actionBar.setTitle(currentDir);
         return tmp;

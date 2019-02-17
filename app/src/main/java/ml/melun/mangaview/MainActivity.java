@@ -44,6 +44,9 @@ import android.widget.ViewFlipper;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import org.acra.ACRA;
+import org.acra.config.CoreConfigurationBuilder;
+import org.acra.data.StringFormat;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -107,6 +110,11 @@ public class MainActivity extends AppCompatActivity
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
+        builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.JSON);
+        //builder.getPluginConfigurationBuilder(ToastConfigurationBuilder.class).setResText(R.string.acra_toast_text);
+        //ACRA.init(this, builder);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

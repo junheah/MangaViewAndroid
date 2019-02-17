@@ -47,7 +47,7 @@ import ml.melun.mangaview.mangaview.Title;
 //todo: preload images
 public class ViewerActivity2 extends AppCompatActivity {
     Preference p;
-    Boolean dark;
+    Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, online, stretch;
     Context context = this;
     String name;
     int id;
@@ -57,7 +57,6 @@ public class ViewerActivity2 extends AppCompatActivity {
     Button pageBtn, nextPageBtn, prevPageBtn, touchToggleBtn;
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
-    Boolean volumeControl;
     int viewerBookmark = -1;
     ArrayList<String> imgs;
     ArrayList<Integer> types;
@@ -68,13 +67,10 @@ public class ViewerActivity2 extends AppCompatActivity {
     ImageView frame;
     int type=-1;
     Bitmap imgCache, preloadImg;
-    Boolean toolbarshow =true;
     Intent result;
-    Boolean reverse;
-    Boolean touch = true;
     AlertDialog.Builder alert;
     Spinner spinner;
-    Boolean online;
+
     Decoder d;
 
     @Override
@@ -102,6 +98,8 @@ public class ViewerActivity2 extends AppCompatActivity {
         touchToggleBtn = this.findViewById(R.id.touchToggleBtn);
         commentBtn = this.findViewById(R.id.commentButton);
         spinner = this.findViewById(R.id.toolbar_spinner);
+        stretch = p.getStretch();
+        if(stretch) frame.setScaleType(ImageView.ScaleType.FIT_XY);
 
         Intent intent = getIntent();
         name = intent.getStringExtra("name");

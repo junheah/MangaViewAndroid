@@ -31,15 +31,16 @@ public class SettingsActivity extends AppCompatActivity {
     //
     Downloader d;
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll, s_reverse, s_dataSave, s_tab, s_url;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll, s_reverse, s_dataSave, s_tab, s_url, s_stretch;
     Spinner s_tab_spinner;
-    Switch s_volumeKey_switch, s_dark_switch, s_scroll_switch, s_reverse_switch, s_dataSave_switch;
+    Switch s_volumeKey_switch, s_dark_switch, s_scroll_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch;
     Preference p;
     Boolean dark;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference(this);
         dark = p.getDarkTheme();
+
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
@@ -231,6 +232,23 @@ public class SettingsActivity extends AppCompatActivity {
                         .show();
             }
         });
+
+        s_stretch = this.findViewById(R.id.setting_stretch);
+        s_stretch_switch = this.findViewById(R.id.setting_stretch_switch);
+        s_stretch_switch.setChecked(p.getStretch());
+        s_stretch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_stretch_switch.toggle();
+            }
+        });
+        s_stretch_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setStretch(isChecked);
+            }
+        });
+
     }
 
 
