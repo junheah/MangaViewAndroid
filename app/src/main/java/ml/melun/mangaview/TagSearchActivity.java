@@ -140,9 +140,16 @@ public class TagSearchActivity extends AppCompatActivity {
                 adapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
                     public void onResumeClick(int position, int id) {
-                        Intent viewer;
-                        if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
-                        else viewer = new Intent(context, ViewerActivity2.class);
+                        Intent viewer = null;
+                        switch (p.getViewerType()){
+                            case 0:
+                            case 2:
+                                viewer = new Intent(context, ViewerActivity.class);
+                                break;
+                            case 1:
+                                viewer = new Intent(context, ViewerActivity2.class);
+                                break;
+                        }
                         viewer.putExtra("id",id);
                         startActivity(viewer);
                     }
@@ -197,9 +204,16 @@ public class TagSearchActivity extends AppCompatActivity {
                     @Override
                     public void onclick(Manga m) {
                         //open viewer
-                        Intent viewer;
-                        if(p.getScrollViewer())  viewer = new Intent(context, ViewerActivity.class);
-                        else viewer = new Intent(context, ViewerActivity2.class);
+                        Intent viewer = null;
+                        switch (p.getViewerType()){
+                            case 0:
+                            case 2:
+                                viewer = new Intent(context, ViewerActivity.class);
+                                break;
+                            case 1:
+                                viewer = new Intent(context, ViewerActivity2.class);
+                                break;
+                        }
                         viewer.putExtra("id", m.getId());
                         viewer.putExtra("name",m.getName());
                         viewer.putExtra("seed", m.getSeed());

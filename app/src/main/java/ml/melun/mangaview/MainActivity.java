@@ -405,9 +405,15 @@ public class MainActivity extends AppCompatActivity
                     //get title from manga m and start intent for manga m
                     //getTitleFromManga intentStarter = new getTitleFromManga();
                     //intentStarter.execute(m);
-
-                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
-                    else viewer = new Intent(context, ViewerActivity2.class);
+                    switch (p.getViewerType()){
+                        case 0:
+                        case 2:
+                            viewer = new Intent(context, ViewerActivity.class);
+                            break;
+                        case 1:
+                            viewer = new Intent(context, ViewerActivity2.class);
+                            break;
+                    }
                     viewer.putExtra("name",m.getName());
                     viewer.putExtra("id",m.getId());
                     viewer.putExtra("seed", m.getSeed());
@@ -512,8 +518,15 @@ public class MainActivity extends AppCompatActivity
                 public void onResumeClick(int position, int id) {
                     selectedPosition = position;
                     p.addRecent(recentAdapter.getItem(position));
-                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
-                    else viewer = new Intent(context, ViewerActivity2.class);
+                    switch (p.getViewerType()){
+                        case 0:
+                        case 2:
+                            viewer = new Intent(context, ViewerActivity.class);
+                            break;
+                        case 1:
+                            viewer = new Intent(context, ViewerActivity2.class);
+                            break;
+                    }
                     viewer.putExtra("id",id);
                     viewer.putExtra("recent",true);
                     startActivityForResult(viewer, 2);
@@ -544,8 +557,15 @@ public class MainActivity extends AppCompatActivity
             favoriteAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                 @Override
                 public void onResumeClick(int position, int id) {
-                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
-                    else viewer = new Intent(context, ViewerActivity2.class);
+                    switch (p.getViewerType()){
+                        case 0:
+                        case 2:
+                            viewer = new Intent(context, ViewerActivity.class);
+                            break;
+                        case 1:
+                            viewer = new Intent(context, ViewerActivity2.class);
+                            break;
+                    }
                     viewer.putExtra("id",id);
                     startActivity(viewer);
                 }
@@ -632,8 +652,15 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onResumeClick(int position, int id) {
-                        if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
-                        else viewer = new Intent(context, ViewerActivity2.class);
+                        switch (p.getViewerType()){
+                            case 0:
+                            case 2:
+                                viewer = new Intent(context, ViewerActivity.class);
+                                break;
+                            case 1:
+                                viewer = new Intent(context, ViewerActivity2.class);
+                                break;
+                        }
                         viewer.putExtra("id",id);
                         startActivity(viewer);
                     }

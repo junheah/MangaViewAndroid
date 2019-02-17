@@ -96,8 +96,15 @@ public class OfflineEpisodeActivity extends AppCompatActivity {
                 for(int i=0; i<imgs.length;i++){
                     imgPaths[i] = imgs[i].getAbsolutePath();
                 }
-                if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
-                else viewer = new Intent(context, ViewerActivity2.class);
+                switch (p.getViewerType()){
+                    case 0:
+                    case 2:
+                        viewer = new Intent(context, ViewerActivity.class);
+                        break;
+                    case 1:
+                        viewer = new Intent(context, ViewerActivity2.class);
+                        break;
+                }
                 viewer.putExtra("name",ep);
                 viewer.putExtra("online", false);
                 if(idList){

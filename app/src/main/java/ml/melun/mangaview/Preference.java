@@ -25,7 +25,7 @@ public class Preference {
     static String homeDir;
     static Boolean volumeControl;
     static Boolean darkTheme;
-    static Boolean scrollViewer;
+    static int viewerType;
     static Boolean reverse;
     static Boolean dataSave;
     static int startTab;
@@ -52,7 +52,7 @@ public class Preference {
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
             bookmark = new JSONObject(sharedPref.getString("bookmark2", "{}"));
             darkTheme = sharedPref.getBoolean("darkTheme", false);
-            scrollViewer = sharedPref.getBoolean("scrollViewer",true);
+            viewerType = sharedPref.getInt("viewerType",0);
             reverse = sharedPref.getBoolean("pageReverse",false);
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
@@ -61,6 +61,18 @@ public class Preference {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+
+
+    public static int getViewerType() {
+        return viewerType;
+    }
+
+    public static void setViewerType(int viewerType) {
+        Preference.viewerType = viewerType;
+        prefsEditor.putInt("viewerType", viewerType);
+        prefsEditor.commit();
     }
 
     public static Boolean getStretch() {
@@ -113,15 +125,6 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public static Boolean getScrollViewer() {
-        return scrollViewer;
-    }
-
-    public static void setScrollViewer(Boolean scrollViewer) {
-        Preference.scrollViewer = scrollViewer;
-        prefsEditor.putBoolean("scrollViewer", scrollViewer);
-        prefsEditor.commit();
-    }
 
     public static Boolean getDarkTheme() {
         return darkTheme;

@@ -24,26 +24,35 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EpisodeActivity"
-            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".EpisodeActivity"
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".ViewerActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".DownloadActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".OfflineEpisodeActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".SettingsActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".FolderSelectActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".TagSearchActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".ViewerActivity2"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".LicenseActivity"
-            android:configChanges="orientation|screenSize"/>
+        <activity
+            android:name=".DownloadActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".OfflineEpisodeActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".SettingsActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".FolderSelectActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".TagSearchActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".ViewerActivity2"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".LicenseActivity"
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".AdvSearchActivity"
             android:configChanges="orientation|screenSize"
@@ -53,10 +62,12 @@
             android:configChanges="orientation|screenSize"
             android:label="댓글"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".DebugActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity android:name=".NoticesActivity"
-            android:configChanges="orientation|screenSize"></activity>
+        <activity
+            android:name=".DebugActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".NoticesActivity"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>

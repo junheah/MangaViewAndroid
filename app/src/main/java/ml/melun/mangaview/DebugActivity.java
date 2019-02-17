@@ -120,9 +120,10 @@ public class DebugActivity extends AppCompatActivity {
             data.put("volumeControl",sharedPref.getBoolean("volumeControl",false));
             data.put("bookmark(viewer)",new JSONObject(sharedPref.getString("bookmark", "{}")));
             data.put("bookmark(episode)",new JSONObject(sharedPref.getString("bookmark2", "{}")));
-            data.put("scrollViewer", sharedPref.getBoolean("scrollViewer",true));
+            data.put("viewerType", sharedPref.getInt("viewerType",0));
             data.put("pageReverse",sharedPref.getBoolean("pageReverse",false));
             data.put("dataSave",sharedPref.getBoolean("dataSave", false));
+            data.put("stretch",sharedPref.getBoolean("stretch", false));
             data.put("startTab",sharedPref.getInt("startTab", 0));
             data.put("url",sharedPref.getString("url", "http://188.214.128.5"));
         }catch(Exception e){
@@ -143,9 +144,10 @@ public class DebugActivity extends AppCompatActivity {
             editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
             editor.putString("bookmark",filter(data.getJSONObject("bookmark(viewer)").toString()));
             editor.putString("bookmark2",filter(data.getJSONObject("bookmark(episode)").toString()));
-            editor.putBoolean("scrollViewer",data.getBoolean("scrollViewer"));
+            editor.putInt("viewerType",data.getInt("viewerType"));
             editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
             editor.putBoolean("dataSave",data.getBoolean("dataSave"));
+            editor.putBoolean("stretch",data.getBoolean("stretch"));
             editor.putInt("startTab",data.getInt("startTab"));
             editor.putString("url",filter(data.getString("url")));
             editor.commit();

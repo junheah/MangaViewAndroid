@@ -177,7 +177,7 @@
             </android.support.constraint.ConstraintLayout>
 
             <android.support.constraint.ConstraintLayout
-                android:id="@+id/setting_scroll"
+                android:id="@+id/setting_viewer"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:clickable="true"
@@ -191,20 +191,21 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="스크롤 뷰어 (웹툰 뷰어)"
+                    android:text="뷰어 종류"
                     android:textSize="15dp"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/setting_scroll_switch"
+                    app:layout_constraintEnd_toStartOf="@+id/setting_viewer_spinner"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <Switch
-                    android:id="@+id/setting_scroll_switch"
+                <Spinner
+                    android:id="@+id/setting_viewer_spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginTop="8dp"
+                    android:entries="@array/viewer"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

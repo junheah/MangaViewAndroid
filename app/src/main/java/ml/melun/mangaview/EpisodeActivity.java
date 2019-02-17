@@ -209,8 +209,15 @@ public class EpisodeActivity extends AppCompatActivity {
                     System.out.println(selected.getId());
 
                     p.setBookmark(title.getName(),selected.getId());
-                    if(p.getScrollViewer()) viewer = new Intent(context, ViewerActivity.class);
-                    else viewer = new Intent(context, ViewerActivity2.class);
+                    switch (p.getViewerType()){
+                        case 0:
+                        case 2:
+                            viewer = new Intent(context, ViewerActivity.class);
+                            break;
+                        case 1:
+                            viewer = new Intent(context, ViewerActivity2.class);
+                            break;
+                    }
                     viewer.putExtra("id", selected.getId());
                     viewer.putExtra("name",selected.getName());
                     viewer.putExtra("seed", selected.getSeed());

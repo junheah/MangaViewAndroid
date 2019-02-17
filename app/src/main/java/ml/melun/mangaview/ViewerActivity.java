@@ -9,6 +9,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -66,6 +67,7 @@ public class ViewerActivity extends AppCompatActivity {
     Spinner spinner;
     int seed;
     int epsCount = 0;
+    int viewerType=0;
     Boolean online;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,7 @@ public class ViewerActivity extends AppCompatActivity {
         cut = this.findViewById(R.id.autoCutBtn);
         spinner = this.findViewById(R.id.toolbar_spinner);
         commentBtn = this.findViewById(R.id.commentButton);
+        viewerType = p.getViewerType();
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             Intent intent = getIntent();
@@ -99,7 +102,11 @@ public class ViewerActivity extends AppCompatActivity {
             //getSupportActionBar().setTitle(title.getName());
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);
-            manager.setOrientation(LinearLayoutManager.VERTICAL);
+            if(viewerType==2){
+                manager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                PagerSnapHelper snapHelper = new PagerSnapHelper();
+                snapHelper.attachToRecyclerView(strip);
+            }else manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             if(intent.getBooleanExtra("recent",false)){
                 Intent resultIntent = new Intent();
@@ -152,16 +159,22 @@ public class ViewerActivity extends AppCompatActivity {
                         }
                         //bookmark handler
                         if (firstVisible == 0) p.removeViewerBookmark(id);
-                        if (lastVisible == stripAdapter.getItemCount() - 1) {
-                            p.removeViewerBookmark(id);
-                        }
                         if (firstVisible != viewerBookmark) {
                             p.setViewerBookmark(id, firstVisible);
                             viewerBookmark = firstVisible;
                         }
+                        if (lastVisible == stripAdapter.getItemCount() - 1) {
+                            p.removeViewerBookmark(id);
+                        }
 
-                        if((!strip.canScrollVertically(1))&&!toolbarshow){
-                            toggleToolbar();
+                        if(viewerType==2) {
+                            if ((!strip.canScrollHorizontally(1)) && !toolbarshow) {
+                                toggleToolbar();
+                            }
+                        }else if(viewerType==0){
+                            if ((!strip.canScrollVertically(1)) && !toolbarshow) {
+                                toggleToolbar();
+                            }
                         }
                     }else if(newState==RecyclerView.SCROLL_STATE_DRAGGING){
                         if(toolbarshow){

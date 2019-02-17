@@ -31,9 +31,9 @@ public class SettingsActivity extends AppCompatActivity {
     //
     Downloader d;
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_scroll, s_reverse, s_dataSave, s_tab, s_url, s_stretch;
-    Spinner s_tab_spinner;
-    Switch s_volumeKey_switch, s_dark_switch, s_scroll_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_viewer, s_reverse, s_dataSave, s_tab, s_url, s_stretch;
+    Spinner s_tab_spinner, s_viewer_spinner;
+    Switch s_volumeKey_switch, s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch;
     Preference p;
     Boolean dark;
     @Override
@@ -126,20 +126,36 @@ public class SettingsActivity extends AppCompatActivity {
                 p.setDarkTheme(isChecked);
             }
         });
+//
+//        s_scroll = this.findViewById(R.id.setting_scroll);
+//        s_scroll_switch = this.findViewById(R.id.setting_scroll_switch);
+//        s_scroll_spinner.setChecked(p.getScrollViewer());
+//        s_scroll.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                s_scroll_switch.toggle();
+//            }
+//        });
+//        s_scroll_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                p.setScrollViewer(isChecked);
+//            }
+//        });
 
-        s_scroll = this.findViewById(R.id.setting_scroll);
-        s_scroll_switch = this.findViewById(R.id.setting_scroll_switch);
-        s_scroll_switch.setChecked(p.getScrollViewer());
-        s_scroll.setOnClickListener(new View.OnClickListener() {
+        s_viewer = this.findViewById(R.id.setting_viewer);
+        s_viewer_spinner = this.findViewById(R.id.setting_viewer_spinner);
+        if(dark) s_viewer_spinner.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        s_viewer_spinner.setSelection(p.getViewerType());
+        s_viewer_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                s_scroll_switch.toggle();
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                p.setViewerType(position);
             }
-        });
-        s_scroll_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                p.setScrollViewer(isChecked);
+            public void onNothingSelected(AdapterView<?> parent) {
+                //
             }
         });
 
