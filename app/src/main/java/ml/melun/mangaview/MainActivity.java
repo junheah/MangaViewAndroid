@@ -1,6 +1,9 @@
 package ml.melun.mangaview;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -67,6 +71,7 @@ import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WAKE_LOCK;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity
@@ -87,12 +92,6 @@ public class MainActivity extends AppCompatActivity
     private int version;
     int mode = 0;
     int selectedPosition=-1;
-    Downloader downloader;
-    TextView statNo, statName, stat;
-    int dlstatus=0;
-    int dlProgress;
-    ProgressBar dlBar;
-    ConstraintLayout dlStatContainer;
     MenuItem versionItem;
     String homeDirStr;
     SwipyRefreshLayout swipe;
@@ -100,6 +99,8 @@ public class MainActivity extends AppCompatActivity
     Intent viewer;
     Spinner searchMode;
     NavigationView navigationView;
+    NotificationManagerCompat notificationManagerc;
+    NotificationManager notificationManager;
 
 
     @Override
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -153,8 +155,6 @@ public class MainActivity extends AppCompatActivity
         //SharedPreferences preferences = getSharedPreferences("mangaView",MODE_PRIVATE);
 
         homeDirStr = p.getHomeDir();
-        dlStatContainer = findViewById(R.id.statusContainter);
-        downloader = new Downloader(this);
 
         versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
         versionItem.setTitle("v."+version);
@@ -171,73 +171,9 @@ public class MainActivity extends AppCompatActivity
         }else{
             //
         }
-
-        stat = findViewById(R.id.statusText);
-        statNo = findViewById(R.id.statusNo);
-        statName = findViewById(R.id.statusTitle);
-        dlBar = findViewById(R.id.statusProgress);
         savedList = findViewById(R.id.savedList);
         //show downloaded manga list
-        downloader.addListener(new Downloader.Listener() {
-            @Override
-            public void changeNameStr(final String name) {
-                statName.post(new Runnable() {
-                    public void run() {
-                        statName.setText(name);
-                    }
-                });
-            }
 
-            @Override
-            public void changeNo(final int n) {
-                statNo.post(new Runnable() {
-                    public void run() {
-                        statNo.setText(n+" in queue");
-                    }
-                });
-            }
-
-            @Override
-            public void processStatus(int s) {
-                if(dlstatus!=s){
-                    dlstatus = s;
-                    switch(s) {
-                        case 0:
-                            stat.post(new Runnable() {
-                                public void run() {
-                                    stat.setText("idle");
-                                    Toast.makeText(getApplication(),"모든 다운로드가 완료되었습니다.", Toast.LENGTH_LONG).show();
-                                    dlStatContainer.setVisibility(View.GONE);
-                                }
-                            });
-                            //collapse download status container
-                            break;
-                        case 1:
-                            stat.post(new Runnable() {
-                                public void run() {
-                                    dlStatContainer.setVisibility(View.VISIBLE);
-                                    stat.setText("downloading");
-                                }
-                            });
-                            //open download status container
-                            break;
-                    }
-                }
-            }
-
-            @Override
-            public void setProgress(int p) {
-                if(dlProgress!=p){
-                    dlProgress = p;
-                    dlBar.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            dlBar.setProgress(dlProgress);
-                        }
-                    });
-                }
-            }
-        });
 
         //set startTab and refresh views
         startTab = p.getStartTab();
@@ -251,6 +187,18 @@ public class MainActivity extends AppCompatActivity
         //check for notice
         noticeCheck n = new noticeCheck();
         n.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        //notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel notificationChannel = new NotificationChannel("UtaiteBox Player", "UtaiteBox Player", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setDescription("channel description"); notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.GREEN); notificationChannel.enableVibration(true);
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }else{
+            notificationManagerc = NotificationManagerCompat.from(MainActivity.this);
+        }
     }
 
     public int getTabId(int i){

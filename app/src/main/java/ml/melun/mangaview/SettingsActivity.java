@@ -29,7 +29,6 @@ public class SettingsActivity extends AppCompatActivity {
     //다운로드 위치 설정
     //데이터 절약 모드 : 외부 이미지 로드 안함
     //
-    Downloader d;
     Context context;
     ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_viewer, s_reverse, s_dataSave, s_tab, s_url, s_stretch;
     Spinner s_tab_spinner, s_viewer_spinner;
@@ -44,18 +43,13 @@ public class SettingsActivity extends AppCompatActivity {
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        d = new Downloader(this);
         context = this;
         s_setHomeDir = this.findViewById(R.id.setting_dir);
         s_setHomeDir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (d.getStatus() == 0) {
-                    Intent intent = new Intent(context, FolderSelectActivity.class);
-                    startActivity(intent);
-                }else{
-                    Toast.makeText(context,"현재 다운로드가 진행중입니다. 작업이 끝난 후 변경 해 주세요",Toast.LENGTH_LONG).show();
-                }
+                Intent intent = new Intent(context, FolderSelectActivity.class);
+                startActivity(intent);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

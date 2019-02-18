@@ -9,7 +9,6 @@ public class Decoder {
     public Decoder(int seed, int id){
         __seed = seed/10;
         this.id = id;
-        System.out.println("sssss"+seed);
     }
     public Bitmap decode(Bitmap input){
         if(__seed==0) return input;

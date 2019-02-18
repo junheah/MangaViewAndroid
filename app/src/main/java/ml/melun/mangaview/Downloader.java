@@ -1,5 +1,9 @@
 package ml.melun.mangaview;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
@@ -7,11 +11,20 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.widget.RemoteViews;
 
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -38,17 +51,61 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Downloader extends Service {
-    Preference p;
     static String homeDir;
-    static downloadTitle dt;
+    static String baseUrl;
     static ArrayList<Title> titles;
-    static Listener listener;
-    static int status =0;
+    float progress = 0;
+    String content="";
+    int queue;
+    Context context;
+    static Boolean running = false;
+    NotificationCompat.Builder notification;
+    public static final String ACTION_START = "ml.melu.mangaview.action.START";
+    public static final String ACTION_STOP = "ml.melu.mangaview.action.STOP";
+    public static final String ACTION_QUEUE = "ml.melu.mangaview.action.QUEUE";
+    public static final String ACTION_INFO = "ml.melu.mangaview.action.INFO";
+    static downloadTitle dt;
+    NotificationManager notificationManager;
+    int nid = 16848323;
+    PendingIntent pendingIntent;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if(titles==null) titles = new ArrayList<>();
+        homeDir = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir","/sdcard/MangaView/saved");
+        baseUrl = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "http://188.214.128.5");
+        if(dt==null) dt = new downloadTitle();
+        //android O bullshit
+        if (Build.VERSION.SDK_INT >= 26) {
+            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel mchannel = new NotificationChannel("MangaView", "MangaView", NotificationManager.IMPORTANCE_DEFAULT);
+            mchannel.setDescription("다운로드 상태");
+            mchannel.enableLights(true);
+            mchannel.setLightColor(Color.MAGENTA);
+            mchannel.enableVibration(false);
+            mchannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            notificationManager.createNotificationChannel(mchannel);
+        }
+        startNotification();
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
 
+        switch(intent.getAction()){
+            case ACTION_START:
+                break;
+            case ACTION_QUEUE:
+                Title target = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
+                queueTitle(target);
+                break;
+            case ACTION_STOP:
+                break;
+        }
+        return START_STICKY;
     }
 
     @Override
@@ -62,53 +119,48 @@ public class Downloader extends Service {
         return null;
     }
 
-    static float progress = 0;
-    static Context context;
-
-    public Downloader(Context context) {
-        //static
-        if(titles==null) titles = new ArrayList<>();
-        if(dt==null) dt = new downloadTitle();
-        if(p==null) p = new Preference(context);
-        if(this.context == null) this.context = context;
+    public void setQueue(int size){
+        this.queue = size;
     }
-    //pocess status no.
-    // 0=idle 1=downloading
+    public void setName(String name){
+        this.content = name;
+    }
+    public void setProgress(float progress){
+        this.progress = progress;
+    }
+
 
     public void queueTitle(Title title){
-        homeDir = p.getHomeDir();
         if(dt.getStatus() == AsyncTask.Status.PENDING || dt.getStatus() == AsyncTask.Status.FINISHED) {
             dt = new downloadTitle();
             titles.add(title);
             dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            //System.out.println("pp async idle, starting async process");
         }else{
             titles.add(title);
-            status = 1;
-            setStatus();
-            sendQueue(titles.size());
-            //System.out.println("pp async busy, queueing process");
+            running = true;
+            setQueue(titles.size());
+            updateNotification();
         }
     }
     private class downloadTitle extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
-            status = 1;
-            setStatus();
+            running = true;
         }
 
         protected Integer doInBackground(Void... params) {
             while(titles.size()>0) {
                 progress = 0;
-                sendQueue(titles.size());
+                setQueue(titles.size());
                 Title title = titles.get(0);
-                sendName(title.getName());
-                if(title.getEps()==null) title.fetchEps(p.getUrl());
+                setName(title.getName());
+                updateNotification();
+                if(title.getEps()==null) title.fetchEps(baseUrl);
                 ArrayList<Manga> mangas = title.getEps();
                 float stepSize = 1000/mangas.size();
                 for(int h=0;h<mangas.size();h++) {
                     Manga target = mangas.get(h);
-                    target.fetch(p.getUrl());
+                    target.fetch(baseUrl);
                     Decoder d = new Decoder(target.getSeed(), target.getId());
                     int index = getIndex(target.getEps(),target.getId());
                     ArrayList<String> urls = target.getImgs();
@@ -154,18 +206,6 @@ public class Downloader extends Service {
                             String fileType = url.toString().substring(url.toString().lastIndexOf('.') + 1);
                             URLConnection connection = url.openConnection();
 
-                            /*
-                            BufferedInputStream in = new BufferedInputStream(connection.getInputStream());
-                            File outputFile = new File(targetDir + (new DecimalFormat("0000").format(i)));
-                            FileOutputStream out = new FileOutputStream(outputFile.toString() + '.'+fileType);
-                            byte[] data = new byte[1024];
-                            int length = connection.getContentLength();
-                            int count;
-                            while ((count = in.read(data, 0, 1024)) != -1) {
-                                out.write(data, 0, count);
-                            }
-                            */
-
                             //load image as bitmap
                             InputStream in = connection.getInputStream();
                             Bitmap bitmap = BitmapFactory.decodeStream(in);
@@ -177,11 +217,9 @@ public class Downloader extends Service {
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
                             outputStream.flush(); // Not really required
                             outputStream.close(); // do not forget to close the stream
-
-
                             progress+=imgStepSize;
-                            sendProgress((int)progress);
-
+                            setProgress(progress);
+                            updateNotification();
                         } catch (Exception e) {
                             //
                             e.printStackTrace();
@@ -197,30 +235,13 @@ public class Downloader extends Service {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            status = 0;
-            setStatus();
+            endNotification();
+            running = false;
+            stopSelf();
         }
 
     }
-    public void sendName(String text){ if(listener!=null) listener.changeNameStr(text); }
-    public void setStatus(){ if(listener!=null) listener.processStatus(status); }
-    public void sendQueue(int n){ if(listener!=null) listener.changeNo(n); }
-    public void sendProgress(int p){ if(listener!=null) listener.setProgress(p);}
 
-    public static int getStatus() {
-        return status;
-    }
-
-    public void addListener(Listener l){
-        listener = l;
-    }
-
-    public interface Listener{
-        void changeNameStr(String name);
-        void changeNo(int n);
-        void processStatus(int s);
-        void setProgress(int p);
-    }
     private String filterString(String input){
         int m=0;
         while(m>-1){
@@ -239,5 +260,32 @@ public class Downloader extends Service {
             }
         }
         return 0;
+    }
+    private void startNotification() {
+        notification = new NotificationCompat.Builder(this, "MangaView")
+                .setContentIntent(pendingIntent)
+                .setContentText("다운로드를 시작합니다")
+                .setSmallIcon(R.drawable.ic_logo)
+                .setOngoing(true);
+        startForeground(nid, notification.build());
+    }
+    private void updateNotification() {
+        notification = new NotificationCompat.Builder(this, "MangaView")
+                .setContentIntent(pendingIntent)
+                .setContentText(content)
+                .setSubText("대기열: "+queue)
+                .setProgress(1000,(int)progress,false)
+                .setSmallIcon(R.drawable.ic_logo)
+                .setOngoing(true);
+        notificationManager.notify(nid, notification.build());
+    }
+
+    private void endNotification(){
+        notification = new NotificationCompat.Builder(this, "MangaView")
+                .setContentIntent(pendingIntent)
+                .setContentText("모든 다운로드가 완료되었습니다.")
+                .setSmallIcon(R.drawable.ic_logo)
+                .setOngoing(false);
+        notificationManager.notify(nid+1, notification.build());
     }
 }

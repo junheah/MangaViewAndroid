@@ -3,6 +3,7 @@ package ml.melun.mangaview;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,7 +27,6 @@ import ml.melun.mangaview.mangaview.Title;
 
 public class DownloadActivity extends AppCompatActivity {
     Title title;
-    Downloader downloader;
     JSONArray episodes;
     SelectEpisodeAdapter adapter;
     RecyclerView eplist;
@@ -40,7 +42,6 @@ public class DownloadActivity extends AppCompatActivity {
         setContentView(R.layout.activity_download);
         eplist = this.findViewById(R.id.dl_eplist);
         Intent intent = getIntent();
-        downloader = new Downloader(this);
         try {
             title = new Title(intent.getStringExtra("name"), "","",new ArrayList<String>(),-1);
             episodes = new JSONArray(intent.getStringExtra("list"));
@@ -98,10 +99,15 @@ public class DownloadActivity extends AppCompatActivity {
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
                         //check if download service is up and running
-                        //if not, start service
-
+                        Intent downloader = new Intent(getApplicationContext(),Downloader.class);
+                        downloader.setAction(Downloader.ACTION_QUEUE);
+                        downloader.putExtra("title", new Gson().toJson(title));
+                        if (Build.VERSION.SDK_INT >= 26) {
+                            startForegroundService(downloader);
+                        }else{
+                            startService(downloader);
+                        }
                         //queue title to service
-                        downloader.queueTitle(title);
                         Toast.makeText(getApplication(),"다운로드를 시작합니다. 진행률은 저장된 만화 탭에서 확인 가능합니다.", Toast.LENGTH_LONG).show();
                         finish();
                         break;

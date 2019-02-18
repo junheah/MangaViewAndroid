@@ -124,6 +124,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             types = new ArrayList<>();
             for(int i=0; i<imgs.size()*2;i++) types.add(-1);
             commentBtn.setVisibility(View.GONE);
+            d = new Decoder(manga.getSeed(), manga.getId());
             refreshImage();
         }else{
             //if online
@@ -332,25 +333,11 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     }
 
-    void preload(){
-        for(int i=viewerBookmark; i<imgs.size(); i++){
-            String image = imgs.get(i);
-            Glide.with(context)
-                    .asBitmap()
-                    .load(image)
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap bitmap,
-                                                    Transition<? super Bitmap> transition) {
-                            //preload
-                        }
-                    });
-        }
-    }
 
 
     void refreshImage(){
         final String image = imgs.get(viewerBookmark);
+        System.out.println("ppppp"+image);
         //placeholder
         //frame.setImageResource(R.drawable.placeholder);
         Glide.with(context)
@@ -473,8 +460,6 @@ public class ViewerActivity2 extends AppCompatActivity {
             });
             spinner.setSelection(index);
 
-
-            preload();
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
             p.setBookmark(title.getName(),id);
