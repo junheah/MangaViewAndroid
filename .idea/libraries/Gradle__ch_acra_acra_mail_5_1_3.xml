@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: ch.acra:acra-mail-5.1.3">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/acra-mail-5.1.3.aar/d3227038c46fa33f13130df57a0c7abd/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/acra-mail-5.1.3.aar/d3227038c46fa33f13130df57a0c7abd/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/acra-mail-5.1.3.aar/8f897e657a3966c35848d90a2839133b/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/acra-mail-5.1.3.aar/8f897e657a3966c35848d90a2839133b/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
