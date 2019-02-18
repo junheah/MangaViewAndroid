@@ -97,6 +97,10 @@ public class DownloadActivity extends AppCompatActivity {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
+                        //check if download service is up and running
+                        //if not, start service
+
+                        //queue title to service
                         downloader.queueTitle(title);
                         Toast.makeText(getApplication(),"다운로드를 시작합니다. 진행률은 저장된 만화 탭에서 확인 가능합니다.", Toast.LENGTH_LONG).show();
                         finish();

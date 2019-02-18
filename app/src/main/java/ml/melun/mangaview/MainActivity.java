@@ -111,11 +111,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
-        builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.JSON);
-        //builder.getPluginConfigurationBuilder(ToastConfigurationBuilder.class).setResText(R.string.acra_toast_text);
-        //ACRA.init(this, builder);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -648,6 +643,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onLongClick(View view, int position) {
                         //none
+                        popup(view, position, searchAdapter.getItem(position), 0);
                     }
 
                     @Override
@@ -744,6 +740,7 @@ public class MainActivity extends AppCompatActivity
     private class updateCheck extends AsyncTask<Void, Integer, Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
+            Toast.makeText(getApplicationContext(), "업데이트 확인중..", Toast.LENGTH_SHORT).show();
         }
 
         protected Integer doInBackground(Void... params) {
@@ -849,7 +846,7 @@ public class MainActivity extends AppCompatActivity
         switch(m){
             case 0:
                 //검색
-                break;
+                popup.getMenu().removeItem(R.id.del);
             case 1:
                 //최근
                 if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
@@ -889,9 +886,7 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-
         popup.show(); //showing popup menu
-
     }
 
 }

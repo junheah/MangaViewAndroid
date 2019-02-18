@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
@@ -170,7 +171,7 @@ public class TagSearchActivity extends AppCompatActivity {
 
                     @Override
                     public void onLongClick(View view, int position) {
-
+                        popup(view, position, adapter.getItem(position), 0);
                     }
                 });
             }else{
@@ -232,5 +233,33 @@ public class TagSearchActivity extends AppCompatActivity {
             swipe.setRefreshing(false);
         }
     }
+    void popup(View view, final int position, final Title title, final int m){
+        PopupMenu popup = new PopupMenu(TagSearchActivity.this, view);
+        //Inflating the Popup using xml file
 
+        popup.getMenuInflater()
+                .inflate(R.menu.title_options, popup.getMenu());
+
+        popup.getMenu().removeItem(R.id.del);
+        if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
+        else popup.getMenu().removeItem(R.id.favDel);
+
+
+        //registering popup with OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                switch(item.getItemId()){
+                    case R.id.del:
+                        break;
+                    case R.id.favAdd:
+                    case R.id.favDel:
+                        //toggle favorite
+                        p.toggleFavorite(title,0);
+                        break;
+                }
+                return true;
+            }
+        });
+        popup.show(); //showing popup menu
+    }
 }

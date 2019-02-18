@@ -2,21 +2,26 @@ package ml.melun.mangaview;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -54,7 +59,7 @@ public class ViewerActivity extends AppCompatActivity {
     int pageForVolume;
     LinearLayoutManager manager;
     ImageButton next, prev;
-    Button cut;
+    Button cut, pageBtn;
     ArrayList<Manga> eps;
     int index;
     Title title;
@@ -83,11 +88,15 @@ public class ViewerActivity extends AppCompatActivity {
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         volumeControl = p.getVolumeControl();
         swipe = this.findViewById(R.id.viewerSwipe);
-        cut = this.findViewById(R.id.autoCutBtn);
+        cut = this.findViewById(R.id.viewerBtn2);
+        cut.setText("자동 분할");
+        pageBtn = this.findViewById(R.id.viewerBtn1);
+        pageBtn.setText("-/-");
         spinner = this.findViewById(R.id.toolbar_spinner);
         commentBtn = this.findViewById(R.id.commentButton);
         viewerType = p.getViewerType();
         //imageZoomHelper = new ImageZoomHelper(this);
+
         try {
             Intent intent = getIntent();
             name = intent.getStringExtra("name");
@@ -166,7 +175,6 @@ public class ViewerActivity extends AppCompatActivity {
                         if (lastVisible == stripAdapter.getItemCount() - 1) {
                             p.removeViewerBookmark(id);
                         }
-
                         if(viewerType==2) {
                             if ((!strip.canScrollHorizontally(1)) && !toolbarshow) {
                                 toggleToolbar();
@@ -226,6 +234,40 @@ public class ViewerActivity extends AppCompatActivity {
                 refresh();
             }
         });
+        pageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alert;
+                if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
+                else alert = new AlertDialog.Builder(context);
+
+                alert.setTitle("페이지 선택\n(1~"+imgs.size()+")");
+                final EditText input = new EditText(context);
+                input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                input.setRawInputType(Configuration.KEYBOARD_12KEY);
+                alert.setView(input);
+                alert.setPositiveButton("이동", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        //이동 시
+                        if(input.getText().length()>0) {
+                            int page = Integer.parseInt(input.getText().toString());
+                            if (page < 1) page = 1;
+                            if (page > imgs.size()) page = imgs.size();
+                            viewerBookmark = page - 1;
+                            if(autoCut) strip.scrollToPosition(viewerBookmark*2);
+                            else strip.scrollToPosition(viewerBookmark);
+                            pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
+                        }
+                    }
+                });
+                alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        //취소 시
+                    }
+                });
+                alert.show();
+            }
+        });
     }
 
     void refresh(){
@@ -240,7 +282,7 @@ public class ViewerActivity extends AppCompatActivity {
     {
         if(volumeControl && (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN ||keyCode==KeyEvent.KEYCODE_VOLUME_UP)) {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
-                if(viewerBookmark<stripAdapter.getItemCount()-1)strip.scrollToPosition(++viewerBookmark);
+                if(viewerBookmark<stripAdapter.getItemCount()-1) strip.scrollToPosition(++viewerBookmark);
             } else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
                 if(viewerBookmark>0) strip.scrollToPosition(--viewerBookmark);
             }
@@ -261,6 +303,7 @@ public class ViewerActivity extends AppCompatActivity {
             toolbarshow=false;
         }
         else {
+            pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
             appbar.animate().translationY(0);
             appbarBottom.animate().translationY(0);
             toolbarshow=true;
@@ -357,8 +400,6 @@ public class ViewerActivity extends AppCompatActivity {
             else prev.setEnabled(true);
             swipe.setRefreshing(false);
 
-
-
             //refresh spinner
             spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, epsName));
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -378,6 +419,7 @@ public class ViewerActivity extends AppCompatActivity {
                 }
             });
             spinner.setSelection(index);
+            pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
 
             bookmarkRefresh();
 
@@ -390,7 +432,6 @@ public class ViewerActivity extends AppCompatActivity {
             if (pd.isShowing()) {
                 pd.dismiss();
             }
-
         }
     }
 }

@@ -1,12 +1,16 @@
 package ml.melun.mangaview;
 
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 
 
 import java.io.BufferedInputStream;
@@ -33,17 +37,35 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
-public class Downloader {
-    static Preference p;
+public class Downloader extends Service {
+    Preference p;
     static String homeDir;
     static downloadTitle dt;
     static ArrayList<Title> titles;
     static Listener listener;
     static int status =0;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
     static float progress = 0;
     static Context context;
 
-    public Downloader(Context context){
+    public Downloader(Context context) {
         //static
         if(titles==null) titles = new ArrayList<>();
         if(dt==null) dt = new downloadTitle();

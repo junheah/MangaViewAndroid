@@ -84,18 +84,19 @@ public class ViewerActivity2 extends AppCompatActivity {
 
         next = this.findViewById(R.id.toolbar_next);
         prev = this.findViewById(R.id.toolbar_previous);
-        toolbar = this.findViewById(R.id.viewerToolbar2);
-        appbar = this.findViewById(R.id.viewerAppbar2);
+        toolbar = this.findViewById(R.id.viewerToolbar);
+        appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
-        appbarBottom = this.findViewById(R.id.viewerAppbarBottom2);
+        appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         volumeControl = p.getVolumeControl();
         reverse = p.getReverse();
         frame = this.findViewById(R.id.viewer_image);
-        pageBtn = this.findViewById(R.id.autoCutBtn);
-        pageBtn.setText("");
+        pageBtn = this.findViewById(R.id.viewerBtn1);
+        pageBtn.setText("-/-");
         nextPageBtn = this.findViewById(R.id.nextPageBtn);
         prevPageBtn = this.findViewById(R.id.prevPageBtn);
-        touchToggleBtn = this.findViewById(R.id.touchToggleBtn);
+        touchToggleBtn = this.findViewById(R.id.viewerBtn2);
+        touchToggleBtn.setText("입력 제한");
         commentBtn = this.findViewById(R.id.commentButton);
         spinner = this.findViewById(R.id.toolbar_spinner);
         stretch = p.getStretch();
