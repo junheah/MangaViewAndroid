@@ -471,7 +471,7 @@ public class MainActivity extends AppCompatActivity
                             viewer = new Intent(context, ViewerActivity2.class);
                             break;
                     }
-                    viewer.putExtra("id",id);
+                    viewer.putExtra("manga",new Gson().toJson(new Manga(id,"","")));
                     viewer.putExtra("recent",true);
                     startActivityForResult(viewer, 2);
                 }
@@ -484,6 +484,7 @@ public class MainActivity extends AppCompatActivity
                     p.addRecent(selected);
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title", new Gson().toJson(selected));
+                    episodeView.putExtra("recent",true);
                     startActivityForResult(episodeView,2);
                 }
             });
@@ -505,7 +506,7 @@ public class MainActivity extends AppCompatActivity
                             viewer = new Intent(context, ViewerActivity2.class);
                             break;
                     }
-                    viewer.putExtra("id",id);
+                    viewer.putExtra("manga",new Gson().toJson(new Manga(id,"","")));
                     startActivity(viewer);
                 }
 

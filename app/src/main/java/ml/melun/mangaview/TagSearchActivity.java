@@ -152,7 +152,8 @@ public class TagSearchActivity extends AppCompatActivity {
                                 viewer = new Intent(context, ViewerActivity2.class);
                                 break;
                         }
-                        viewer.putExtra("id",id);
+                        viewer.putExtra("manga",new Gson().toJson(new Manga(id,"","")));
+                        viewer.putExtra("online",true);
                         startActivity(viewer);
                     }
 
