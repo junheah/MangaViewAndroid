@@ -151,7 +151,7 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         String res = "";
         for(int i=0; i<tags.size(); i++){
             if(selected[i]){
-                if(res.length()>0) res += ","+tags.get(i);
+                if(res.length()>0) res += ','+tags.get(i);
                 else res = tags.get(i);
             }
         }

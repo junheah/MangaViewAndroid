@@ -1,12 +1,8 @@
 package ml.melun.mangaview.adapter;
 import android.content.Context;
-import android.graphics.Color;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +27,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private Context mainContext;
     Boolean dark = false;
     Boolean save;
+    Boolean resume = true;
     Boolean updated = false;
     Preference p;
 
@@ -89,7 +86,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.tags.setText(tags);
         if(thumb.length()>1 && !save)Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
-        if(bookmark>0) holder.resume.setVisibility(View.VISIBLE);
+        if(bookmark>0 && resume) holder.resume.setVisibility(View.VISIBLE);
         else holder.resume.setVisibility(View.GONE);
 
     }
@@ -114,7 +111,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             author =itemView.findViewById(R.id.TitleAuthor);
             tags = itemView.findViewById(R.id.TitleTag);
             card = itemView.findViewById(R.id.titleCard);
-            resume = itemView.findViewById(R.id.resumeButton);
+            resume = itemView.findViewById(R.id.epsButton);
 
 
             if(dark){
@@ -145,6 +142,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         }
     }
 
+    public void noResume(){
+        resume = false;
+    }
     public Title getItem(int id) {
         return mData.get(id);
     }

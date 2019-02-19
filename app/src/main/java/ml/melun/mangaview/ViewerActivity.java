@@ -29,6 +29,7 @@ import android.widget.TextView;
 //import com.viven.imagezoom.ImageZoomHelper;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -60,17 +61,17 @@ public class ViewerActivity extends AppCompatActivity {
     LinearLayoutManager manager;
     ImageButton next, prev;
     Button cut, pageBtn;
-    ArrayList<Manga> eps;
+    List<Manga> eps;
     int index;
     Title title;
     Boolean autoCut = false;
-    ArrayList<String> imgs;
+    List<String> imgs;
     Boolean dark;
     Intent result;
     SwipyRefreshLayout swipe;
     ImageButton commentBtn;
     Spinner spinner;
-    int seed;
+    int seed = 0;
     int epsCount = 0;
     int viewerType=0;
     Boolean online;
@@ -99,16 +100,16 @@ public class ViewerActivity extends AppCompatActivity {
 
         try {
             Intent intent = getIntent();
-            name = intent.getStringExtra("name");
-            seed = intent.getIntExtra("seed", 0);
-            id = intent.getIntExtra("id",-1);
-            System.out.println("ppppp"+id);
-            localImgs = intent.getStringArrayExtra("localImgs");
+            manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
+            online = intent.getBooleanExtra("online", true);
+
+            name = manga.getName();
+            id = manga.getId();
+
             toolbarTitle.setText(name);
             viewerBookmark = p.getViewerBookmark(id);
-            manga = new Manga(id, name, "");
-            online = intent.getBooleanExtra("online", true);
-            //getSupportActionBar().setTitle(title.getName());
+            System.out.println("pppppppppp"+manga.getId());
+
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);
             if(viewerType==2){
@@ -128,7 +129,7 @@ public class ViewerActivity extends AppCompatActivity {
                 next.setVisibility(View.GONE);
                 spinner.setVisibility(View.GONE);
                 commentBtn.setVisibility(View.GONE);
-                imgs = new ArrayList<>(Arrays.asList(localImgs));
+                imgs = manga.getImgs();
                 stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
@@ -315,11 +316,11 @@ public class ViewerActivity extends AppCompatActivity {
         if(autoCut){
             autoCut = false;
             cut.setBackgroundResource(R.drawable.button_bg);
-            viewerBookmark = p.getViewerBookmark(id);
+            viewerBookmark /= 2;
         } else{
             autoCut = true;
             cut.setBackgroundResource(R.drawable.button_bg_on);
-            viewerBookmark = p.getViewerBookmark(id)*2;
+            viewerBookmark *= 2;
         }
         stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
         strip.setAdapter(stripAdapter);
@@ -425,7 +426,7 @@ public class ViewerActivity extends AppCompatActivity {
 
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
-            p.setBookmark(title.getName(), id);
+            if(id>0) p.setBookmark(title.getName(), id);
             result = new Intent();
             result.putExtra("id",id);
             setResult(RESULT_OK, result);

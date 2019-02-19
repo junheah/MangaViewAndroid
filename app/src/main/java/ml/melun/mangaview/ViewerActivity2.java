@@ -31,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,10 +59,10 @@ public class ViewerActivity2 extends AppCompatActivity {
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
     int viewerBookmark = -1;
-    ArrayList<String> imgs;
-    ArrayList<Integer> types;
+    List<String> imgs;
+    List<Integer> types;
     ProgressDialog pd;
-    ArrayList<Manga> eps;
+    List<Manga> eps;
     int index;
     Title title;
     ImageView frame;
@@ -103,13 +104,15 @@ public class ViewerActivity2 extends AppCompatActivity {
         if(stretch) frame.setScaleType(ImageView.ScaleType.FIT_XY);
 
         Intent intent = getIntent();
-        name = intent.getStringExtra("name");
-        id = intent.getIntExtra("id",-1);
+
+        manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
         online = intent.getBooleanExtra("online",true);
-        String[] localImgs = intent.getStringArrayExtra("localImgs");
+        name = manga.getName();
+        id = manga.getId();
+
         toolbarTitle.setText(name);
         viewerBookmark = p.getViewerBookmark(id);
-        manga = new Manga(id, name, "");
+
 
         if(intent.getBooleanExtra("recent",false)){
             Intent resultIntent = new Intent();
@@ -120,7 +123,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //appbarBottom.setVisibility(View.GONE);
             next.setVisibility(View.GONE);
             prev.setVisibility(View.GONE);
-            imgs = new ArrayList<>(Arrays.asList(localImgs));
+            imgs = manga.getImgs();
             types = new ArrayList<>();
             for(int i=0; i<imgs.size()*2;i++) types.add(-1);
             commentBtn.setVisibility(View.GONE);
@@ -462,7 +465,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
             if(title == null) title = manga.getTitle();
             p.addRecent(title);
-            p.setBookmark(title.getName(),id);
+            if(id>0) p.setBookmark(title.getName(),id);
             viewerBookmark = p.getViewerBookmark(id);
             refreshImage();
             if (pd.isShowing()) {

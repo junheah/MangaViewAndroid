@@ -24,7 +24,7 @@ import ml.melun.mangaview.mangaview.Decoder;
 
 public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
 
-    private ArrayList<String> imgs;
+    private List<String> imgs;
     private LayoutInflater mInflater;
     private Context mainContext;
     private StripAdapter.ItemClickListener mClickListener;
@@ -35,7 +35,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
 
 
     // data is passed into the constructor
-    public StripAdapter(Context context, ArrayList<String> data, Boolean cut, int seed, int id) {
+    public StripAdapter(Context context, List<String> data, Boolean cut, int seed, int id) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.imgs = data;

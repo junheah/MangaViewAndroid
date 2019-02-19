@@ -45,6 +45,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -55,14 +57,15 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import ml.melun.mangaview.adapter.OfflineTitleApapter;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.mainAdapter;
 import ml.melun.mangaview.mangaview.MainPage;
@@ -87,7 +90,7 @@ public class MainActivity extends AppCompatActivity
     public Context context = this;
     ProgressDialog pd;
     Search search;
-    TitleAdapter searchAdapter, recentAdapter, favoriteAdapter;
+    TitleAdapter searchAdapter, recentAdapter, favoriteAdapter, offlineAdapter;
     RecyclerView searchResult, recentResult, favoriteResult, savedList, mainRecycler;
     private int version;
     int mode = 0;
@@ -357,9 +360,7 @@ public class MainActivity extends AppCompatActivity
                             viewer = new Intent(context, ViewerActivity2.class);
                             break;
                     }
-                    viewer.putExtra("name",m.getName());
-                    viewer.putExtra("id",m.getId());
-                    viewer.putExtra("seed", m.getSeed());
+                    viewer.putExtra("manga",new Gson().toJson(m));
                     startActivity(viewer);
                 }
 
@@ -482,12 +483,7 @@ public class MainActivity extends AppCompatActivity
                     selectedPosition = position;
                     p.addRecent(selected);
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
-                    episodeView.putExtra("title", selected.getName());
-                    episodeView.putExtra("thumb",selected.getThumb());
-                    episodeView.putExtra("author",selected.getAuthor());
-                    episodeView.putExtra("tags",new ArrayList<String>(selected.getTags()));
-                    episodeView.putExtra("release",selected.getRelease());
-                    episodeView.putExtra("recent",true);
+                    episodeView.putExtra("title", new Gson().toJson(selected));
                     startActivityForResult(episodeView,2);
                 }
             });
@@ -526,10 +522,7 @@ public class MainActivity extends AppCompatActivity
                     //start intent for result : has to know if favorite has been removed or not
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("position", position);
-                    episodeView.putExtra("title", selected.getName());
-                    episodeView.putExtra("author",selected.getAuthor());
-                    episodeView.putExtra("tags",new ArrayList<String>(selected.getTags()));
-                    episodeView.putExtra("thumb",selected.getThumb());
+                    episodeView.putExtra("title", new Gson().toJson(selected));
                     episodeView.putExtra("favorite",true);
                     selectedPosition = position;
                     startActivityForResult(episodeView,1);
@@ -540,19 +533,31 @@ public class MainActivity extends AppCompatActivity
             //그냥 코드 개더러워져도 액티비티 한개로 다할거임.. 귀찮고 이미 더러움...
             //원래 viewFlipper 도 비효율적이라 바꿔야지 했는데 이미 늦음
             //todo: viewflipper 갖다 버리고 fragment 사용하기
-            final OfflineTitleApapter offAdapter = new OfflineTitleApapter(context,getSavedTitles());
+            offlineAdapter = new TitleAdapter(context);
+            offlineAdapter.noResume();
             savedList.setLayoutManager(new LinearLayoutManager(this));
-            savedList.setAdapter(offAdapter);
-            offAdapter.setClickListener(new OfflineTitleApapter.ItemClickListener() {
+            savedList.setAdapter(offlineAdapter);
+            offlineAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                 @Override
-                public void onItemClick(View v, int position) {
-                    Intent i = new Intent(context, OfflineEpisodeActivity.class);
-                    i.putExtra("title",offAdapter.getItem(position));
-                    i.putExtra("homeDir",homeDirStr);
+                public void onItemClick(int position) {
+                    Intent i = new Intent(context, EpisodeActivity.class);
+                    i.putExtra("title",new Gson().toJson(offlineAdapter.getItem(position)));
+                    i.putExtra("online", false);
                     startActivity(i);
                 }
-            });
 
+                @Override
+                public void onLongClick(View view, int position) {
+                    popup(view, position, offlineAdapter.getItem(position),3);
+                }
+
+                @Override
+                public void onResumeClick(int position, int id) {
+                    //not used
+                }
+            });
+            getSavedTitles get = new getSavedTitles();
+            get.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
     @Override
@@ -617,10 +622,7 @@ public class MainActivity extends AppCompatActivity
                         System.out.println("onItemClick position: " + position);
 
                         Intent episodeView = new Intent(context, EpisodeActivity.class);
-                        episodeView.putExtra("title", selected.getName());
-                        episodeView.putExtra("thumb", selected.getThumb());
-                        episodeView.putExtra("author", selected.getAuthor());
-                        episodeView.putExtra("tags", new ArrayList<String>(selected.getTags()));
+                        episodeView.putExtra("title", new Gson().toJson(selected));
                         startActivity(episodeView);
                     }
                 });
@@ -637,18 +639,59 @@ public class MainActivity extends AppCompatActivity
             swipe.setRefreshing(false);
         }
     }
-    public ArrayList<String> getSavedTitles(){
-        homeDirStr = p.getHomeDir();
-        ArrayList<String> savedTitles = new ArrayList<>();
-        File homeDir = new File(homeDirStr);
-        if(homeDir.exists()){
-            File[] files = homeDir.listFiles();
-            for(File f:files){
-                if(f.isDirectory()) savedTitles.add(f.getName());
-            }
+
+
+    private class getSavedTitles extends AsyncTask<Void, Void, Integer>{
+        List<Title> titles;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
         }
-        return savedTitles;
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            offlineAdapter.addData(titles);
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            titles = new ArrayList<>();
+            homeDirStr = p.getHomeDir();
+            List<Title> savedTitles = new ArrayList<>();
+            File homeDir = new File(homeDirStr);
+            if(homeDir.exists()){
+                File[] files = homeDir.listFiles();
+                for(File f:files){
+                    if(f.isDirectory()){
+                        File data = new File(f.getPath()+"/title.data");
+                        if(data.exists()){
+                            StringBuilder raw = new StringBuilder();
+                            try {
+                                BufferedReader br = new BufferedReader(new FileReader(data));
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    raw.append(line);
+                                }
+                                br.close();
+                                JSONObject json = new JSONObject(raw.toString());
+                                Title title = new Gson().fromJson(json.getJSONObject("title").toString(),new TypeToken<Title>(){}.getType());
+                                if(title.getThumb().length()>0) title.setThumb(f.getAbsolutePath()+'/'+title.getThumb());
+                                System.out.println("pppppppppppp "+title.getThumb());
+                                titles.add(title);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                            }
+                        }else titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                    }
+                }
+                //add titles to adapter
+            }
+            return null;
+        }
     }
+
 
     public String httpsGet(String urlin){
         HttpsURLConnection connection = null;
@@ -788,25 +831,30 @@ public class MainActivity extends AppCompatActivity
     void popup(View view, final int position, final Title title, final int m){
         PopupMenu popup = new PopupMenu(MainActivity.this, view);
         //Inflating the Popup using xml file
+        //todo: clean this part
 
         popup.getMenuInflater()
                 .inflate(R.menu.title_options, popup.getMenu());
         switch(m){
-            case 0:
-                //검색
-                popup.getMenu().removeItem(R.id.del);
             case 1:
                 //최근
-                if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
-                else popup.getMenu().removeItem(R.id.favDel);
+                popup.getMenu().findItem(R.id.del).setVisible(true);
+            case 0:
+                //검색
+                popup.getMenu().findItem(R.id.favAdd).setVisible(true);
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
                 break;
             case 2:
                 //좋아요
-                popup.getMenu().removeItem(R.id.favAdd);
-                popup.getMenu().removeItem(R.id.del);
+                break;
+            case 3:
+                //저장됨
+                popup.getMenu().findItem(R.id.favAdd).setVisible(true);
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
+                popup.getMenu().findItem(R.id.remove).setVisible(true);
                 break;
         }
-
+        //좋아요 추가/제거 중 하나만 남김
         if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
         else popup.getMenu().removeItem(R.id.favDel);
 
@@ -830,11 +878,43 @@ public class MainActivity extends AppCompatActivity
                             favoriteAdapter.notifyItemRemoved(position);
                         }
                         break;
+                    case R.id.remove:
+                        //저장된 만화에서 삭제
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        //Yes button clicked
+                                        File folder = new File(homeDirStr+'/'+title.getName());
+                                        deleteRecursive(folder);
+                                        offlineAdapter.remove(position);
+                                        offlineAdapter.notifyItemRemoved(position);
+                                        Toast.makeText(context,"삭제가 완료되었습니다.",Toast.LENGTH_SHORT);
+                                        break;
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        //No button clicked
+                                        break;
+                                }
+                            }
+                        };
+                        AlertDialog.Builder builder;
+                        if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                        else builder = new AlertDialog.Builder(context);
+                        builder.setMessage("정말로 삭제 하시겠습니까?").setPositiveButton("네", dialogClickListener)
+                                .setNegativeButton("아니오", dialogClickListener).show();
                 }
                 return true;
             }
         });
         popup.show(); //showing popup menu
+    }
+
+    void deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory())
+            for (File child : fileOrDirectory.listFiles())
+                deleteRecursive(child);
+        fileOrDirectory.delete();
     }
 
 }

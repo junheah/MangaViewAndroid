@@ -21,10 +21,19 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.EpisodeAdapter;
@@ -49,10 +58,12 @@ public class EpisodeActivity extends AppCompatActivity {
     int bookmarkIndex = -1;
     FloatingActionButton upBtn;
     Boolean upBtnVisible = false;
-    ArrayList<Manga> episodes;
-    Boolean dark;
+    List<Manga> episodes;
+    Boolean dark, online=true;
     Intent viewer;
     ActionBar actionBar;
+    String homeDir;
+    File[] offlineEpisodes;
 
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
@@ -68,16 +79,16 @@ public class EpisodeActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode== RESULT_OK && requestCode==0){
             int newid = data.getIntExtra("id", -1);
-            if(newid>-1 && newid!=bookmarkId){
+            if(newid>0 && newid!=bookmarkId){
                 bookmarkId = newid;
                 //find index of bookmark;
                 for(int i=0; i< episodes.size(); i++){
                     if(episodes.get(i).getId()==bookmarkId){
-                        bookmarkIndex=i;
+                        bookmarkIndex = i+1;
+                        episodeAdapter.setBookmark(bookmarkIndex);
                         break;
                     }
                 }
-                episodeAdapter.setBookmark(bookmarkIndex);
             }
         }
     }
@@ -91,17 +102,15 @@ public class EpisodeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
         upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
-        title = new Title(intent.getStringExtra("title")
-                ,intent.getStringExtra("thumb")
-                ,intent.getStringExtra("author")
-                ,intent.getStringArrayListExtra("tags")
-                ,intent.getIntExtra("release",-1));
+        title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
+        online = intent.getBooleanExtra("online", true);
         bookmarkId = p.getBookmark(title.getName());
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
         episodeList = this.findViewById(R.id.EpisodeList);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
+        homeDir = p.getHomeDir();
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
         if(recentResult){
             Intent resultIntent = new Intent();
@@ -112,8 +121,85 @@ public class EpisodeActivity extends AppCompatActivity {
             actionBar.setTitle(title.getName());
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        getEpisodes g = new getEpisodes();
-        g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if(online) {
+            getEpisodes g = new getEpisodes();
+            g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }else{
+            //offline title
+
+            episodes = new ArrayList<>();
+            offlineEpisodes = getOfflineEpisodes();
+            //read ids and folder names
+            File data = new File(homeDir+'/'+title.getName()+"/title.data");
+            if(data.exists()){
+                //read file to string
+                StringBuilder raw = new StringBuilder();
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(data));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        raw.append(line);
+                    }
+                    br.close();
+                    JSONObject json = new JSONObject(raw.toString());
+                    JSONArray ids = json.getJSONArray("ids");
+                    for(int i=0; i<offlineEpisodes.length;i++){
+                        Manga manga;
+                        String episodeName = offlineEpisodes[i].getName();
+                        try {
+                            //real index starts from [ 0001 ]
+                            int realIndex = Integer.parseInt(episodeName.split("\\.")[0])-1;
+                            int id = ids.getInt(realIndex);
+                            manga = new Manga(id, episodeName, String.valueOf(id));
+                        }catch(Exception e){
+                            manga = new Manga(-1,episodeName, "");
+                        }
+                        //add local images to manga
+                        List<String> localImgs = new ArrayList<>();
+                        File[] imgs = offlineEpisodes[i].listFiles();
+                        Arrays.sort(imgs);
+                        for(File img:imgs){
+                            localImgs.add(img.getAbsolutePath());
+                        }
+                        manga.setImgs(localImgs);
+                        episodes.add(manga);
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else {
+                for (File f : offlineEpisodes) {
+                    Manga manga;
+                    manga = new Manga(-1, f.getName(), "");
+                    //add local images to manga
+                    List<String> localImgs = new ArrayList<>();
+                    File[] imgs = f.listFiles();
+                    Arrays.sort(imgs);
+                    for(File img:imgs){
+                        localImgs.add(img.getAbsolutePath());
+                    }
+                    manga.setImgs(localImgs);
+                    episodes.add(manga);
+                }
+            }
+            //set up adapter
+            episodeAdapter = new EpisodeAdapter(context, episodes, title, online);
+            afterLoad();
+        }
+    }
+
+    public File[] getOfflineEpisodes(){
+        File[] episodeFiles = new File(homeDir + '/' + title.getName()).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
+        //sort
+        Arrays.sort(episodeFiles);
+        //add as manga
+        return episodeFiles;
     }
 
 //    @Override
@@ -126,6 +212,113 @@ public class EpisodeActivity extends AppCompatActivity {
 //            }
 //        }
 //    }
+
+    public void afterLoad(){
+        //find bookmark
+        if(bookmarkId>-1){
+            for(int i=0; i< episodes.size(); i++){
+                if(episodes.get(i).getId()==bookmarkId){
+                    bookmarkIndex=i+1;
+                    episodeAdapter.setBookmark(bookmarkIndex);
+                    break;
+                }
+            }
+        }
+        episodeAdapter.setFavorite(p.findFavorite(title)>-1);
+        episodeList.setAdapter(episodeAdapter);
+        if(bookmarkIndex>8){
+            episodeList.scrollToPosition(bookmarkIndex);
+            upBtn.setAlpha(1.0f);
+            upBtnVisible = true;
+        }else{
+            upBtn.setAlpha(0.0f);
+            upBtnVisible = false;
+        }
+        episodeList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstVisible = ((LinearLayoutManager) episodeList.getLayoutManager()).findFirstVisibleItemPosition();
+                if(firstVisible>0 && !upBtnVisible){
+                    upBtn.animate().translationX(0);
+                    upBtn.animate().alpha(1.0f);
+                    upBtnVisible = true;
+                } else if(firstVisible==0 && upBtnVisible){
+                    upBtn.animate().alpha(0.0f);
+                    upBtn.animate().translationX(upBtn.getWidth());
+                    upBtnVisible = false;
+                }
+            }
+        });
+        upBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(upBtnVisible) {
+                    episodeList.scrollToPosition(0);
+                    upBtn.animate().alpha(0.0f);
+                    upBtn.animate().translationX(upBtn.getWidth());
+                    upBtnVisible = false;
+                }
+            }
+        });
+        episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(Manga selected) {
+                // start intent : Episode viewer
+                if(selected.getId() > 0) p.setBookmark(title.getName(),selected.getId());
+                switch (p.getViewerType()){
+                    case 0:
+                    case 2:
+                        viewer = new Intent(context, ViewerActivity.class);
+                        break;
+                    case 1:
+                        viewer = new Intent(context, ViewerActivity2.class);
+                        break;
+                }
+                //create manga object, add local img list and pass to viewer
+                viewer.putExtra("manga", new Gson().toJson(selected));
+                viewer.putExtra("online", online);
+                startActivityForResult(viewer,0);
+            }
+            @Override
+            public void onStarClick(){
+                //star click handler
+                episodeAdapter.setFavorite(p.toggleFavorite(title,position));
+                if(favoriteResult){
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("favorite", p.findFavorite(title)>-1);
+                    setResult(RESULT_OK, resultIntent);
+                }
+            }
+
+            @Override
+            public void onAuthorClick() {
+                if(title.getAuthor().length()>0){
+                    Intent i = new Intent(context, TagSearchActivity.class);
+                    i.putExtra("query",title.getAuthor());
+                    i.putExtra("mode",1);
+                    startActivity(i);
+                }
+            }
+
+            @Override
+            public void onDownloadClick(){
+                //start download activity
+                Intent download = new Intent(context, DownloadActivity.class);
+                download.putExtra("title", new Gson().toJson(title));
+                startActivity(download);
+            }
+        });
+        episodeAdapter.setTagClickListener(new TagAdapter.tagOnclick() {
+            @Override
+            public void onClick(String tag) {
+                Intent i = new Intent(context, TagSearchActivity.class);
+                i.putExtra("query",tag);
+                i.putExtra("mode",2);
+                startActivity(i);
+            }
+        });
+    }
 
     private class getEpisodes extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
@@ -140,135 +333,15 @@ public class EpisodeActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             title.fetchEps(p.getUrl());
             episodes = title.getEps();
-            episodes.add(0,new Manga(0,"", ""));
-            //find bookmark
-            if(bookmarkId!=-1){
-                for(int i=0; i< episodes.size(); i++){
-                    if(episodes.get(i).getId()==bookmarkId){
-                        bookmarkIndex=i;
-                        break;
-                    }
-                }
-            }
-            episodeAdapter = new EpisodeAdapter(context, episodes, title);
+            episodeAdapter = new EpisodeAdapter(context, episodes, title, online);
             return null;
         }
 
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            episodeAdapter.setFavorite(p.findFavorite(title)>-1);
-            episodeAdapter.setBookmark(bookmarkIndex);
-            episodeList.setAdapter(episodeAdapter);
-            if(bookmarkIndex>8){
-                episodeList.scrollToPosition(bookmarkIndex);
-                upBtn.setAlpha(1.0f);
-                upBtnVisible = true;
-            }else{
-                upBtn.setAlpha(0.0f);
-                upBtnVisible = false;
-            }
-//            getActionBarView().setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    System.out.println("hellllllllloi");
-//                }
-//            });
-            episodeList.setOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    int firstVisible = ((LinearLayoutManager) episodeList.getLayoutManager()).findFirstVisibleItemPosition();
-                    if(firstVisible>0 && !upBtnVisible){
-                        upBtn.animate().translationX(0);
-                        upBtn.animate().alpha(1.0f);
-                        upBtnVisible = true;
-                    } else if(firstVisible==0 && upBtnVisible){
-                        upBtn.animate().alpha(0.0f);
-                        upBtn.animate().translationX(upBtn.getWidth());
-                        upBtnVisible = false;
-                    }
-                }
-            });
-            upBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(upBtnVisible) {
-                        episodeList.scrollToPosition(0);
-                        upBtn.animate().alpha(0.0f);
-                        upBtn.animate().translationX(upBtn.getWidth());
-                        upBtnVisible = false;
-                    }
-                }
-            });
-            episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
-                @Override
-                public void onItemClick(View v, int position) {
-                    // start intent : Episode viewer
-                    Manga selected = episodeAdapter.getItem(position);
-                    System.out.println(selected.getId());
-
-                    p.setBookmark(title.getName(),selected.getId());
-                    switch (p.getViewerType()){
-                        case 0:
-                        case 2:
-                            viewer = new Intent(context, ViewerActivity.class);
-                            break;
-                        case 1:
-                            viewer = new Intent(context, ViewerActivity2.class);
-                            break;
-                    }
-                    viewer.putExtra("id", selected.getId());
-                    viewer.putExtra("name",selected.getName());
-                    viewer.putExtra("seed", selected.getSeed());
-                    startActivityForResult(viewer,0);
-                }
-                @Override
-                public void onStarClick(){
-                    //star click handler
-                    episodeAdapter.setFavorite(p.toggleFavorite(title,position));
-                    if(favoriteResult){
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("favorite", p.findFavorite(title)>-1);
-                        setResult(RESULT_OK, resultIntent);
-                    }
-                }
-
-                @Override
-                public void onAuthorClick() {
-                    if(title.getAuthor().length()>0){
-                        Intent i = new Intent(context, TagSearchActivity.class);
-                        i.putExtra("query",title.getAuthor());
-                        i.putExtra("mode",1);
-                        startActivity(i);
-                    }
-                }
-
-                @Override
-                public void onDownloadClick(){
-                    //start download activity
-                    Intent download = new Intent(context, DownloadActivity.class);
-                    JSONArray mangas = new JSONArray();
-                    //index 0 contains header : blank Manga
-                    for(int i=1; i<episodes.size();i++) {
-                        mangas.put(episodes.get(i).toString());
-                    }
-                    download.putExtra("list", mangas.toString());
-                    download.putExtra("name",title.getName());
-                    startActivity(download);
-                }
-            });
-            episodeAdapter.setTagClickListener(new TagAdapter.tagOnclick() {
-                @Override
-                public void onClick(String tag) {
-                    Intent i = new Intent(context, TagSearchActivity.class);
-                    i.putExtra("query",tag);
-                    i.putExtra("mode",2);
-                    startActivity(i);
-                }
-            });
-            //if title data is updated, add data
-            p.updateRecentData(title.getName(),title.getThumb(),title.getAuthor(),title.getTags());
+            afterLoad();
+            p.updateRecentData(title);
             if (pd.isShowing()) {
                 pd.dismiss();
             }

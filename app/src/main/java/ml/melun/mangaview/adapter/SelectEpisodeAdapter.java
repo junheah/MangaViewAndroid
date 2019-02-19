@@ -15,14 +15,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private JSONArray data;
+    private List<Manga> data;
     private LayoutInflater mInflater;
     private Context mainContext;
     Boolean favorite = false;
@@ -32,12 +34,12 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     Boolean dark;
 
     // data is passed into the constructor
-    public SelectEpisodeAdapter(Context context, JSONArray list) {
+    public SelectEpisodeAdapter(Context context, List<Manga> list) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.data = list;
         outValue = new TypedValue();
-        selected = new Boolean[list.length()];
+        selected = new Boolean[list.size()];
         Arrays.fill(selected,Boolean.FALSE);
         dark = new Preference(context).getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
@@ -55,9 +57,9 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ViewHolder h = (ViewHolder) holder;
         try {
-            JSONObject episode = new JSONObject(data.getString(position));
-            h.episode.setText(episode.getString("name"));
-            h.date.setText(episode.getString("date"));
+            Manga m = data.get(position);
+            h.episode.setText(m.getName());
+            h.date.setText(m.getDate());
             if (selected[position]) {
                 if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
                 else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
@@ -73,7 +75,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     // total number of rows
     @Override
     public int getItemCount() {
-        return data.length();
+        return data.size();
     }
 
     public void select(int position){
@@ -101,12 +103,12 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
-    public JSONArray getSelected(){
-        JSONArray tmp= new JSONArray();
+    public List<Manga> getSelected(){
+        List<Manga> tmp= new ArrayList<>();
         for(int i=0; i<selected.length; i++){
             try {
                 if (selected[i]){
-                    tmp.put(new JSONObject(data.getString(i)));
+                    tmp.add(data.get(i));
                 }
             }catch (Exception e){
 

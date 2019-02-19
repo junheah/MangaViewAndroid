@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -162,10 +163,8 @@ public class TagSearchActivity extends AppCompatActivity {
                         p.addRecent(selected);
                         //System.out.println("onItemClick position: " + position);
                         Intent episodeView = new Intent(context, EpisodeActivity.class);
-                        episodeView.putExtra("title", selected.getName());
-                        episodeView.putExtra("thumb", selected.getThumb());
-                        episodeView.putExtra("author", selected.getAuthor());
-                        episodeView.putExtra("tags", new ArrayList<String>(selected.getTags()));
+                        episodeView.putExtra("title", new Gson().toJson(selected));
+                        episodeView.putExtra("online", true);
                         startActivity(episodeView);
                     }
 
@@ -203,7 +202,15 @@ public class TagSearchActivity extends AppCompatActivity {
                 searchResult.setAdapter(uadapter);
                 uadapter.setOnClickListener(new UpdatedAdapter.onclickListener() {
                     @Override
-                    public void onclick(Manga m) {
+                    public void onEpsClick(Title t) {
+                        Intent eps = new Intent(context, EpisodeActivity.class);
+                        eps.putExtra("title", new Gson().toJson(t));
+                        eps.putExtra("online", true);
+                        startActivity(eps);
+                    }
+
+                    @Override
+                    public void onClick(Manga m) {
                         //open viewer
                         Intent viewer = null;
                         switch (p.getViewerType()){
@@ -215,9 +222,8 @@ public class TagSearchActivity extends AppCompatActivity {
                                 viewer = new Intent(context, ViewerActivity2.class);
                                 break;
                         }
-                        viewer.putExtra("id", m.getId());
-                        viewer.putExtra("name",m.getName());
-                        viewer.putExtra("seed", m.getSeed());
+                        viewer.putExtra("manga", new Gson().toJson(m));
+                        viewer.putExtra("online", true);
                         startActivityForResult(viewer,0);
                     }
                 });

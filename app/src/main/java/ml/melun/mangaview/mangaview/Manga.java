@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 import org.jsoup.*;
@@ -40,6 +41,10 @@ public class Manga {
     }
     public String getDate() {
         return date;
+    }
+
+    public void setImgs(List<String> imgs){
+        this.imgs = imgs;
     }
 
     public String getThumb() {
@@ -195,7 +200,7 @@ public class Manga {
         }
     }
 
-    public ArrayList<Manga> getEps() {
+    public List<Manga> getEps() {
         return eps;
     }
 
@@ -203,12 +208,12 @@ public class Manga {
         return title;
     }
 
-    public ArrayList<String> getImgs(){
+    public List<String> getImgs(){
         return imgs;
     }
-    public ArrayList<Comment> getComments(){ return comments; }
+    public List<Comment> getComments(){ return comments; }
 
-    public ArrayList<Comment> getBestComments() { return bcomments; }
+    public List<Comment> getBestComments() { return bcomments; }
 
     public int getSeed() {
         System.out.println("mmmmmmmmmm"+seed);
@@ -227,11 +232,15 @@ public class Manga {
         return tmp.toString();
     }
 
+    public void setTitle(Title title) {
+        this.title = title;
+    }
+
     private int id;
     String name;
-    ArrayList<Manga> eps;
-    ArrayList<String> imgs;
-    ArrayList<Comment> comments, bcomments;
+    List<Manga> eps;
+    List<String> imgs;
+    List<Comment> comments, bcomments;
     String thumb;
     Title title;
     String date;

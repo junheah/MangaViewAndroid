@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
@@ -30,7 +31,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private ArrayList<Manga> mData;
+    private List<Manga> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
@@ -44,13 +45,15 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     LinearLayoutManager lm;
     Boolean dark;
     Boolean save;
+    Boolean online;
 
     // data is passed into the constructor
-    public EpisodeAdapter(Context context, ArrayList<Manga> data, Title title) {
+    public EpisodeAdapter(Context context, List<Manga> data, Title title, Boolean online) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = data;
         this.header = title;
+        this.online = online;
         outValue = new TypedValue();
         dark = new Preference(context).getDarkTheme();
         save = new Preference(context).getDataSave();
@@ -99,10 +102,16 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .load(thumb)
                     .apply(new RequestOptions().dontTransform())
                     .into(h.h_thumb);
+            if(online){
+                ((HeaderHolder) holder).h_download.setVisibility(View.VISIBLE);
+            }else{
+                ((HeaderHolder) holder).h_download.setVisibility(View.GONE);
+            }
         }else {
             ViewHolder h = (ViewHolder) holder;
-            h.episode.setText(mData.get(position).getName());
-            h.date.setText(mData.get(position).getDate());
+            int Dposition = position-1;
+            h.episode.setText(mData.get(Dposition).getName());
+            h.date.setText(mData.get(Dposition).getDate());
             if (position == bookmark) {
                 if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
                 else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
@@ -117,10 +126,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     // total number of rows
     @Override
     public int getItemCount() {
-        return mData.size();
+        return mData.size()+1;
     }
 
-    // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView episode,date;
         ViewHolder(View itemView) {
@@ -130,13 +138,17 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(bookmark!=-1){
-                        int pre = bookmark;
-                        notifyItemChanged(pre);
+
+                    Manga m = mData.get(getAdapterPosition()-1);
+                    if(m.getId()>-1) {
+                        if (bookmark != -1) {
+                            int pre = bookmark;
+                            notifyItemChanged(pre);
+                        }
+                        bookmark = getAdapterPosition();
+                        notifyItemChanged(bookmark);
                     }
-                    bookmark = getAdapterPosition();
-                    notifyItemChanged(bookmark);
-                    mClickListener.onItemClick(v, getAdapterPosition());
+                    mClickListener.onItemClick(m);
                 }
             });
         }
@@ -182,11 +194,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    // convenience method for getting data at click position
-    public Manga getItem(int id) {
-        return mData.get(id);
-    }
-
     public void setFavorite(Boolean b){
         if(favorite!=b) {
             favorite = b;
@@ -195,12 +202,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void setBookmark(int i){
-        //THIS SHOULD BE SET TO INDEX, NOT ID!
+        //THIS SHOULD BE SET TO INDEX, NOT ID! : because of notifyitemChanged
+        //i is real index in recyclerview
         if(i!=bookmark){
             int tmp = bookmark;
             bookmark = i;
-            notifyItemChanged(tmp);
-            notifyItemChanged(bookmark);
+            if(tmp>0) notifyItemChanged(tmp);
+            if(bookmark>0) notifyItemChanged(bookmark);
         }
     }
 
@@ -215,7 +223,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(Manga m);
         void onStarClick();
         void onDownloadClick();
         void onAuthorClick();

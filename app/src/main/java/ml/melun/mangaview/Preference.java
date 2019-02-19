@@ -169,13 +169,24 @@ public class Preference {
         } else recent.add(0,title);
         writeRecent();
     }
-    public void updateRecentData(String name, String thumb, String author,List<String> tags){
-        recent.get(0).setName(name);
-        recent.get(0).setThumb(thumb);
-        recent.get(0).setAuthor(author);
-        recent.get(0).setTags(tags);
+    public void updateRecentData(Title title){
+        recent.get(0).setName(title.getName());
+        recent.get(0).setThumb(title.getThumb());
+        recent.get(0).setAuthor(title.getAuthor());
+        recent.get(0).setTags(title.getTags());
         writeRecent();
+        int index = findFavorite(title);
+        if(index>-1){
+            favorite.get(index).setName(title.getName());
+            favorite.get(index).setThumb(title.getThumb());
+            favorite.get(index).setAuthor(title.getAuthor());
+            favorite.get(index).setTags(title.getTags());
+            Gson gson = new Gson();
+            prefsEditor.putString("favorite", gson.toJson(favorite));
+            prefsEditor.commit();
+        }
     }
+
     private int getIndexOf(Title title){
         String targetT = title.getName();
         for(int i=0; i<recent.size(); i++){

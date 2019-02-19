@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ import java.util.List;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
+import ml.melun.mangaview.mangaview.Title;
 
 public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context context;
@@ -50,7 +52,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.item_title, parent, false);
+        View view = mInflater.inflate(R.layout.item_updated_list, parent, false);
         return new viewHolder(view);
     }
 
@@ -73,23 +75,35 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView text, date;
         ImageView thumb;
         CardView card;
+        Button viewEps;
         public viewHolder(View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.Title);
-            date = itemView.findViewById(R.id.TitleAuthor);
-            card = itemView.findViewById(R.id.titleCard);
+            date = itemView.findViewById(R.id.date);
+            card = itemView.findViewById(R.id.updatedCard);
             thumb = itemView.findViewById(R.id.Thumb);
+            viewEps = itemView.findViewById(R.id.epsButton);
             if(dark){
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
+                viewEps.setBackgroundColor(ContextCompat.getColor(context, R.color.resumeDark));
             }
             card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    olisten.onclick(mData.get(getAdapterPosition()));
+                    olisten.onClick(mData.get(getAdapterPosition()));
+                }
+            });
+            viewEps.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    olisten.onEpsClick(mData.get(getAdapterPosition()).getTitle());
                 }
             });
         }
     }
 
-    public interface onclickListener {void onclick(Manga m);}
+    public interface onclickListener {
+        void onClick(Manga m);
+        void onEpsClick(Title t);
+    }
 }
