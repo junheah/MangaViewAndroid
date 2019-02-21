@@ -308,7 +308,6 @@ public class Preference {
         return pagebookmark.has(id+"");
     }
 
-
     public Boolean match(String s1, String s2){
         return filterString(s1).matches(filterString(s2));
     }
@@ -338,6 +337,4 @@ public class Preference {
         prefsEditor.putString("favorite", gson.toJson(favorite));
         prefsEditor.commit();
     }
-
-
 }
