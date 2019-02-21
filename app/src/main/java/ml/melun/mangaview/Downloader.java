@@ -147,7 +147,6 @@ public class Downloader extends Service {
             super.onPreExecute();
             running = true;
         }
-
         protected Integer doInBackground(Void... params) {
             while(titles.size()>0) {
                 progress = 0;
@@ -170,8 +169,10 @@ public class Downloader extends Service {
                         return 1;
                     }
                     File titleDir = new File(homeDir,filterString(title.getName()));
-                    File dir = new File(titleDir, (new DecimalFormat("0000").format(index))+". "+filterString(target.getName()));
-                    if(!dir.exists()) dir.mkdir();
+                    if(!titleDir.exists()) titleDir.mkdir();
+                    System.out.println("ppppppp"+titleDir.getAbsolutePath());
+                    File dir = new File(titleDir, new DecimalFormat("0000").format(index)+". "+filterString(target.getName()));
+                    if(!dir.exists()) dir.mkdirs();
                     //if first manga, save title data
                     if(h==0){
                         try {
@@ -190,6 +191,7 @@ public class Downloader extends Service {
                             }
                             json.put("ids", ids);
                             File summary = new File(titleDir,"title.data");
+                            summary.createNewFile();
                             FileOutputStream stream = new FileOutputStream(summary);
                             stream.write(json.toString().getBytes());
                             stream.flush();
@@ -317,13 +319,17 @@ public class Downloader extends Service {
         return name;
     }
 
+    char[] filter = {'/','?','*',':','|','<','>','\\'};
+
     private String filterString(String input){
-        int m=0;
-        while(m>-1){
-            m = input.indexOf('/');
-            char[] tmp = input.toCharArray();
-            if(m>-1) tmp[m] = ' ';
-            input = String.valueOf(tmp);
+        for(int i=0; i<filter.length;i++) {
+            int index = input.indexOf(filter[i]);
+            while(index>=0) {
+                char tmp[] = input.toCharArray();
+                tmp[index] = ' ';
+                input = String.valueOf(tmp);
+                index = input.indexOf(filter[i]);
+            }
         }
         return input;
     }
