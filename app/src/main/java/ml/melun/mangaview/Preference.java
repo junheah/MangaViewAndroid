@@ -160,7 +160,8 @@ public class Preference {
         writeRecent();
     }
 
-    public void addRecent(Title title){
+    public void addRecent(Title tmp){
+        Title title = tmp;
         title.removeEps();
         int position = getIndexOf(title);
         if(position>-1) {
