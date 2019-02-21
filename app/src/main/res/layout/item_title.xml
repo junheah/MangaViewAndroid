@@ -16,7 +16,7 @@
         <android.support.v7.widget.CardView
             android:id="@+id/titleCard"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="wrap_content"
             app:cardCornerRadius="6dp"
             app:cardElevation="3dp"
             android:layout_marginTop="3dp"
@@ -24,20 +24,20 @@
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:foreground="?android:attr/selectableItemBackground">
+
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:minHeight="88sp">
 
                 <ImageView
                     android:id="@+id/Thumb"
                     android:layout_width="80dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
                     android:scaleType="centerCrop"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/Title"
@@ -46,53 +46,60 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="TextView\nText"
-                    android:textSize="14dp"
+                    android:text="test"
+                    android:textSize="16sp"
                     app:layout_constraintEnd_toStartOf="@+id/epsButton"
                     app:layout_constraintStart_toEndOf="@+id/Thumb"
                     app:layout_constraintTop_toTopOf="parent" />
+
                 <TextView
                     android:id="@+id/TitleAuthor"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="4dp"
+                    android:minLines="1"
+                    android:singleLine="true"
+                    android:text="작가"
                     android:textColor="@android:color/darker_gray"
-                    android:text=""
-                    android:textSize="12dp"
+                    android:textSize="12sp"
+                    app:layout_constraintHeight_min="15sp"
+                    app:layout_constraintBottom_toTopOf="@+id/TitleTag"
                     app:layout_constraintEnd_toStartOf="@+id/epsButton"
                     app:layout_constraintStart_toEndOf="@+id/Thumb"
-                    app:layout_constraintTop_toBottomOf="@+id/Title" />
+                    app:layout_constraintTop_toBottomOf="@+id/Title"/>
 
                 <TextView
                     android:id="@+id/TitleTag"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="15sp"
+                    android:layout_marginBottom="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="4dp"
                     android:singleLine="true"
-                    android:text=""
+                    android:text="태그1 태그2 태그3"
                     android:textColor="@color/colorAccent"
-                    android:textSize="10dp"
+                    android:textSize="11sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/epsButton"
-                    app:layout_constraintStart_toEndOf="@+id/Thumb"
-                    app:layout_constraintTop_toBottomOf="@+id/TitleAuthor" />
+                    app:layout_constraintStart_toEndOf="@+id/Thumb"/>
 
                 <Button
                     android:id="@+id/epsButton"
-                    android:visibility="gone"
-                    android:textColor="@android:color/white"
-                    android:layout_width="43dp"
-                    android:layout_height="match_parent"
-                    android:padding="0dp"
-                    android:text="이\n어\n보\n기"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:textDirection="firstStrong"
+                    android:layout_width="40dp"
+                    android:layout_height="0dp"
                     android:background="@android:color/darker_gray"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp"
+                    android:text="이\n어\n보\n기"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

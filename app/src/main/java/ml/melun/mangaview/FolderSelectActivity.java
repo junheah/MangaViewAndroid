@@ -46,7 +46,7 @@ public class FolderSelectActivity extends AppCompatActivity {
     Context context;
     int requestCode;
     ActionBar actionBar;
-    String defDir = "/sdcard/MangaView/saved/";
+    File defDir;
     ArrayAdapter<String> arrayAdapter;
     TextView path;
     Boolean dark;
@@ -57,17 +57,25 @@ public class FolderSelectActivity extends AppCompatActivity {
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder_select);
+
+        context = this;
         currentDir = new File(p.getHomeDir());
-        File hd = new File(p.getHomeDir());
-        if(!hd.exists()) hd.mkdir();
+        defDir = new File("/sdcard/MangaView/saved/");
+        if(!currentDir.exists()){
+            p.setHomeDir(defDir.getAbsolutePath());
+            Toast.makeText(context, "설정된 폴더를 찾을 수 없습니다. 기본 폴더로 설정 합니다.", Toast.LENGTH_LONG).show();
+            currentDir = defDir;
+            if(!defDir.exists()) currentDir.mkdir();
+        }
 
         dirList = this.findViewById(R.id.dirList);
         select = this.findViewById(R.id.dirSelectBtn);
-        context = this;
+
         actionBar = getSupportActionBar();
         actionBar.setTitle("폴더 선택기");
         actionBar.setDisplayHomeAsUpEnabled(true);
         path = this.findViewById(R.id.path);
+        //adapter init
         folders = refresh();
         arrayAdapter = new ArrayAdapter<String>(
                 this,
@@ -78,11 +86,11 @@ public class FolderSelectActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(checkWriteable()) {
-                    p.setHomeDir(currentDir.getAbsolutePath() + '/');
+                    p.setHomeDir(currentDir.getAbsolutePath());
                     Toast.makeText(context, "설정 완료!", Toast.LENGTH_LONG).show();
                     finish();
                 }else{
-                    Toast.makeText(context, "쓰기가 불가능한 위치 입니다. 다른 위치를 설정해 주세요.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "쓰기가 불가능한 위치 입니다. 다른 위치를 선택해 주세요.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -101,13 +109,42 @@ public class FolderSelectActivity extends AppCompatActivity {
                 }
             }
         });
+        dirList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                String target = folders.get(position);
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //Yes button clicked
+                                File folder = new File(currentDir, target);
+                                deleteRecursive(folder);
+                                populate();
+                                Toast.makeText(context,"삭제가 완료되었습니다.",Toast.LENGTH_SHORT).show();
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder;
+                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                else builder = new AlertDialog.Builder(context);
+                builder.setMessage(target + " 을(를) 삭제 하시겠습니까?").setPositiveButton("네", dialogClickListener)
+                        .setNegativeButton("아니오", dialogClickListener).show();
+                return false;
+            }
+        });
         dirList.setAdapter(arrayAdapter);
         changeSource = this.findViewById(R.id.changeSourceBtn);
         changeSource.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 File[] dirs =  ContextCompat.getExternalFilesDirs(context, null);
-                dirs[0] = new File(defDir); //기본 내부 저장소로 설정
+                dirs[0] = defDir; //기본 내부 저장소로 설정
                 PopupMenu popup = new PopupMenu(FolderSelectActivity.this,changeSource);
                 for(int i=0;i<dirs.length;i++){
                     if(i==0) popup.getMenu().add(i+".내부 저장소");
@@ -205,7 +242,7 @@ public class FolderSelectActivity extends AppCompatActivity {
             folders.addAll(refresh());
             arrayAdapter.notifyDataSetChanged();
         }
-        dirList.smoothScrollToPosition(0);
+        dirList.scrollTo(0,0);
     }
 
     public boolean checkWriteable(){
@@ -217,6 +254,13 @@ public class FolderSelectActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    void deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory())
+            for (File child : fileOrDirectory.listFiles())
+                deleteRecursive(child);
+        fileOrDirectory.delete();
     }
 
 }

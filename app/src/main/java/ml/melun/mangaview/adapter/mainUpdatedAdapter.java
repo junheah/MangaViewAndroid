@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,10 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(itemView);
             thumb = itemView.findViewById(R.id.main_new_thumb);
             title = itemView.findViewById(R.id.main_new_name);
+            title.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            title.setMarqueeRepeatLimit(-1);
+            title.setSingleLine(true);
+            title.setSelected(true);
             card = itemView.findViewById(R.id.updatedCard);
             card.setOnClickListener(new View.OnClickListener() {
                 @Override

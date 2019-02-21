@@ -21,7 +21,7 @@
         android:marqueeRepeatLimit="marquee_forever"
         android:ellipsize="marquee"
         android:singleLine="true"
-        android:textSize="20dp"
+        style="@android:style/TextAppearance.Large"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/commentButton"
         app:layout_constraintStart_toStartOf="parent"

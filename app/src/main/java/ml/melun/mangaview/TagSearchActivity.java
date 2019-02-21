@@ -161,7 +161,6 @@ public class TagSearchActivity extends AppCompatActivity {
                     public void onItemClick(int position) {
                         // start intent : Episode viewer
                         Title selected = adapter.getItem(position);
-                        p.addRecent(selected);
                         //System.out.println("onItemClick position: " + position);
                         Intent episodeView = new Intent(context, EpisodeActivity.class);
                         episodeView.putExtra("title", new Gson().toJson(selected));
@@ -243,11 +242,11 @@ public class TagSearchActivity extends AppCompatActivity {
     void popup(View view, final int position, final Title title, final int m){
         PopupMenu popup = new PopupMenu(TagSearchActivity.this, view);
         //Inflating the Popup using xml file
-
         popup.getMenuInflater()
                 .inflate(R.menu.title_options, popup.getMenu());
-
         popup.getMenu().removeItem(R.id.del);
+        popup.getMenu().findItem(R.id.favAdd).setVisible(true);
+        popup.getMenu().findItem(R.id.favDel).setVisible(true);
         if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
         else popup.getMenu().removeItem(R.id.favDel);
 

@@ -80,6 +80,7 @@ public class DebugActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         //save changes
                         writeToPref(editor.getText().toString());
+                        new Preference(context).init(context);
                         editor.setVisibility(View.GONE);
                         save.setVisibility(View.GONE);
                         cancel.setVisibility(View.GONE);

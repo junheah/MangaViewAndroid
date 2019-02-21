@@ -41,7 +41,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:text="0000-00-00 00:00"
-        android:textSize="9dp"
+        android:textSize="9sp"
+
         app:layout_constraintStart_toEndOf="@+id/comment_icon"
         app:layout_constraintTop_toTopOf="parent" />
     <TextView
@@ -52,7 +53,7 @@
         android:layout_marginEnd="12dp"
         android:text="likes"
         android:textColor="@color/colorAccent"
-        android:textSize="12dp"
+        android:textSize="9sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -63,7 +64,7 @@
         android:layout_margin="4dp"
         android:text="User"
         android:textAlignment="center"
-        android:textSize="10dp"
+        android:textSize="10sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/comment_content"
         app:layout_constraintStart_toStartOf="parent"

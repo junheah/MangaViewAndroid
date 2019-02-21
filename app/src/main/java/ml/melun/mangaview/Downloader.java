@@ -54,10 +54,11 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Downloader extends Service {
-    String homeDir;
+    File homeDir;
     String baseUrl;
     ArrayList<Title> titles;
     float progress = 0;
+    int maxProgress=1000;
     String content="";
     int queue;
     Context context;
@@ -78,7 +79,7 @@ public class Downloader extends Service {
     public void onCreate() {
         super.onCreate();
         if(titles==null) titles = new ArrayList<>();
-        homeDir = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir","/sdcard/MangaView/saved");
+        homeDir = new File(getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir","/sdcard/MangaView/saved"));
         baseUrl = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "http://188.214.128.5");
         if(dt==null) dt = new downloadTitle();
         //android O bullshit
@@ -150,7 +151,7 @@ public class Downloader extends Service {
             titles.add(title);
             running = true;
             setQueue(titles.size());
-            updateNotification();
+            updateNotification("");
         }
     }
     private class downloadTitle extends AsyncTask<Void,Void,Integer> {
@@ -165,40 +166,42 @@ public class Downloader extends Service {
                 setQueue(titles.size());
                 Title title = titles.get(0);
                 setName(title.getName());
-                updateNotification();
+                updateNotification("");
                 if(title.getEps()==null) title.fetchEps(baseUrl);
                 List<Manga> mangas = title.getEps();
-                float stepSize = 1000/mangas.size();
+                float stepSize = maxProgress/mangas.size();
                 for(int h=0;h<mangas.size();h++) {
-                    if(isCancelled()) return null;
+                    if(isCancelled()) return 0;
                     Manga target = mangas.get(h);
                     target.fetch(baseUrl);
                     Decoder d = new Decoder(target.getSeed(), target.getId());
                     int index = getIndex(target.getEps(),target.getId());
                     List<String> urls = target.getImgs();
-                    String targetDir = homeDir+'/' + filterString(title.getName())+'/'+(new DecimalFormat("0000").format(index))+". "+filterString(target.getName())+'/';
-                    File dir = new File(targetDir);
-                    if (!dir.exists()) dir.mkdirs();
+                    if (!homeDir.exists()){
+                        this.cancel(true);
+                        return 1;
+                    }
+                    File titleDir = new File(homeDir,filterString(title.getName()));
+                    File dir = new File(titleDir, (new DecimalFormat("0000").format(index))+". "+filterString(target.getName()));
+                    if(!dir.exists()) dir.mkdir();
                     //if first manga, save title data
                     if(h==0){
                         try {
                             //save thumbnail
-                            String thumb = downloadFile(title.getThumb(), homeDir+'/' + filterString(title.getName()) +"/thumb");
+                            String thumb = downloadFile(title.getThumb(), new File(titleDir,"thumb"));
                             title.setThumb(thumb);
-                            //if first manga, save index:id list to file
+                            //if first manga, save title data & id list to title.data as JSON
                             List<Manga> realEps = target.getEps();
-                            //save title class as GSON on index 0
                             title.removeEps();
                             JSONObject json = new JSONObject();
                             json.put("title", new JSONObject(new Gson().toJson(title)));
                             JSONArray ids = new JSONArray();
                             for(int i=realEps.size()-1; i>=0; i--){
-                                //save manga id according to index
+                                //save manga id to JSONArray
                                 ids.put(realEps.get(i).getId());
                             }
                             json.put("ids", ids);
-
-                            File summary = new File(homeDir+'/' + filterString(title.getName()) + "/title.data");
+                            File summary = new File(titleDir,"title.data");
                             FileOutputStream stream = new FileOutputStream(summary);
                             stream.write(json.toString().getBytes());
                             stream.flush();
@@ -207,13 +210,13 @@ public class Downloader extends Service {
                             e.printStackTrace();
                         }
                     }
+
                     float imgStepSize = stepSize/urls.size();
                     for (int i = 0; i < urls.size(); i++) {
-                        if(isCancelled()) return null;
-                        downloadImage(urls.get(i), targetDir + (new DecimalFormat("0000").format(i)), d);
+                        if(isCancelled()) return 0;
+                        downloadImage(urls.get(i), new File(dir,new DecimalFormat("0000").format(i)), d);
                         progress+=imgStepSize;
-                        setProgress(progress);
-                        updateNotification();
+                        updateNotification((h+1)+"/"+mangas.size());
                     }
                     //in case imgStepSize grounds to zero
                 }
@@ -231,14 +234,24 @@ public class Downloader extends Service {
         }
 
         @Override
-        protected void onCancelled() {
+        protected void onCancelled(Integer mode) {
             super.onCancelled();
-            stopNotification();
+            String why = "";
+            switch(mode){
+                case 0:
+                    why = "유저 취소";
+                    break;
+                case 1:
+                    why = "쓰기 실패";
+                    break;
+
+            }
+            stopNotification(why);
             stopSelf();
         }
     }
 
-    void downloadImage(String urlStr, String filePath, Decoder d){
+    void downloadImage(String urlStr, File outputFile, Decoder d){
         try {
             URL url = new URL(urlStr);
             if(url.getProtocol().toLowerCase().matches("https")) {
@@ -263,8 +276,7 @@ public class Downloader extends Service {
             //decode image
             bitmap = d.decode(bitmap);
             //save image
-            File outputFile = new File(filePath);
-            OutputStream outputStream = new FileOutputStream(outputFile+".jpg");
+            OutputStream outputStream = new FileOutputStream(outputFile.getAbsolutePath()+".jpg");
             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
             in.close();
             outputStream.flush(); // Not really required
@@ -275,7 +287,7 @@ public class Downloader extends Service {
         }
     }
 
-    String downloadFile(String urlStr, String filePath){
+    String downloadFile(String urlStr, File outputFile){
         //returns file name with extension
         String name = "";
         try {
@@ -298,7 +310,7 @@ public class Downloader extends Service {
 
             //load file
             InputStream in = connection.getInputStream();
-            File outputFile = new File(filePath+'.'+fileType);
+            outputFile = new File(outputFile.getAbsolutePath()+'.'+fileType);
             name = outputFile.getName();
             OutputStream outputStream = new FileOutputStream(outputFile);
             //save file
@@ -344,13 +356,14 @@ public class Downloader extends Service {
                 .setOngoing(true);
         startForeground(nid, notification.build());
     }
-    private void updateNotification() {
+    private void updateNotification(String text) {
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
                 .setContentTitle(content)
                 .setSubText("대기열: "+queue)
+                .setContentText(text)
                 .addAction(R.drawable.ic_logo, "중지", stopIntent)
-                .setProgress(1000,(int)progress,false)
+                .setProgress(maxProgress, (int)progress, !(progress > 0))
                 .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(true);
         notificationManager.notify(nid, notification.build());
@@ -364,9 +377,10 @@ public class Downloader extends Service {
                 .setOngoing(false);
         notificationManager.notify(nid+1, notification.build());
     }
-    private void stopNotification(){
+    private void stopNotification(String why){
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
+                .setContentText(why)
                 .setContentTitle("다운로드가 취소되었습니다.")
                 .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(false);

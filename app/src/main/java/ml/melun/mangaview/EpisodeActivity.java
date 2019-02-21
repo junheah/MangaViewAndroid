@@ -111,6 +111,8 @@ public class EpisodeActivity extends AppCompatActivity {
         episodeList = this.findViewById(R.id.EpisodeList);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
         homeDir = p.getHomeDir();
+
+        p.addRecent(title);
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
         if(recentResult){
             Intent resultIntent = new Intent();
@@ -126,7 +128,6 @@ public class EpisodeActivity extends AppCompatActivity {
             g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }else{
             //offline title
-
             episodes = new ArrayList<>();
             offlineEpisodes = getOfflineEpisodes();
             //read ids and folder names

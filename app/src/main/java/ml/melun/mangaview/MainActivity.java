@@ -461,7 +461,6 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onResumeClick(int position, int id) {
                     selectedPosition = position;
-                    p.addRecent(recentAdapter.getItem(position));
                     switch (p.getViewerType()){
                         case 0:
                         case 2:
@@ -481,7 +480,6 @@ public class MainActivity extends AppCompatActivity
                     // start intent : Episode viewer
                     Title selected = recentAdapter.getItem(position);
                     selectedPosition = position;
-                    p.addRecent(selected);
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("title", new Gson().toJson(selected));
                     episodeView.putExtra("recent",true);
@@ -519,7 +517,6 @@ public class MainActivity extends AppCompatActivity
                 public void onItemClick(int position) {
                     // start intent : Episode viewer
                     Title selected = favoriteAdapter.getItem(position);
-                    p.addRecent(selected);
                     //start intent for result : has to know if favorite has been removed or not
                     Intent episodeView = new Intent(context, EpisodeActivity.class);
                     episodeView.putExtra("position", position);
@@ -619,7 +616,6 @@ public class MainActivity extends AppCompatActivity
                     public void onItemClick(int position) {
                         // start intent : Episode viewer
                         Title selected = searchAdapter.getItem(position);
-                        p.addRecent(selected);
                         System.out.println("onItemClick position: " + position);
 
                         Intent episodeView = new Intent(context, EpisodeActivity.class);
@@ -847,6 +843,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 2:
                 //좋아요
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
                 break;
             case 3:
                 //저장됨
@@ -891,7 +888,7 @@ public class MainActivity extends AppCompatActivity
                                         deleteRecursive(folder);
                                         offlineAdapter.remove(position);
                                         offlineAdapter.notifyItemRemoved(position);
-                                        Toast.makeText(context,"삭제가 완료되었습니다.",Toast.LENGTH_SHORT);
+                                        Toast.makeText(context,"삭제가 완료되었습니다.",Toast.LENGTH_SHORT).show();
                                         break;
                                     case DialogInterface.BUTTON_NEGATIVE:
                                         //No button clicked

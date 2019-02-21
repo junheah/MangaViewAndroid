@@ -108,7 +108,6 @@ public class ViewerActivity extends AppCompatActivity {
 
             toolbarTitle.setText(name);
             viewerBookmark = p.getViewerBookmark(id);
-            System.out.println("pppppppppp"+manga.getId());
 
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);
