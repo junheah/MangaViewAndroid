@@ -52,8 +52,6 @@ public class Title {
             }catch (Exception e){
 
             }
-
-
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -97,13 +95,10 @@ public class Title {
     }
 
     public void removeEps(){
-        eps = new ArrayList<>();
+        if(eps!=null) eps.clear();
     }
 
-    public String toString(){
 
-        return null;
-    }
     public void setBookmark(int b){bookmark = b;}
 
     private String name;

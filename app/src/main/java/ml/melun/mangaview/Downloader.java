@@ -41,10 +41,13 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.Utils.filterFolder;
+
 public class Downloader extends Service {
     File homeDir;
     String baseUrl;
     ArrayList<Title> titles;
+    ArrayList<JSONArray> selected;
     float progress = 0;
     int maxProgress=1000;
     String content="";
@@ -67,12 +70,13 @@ public class Downloader extends Service {
     public void onCreate() {
         super.onCreate();
         if(titles==null) titles = new ArrayList<>();
+        if(selected==null) selected = new ArrayList<>();
         homeDir = new File(getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir","/sdcard/MangaView/saved"));
         baseUrl = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "http://188.214.128.5");
         if(dt==null) dt = new downloadTitle();
         //android O bullshit
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= 26) {
-            notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             //notificationManager.deleteNotificationChannel("mangaView");
             NotificationChannel mchannel = new NotificationChannel(channeld, "MangaView", NotificationManager.IMPORTANCE_LOW);
             mchannel.setDescription("다운로드 상태");
@@ -98,8 +102,14 @@ public class Downloader extends Service {
                 break;
             case ACTION_QUEUE:
                 if(dt==null) dt = new downloadTitle();
-                Title target = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
-                queueTitle(target);
+                try {
+                    Title target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+                    }.getType());
+                    JSONArray selection = new JSONArray(intent.getStringExtra("selected"));
+                    queueTitle(target,selection);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 break;
             case ACTION_STOP:
                 dt.cancel(true);
@@ -125,18 +135,17 @@ public class Downloader extends Service {
     public void setName(String name){
         this.content = name;
     }
-    public void setProgress(float progress){
-        this.progress = progress;
-    }
 
 
-    public void queueTitle(Title title){
+    public void queueTitle(Title title, JSONArray selection){
         if(dt.getStatus() == AsyncTask.Status.PENDING || dt.getStatus() == AsyncTask.Status.FINISHED) {
             dt = new downloadTitle();
             titles.add(title);
+            selected.add(selection);
             dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }else{
             titles.add(title);
+            selected.add(selection);
             running = true;
             setQueue(titles.size());
             updateNotification("");
@@ -148,69 +157,76 @@ public class Downloader extends Service {
             running = true;
         }
         protected Integer doInBackground(Void... params) {
-            while(titles.size()>0) {
-                progress = 0;
-                setQueue(titles.size());
-                Title title = titles.get(0);
-                setName(title.getName());
-                updateNotification("");
-                if(title.getEps()==null) title.fetchEps(baseUrl);
-                List<Manga> mangas = title.getEps();
-                float stepSize = maxProgress/mangas.size();
-                for(int h=0;h<mangas.size();h++) {
-                    if(isCancelled()) return 0;
-                    Manga target = mangas.get(h);
-                    target.fetch(baseUrl);
-                    Decoder d = new Decoder(target.getSeed(), target.getId());
-                    int index = getIndex(target.getEps(),target.getId());
-                    List<String> urls = target.getImgs();
-                    if (!homeDir.exists()){
-                        this.cancel(true);
-                        return 1;
-                    }
-                    File titleDir = new File(homeDir,filterString(title.getName()));
-                    if(!titleDir.exists()) titleDir.mkdir();
-                    System.out.println("ppppppp"+titleDir.getAbsolutePath());
-                    File dir = new File(titleDir, new DecimalFormat("0000").format(index)+". "+filterString(target.getName()));
-                    if(!dir.exists()) dir.mkdirs();
-                    //if first manga, save title data
-                    if(h==0){
-                        try {
-                            //save thumbnail
-                            String thumb = downloadFile(title.getThumb(), new File(titleDir,"thumb"));
-                            title.setThumb(thumb);
-                            //if first manga, save title data & id list to title.data as JSON
-                            List<Manga> realEps = target.getEps();
-                            title.removeEps();
-                            JSONObject json = new JSONObject();
-                            json.put("title", new JSONObject(new Gson().toJson(title)));
-                            JSONArray ids = new JSONArray();
-                            for(int i=realEps.size()-1; i>=0; i--){
-                                //save manga id to JSONArray
-                                ids.put(realEps.get(i).getId());
-                            }
-                            json.put("ids", ids);
-                            File summary = new File(titleDir,"title.data");
-                            summary.createNewFile();
-                            FileOutputStream stream = new FileOutputStream(summary);
-                            stream.write(json.toString().getBytes());
-                            stream.flush();
-                            stream.close();
-                        }catch (Exception e){
-                            e.printStackTrace();
+            try {
+                while (titles.size() > 0) {
+                    progress = 0;
+                    setQueue(titles.size());
+                    Title title = titles.get(0);
+                    JSONArray select = selected.get(0);
+                    setName(title.getName());
+                    updateNotification("");
+                    if (title.getEps() == null) title.fetchEps(baseUrl);
+                    List<Manga> mangas = title.getEps();
+                    float stepSize = maxProgress / select.length();
+                    for (int c = 0; c < select.length(); c++) {
+                        if (isCancelled()) return 0;
+                        int h = select.getInt(c);
+                        Manga target = mangas.get(h);
+                        target.fetch(baseUrl);
+                        Decoder d = new Decoder(target.getSeed(), target.getId());
+                        int index = mangas.size()-h;
+                        List<String> urls = target.getImgs();
+                        if (!homeDir.exists()) {
+                            this.cancel(true);
+                            return 1;
                         }
-                    }
+                        File titleDir = new File(homeDir, filterFolder(title.getName()));
+                        if (!titleDir.exists()) titleDir.mkdirs();
+                        File dir = new File(titleDir, new DecimalFormat("0000").format(index) + ". " + filterFolder(target.getName()));
+                        if (!dir.exists()) dir.mkdirs();
+                        //if first manga, save title data
+                        if (c==0) {
+                            try {
+                                //save thumbnail
+                                String thumb = downloadFile(title.getThumb(), new File(titleDir, "thumb"));
+                                title.setThumb(thumb);
+                                //if first manga, save title data & id list to title.data as JSON
+                                title.removeEps();
+                                JSONObject json = new JSONObject();
+                                json.put("title", new JSONObject(new Gson().toJson(title)));
+                                JSONArray ids = new JSONArray();
+                                for (int i = mangas.size() - 1; i >= 0; i--) {
+                                    //save manga id to JSONArray
+                                    ids.put(mangas.get(i).getId());
+                                }
+                                json.put("ids", ids);
+                                File summary = new File(titleDir, "title.data");
+                                summary.createNewFile();
+                                FileOutputStream stream = new FileOutputStream(summary);
+                                stream.write(json.toString().getBytes());
+                                stream.flush();
+                                stream.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-                    float imgStepSize = stepSize/urls.size();
-                    for (int i = 0; i < urls.size(); i++) {
-                        if(isCancelled()) return 0;
-                        downloadImage(urls.get(i), new File(dir,new DecimalFormat("0000").format(i)), d);
-                        progress+=imgStepSize;
-                        updateNotification((h+1)+"/"+mangas.size());
+                        float imgStepSize = stepSize / urls.size();
+                        for (int i = 0; i < urls.size(); i++) {
+                            if (isCancelled()) return 0;
+                            downloadImage(urls.get(i), new File(dir, new DecimalFormat("0000").format(i)), d);
+                            progress += imgStepSize;
+                            updateNotification((c + 1) + "/" + select.length());
+                        }
+                        //in case imgStepSize grounds to zero
                     }
-                    //in case imgStepSize grounds to zero
+                    titles.remove(0);
+                    selected.remove(0);
                 }
-                titles.remove(0);
+            }catch (Exception e){
+                e.printStackTrace();
+                cancel(true);
+                return 1;
             }
             return null;
         }
@@ -318,22 +334,6 @@ public class Downloader extends Service {
         }
         return name;
     }
-
-    char[] filter = {'/','?','*',':','|','<','>','\\'};
-
-    private String filterString(String input){
-        for(int i=0; i<filter.length;i++) {
-            int index = input.indexOf(filter[i]);
-            while(index>=0) {
-                char tmp[] = input.toCharArray();
-                tmp[index] = ' ';
-                input = String.valueOf(tmp);
-                index = input.indexOf(filter[i]);
-            }
-        }
-        return input;
-    }
-
     public int getIndex(List<Manga> eps, int id){
         for(int i=0; i<eps.size(); i++){
             if(eps.get(i).getId()==id){
@@ -356,7 +356,7 @@ public class Downloader extends Service {
                 .setContentTitle(content)
                 .setSubText("대기열: "+queue)
                 .setContentText(text)
-                .addAction(R.drawable.ic_logo, "중지", stopIntent)
+                .addAction(R.drawable.blank, "중지", stopIntent)
                 .setProgress(maxProgress, (int)progress, !(progress > 0))
                 .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(true);

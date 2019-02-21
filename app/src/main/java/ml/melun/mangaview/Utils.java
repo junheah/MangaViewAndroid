@@ -117,4 +117,18 @@ public class Utils {
                 .setPositiveButton("확인", dialogClickListener)
                 .show();
     }
+
+    static char[] filter = {'/','?','*',':','|','<','>','\\'};
+    static public String filterFolder(String input){
+        for(int i=0; i<filter.length;i++) {
+            int index = input.indexOf(filter[i]);
+            while(index>=0) {
+                char tmp[] = input.toCharArray();
+                tmp[index] = ' ';
+                input = String.valueOf(tmp);
+                index = input.indexOf(filter[i]);
+            }
+        }
+        return input;
+    }
 }

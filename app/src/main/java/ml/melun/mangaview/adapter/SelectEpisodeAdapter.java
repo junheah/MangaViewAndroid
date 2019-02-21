@@ -91,7 +91,14 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
             super(itemView);
             episode = itemView.findViewById(R.id.episode);
             date = itemView.findViewById(R.id.date);
-            if(dark) episode.setTextColor(Color.WHITE);
+            if(dark){
+                date.setTextColor(Color.WHITE);
+                episode.setTextColor(Color.WHITE);
+            }
+            else{
+                date.setTextColor(Color.BLACK);
+                episode.setTextColor(Color.BLACK);
+            }
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -103,16 +110,11 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
-    public List<Manga> getSelected(){
-        List<Manga> tmp= new ArrayList<>();
-        for(int i=0; i<selected.length; i++){
-            try {
-                if (selected[i]){
-                    tmp.add(data.get(i));
-                }
-            }catch (Exception e){
-
-            }
+    public JSONArray getSelected(Boolean all){
+        JSONArray tmp = new JSONArray();
+        for(int i=0; i<selected.length;i++){
+            if(selected[i]) tmp.put(i);
+            else if(all) tmp.put(i);
         }
         return tmp;
     }

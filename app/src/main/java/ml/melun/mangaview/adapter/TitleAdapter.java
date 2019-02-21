@@ -29,6 +29,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     Boolean save;
     Boolean resume = true;
     Boolean updated = false;
+    String path = "";
     Preference p;
 
     public TitleAdapter(Context context) {

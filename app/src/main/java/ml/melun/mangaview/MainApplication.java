@@ -10,13 +10,15 @@ import org.acra.annotation.AcraDialog;
 import org.acra.annotation.AcraMailSender;
 
 import static org.acra.ReportField.ANDROID_VERSION;
+import static org.acra.ReportField.APPLICATION_LOG;
 import static org.acra.ReportField.APP_VERSION_NAME;
 import static org.acra.ReportField.PHONE_MODEL;
+import static org.acra.ReportField.REPORT_ID;
 import static org.acra.ReportField.STACK_TRACE;
 
 
 @AcraMailSender(mailTo = "mangaview@protonmail.com")
-@AcraCore(reportContent = { APP_VERSION_NAME, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE })
+@AcraCore(reportContent = { APP_VERSION_NAME, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, APPLICATION_LOG, REPORT_ID })
 @AcraDialog(resText=R.string.acra_dialog_text)
 
 public class MainApplication extends Application{

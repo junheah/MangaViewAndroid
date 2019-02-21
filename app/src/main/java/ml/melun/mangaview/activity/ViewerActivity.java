@@ -101,6 +101,7 @@ public class ViewerActivity extends AppCompatActivity {
 
         try {
             Intent intent = getIntent();
+            title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
             manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
             online = intent.getBooleanExtra("online", true);
 
@@ -124,11 +125,17 @@ public class ViewerActivity extends AppCompatActivity {
             }
             if(!online){
                 //load local imgs
+                if(id>-1){
+                    //if manga has id = manga has title = update bookmark and add to recent
+                    p.addRecent(title);
+                    p.setBookmark(title.getName(),id);
+                }
                 spinner.setVisibility(View.GONE);
                 prev.setVisibility(View.GONE);
                 next.setVisibility(View.GONE);
                 spinner.setVisibility(View.GONE);
                 commentBtn.setVisibility(View.GONE);
+                swipe.setEnabled(false);
                 imgs = manga.getImgs();
                 stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
                 strip.setAdapter(stripAdapter);

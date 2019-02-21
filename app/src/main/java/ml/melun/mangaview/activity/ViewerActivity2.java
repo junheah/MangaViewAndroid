@@ -105,6 +105,8 @@ public class ViewerActivity2 extends AppCompatActivity {
         Intent intent = getIntent();
 
         manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
+        title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
+
         online = intent.getBooleanExtra("online",true);
         name = manga.getName();
         id = manga.getId();
@@ -122,6 +124,11 @@ public class ViewerActivity2 extends AppCompatActivity {
             //appbarBottom.setVisibility(View.GONE);
             next.setVisibility(View.GONE);
             prev.setVisibility(View.GONE);
+            if(id>-1){
+                //if manga has id = manga has title = update bookmark and add to recent
+                p.addRecent(title);
+                p.setBookmark(title.getName(),id);
+            }
             imgs = manga.getImgs();
             types = new ArrayList<>();
             for(int i=0; i<imgs.size()*2;i++) types.add(-1);

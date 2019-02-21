@@ -66,6 +66,7 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.episodeIntent;
+import static ml.melun.mangaview.Utils.filterFolder;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
@@ -675,7 +676,7 @@ public class MainActivity extends AppCompatActivity
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
                                         //Yes button clicked
-                                        File folder = new File(homeDirStr+'/'+title.getName());
+                                        File folder = new File(homeDirStr+'/'+filterFolder(title.getName()));
                                         if(deleteRecursive(folder)) {
                                             offlineAdapter.remove(position);
                                             offlineAdapter.notifyItemRemoved(position);

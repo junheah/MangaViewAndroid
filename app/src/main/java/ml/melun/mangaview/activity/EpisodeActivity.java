@@ -35,6 +35,8 @@ import ml.melun.mangaview.adapter.TagAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.Utils.filterFolder;
+
 
 public class EpisodeActivity extends AppCompatActivity {
     //global variables
@@ -115,7 +117,6 @@ public class EpisodeActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         if(online) {
-            p.addRecent(title);
             getEpisodes g = new getEpisodes();
             g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }else{
@@ -123,8 +124,9 @@ public class EpisodeActivity extends AppCompatActivity {
             episodes = new ArrayList<>();
             offlineEpisodes = getOfflineEpisodes();
             //read ids and folder names
-            File data = new File(homeDir+'/'+title.getName()+"/title.data");
+            File data = new File(homeDir+'/'+filterFolder(title.getName())+"/title.data");
             if(data.exists()){
+                p.addRecent(title);
                 //read file to string
                 StringBuilder raw = new StringBuilder();
                 try {
@@ -147,14 +149,6 @@ public class EpisodeActivity extends AppCompatActivity {
                         }catch(Exception e){
                             manga = new Manga(-1,episodeName, "");
                         }
-                        //add local images to manga
-                        List<String> localImgs = new ArrayList<>();
-                        File[] imgs = offlineEpisodes[i].listFiles();
-                        Arrays.sort(imgs);
-                        for(File img:imgs){
-                            localImgs.add(img.getAbsolutePath());
-                        }
-                        manga.setImgs(localImgs);
                         episodes.add(manga);
                     }
                 }
@@ -162,17 +156,11 @@ public class EpisodeActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }else {
+
                 for (File f : offlineEpisodes) {
                     Manga manga;
                     manga = new Manga(-1, f.getName(), "");
                     //add local images to manga
-                    List<String> localImgs = new ArrayList<>();
-                    File[] imgs = f.listFiles();
-                    Arrays.sort(imgs);
-                    for(File img:imgs){
-                        localImgs.add(img.getAbsolutePath());
-                    }
-                    manga.setImgs(localImgs);
                     episodes.add(manga);
                 }
             }
@@ -183,7 +171,7 @@ public class EpisodeActivity extends AppCompatActivity {
     }
 
     public File[] getOfflineEpisodes(){
-        File[] episodeFiles = new File(homeDir + '/' + title.getName()).listFiles(new FileFilter() {
+        File[] episodeFiles = new File(homeDir, filterFolder(title.getName())).listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
                 return pathname.isDirectory();
@@ -256,7 +244,17 @@ public class EpisodeActivity extends AppCompatActivity {
         });
         episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
             @Override
-            public void onItemClick(Manga selected) {
+            public void onItemClick(int position, Manga selected) {
+                //add local images to manga
+                if(!online) {
+                    List<String> localImgs = new ArrayList<>();
+                    File[] imgs = offlineEpisodes[position].listFiles();
+                    Arrays.sort(imgs);
+                    for (File img : imgs) {
+                        localImgs.add(img.getAbsolutePath());
+                    }
+                    selected.setImgs(localImgs);
+                }
                 openViewer(selected,0);
             }
             @Override
@@ -320,6 +318,7 @@ public class EpisodeActivity extends AppCompatActivity {
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
             afterLoad();
+            p.addRecent(title);
             p.updateRecentData(title);
             if (pd.isShowing()) {
                 pd.dismiss();
@@ -338,7 +337,9 @@ public class EpisodeActivity extends AppCompatActivity {
                 viewer = new Intent(context, ViewerActivity2.class);
                 break;
         }
-        viewer.putExtra("manga",new Gson().toJson(manga));
+        viewer.putExtra("manga", new Gson().toJson(manga));
+        viewer.putExtra("title", new Gson().toJson(title));
+        viewer.putExtra("recent",true);
         viewer.putExtra("online",online);
         startActivityForResult(viewer, code);
     }

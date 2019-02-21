@@ -148,7 +148,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         bookmark = getAdapterPosition();
                         notifyItemChanged(bookmark);
                     }
-                    mClickListener.onItemClick(m);
+                    mClickListener.onItemClick(getAdapterPosition()-1, m);
                 }
             });
         }
@@ -223,7 +223,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(Manga m);
+        void onItemClick(int position, Manga m);
         void onStarClick();
         void onDownloadClick();
         void onAuthorClick();

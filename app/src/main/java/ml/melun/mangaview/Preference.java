@@ -161,8 +161,8 @@ public class Preference {
     }
 
     public void addRecent(Title tmp){
-        Title title = tmp;
-        title.removeEps();
+        //FUCK YOU JAVA FOR NOT IMPLEMENTING POINTERS
+        Title title = new Title(tmp.getName(),tmp.getThumb(),tmp.getAuthor(),tmp.getTags(),tmp.getRelease());
         int position = getIndexOf(title);
         if(position>-1) {
             recent.add(0,recent.get(position));
@@ -273,10 +273,10 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public Boolean toggleFavorite(Title title, int position){
-        int index = findFavorite(title);
+    public Boolean toggleFavorite(Title tmp, int position){
+        int index = findFavorite(tmp);
         if(index==-1){
-            title.removeEps();
+            Title title = new Title(tmp.getName(),tmp.getThumb(),tmp.getAuthor(),tmp.getTags(),tmp.getRelease());
             favorite.add(position,title);
             Gson gson = new Gson();
             prefsEditor.putString("favorite", gson.toJson(favorite));

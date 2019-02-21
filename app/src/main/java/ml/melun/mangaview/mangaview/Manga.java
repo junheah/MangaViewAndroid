@@ -216,7 +216,6 @@ public class Manga {
     public List<Comment> getBestComments() { return bcomments; }
 
     public int getSeed() {
-        System.out.println("mmmmmmmmmm"+seed);
         return seed;
     }
 

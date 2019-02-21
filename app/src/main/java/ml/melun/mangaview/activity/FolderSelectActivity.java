@@ -60,7 +60,7 @@ public class FolderSelectActivity extends AppCompatActivity {
             p.setHomeDir(defDir.getAbsolutePath());
             showPopup(context, "알림","설정된 폴더를 찾을 수 없습니다. 기본 폴더로 설정 합니다.");
             currentDir = defDir;
-            if(!defDir.exists()) currentDir.mkdir();
+            if(!defDir.exists()) currentDir.mkdirs();
         }
 
         dirList = this.findViewById(R.id.dirList);
