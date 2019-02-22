@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -130,5 +131,20 @@ public class Utils {
             }
         }
         return input;
+    }
+
+    static public String readFileToString(File data){
+        StringBuilder raw = new StringBuilder();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(data));
+            String line;
+            while ((line = br.readLine()) != null) {
+                raw.append(line);
+            }
+            br.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return raw.toString();
     }
 }

@@ -67,6 +67,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.filterFolder;
+import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
@@ -586,26 +587,29 @@ public class MainActivity extends AppCompatActivity
                 File[] files = homeDir.listFiles();
                 for(File f:files){
                     if(f.isDirectory()){
-                        File data = new File(f.getPath()+"/title.data");
-                        if(data.exists()){
-                            StringBuilder raw = new StringBuilder();
+                        File oldData = new File(f,"title.data");
+                        File data = new File(f,"title.gson");
+                        if(oldData.exists()){
                             try {
-                                BufferedReader br = new BufferedReader(new FileReader(data));
-                                String line;
-                                while ((line = br.readLine()) != null) {
-                                    raw.append(line);
-                                }
-                                br.close();
-                                JSONObject json = new JSONObject(raw.toString());
+                                JSONObject json = new JSONObject(readFileToString(oldData));
                                 Title title = new Gson().fromJson(json.getJSONObject("title").toString(),new TypeToken<Title>(){}.getType());
                                 if(title.getThumb().length()>0) title.setThumb(f.getAbsolutePath()+'/'+title.getThumb());
-                                System.out.println("pppppppppppp "+title.getThumb());
                                 titles.add(title);
                             }catch (Exception e){
                                 e.printStackTrace();
                                 titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
                             }
-                        }else titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                        }else if(data.exists()){
+                            try {
+                                Title title = new Gson().fromJson(readFileToString(data),new TypeToken<Title>(){}.getType());
+                                if(title.getThumb().length()>0) title.setThumb(f.getAbsolutePath()+'/'+title.getThumb());
+                                titles.add(title);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                            }
+
+                        } else titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
                     }
                 }
                 //add titles to adapter

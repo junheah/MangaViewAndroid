@@ -20,7 +20,6 @@ import java.util.List;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
-import ml.melun.mangaview.mangaview.Title;
 
 public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
