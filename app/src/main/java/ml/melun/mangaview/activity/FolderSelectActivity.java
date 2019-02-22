@@ -72,10 +72,7 @@ public class FolderSelectActivity extends AppCompatActivity {
         path = this.findViewById(R.id.path);
         //adapter init
         folders = refresh();
-        arrayAdapter = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                folders );
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, folders );
 
         select.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +147,7 @@ public class FolderSelectActivity extends AppCompatActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         int index = Integer.parseInt(item.getTitle().toString().split("\\.")[0]);
                         currentDir = dirs[index];
+                        if(!currentDir.exists()) currentDir.mkdirs();
                         populate();
                         return true;
                     }

@@ -125,6 +125,8 @@ public class DebugActivity extends AppCompatActivity {
             data.put("startTab",sharedPref.getInt("startTab", 0));
             data.put("url",sharedPref.getString("url", "http://188.214.128.5"));
             data.put("notices",sharedPref.getString("notices", "{}"));
+            data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
+            data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -150,6 +152,8 @@ public class DebugActivity extends AppCompatActivity {
             editor.putInt("startTab",data.getInt("startTab"));
             editor.putString("url",filter(data.getString("url")));
             editor.putString("notices",filter(data.getString("notices")));
+            editor.putLong("lastUpdateTime", System.currentTimeMillis());
+            editor.putLong("lastNoticeTime", System.currentTimeMillis());
             editor.commit();
         }catch (Exception e){
             e.printStackTrace();

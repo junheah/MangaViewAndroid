@@ -235,11 +235,28 @@ public class Manga {
         this.title = title;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return this.id == ((Manga)obj).getId();
+    }
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    public void setOfflineName(String offlineName) {
+        this.offlineName = offlineName;
+    }
+
+    public String getOfflineName(){
+        return this.offlineName;
+    }
     private int id;
     String name;
     List<Manga> eps;
     List<String> imgs;
     List<Comment> comments, bcomments;
+    String offlineName;
     String thumb;
     Title title;
     String date;

@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(startTab).setChecked(true);
 
         //check for update, notices
-        new CheckInfo(context).all();
+        new CheckInfo(context).all(false);
     }
 
     public int getTabId(int i){
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update
-                new CheckInfo(context).update();
+                new CheckInfo(context).update(true);
             }else if(id==R.id.nav_notice){
                 Intent noticesIntent = new Intent(context, NoticesActivity.class);
                 startActivity(noticesIntent);

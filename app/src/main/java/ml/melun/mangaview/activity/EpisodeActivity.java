@@ -58,7 +58,7 @@ public class EpisodeActivity extends AppCompatActivity {
     Intent viewer;
     ActionBar actionBar;
     String homeDir;
-    File[] offlineEpisodes;
+    List<File> offlineEpisodes;
     int mode = 0;
     /*
     mode:
@@ -150,9 +150,9 @@ public class EpisodeActivity extends AppCompatActivity {
                     br.close();
                     JSONObject json = new JSONObject(raw.toString());
                     JSONArray ids = json.getJSONArray("ids");
-                    for(int i=0; i<offlineEpisodes.length;i++){
+                    for(int i=0; i<offlineEpisodes.size();i++){
                         Manga manga;
-                        String episodeName = offlineEpisodes[i].getName();
+                        String episodeName = offlineEpisodes.get(i).getName();
                         try {
                             //real index starts from [ 0001 ]
                             int realIndex = Integer.parseInt(episodeName.split("\\.")[0])-1;
@@ -171,13 +171,25 @@ public class EpisodeActivity extends AppCompatActivity {
                 mode = 3;
                 //new reader
                 p.addRecent(title);
-                episodes = title.getEps();
-                for(int i=episodes.size()-1; i>=0; i--){
-                    //mangas are saved as id
-                    Manga m = episodes.get(i);
-                    File dir = new File(titleDir,String.valueOf(m.getId()));
-                    if(!dir.exists() || new File(dir,"downloading").exists()) episodes.remove(i);
+                episodes =  title.getEps();
+                offlineEpisodes = new ArrayList<>();
+                for(File folder : getOfflineEpisodes()){
+                    //get id from folders
+                    String name = folder.getName();
+                    try {
+                        int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)),"",""));
+                        if(index>-1){
+                            episodes.get(index).setOfflineName(name);
+                        }
+                    }catch(Exception e){
+                        // folder name is not properly formatted
+                    }
                 }
+                //for loop to remove non-existing episodes
+                for(int i = episodes.size()-1;i>=0 ;i--){
+                    if(episodes.get(i).getOfflineName()==null) episodes.remove(i);
+                }
+
             } else {
                 mode = 1;
                 for (File f : offlineEpisodes) {
@@ -193,7 +205,7 @@ public class EpisodeActivity extends AppCompatActivity {
         }
     }
 
-    public File[] getOfflineEpisodes(){
+    public List<File> getOfflineEpisodes(){
         File[] episodeFiles = new File(homeDir, filterFolder(title.getName())).listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -203,7 +215,7 @@ public class EpisodeActivity extends AppCompatActivity {
         //sort
         Arrays.sort(episodeFiles);
         //add as manga
-        return episodeFiles;
+        return Arrays.asList(episodeFiles);
     }
 
 //    @Override
@@ -275,11 +287,11 @@ public class EpisodeActivity extends AppCompatActivity {
                     switch(mode){
                         case 1:
                         case 2:
-                            imgs = offlineEpisodes[position].listFiles();
+                            imgs = offlineEpisodes.get(position).listFiles();
                             break;
                         case 3:
                             File titleDir = new File(homeDir,title.getName());
-                            imgs = new File(titleDir, String.valueOf(selected.getId())).listFiles();
+                            imgs = new File(titleDir, selected.getOfflineName()).listFiles();
                             break;
                     }
                     Arrays.sort(imgs);

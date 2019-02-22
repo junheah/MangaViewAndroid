@@ -27,6 +27,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 public class Utils {
     public static Boolean deleteRecursive(File fileOrDirectory) {
+        if(!checkWriteable(fileOrDirectory)) return false;
         try {
             if (fileOrDirectory.isDirectory())
                 for (File child : fileOrDirectory.listFiles())
@@ -39,14 +40,16 @@ public class Utils {
     }
 
     public static boolean checkWriteable(File targetDir) {
-        File tmp = new File(targetDir, "mangaViewTestFile");
-        try {
-            if (tmp.createNewFile()) tmp.delete();
-            else return false;
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+        if(targetDir.isDirectory()) {
+            File tmp = new File(targetDir, "mangaViewTestFile");
+            try {
+                if (tmp.createNewFile()) tmp.delete();
+                else return false;
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }else return false;
     }
 
     public static String httpsGet(String urlin){

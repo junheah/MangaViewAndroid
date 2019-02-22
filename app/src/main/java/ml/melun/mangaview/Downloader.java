@@ -166,7 +166,7 @@ public class Downloader extends Service {
 
                     if (title.getEps() == null) title.fetchEps(baseUrl);
                     List<Manga> mangas = title.getEps();
-                    System.out.println("pppppp"+mangas.size());
+
                     float stepSize = maxProgress / selectedEps.length();
                     for (int queueIndex = 0; queueIndex < selectedEps.length(); queueIndex++) {
                         if (isCancelled()) return 0;
@@ -228,7 +228,8 @@ public class Downloader extends Service {
                         float imgStepSize = stepSize / urls.size();
 
                         //create dir for manga
-                        File dir = new File(titleDir, String.valueOf(target.getId()));
+                        int realIndex = mangas.size()-mangas.indexOf(target);
+                        File dir = new File(titleDir, filterFolder(new DecimalFormat("0000").format(realIndex)+"."+target.getName())+"."+target.getId());
                         if (!dir.exists()) dir.mkdirs();
 
                         //create download flag

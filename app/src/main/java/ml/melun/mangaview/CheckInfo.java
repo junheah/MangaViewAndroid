@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static ml.melun.mangaview.Utils.httpsGet;
@@ -20,51 +21,57 @@ public class CheckInfo {
     Context context;
     updateCheck uc;
     noticeCheck nc;
+    SharedPreferences sharedPref;
     public CheckInfo(Context context){
         this.context = context;
         uc = new updateCheck();
         nc = new noticeCheck();
+        sharedPref = context.getSharedPreferences("mangaView",Context.MODE_PRIVATE);
     }
-    public void all(){
-        if(update()) notice();
+    public void all(Boolean force){
+        if(update(force)) notice(force);
     }
-    public Boolean update(){
+    public Boolean update(Boolean force){
+        Long lastUpdateTime = sharedPref.getLong("lastUpdateTime", 0);
+        Long updateCycle = sharedPref.getLong("updateCycle",3600000); // def cycle = 1hr
         if(uc.getStatus()== AsyncTask.Status.RUNNING) {
             Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
             return false;
         }
         else{
-            uc.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            if ((System.currentTimeMillis()>lastUpdateTime + updateCycle) || force)
+                uc.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             return true;
         }
     }
-    public Boolean notice() {
+    public Boolean notice(Boolean force) {
+        Long lastUpdateTime = sharedPref.getLong("lastNoticeTime", 0);
+        Long updateCycle = sharedPref.getLong("noticeCycle",3600000); // def cycle = 1hr
         if (nc.getStatus() == AsyncTask.Status.RUNNING){
             Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
             return false;
         }
         else {
-            nc.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            if ((System.currentTimeMillis()>lastUpdateTime + updateCycle) || force)
+                nc.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             return true;
         }
     }
+
 
     private class noticeCheck extends AsyncTask<Void, Void, Integer> {
         String title, content, date;
         int nid = 0;
         protected void onPreExecute() {
             super.onPreExecute();
+            sharedPref.edit().putLong("lastNoticeTime", System.currentTimeMillis()).commit();
         }
         protected Integer doInBackground(Void... params) {
+            //get all notices
             try {
-                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/notice.json");
-                JSONObject data = new JSONObject(rawdata);
-                title = data.getString("title");
-                System.out.println("pppppp"+title);
-                content = data.getString("content");
-                date = data.getString("date");
-                nid = data.getInt("id");
-            }catch(Exception e){
+                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/notices.json");
+                JSONArray data = new JSONArray(rawdata);
+            }catch (Exception e){
                 e.printStackTrace();
             }
             return 0;
@@ -78,6 +85,7 @@ public class CheckInfo {
     public class updateCheck extends AsyncTask<Void, Integer, Integer> {
         int version = 0;
         protected void onPreExecute() {
+            sharedPref.edit().putLong("lastUpdateTime", System.currentTimeMillis()).commit();
             super.onPreExecute();
             try {
                 PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -125,9 +133,7 @@ public class CheckInfo {
             SharedPreferences sharedPref = context.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
             JSONObject notices = new JSONObject(sharedPref.getString("notices", "{}"));
             try {
-                if (notices.getJSONObject(nid + "").getString("content").length() > 0) {
-                    //notice already exists
-                }
+                notices.getJSONObject(String.valueOf(nid));
             }catch (Exception e) {
                 JSONObject notice = new JSONObject();
                 notice.put("title", title).put("content", content).put("date", date);
@@ -138,5 +144,4 @@ public class CheckInfo {
             }
         }catch (Exception e){e.printStackTrace();}
     }
-
 }
