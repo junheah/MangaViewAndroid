@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -40,7 +41,6 @@ import static ml.melun.mangaview.Utils.filterFolder;
 
 public class EpisodeActivity extends AppCompatActivity {
     //global variables
-    ProgressDialog pd;
     Title title;
     EpisodeAdapter episodeAdapter;
     Context context = this;
@@ -60,6 +60,7 @@ public class EpisodeActivity extends AppCompatActivity {
     String homeDir;
     List<File> offlineEpisodes;
     int mode = 0;
+    ProgressBar progress;
     /*
     mode:
     0 = online
@@ -112,6 +113,7 @@ public class EpisodeActivity extends AppCompatActivity {
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
         episodeList = this.findViewById(R.id.EpisodeList);
+        progress = this.findViewById(R.id.progress);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
         homeDir = p.getHomeDir();
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
@@ -345,11 +347,7 @@ public class EpisodeActivity extends AppCompatActivity {
     private class getEpisodes extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
-            if(dark) pd = new ProgressDialog(EpisodeActivity.this, R.style.darkDialog);
-            else pd = new ProgressDialog(EpisodeActivity.this);
-            pd.setMessage("로드중");
-            pd.setCancelable(false);
-            pd.show();
+            progress.setVisibility(View.VISIBLE);
         }
 
         protected Integer doInBackground(Void... params) {
@@ -365,9 +363,7 @@ public class EpisodeActivity extends AppCompatActivity {
             afterLoad();
             p.addRecent(title);
             p.updateRecentData(title);
-            if (pd.isShowing()) {
-                pd.dismiss();
-            }
+            progress.setVisibility(View.GONE);
         }
     }
 

@@ -1,28 +1,28 @@
 package ml.melun.mangaview.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
+import ml.melun.mangaview.Notice;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 
@@ -32,28 +32,27 @@ import static ml.melun.mangaview.Utils.showPopup;
 public class NoticesActivity extends AppCompatActivity {
     Boolean dark;
     Context context;
-    JSONObject savedNotices;
-    ArrayList<JSONObject> data;
+    List<Notice> notices;
     SharedPreferences sharedPref;
-    ListView listView;
+    ListView list;
     SwipyRefreshLayout swipe;
+    ProgressBar progress;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if(dark = new Preference(this).getDarkTheme())setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notices);
         ActionBar actionBar = getSupportActionBar();
-        data = new ArrayList<>();
+        notices = new ArrayList<>();
         sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
         context = this;
         swipe = this.findViewById(R.id.noticeSwipe);
-        listView = this.findViewById(R.id.noticeList);
+        list = this.findViewById(R.id.noticeList);
+        progress = this.findViewById(R.id.progress);
         if(actionBar!=null) actionBar.setDisplayHomeAsUpEnabled(true);
-        try {
-            savedNotices = new JSONObject(sharedPref.getString("notices", "{}"));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        sharedPref.edit().putString("notices","").commit();
+        notices = new Gson().fromJson(sharedPref.getString("notice", "[]"), new TypeToken<List<Notice>>(){}.getType());
+        progress.setVisibility(View.VISIBLE);
         swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection direction) {
@@ -61,37 +60,14 @@ public class NoticesActivity extends AppCompatActivity {
                 gn.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
-
-        swipe.setRefreshing(true);
         getNotices gn = new getNotices();
         gn.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    void showNotice(String title, String content, String date){
-        showPopup(context,title,date+"\n\n"+content);
+    void showNotice(Notice notice){
+        showPopup(context,notice.getTitle(),notice.getDate()+"\n\n"+notice.getContent());
     }
 
-    void addNotices(JSONArray notices){
-        //write new notices to SharedPref
-        try {
-            for (int i = 0; i < notices.length(); i++) {
-                JSONObject notice = notices.getJSONObject(i);
-                int id = notice.getInt("id");
-               try{
-                   savedNotices.getJSONObject(String.valueOf(id));
-                   //existing notice
-
-                }catch (Exception e){
-                   //new notice
-                   notice.remove("id");
-                   savedNotices.put(String.valueOf(id), notice.toString());
-                }
-                sharedPref.edit().putString("notices", savedNotices.toString()).commit();
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
@@ -103,41 +79,33 @@ public class NoticesActivity extends AppCompatActivity {
     }
 
     void populate(){
-        //read notices from sharedPref
+        //save notice titles to array
         String[] list = new String[0];
-        data = new ArrayList<>();
         try{
-            JSONObject notices = new JSONObject(sharedPref.getString("notices", "{}"));
-            Iterator<String> keys= notices.keys();
-            while (keys.hasNext())
-            {
-                String keyValue = keys.next();
-                data.add(0, new JSONObject(notices.getString(keyValue)));
-            }
-            list = new String[data.size()];
-            for(int i=0;i<data.size();i++){
-                list[i] = data.get(i).getString("title");
+            list = new String[notices.size()];
+            for(int i=0;i<notices.size();i++){
+                list[i] = notices.get(i).getTitle();
             }
         }catch (Exception e){
             e.printStackTrace();
         }
+        //create arrayAdapter
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this, android.R.layout.simple_list_item_1, list
         );
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //populate listview and set click listener
+        this.list.setAdapter(adapter);
+        this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                JSONObject target = data.get(position);
-                try {
-                    showNotice(target.getString("title"),target.getString("content"),target.getString("date"));
-                }catch (Exception e){e.printStackTrace();}
+                Notice target = notices.get(position);
+                showNotice(target);
             }
         });
     }
 
     private class getNotices extends AsyncTask<Void, Void, Integer> {
-        JSONArray loaded;
+        List<Notice> loaded;
         protected void onPreExecute() {
             super.onPreExecute();
             sharedPref.edit().putLong("lastNoticeTime", System.currentTimeMillis()).commit();
@@ -145,8 +113,8 @@ public class NoticesActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             //get all notices
             try {
-                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/notices.json");
-                loaded = new JSONArray(rawdata);
+                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/etc/notices.json");
+                loaded = new Gson().fromJson(rawdata, new TypeToken<List<Notice>>(){}.getType());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -155,13 +123,19 @@ public class NoticesActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            swipe.setRefreshing(false);
             try {
-                if (loaded.length() > 0) addNotices(loaded);
+                for(Notice n: loaded){
+                    if(!notices.contains(n)) notices.add(n);
+                }
             }catch (Exception e){
                 //probably offline
             }
+            sharedPref.edit().putString("notice", new Gson().toJson(notices)).commit();
+            swipe.setRefreshing(false);
+            progress.setVisibility(View.GONE);
             populate();
         }
     }
+
+
 }

@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update
-                new CheckInfo(context).update(true);
+                new CheckInfo(context).all(true);
             }else if(id==R.id.nav_notice){
                 Intent noticesIntent = new Intent(context, NoticesActivity.class);
                 startActivity(noticesIntent);

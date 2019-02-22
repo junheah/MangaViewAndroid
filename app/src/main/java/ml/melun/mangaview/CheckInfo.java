@@ -11,8 +11,13 @@ import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import static ml.melun.mangaview.Utils.httpsGet;
 import static ml.melun.mangaview.Utils.showPopup;
@@ -29,7 +34,8 @@ public class CheckInfo {
         sharedPref = context.getSharedPreferences("mangaView",Context.MODE_PRIVATE);
     }
     public void all(Boolean force){
-        if(update(force)) notice(force);
+        update(force);
+        notice(force);
     }
     public Boolean update(Boolean force){
         Long lastUpdateTime = sharedPref.getLong("lastUpdateTime", 0);
@@ -60,8 +66,7 @@ public class CheckInfo {
 
 
     private class noticeCheck extends AsyncTask<Void, Void, Integer> {
-        String title, content, date;
-        int nid = 0;
+        Notice notice;
         protected void onPreExecute() {
             super.onPreExecute();
             sharedPref.edit().putLong("lastNoticeTime", System.currentTimeMillis()).commit();
@@ -69,8 +74,8 @@ public class CheckInfo {
         protected Integer doInBackground(Void... params) {
             //get all notices
             try {
-                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/notices.json");
-                JSONArray data = new JSONArray(rawdata);
+                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/etc/notice.json");
+                notice = new Gson().fromJson(rawdata, new TypeToken<Notice>(){}.getType());
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -78,7 +83,7 @@ public class CheckInfo {
         }
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
-            if(nid>0) showNotice(nid,title,content,date);
+            showNotice(notice);
         }
     }
 
@@ -127,21 +132,20 @@ public class CheckInfo {
         }
     }
 
-    void showNotice(int nid, String title, String content, String date){
+    void showNotice(Notice notice){
         //공지 표시
         try {
             SharedPreferences sharedPref = context.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
-            JSONObject notices = new JSONObject(sharedPref.getString("notices", "{}"));
-            try {
-                notices.getJSONObject(String.valueOf(nid));
-            }catch (Exception e) {
-                JSONObject notice = new JSONObject();
-                notice.put("title", title).put("content", content).put("date", date);
-                notices.put(nid + "", notice);
-                sharedPref.edit().putString("notices", notices.toString()).commit();
-                //show notice
-                showPopup(context,title,date+"\n\n"+content);
+            List<Notice> notices = new Gson().fromJson(sharedPref.getString("notice", "[]"), new TypeToken<List<Notice>>(){}.getType());
+            if(!notices.contains(notice)){
+                //add new notice
+                notices.add(notice);
+                //write notices
+                sharedPref.edit().putString("notice", new Gson().toJson(notices)).commit();
+                showPopup(context,notice.getTitle(),notice.getDate()+"\n\n"+notice.getContent());
             }
+
         }catch (Exception e){e.printStackTrace();}
     }
+
 }
