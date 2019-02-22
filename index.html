@@ -36,7 +36,7 @@
             }
             releaselink = release.html_url;
             var releaseInfo = timeAgo + "에 업데이트, " + downloadCount.toLocaleString() +" 회 다운로드 되었습니다.";
-            $(".download").attr("href", asset.browser_download_url);
+            //$(".download").attr("href", asset.browser_download_url);
             downloadlink = asset.browser_download_url;
             $(".release-name").text("apk " +release.name);
             $(".release-info").text(releaseInfo);
@@ -64,7 +64,7 @@
             </div>
             <br>
             <div class="button-container" style="display:none;width:auto;">
-                <button class="download" onclick="location.href = releaselink;">
+                <button class="download" onclick="location.href = downloadlink;">
                     <div class="dlbtn">
                         <p>다운로드</p>
                         <p class="release-name"></p>
