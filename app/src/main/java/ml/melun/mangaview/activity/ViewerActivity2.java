@@ -393,7 +393,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     }
 
     void preload(){
-        if(viewerBookmark<imgs.size())
+        if(viewerBookmark<imgs.size()-1)
             Glide.with(context)
                     .asBitmap()
                     .load(imgs.get(viewerBookmark+1))
