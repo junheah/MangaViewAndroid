@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +17,7 @@ import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,6 +43,8 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.StripAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
+
+import static ml.melun.mangaview.Utils.getScreenSize;
 
 public class ViewerActivity extends AppCompatActivity {
     String name;
@@ -75,6 +79,7 @@ public class ViewerActivity extends AppCompatActivity {
     int seed = 0;
     int epsCount = 0;
     int viewerType=0;
+    int width=0;
     Boolean online;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +102,7 @@ public class ViewerActivity extends AppCompatActivity {
         spinner = this.findViewById(R.id.toolbar_spinner);
         commentBtn = this.findViewById(R.id.commentButton);
         viewerType = p.getViewerType();
+        width = getScreenSize(getWindowManager().getDefaultDisplay());
         //imageZoomHelper = new ImageZoomHelper(this);
 
         try {
@@ -137,7 +143,7 @@ public class ViewerActivity extends AppCompatActivity {
                 commentBtn.setVisibility(View.GONE);
                 swipe.setEnabled(false);
                 imgs = manga.getImgs();
-                stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
+                stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                     public void onItemClick() {
@@ -328,7 +334,7 @@ public class ViewerActivity extends AppCompatActivity {
             cut.setBackgroundResource(R.drawable.button_bg_on);
             viewerBookmark *= 2;
         }
-        stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
+        stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
             public void onItemClick() {
@@ -356,7 +362,6 @@ public class ViewerActivity extends AppCompatActivity {
     private class loadImages extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
-
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
             else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
@@ -368,7 +373,7 @@ public class ViewerActivity extends AppCompatActivity {
             manga.fetch(p.getUrl());
             imgs = manga.getImgs();
             seed = manga.getSeed();
-            stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id);
+            stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
             return null;
         }
 

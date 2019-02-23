@@ -3,6 +3,8 @@ package ml.melun.mangaview.mangaview;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+
 public class Decoder {
     int __seed=0;
     int id=0;
@@ -15,7 +17,7 @@ public class Decoder {
         int[][] order = new int[25][2];
         for (int i = 0; i < 25; i++) {
             order[i][0] = i;
-            if(id<554714) order[i][1] = _random(i);
+            if (id < 554714) order[i][1] = _random(i);
             else order[i][1] = newRandom(i);
         }
         java.util.Arrays.sort(order, new java.util.Comparator<int[]>() {

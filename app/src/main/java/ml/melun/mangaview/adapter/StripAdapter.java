@@ -2,7 +2,12 @@ package ml.melun.mangaview.adapter;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +16,14 @@ import android.widget.ImageView;
 import android.graphics.Bitmap;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.CustomViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
@@ -20,7 +31,10 @@ import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.mangaview.DecodeTransform;
 import ml.melun.mangaview.mangaview.Decoder;
+
+import static ml.melun.mangaview.Utils.getSample;
 
 public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
 
@@ -32,10 +46,11 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     Boolean reverse;
     int __seed;
     Decoder d;
+    int width;
 
 
     // data is passed into the constructor
-    public StripAdapter(Context context, List<String> data, Boolean cut, int seed, int id) {
+    public StripAdapter(Context context, List<String> data, Boolean cut, int seed, int id, int width) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.imgs = data;
@@ -43,7 +58,9 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         reverse = new Preference(context).getReverse();
         __seed = seed;
         d = new Decoder(seed, id);
+        this.width = width;
     }
+
     public void removeAll(){
         imgs.clear();
         notifyDataSetChanged();
@@ -69,11 +86,10 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
             Glide.with(mainContext)
                     .asBitmap()
                     .load(image)
-                    .into(new SimpleTarget<android.graphics.Bitmap>() {
+                    .into(new CustomTarget<Bitmap>() {
                         @Override
-                        public void onResourceReady(Bitmap bitmap,
-                                                    Transition<? super Bitmap> transition) {
-                            Bitmap decoded = d.decode(bitmap);
+                        public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                            Bitmap decoded = getSample(d.decode(bitmap),width);
                             int width = decoded.getWidth();
                             int height = decoded.getHeight();
                             if(width>height){
@@ -86,7 +102,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                                     if (reverse)
                                         holder.frame.setImageBitmap(Bitmap.createBitmap(decoded, width / 2, 0, width / 2, height));
                                     else
-                                         holder.frame.setImageBitmap(Bitmap.createBitmap(decoded, 0, 0, width / 2, height));
+                                        holder.frame.setImageBitmap(Bitmap.createBitmap(decoded, 0, 0, width / 2, height));
                                 }
                             }else{
                                 if(type==0) {
@@ -97,19 +113,30 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                             }
                             holder.refresh.setVisibility(View.GONE);
                         }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                            holder.frame.setImageDrawable(placeholder);
+                            holder.refresh.setVisibility(View.VISIBLE);
+                        }
                     });
         }
         else Glide.with(mainContext)
                 .asBitmap()
                 .load(imgs.get(pos))
                 .apply(new RequestOptions().dontTransform().placeholder(R.drawable.placeholder))
-                .into(new SimpleTarget<android.graphics.Bitmap>() {
+                .into(new CustomTarget<Bitmap>() {
                     @Override
-                    public void onResourceReady(Bitmap bitmap,
-                                                Transition<? super Bitmap> transition) {
-                        Bitmap decoded = d.decode(bitmap);
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        Bitmap decoded = getSample(d.decode(resource),width);
                         holder.frame.setImageBitmap(decoded);
                         holder.refresh.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                        holder.frame.setImageDrawable(placeholder);
+                        holder.refresh.setVisibility(View.VISIBLE);
                     }
                 });
     }
@@ -121,9 +148,6 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         if(autoCut) return imgs.size()*2;
         else return imgs.size();
     }
-
-
-    public String getItem(int index){return imgs.get(index);}
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -157,7 +181,5 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     public interface ItemClickListener {
         void onItemClick();
     }
-
-
 }
 

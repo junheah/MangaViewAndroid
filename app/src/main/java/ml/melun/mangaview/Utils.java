@@ -4,8 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Display;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -149,5 +154,35 @@ public class Utils {
             e.printStackTrace();
         }
         return raw.toString();
+    }
+
+    public static Bitmap getSample(Bitmap input, int width){
+        //scale down bitmap to avoid outofmem exception
+        if(input.getWidth()<=width) return input;
+        else{
+            //ratio
+            float ratio = (float)input.getHeight()/(float)input.getWidth();
+            int height = Math.round(ratio*width);
+            return Bitmap.createScaledBitmap(input, width, height,false);
+        }
+    }
+
+    private static int calculateInSampleSize(int width, int reqWidth) {
+        int inSampleSize = 1;
+        if (width > reqWidth) {
+            // Calculate ratios of height and width to requested height and width
+            final int widthRatio = Math.round((float) width / (float) reqWidth);
+            // Choose the smallest ratio as inSampleSize value, this will guarantee
+            // a final image with both dimensions larger than or equal to the
+            // requested height and width.
+            inSampleSize = widthRatio;
+        }
+        return inSampleSize;
+    }
+
+    public static int getScreenSize(Display display){
+        Point size = new Point();
+        display.getSize(size);
+        return (size.x>=size.y)? size.x : size.y;
     }
 }

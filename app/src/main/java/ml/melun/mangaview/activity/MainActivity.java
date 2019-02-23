@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -86,7 +87,6 @@ public class MainActivity extends AppCompatActivity
     Search search;
     TitleAdapter searchAdapter, recentAdapter, favoriteAdapter, offlineAdapter;
     RecyclerView searchResult, recentResult, favoriteResult, savedList, mainRecycler;
-    int mode = 0;
     int selectedPosition=-1;
     MenuItem versionItem;
     String homeDirStr;
@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity
     NavigationView navigationView;
     NotificationManagerCompat notificationManagerc;
     NotificationManager notificationManager;
+    Toolbar toolbar;
 
 
     @Override
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // toolbar.getRootView().setBackgroundColor(getResources().getColor(R.color.colorDark));
@@ -140,7 +141,6 @@ public class MainActivity extends AppCompatActivity
             navigationView.setItemTextColor(colorStateList);
         }
 
-        //custom var init starts here
         contentHolder = this.findViewById(R.id.contentHolder);
         //SharedPreferences preferences = getSharedPreferences("mangaView",MODE_PRIVATE);
 
@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity
         startTab = p.getStartTab();
         contentHolder.setDisplayedChild(startTab);
         refreshViews(getTabId(startTab));
+        getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
         navigationView.getMenu().getItem(startTab).setChecked(true);
 
         //check for update, notices
@@ -228,6 +229,7 @@ public class MainActivity extends AppCompatActivity
             }else{
                 contentHolder.setDisplayedChild(startTab);
                 navigationView.getMenu().getItem(startTab).setChecked(true);
+                toolbar.setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
                 refreshViews(getTabId(startTab));
             }
         }
@@ -268,22 +270,17 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_main) {
             // Handle the main action
             contentHolder.setDisplayedChild(0);
-            mode = 0;
         } else if (id == R.id.nav_search) {
             // Handle the search action
             contentHolder.setDisplayedChild(1);
-            mode = 1;
         }else if(id==R.id.nav_recent) {
             // Handle the recent action
             contentHolder.setDisplayedChild(2);
-            mode = 2;
         }else if(id==R.id.nav_favorite) {
             // Handle the favorite action
             contentHolder.setDisplayedChild(3);
-            mode = 3;
         }else if(id==R.id.nav_download){
             contentHolder.setDisplayedChild(4);
-            mode = 4;
         }else{
             //don't refresh views
             if(id==R.id.nav_update) {
@@ -301,11 +298,15 @@ public class MainActivity extends AppCompatActivity
                 Intent settingIntent = new Intent(context, SettingsActivity.class);
                 startActivity(settingIntent);
                 return true;
+            }else if(id==R.id.nav_donate){
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://junheah.ml/donate"));
+                startActivity(browserIntent);
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);
             return true;
         }
+        toolbar.setTitle(item.getTitle());
         refreshViews(id);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

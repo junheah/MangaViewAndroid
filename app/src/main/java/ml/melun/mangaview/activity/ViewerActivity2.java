@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
@@ -40,11 +43,9 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
-/*todo: glide를 안쓰고 프리로딩 서비스를 만들어서, 현재 페이지가 갑자기 바뀌었을 때도 dynamic 하게 처리할 수 있도록 하던가,
-* 아니면 그냥 recycler 쓰던가 합시다
-* 아니면 처음에 포문으로 이미지를 전부 한번씩 글라이드로 로딩 하면 될수도? (이미지 뷰에 안넣어도 캐싱을 한다는 가정 하에) = 안됨
-*/
-//todo: preload images
+import static ml.melun.mangaview.Utils.getSample;
+import static ml.melun.mangaview.Utils.getScreenSize;
+
 public class ViewerActivity2 extends AppCompatActivity {
     Preference p;
     Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, online, stretch;
@@ -70,6 +71,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Intent result;
     AlertDialog.Builder alert;
     Spinner spinner;
+    int width = 0;
 
     Decoder d;
 
@@ -101,6 +103,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         spinner = this.findViewById(R.id.toolbar_spinner);
         stretch = p.getStretch();
         if(stretch) frame.setScaleType(ImageView.ScaleType.FIT_XY);
+        width = getScreenSize(getWindowManager().getDefaultDisplay());
 
         Intent intent = getIntent();
 
@@ -275,21 +278,28 @@ public class ViewerActivity2 extends AppCompatActivity {
             Glide.with(context)
                     .asBitmap()
                     .load(image)
-                    .into(new SimpleTarget<Bitmap>() {
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                            //
+                        }
+
                         @Override
                         public void onResourceReady(Bitmap bitmap,
                                                     Transition<? super Bitmap> transition) {
-                            int width = bitmap.getWidth();
-                            int height = bitmap.getHeight();
+                            Bitmap sample = getSample(d.decode(bitmap),width);
+                            int width = sample.getWidth();
+                            int height = sample.getHeight();
                             if(width>height){
-                                imgCache = d.decode(bitmap);
+                                imgCache = sample;
                                 type=0;
-                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(d.decode(bitmap),0,0,width/2,height));
-                                else frame.setImageBitmap(Bitmap.createBitmap(d.decode(bitmap),width/2,0,width/2,height));
+                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
+                                else frame.setImageBitmap(Bitmap.createBitmap(imgCache,width/2,0,width/2,height));
                             }else{
                                 type=-1;
-                                frame.setImageBitmap(d.decode(bitmap));
+                                frame.setImageBitmap(sample);
                             }
+                            preload();
                         }
                     });
         }
@@ -318,21 +328,26 @@ public class ViewerActivity2 extends AppCompatActivity {
             Glide.with(context)
                     .asBitmap()
                     .load(image)
-                    .into(new SimpleTarget<Bitmap>() {
+                    .into(new CustomTarget<Bitmap>() {
                         @Override
-                        public void onResourceReady(Bitmap bitmap,
-                                                    Transition<? super Bitmap> transition) {
-                            int width = bitmap.getWidth();
-                            int height = bitmap.getHeight();
+                        public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                            Bitmap sample = getSample(d.decode(bitmap), width);
+                            int width = sample.getWidth();
+                            int height = sample.getHeight();
                             if(width>height){
-                                imgCache = d.decode(bitmap);
+                                imgCache = sample;
                                 type=1;
-                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(d.decode(bitmap), width/2, 0, width / 2, height));
-                                else frame.setImageBitmap(Bitmap.createBitmap(d.decode(bitmap),0,0,width/2,height));
+                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
+                                else frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
                             }else{
                                 type=-1;
-                                frame.setImageBitmap(d.decode(bitmap));
+                                frame.setImageBitmap(sample);
                             }
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+
                         }
                     });
         }
@@ -346,32 +361,44 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void refreshImage(){
         final String image = imgs.get(viewerBookmark);
-        System.out.println("ppppp"+image);
         //placeholder
         //frame.setImageResource(R.drawable.placeholder);
         Glide.with(context)
                 .asBitmap()
                 .load(image)
-                .into(new SimpleTarget<Bitmap>() {
+                .into(new CustomTarget<Bitmap>() {
                     @Override
-                    public void onResourceReady(Bitmap bitmap,
-                                                Transition<? super Bitmap> transition) {
-                        int width = bitmap.getWidth();
-                        int height = bitmap.getHeight();
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                    }
+
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                        Bitmap sample = getSample(d.decode(bitmap),width);
+                        int width = sample.getWidth();
+                        int height = sample.getHeight();
                         if(width>height){
-                            imgCache = d.decode(bitmap);
+                            imgCache = sample;
                             type=0;
                             if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
-                            else frame.setImageBitmap(Bitmap.createBitmap(d.decode(bitmap),width/2,0,width/2,height));
+                            else frame.setImageBitmap(Bitmap.createBitmap(imgCache,width/2,0,width/2,height));
                         }else{
                             type=-1;
-                            frame.setImageBitmap(d.decode(bitmap));
+                            frame.setImageBitmap(sample);
                         }
+                        preload();
                     }
                 });
         updatePageIndex();
     }
 
+    void preload(){
+        if(viewerBookmark<imgs.size())
+            Glide.with(context)
+                    .asBitmap()
+                    .load(imgs.get(viewerBookmark+1))
+                    .preload();
+    }
     void updatePageIndex(){
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
         if(viewerBookmark==imgs.size()-1 && !toolbarshow) toggleToolbar();
