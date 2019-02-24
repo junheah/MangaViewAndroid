@@ -94,7 +94,7 @@ public class Search {
                     String ttmp = (item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
                     String atmp = "";
                     try {
-                        atmp = item.selectFirst("div.author").selectFirst("div").ownText();
+                        atmp = item.selectFirst("div.author").selectFirst("div").text();
                     } catch (Exception e) {
 
                     }
