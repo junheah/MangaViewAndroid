@@ -135,16 +135,16 @@ public class Manga {
                     if(!i.isEmpty()) {
                         icon = i.get(0).attr("src");
                     }else icon = "";
-                    user = c.selectFirst("span.member").text();
-                    timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
-                    content = c.selectFirst("div.media-content").selectFirst("textarea").text();
+                    user = c.selectFirst("span.member").ownText();
+                    timestamp = c.selectFirst("span.media-info").selectFirst("span").ownText();
+                    content = c.selectFirst("div.media-content").selectFirst("textarea").ownText();
                     String indentStr = c.attr("style");
                     if(indentStr.length()>0) {
                         String indentStrSplit = indentStr.split(":")[1].split("px")[0];
                         int indentRaw = Integer.parseInt(indentStrSplit);
                         indent = indentRaw / 64;
                     }else indent = 0;
-                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
+                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").ownText());
                     comments.add(new Comment(user, timestamp, icon, content,indent, likes));
                 }
 
@@ -157,12 +157,12 @@ public class Manga {
                     if(!i.isEmpty()) {
                         icon = i.get(0).attr("src");
                     }else icon = "";
-                    user = c.selectFirst("span.member").text();
-                    timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
-                    content = c.selectFirst("div.commtent-content").text();
+                    user = c.selectFirst("span.member").ownText();
+                    timestamp = c.selectFirst("span.media-info").selectFirst("span").ownText();
+                    content = c.selectFirst("div.commtent-content").ownText();
                     String indentStr = c.attr("style");
                     indent = 0;
-                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
+                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").ownText());
                     bcomments.add(new Comment(user, timestamp, icon, content,indent, likes));
                 }
 

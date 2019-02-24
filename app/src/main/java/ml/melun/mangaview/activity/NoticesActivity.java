@@ -50,8 +50,13 @@ public class NoticesActivity extends AppCompatActivity {
         list = this.findViewById(R.id.noticeList);
         progress = this.findViewById(R.id.progress);
         if(actionBar!=null) actionBar.setDisplayHomeAsUpEnabled(true);
+        //reset old notices sharedpref
         sharedPref.edit().putString("notices","").commit();
         notices = new Gson().fromJson(sharedPref.getString("notice", "[]"), new TypeToken<List<Notice>>(){}.getType());
+        //check notices for null object
+        for(int i=notices.size()-1; i>=0;i--){
+            if(notices.get(i)==null) notices.remove(i);
+        }
         progress.setVisibility(View.VISIBLE);
         swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
@@ -80,28 +85,27 @@ public class NoticesActivity extends AppCompatActivity {
 
     void populate(){
         //save notice titles to array
-        String[] list = new String[0];
         try{
-            list = new String[notices.size()];
+            String[] list = new String[notices.size()];
             for(int i=0;i<notices.size();i++){
                 list[i] = notices.get(i).getTitle();
             }
+            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
+            //populate listview and set click listener
+            this.list.setAdapter(adapter);
+            this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    Notice target = notices.get(position);
+                    showNotice(target);
+                }
+            });
         }catch (Exception e){
+            showPopup(context,"오류",e.getMessage());
             e.printStackTrace();
         }
         //create arrayAdapter
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, list
-        );
-        //populate listview and set click listener
-        this.list.setAdapter(adapter);
-        this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Notice target = notices.get(position);
-                showNotice(target);
-            }
-        });
+
     }
 
     private class getNotices extends AsyncTask<Void, Void, Integer> {
@@ -113,7 +117,7 @@ public class NoticesActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             //get all notices
             try {
-                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/etc/notices.json");
+                String rawdata = httpsGet("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json");
                 loaded = new Gson().fromJson(rawdata, new TypeToken<List<Notice>>(){}.getType());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -125,7 +129,12 @@ public class NoticesActivity extends AppCompatActivity {
             super.onPostExecute(integer);
             try {
                 for(Notice n: loaded){
-                    if(!notices.contains(n)) notices.add(n);
+                    if(n!=null){
+                        int index = notices.indexOf(n);
+                        if(index>-1) notices.set(index, n);
+                        else notices.add(n);
+                    }
+
                 }
             }catch (Exception e){
                 //probably offline

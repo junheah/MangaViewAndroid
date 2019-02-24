@@ -79,7 +79,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="acra_dialog_text">MangaView\n\n예상치 못한 오류가 발생했습니다. 오류 보고서를 전송합니다.</string>
+    <string name="acra_dialog_text">MangaView\n\n예상치 못한 오류가 발생했습니다. 오류 보고서를 전송 하시겠습니까?\n(디버깅에 큰 도움이 됩니다.)</string>
     <string name="acra_dialog_comment"></string>
 
     <string name="license">

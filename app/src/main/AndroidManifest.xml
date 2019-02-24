@@ -68,6 +68,7 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activity.NoticesActivity"
+            android:label="공지사항"
             android:configChanges="orientation|screenSize" />
     </application>
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Title;
+
+import static ml.melun.mangaview.Utils.showPopup;
 
 public class DebugActivity extends AppCompatActivity {
     TextView output;
@@ -76,7 +79,7 @@ public class DebugActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         //save changes
-                        writeToPref(editor.getText().toString());
+                        writeToPref(editor.getText());
                         new Preference(context).init(context);
                         editor.setVisibility(View.GONE);
                         save.setVisibility(View.GONE);
@@ -124,7 +127,7 @@ public class DebugActivity extends AppCompatActivity {
             data.put("stretch",sharedPref.getBoolean("stretch", false));
             data.put("startTab",sharedPref.getInt("startTab", 0));
             data.put("url",sharedPref.getString("url", "http://188.214.128.5"));
-            data.put("notices",sharedPref.getString("notices", "{}"));
+            data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
         }catch(Exception e){
@@ -133,10 +136,10 @@ public class DebugActivity extends AppCompatActivity {
         return (filter(data.toString()));
     }
 
-    void writeToPref(String input){
+    void writeToPref(Editable edit){
         try {
             SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
-            JSONObject data = new JSONObject(input);
+            JSONObject data = new JSONObject(edit.toString());
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("recent",filter(data.getJSONArray("recent").toString()));
             editor.putString("favorite",filter(data.getJSONArray("favorite").toString()));
@@ -150,12 +153,13 @@ public class DebugActivity extends AppCompatActivity {
             editor.putBoolean("dataSave",data.getBoolean("dataSave"));
             editor.putBoolean("stretch",data.getBoolean("stretch"));
             editor.putInt("startTab",data.getInt("startTab"));
-            editor.putString("url",filter(data.getString("url")));
-            editor.putString("notices",filter(data.getString("notices")));
-            editor.putLong("lastUpdateTime", System.currentTimeMillis());
-            editor.putLong("lastNoticeTime", System.currentTimeMillis());
+            editor.putString("url",data.getString("url").toString());
+            editor.putString("notice",filter(data.getJSONArray("notice").toString()));
+            editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
+            editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.commit();
         }catch (Exception e){
+            showPopup(context,"오류",e.getMessage());
             e.printStackTrace();
         }
     }

@@ -18,7 +18,7 @@ import static org.acra.ReportField.STACK_TRACE;
 
 
 @AcraMailSender(mailTo = "mangaview@protonmail.com")
-@AcraCore(reportContent = { APP_VERSION_NAME, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, APPLICATION_LOG, REPORT_ID })
+@AcraCore(reportContent = { APP_VERSION_NAME, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, REPORT_ID})
 @AcraDialog(resText=R.string.acra_dialog_text)
 
 public class MainApplication extends Application{

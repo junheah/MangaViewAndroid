@@ -74,7 +74,7 @@ public class CheckInfo {
         protected Integer doInBackground(Void... params) {
             //get all notices
             try {
-                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/etc/notice.json");
+                String rawdata = httpsGet("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notice.json");
                 notice = new Gson().fromJson(rawdata, new TypeToken<Notice>(){}.getType());
             }catch (Exception e){
                 e.printStackTrace();
@@ -103,7 +103,7 @@ public class CheckInfo {
 
         protected Integer doInBackground(Void... params) {
             try {
-                String rawdata = httpsGet("https://github.com/junheah/MangaViewAndroid/raw/master/version.json");
+                String rawdata = httpsGet("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/version.json");
                 JSONObject data = new JSONObject(rawdata);
                 int lver = data.getInt("version");
                 String link = data.getString("link");
@@ -137,7 +137,7 @@ public class CheckInfo {
         try {
             SharedPreferences sharedPref = context.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
             List<Notice> notices = new Gson().fromJson(sharedPref.getString("notice", "[]"), new TypeToken<List<Notice>>(){}.getType());
-            if(!notices.contains(notice)){
+            if(notice!=null&&!notices.contains(notice)){
                 //add new notice
                 notices.add(notice);
                 //write notices

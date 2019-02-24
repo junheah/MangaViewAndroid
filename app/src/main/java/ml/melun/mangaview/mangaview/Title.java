@@ -37,14 +37,14 @@ public class Title {
                     .get();
             for(Element e:items.select("div.slot")) {
                 eps.add(new Manga(Integer.parseInt(e.attr("data-wrid"))
-                        ,e.selectFirst("div.title").text()
-                        ,e.selectFirst("div.addedAt").text().split(" ")[0]));
+                        ,e.selectFirst("div.title").ownText()
+                        ,e.selectFirst("div.addedAt").ownText().split(" ")[0]));
             }
             thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
-            author = items.selectFirst("a.author").text();
+            author = items.selectFirst("a.author").ownText();
             tags = new ArrayList<>();
             for(Element e:items.selectFirst("div.manga-tags").select("a.tag")){
-                tags.add(e.text());
+                tags.add(e.ownText());
             }
             try{
                 String releaseRaw =  items.selectFirst("div.manga-thumbnail").selectFirst("a.publish_type").attr("href");

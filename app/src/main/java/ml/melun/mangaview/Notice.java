@@ -1,7 +1,7 @@
 package ml.melun.mangaview;
 
 public class Notice{
-    int id;
+    int id = -1;
     String title, date, content;
 
     Notice(int id, String title, String date, String content){

@@ -25,10 +25,10 @@ public class UpdatedList {
                 if (items.size() < 50) last = true;
                 for(Element item : items){
                     String ttmp = (item.selectFirst("div.thumb").attr("style").split("\\(")[1].split("\\)")[0]);
-                    String ntmp = item.selectFirst("div.subject").text().replace('\n',' ');
+                    String ntmp = item.selectFirst("div.subject").ownText().replace('\n',' ');
                     String title = java.net.URLDecoder.decode(item.selectFirst("div.more-btn").selectFirst("a").attr("href").split("manga_name=")[1], "UTF-8");
                     int itmp = Integer.parseInt(item.selectFirst("div.data-container").attr("data-wrid"));
-                    String dtmp = item.select("div.desc").get(1).text();
+                    String dtmp = item.select("div.desc").get(1).ownText();
                     Manga tmp = new Manga(itmp,ntmp,dtmp);
                     tmp.setTitle(new Title(title,"","",new ArrayList<String>(), -1));
                     tmp.addThumb(ttmp);
