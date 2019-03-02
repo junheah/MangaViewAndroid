@@ -594,7 +594,7 @@ public class MainActivity extends AppCompatActivity
                             try {
                                 JSONObject json = new JSONObject(readFileToString(oldData));
                                 Title title = new Gson().fromJson(json.getJSONObject("title").toString(),new TypeToken<Title>(){}.getType());
-                                if(title.getThumb().length()>0) title.setThumb(f.getAbsolutePath()+'/'+title.getThumb());
+                                if(title.getThumb().length()>0) title.setThumb(new File(f.getAbsolutePath(),title.getThumb()).getAbsolutePath());
                                 titles.add(title);
                             }catch (Exception e){
                                 e.printStackTrace();
@@ -681,7 +681,7 @@ public class MainActivity extends AppCompatActivity
                                 switch (which){
                                     case DialogInterface.BUTTON_POSITIVE:
                                         //Yes button clicked
-                                        File folder = new File(homeDirStr+'/'+filterFolder(title.getName()));
+                                        File folder = new File(homeDirStr, filterFolder(title.getName()));
                                         if(deleteRecursive(folder)) {
                                             offlineAdapter.remove(position);
                                             offlineAdapter.notifyItemRemoved(position);

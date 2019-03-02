@@ -54,7 +54,16 @@ public class Utils {
                 return false;
             }
             return true;
-        }else return false;
+        }else{
+            File tmp = new File(targetDir.getParent(), "mangaViewTestFile");
+            try {
+                if (tmp.createNewFile()) tmp.delete();
+                else return false;
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
     }
 
     public static String httpsGet(String urlin){
@@ -165,19 +174,6 @@ public class Utils {
             int height = Math.round(ratio*width);
             return Bitmap.createScaledBitmap(input, width, height,false);
         }
-    }
-
-    private static int calculateInSampleSize(int width, int reqWidth) {
-        int inSampleSize = 1;
-        if (width > reqWidth) {
-            // Calculate ratios of height and width to requested height and width
-            final int widthRatio = Math.round((float) width / (float) reqWidth);
-            // Choose the smallest ratio as inSampleSize value, this will guarantee
-            // a final image with both dimensions larger than or equal to the
-            // requested height and width.
-            inSampleSize = widthRatio;
-        }
-        return inSampleSize;
     }
 
     public static int getScreenSize(Display display){

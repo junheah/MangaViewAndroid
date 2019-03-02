@@ -292,7 +292,7 @@ public class EpisodeActivity extends AppCompatActivity {
                             imgs = offlineEpisodes.get(position).listFiles();
                             break;
                         case 3:
-                            File titleDir = new File(homeDir,title.getName());
+                            File titleDir = new File(homeDir,filterFolder(title.getName()));
                             imgs = new File(titleDir, selected.getOfflineName()).listFiles();
                             break;
                     }

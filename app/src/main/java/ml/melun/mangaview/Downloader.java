@@ -10,11 +10,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
+import android.widget.Toast;
 
 
 import com.google.gson.Gson;
@@ -51,18 +55,20 @@ public class Downloader extends Service {
     float progress = 0;
     int maxProgress=1000;
     String notiTitle="";
-    Context context;
     Boolean running = false;
     NotificationCompat.Builder notification;
-    public static final String ACTION_START = "ml.melu.mangaview.action.START";
-    public static final String ACTION_STOP = "ml.melu.mangaview.action.STOP";
-    public static final String ACTION_QUEUE = "ml.melu.mangaview.action.QUEUE";
+    public static final String ACTION_START = "ml.melun.mangaview.action.START";
+    public static final String ACTION_STOP = "ml.melun.mangaview.action.STOP";
+    public static final String ACTION_QUEUE = "ml.melun.mangaview.action.QUEUE";
+    public static final String ACTION_UPDATE = "ml.melun.mangaview.action.UPDATE";
     downloadTitle dt;
+    Download d;
     NotificationManager notificationManager;
     int nid = 16848323;
     String channeld = "MangaViewDL";
     PendingIntent pendingIntent;
     PendingIntent stopIntent;
+    Context serviceContext;
 
 
     @Override
@@ -86,12 +92,13 @@ public class Downloader extends Service {
             mchannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
             notificationManager.createNotificationChannel(mchannel);
         }
-        startNotification();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
         Intent previousIntent = new Intent(this, Downloader.class);
         previousIntent.setAction(ACTION_STOP);
         stopIntent = PendingIntent.getService(this, 0, previousIntent, 0);
+        serviceContext = this;
+        startNotification();
     }
 
     @Override
@@ -100,6 +107,7 @@ public class Downloader extends Service {
             case ACTION_START:
                 break;
             case ACTION_QUEUE:
+                startNotification();
                 if(dt==null) dt = new downloadTitle();
                 try {
                     Title target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
@@ -113,6 +121,11 @@ public class Downloader extends Service {
             case ACTION_STOP:
                 dt.cancel(true);
                 break;
+            case ACTION_UPDATE:
+                if(dt==null) dt = new downloadTitle();
+                String url = intent.getStringExtra("url");
+                update(url);
+                break;
         }
         return START_STICKY;
     }
@@ -120,6 +133,7 @@ public class Downloader extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        finishNotification();
     }
 
     @Nullable
@@ -137,6 +151,76 @@ public class Downloader extends Service {
             dt.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }else{
             running = true;
+        }
+    }
+
+    public void update(String url){
+        //saves to android default download dir
+        if(d==null) d = new Download();
+        if(d.getStatus() == AsyncTask.Status.PENDING || d.getStatus() == AsyncTask.Status.FINISHED) {
+            d = new Download();
+            d.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url);
+        }else{
+            updateDownloading = true;
+            Toast.makeText(serviceContext, "이미 다운로드 중 입니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    Boolean updateDownloading = false;
+
+    private class Download extends AsyncTask<String,Void,Integer> {
+        File downloaded;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            updateDownloading = true;
+            Intent intent = new Intent(serviceContext, MainActivity.class);
+            PendingIntent intentP = PendingIntent.getActivity(serviceContext, 0, intent, 0);
+            NotificationCompat.Builder noti = new NotificationCompat.Builder(serviceContext, channeld)
+                    .setContentIntent(intentP)
+                    .setContentTitle("업데이트 다운로드중")
+                    .setSmallIcon(R.drawable.ic_logo)
+                    .setOngoing(true);
+            notificationManager.notify(nid+3, noti.build());
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            downloaded.setReadable(true,false);
+            Uri fileUri = Uri.fromFile(downloaded);
+            if (Build.VERSION.SDK_INT >= 24) {
+                fileUri = FileProvider.getUriForFile(serviceContext, serviceContext.getPackageName()+".provider", downloaded);
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            PendingIntent installP = PendingIntent.getActivity(serviceContext, 0, intent, 0);
+            NotificationCompat.Builder  noti = new NotificationCompat.Builder(serviceContext, channeld)
+                    .setContentIntent(installP)
+                    .setContentTitle("업데이트 다운로드 완료")
+                    .setContentText("지금 설치하려면 터치")
+                    .setSmallIcon(R.drawable.ic_logo)
+                    .setOngoing(false);
+            notificationManager.notify(nid+3, noti.build());
+            updateDownloading = false;
+            if(!running) stopSelf();
+        }
+
+        @Override
+
+        protected Integer doInBackground(String... urls) {
+            String url = urls[0];
+            downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(),"mangaview-update"));
+            return null;
+        }
+
+        Uri getFileUri(Context context, File file) {
+            return FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + "."
+                    , file);
         }
     }
 
@@ -179,7 +263,7 @@ public class Downloader extends Service {
                         if (queueIndex == 0) {
                             try {
                                 //save thumbnail
-                                String thumb = downloadFile(title.getThumb(), new File(titleDir, "thumb"));
+                                String thumb = downloadFile(title.getThumb(), new File(titleDir, "thumb")).getName();
                                 title.setThumb(thumb);
                                 //if first manga, save title data & id list to title.data as JSON
                                 //title.removeEps();
@@ -260,12 +344,13 @@ public class Downloader extends Service {
             super.onPostExecute(res);
             endNotification();
             running = false;
-            stopSelf();
+            if(!updateDownloading) stopSelf();
         }
 
         @Override
         protected void onCancelled(Integer mode) {
             super.onCancelled();
+            running = false;
             String why = "";
             switch(mode){
                 case 0:
@@ -281,8 +366,9 @@ public class Downloader extends Service {
                     why = "예상치 못한 오류";
                     break;
             }
+            notificationManager.cancel(nid);
             stopNotification(why);
-            stopSelf();
+            if(!updateDownloading) stopSelf();
         }
     }
 
@@ -321,7 +407,7 @@ public class Downloader extends Service {
         }
     }
 
-    String downloadFile(String urlStr, File outputFile){
+    File downloadFile(String urlStr, File outputFile){
         //returns file name with extension
         String name = "";
         try {
@@ -360,7 +446,7 @@ public class Downloader extends Service {
             //
             e.printStackTrace();
         }
-        return name;
+        return outputFile;
     }
     public int getIndex(List<Manga> eps, int id){
         for(int i=0; i<eps.size(); i++){
@@ -392,6 +478,15 @@ public class Downloader extends Service {
     }
 
     private void endNotification(){
+        notification = new NotificationCompat.Builder(this, channeld)
+                .setContentIntent(pendingIntent)
+                .setContentTitle("다운로드 완료")
+                .setSmallIcon(R.drawable.ic_logo)
+                .setOngoing(false);
+        notificationManager.notify(nid, notification.build());
+    }
+
+    private void finishNotification(){
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
                 .setContentTitle("모든 다운로드가 완료되었습니다.")

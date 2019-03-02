@@ -186,7 +186,7 @@ public class ViewerActivity extends AppCompatActivity {
                             p.setViewerBookmark(id, firstVisible);
                             viewerBookmark = firstVisible;
                         }
-                        if (lastVisible == stripAdapter.getItemCount() - 1) {
+                        if (lastVisible >= imgs.size() - 1) {
                             p.removeViewerBookmark(id);
                         }
                         if(viewerType==2) {
@@ -328,11 +328,11 @@ public class ViewerActivity extends AppCompatActivity {
         if(autoCut){
             autoCut = false;
             cut.setBackgroundResource(R.drawable.button_bg);
-            viewerBookmark /= 2;
+            //viewerBookmark /= 2;
         } else{
             autoCut = true;
             cut.setBackgroundResource(R.drawable.button_bg_on);
-            viewerBookmark *= 2;
+            //viewerBookmark *= 2;
         }
         stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
         strip.setAdapter(stripAdapter);
@@ -342,7 +342,8 @@ public class ViewerActivity extends AppCompatActivity {
                 toggleToolbar();
             }
         });
-        strip.getLayoutManager().scrollToPosition(viewerBookmark);
+        if(autoCut) strip.getLayoutManager().scrollToPosition(viewerBookmark*2);
+        else strip.getLayoutManager().scrollToPosition(viewerBookmark);
     }
 
     public void bookmarkRefresh(){

@@ -68,5 +68,22 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/comment_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/comment_icon" />
+        app:layout_constraintTop_toBottomOf="@+id/comment_icon"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/comment_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
+        android:gravity="center"
+        android:text="0"
+        android:background="#7000"
+        android:textSize="10sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toStartOf="@+id/comment_icon"
+        app:layout_constraintTop_toTopOf="@+id/comment_icon" />
 </android.support.constraint.ConstraintLayout>
