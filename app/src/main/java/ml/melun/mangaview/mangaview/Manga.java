@@ -101,7 +101,10 @@ public class Manga {
                             String[] imgStrs = imgStr.split("\"");
                             //remove backslash
                             for (int i = 1; i < imgStrs.length; i += 2) {
-                                imgs.add(imgStrs[i].replace("\\",""));
+                                String imgUrl = imgStrs[i].replace("\\","")
+                                        .replace(".mangashow2.me", ".mangashow3.me")
+                                        + "?v=2";
+                                imgs.add(imgUrl);
                             }
                         }
                     }else if(line.contains("var only_chapter")){

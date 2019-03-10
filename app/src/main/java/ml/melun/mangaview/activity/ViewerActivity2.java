@@ -45,6 +45,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.Utils.getSample;
 import static ml.melun.mangaview.Utils.getScreenSize;
+import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity2 extends AppCompatActivity {
     Preference p;
@@ -272,36 +273,41 @@ public class ViewerActivity2 extends AppCompatActivity {
             //add page
             //has to check if twopage
             viewerBookmark++;
-            final String image = imgs.get(viewerBookmark);
-            //placeholder
-            frame.setImageResource(R.drawable.placeholder);
-            Glide.with(context)
-                    .asBitmap()
-                    .load(image)
-                    .into(new CustomTarget<Bitmap>() {
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
-                            //
-                        }
+            try {
+                final String image = imgs.get(viewerBookmark);
 
-                        @Override
-                        public void onResourceReady(Bitmap bitmap,
-                                                    Transition<? super Bitmap> transition) {
-                            Bitmap sample = getSample(d.decode(bitmap),width);
-                            int width = sample.getWidth();
-                            int height = sample.getHeight();
-                            if(width>height){
-                                imgCache = sample;
-                                type=0;
-                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
-                                else frame.setImageBitmap(Bitmap.createBitmap(imgCache,width/2,0,width/2,height));
-                            }else{
-                                type=-1;
-                                frame.setImageBitmap(sample);
+                //placeholder
+                frame.setImageResource(R.drawable.placeholder);
+                Glide.with(context)
+                        .asBitmap()
+                        .load(image)
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                                //
                             }
-                            preload();
-                        }
-                    });
+
+                            @Override
+                            public void onResourceReady(Bitmap bitmap,
+                                                        Transition<? super Bitmap> transition) {
+                                Bitmap sample = getSample(d.decode(bitmap),width);
+                                int width = sample.getWidth();
+                                int height = sample.getHeight();
+                                if(width>height){
+                                    imgCache = sample;
+                                    type=0;
+                                    if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
+                                    else frame.setImageBitmap(Bitmap.createBitmap(imgCache,width/2,0,width/2,height));
+                                }else{
+                                    type=-1;
+                                    frame.setImageBitmap(sample);
+                                }
+                                preload();
+                            }
+                        });
+            }catch (Exception e){
+                viewerBookmark--;
+            }
         }
         p.setViewerBookmark(id,viewerBookmark);
         if(imgs.size()-1==viewerBookmark) p.removeViewerBookmark(id);
@@ -322,34 +328,39 @@ public class ViewerActivity2 extends AppCompatActivity {
             //decrease page
             //has to check if twopage
             viewerBookmark--;
-            final String image = imgs.get(viewerBookmark);
-            //placeholder
-            frame.setImageResource(R.drawable.placeholder);
-            Glide.with(context)
-                    .asBitmap()
-                    .load(image)
-                    .into(new CustomTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                            Bitmap sample = getSample(d.decode(bitmap), width);
-                            int width = sample.getWidth();
-                            int height = sample.getHeight();
-                            if(width>height){
-                                imgCache = sample;
-                                type=1;
-                                if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
-                                else frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
-                            }else{
-                                type=-1;
-                                frame.setImageBitmap(sample);
+            try {
+                final String image = imgs.get(viewerBookmark);
+
+                //placeholder
+                frame.setImageResource(R.drawable.placeholder);
+                Glide.with(context)
+                        .asBitmap()
+                        .load(image)
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                                Bitmap sample = getSample(d.decode(bitmap), width);
+                                int width = sample.getWidth();
+                                int height = sample.getHeight();
+                                if(width>height){
+                                    imgCache = sample;
+                                    type=1;
+                                    if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
+                                    else frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
+                                }else{
+                                    type=-1;
+                                    frame.setImageBitmap(sample);
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                        }
-                    });
+                            }
+                        });
+            }catch (Exception e){
+                viewerBookmark++;
+            }
         }
         p.setViewerBookmark(id,viewerBookmark);
         if(0==viewerBookmark) p.removeViewerBookmark(id);
@@ -360,36 +371,42 @@ public class ViewerActivity2 extends AppCompatActivity {
 
 
     void refreshImage(){
-        final String image = imgs.get(viewerBookmark);
-        //placeholder
-        //frame.setImageResource(R.drawable.placeholder);
-        Glide.with(context)
-                .asBitmap()
-                .load(image)
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
+        try {
+            final String image = imgs.get(viewerBookmark);
+            //placeholder
+            //frame.setImageResource(R.drawable.placeholder);
+            Glide.with(context)
+                    .asBitmap()
+                    .load(image)
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                    }
-
-                    @Override
-                    public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                        Bitmap sample = getSample(d.decode(bitmap),width);
-                        int width = sample.getWidth();
-                        int height = sample.getHeight();
-                        if(width>height){
-                            imgCache = sample;
-                            type=0;
-                            if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
-                            else frame.setImageBitmap(Bitmap.createBitmap(imgCache,width/2,0,width/2,height));
-                        }else{
-                            type=-1;
-                            frame.setImageBitmap(sample);
                         }
-                        preload();
-                    }
-                });
-        updatePageIndex();
+
+                        @Override
+                        public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                            Bitmap sample = getSample(d.decode(bitmap), width);
+                            int width = sample.getWidth();
+                            int height = sample.getHeight();
+                            if (width > height) {
+                                imgCache = sample;
+                                type = 0;
+                                if (reverse)
+                                    frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
+                                else
+                                    frame.setImageBitmap(Bitmap.createBitmap(imgCache, width / 2, 0, width / 2, height));
+                            } else {
+                                type = -1;
+                                frame.setImageBitmap(sample);
+                            }
+                            preload();
+                        }
+                    });
+            updatePageIndex();
+        }catch(Exception e) {
+            showPopup(context, "뷰어 오류", "이미지를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.");
+        }
     }
 
     void preload(){
@@ -495,12 +512,27 @@ public class ViewerActivity2 extends AppCompatActivity {
                 }
             });
             spinner.setSelection(index);
-
-            if(title == null) title = manga.getTitle();
-            p.addRecent(title);
-            if(id>0) p.setBookmark(title.getName(),id);
-            viewerBookmark = p.getViewerBookmark(id);
-            refreshImage();
+            try {
+                if (title == null) {
+                    title = manga.getTitle();
+                    p.addRecent(title);
+                }
+                if (id > 0) p.setBookmark(title.getName(), id);
+                viewerBookmark = p.getViewerBookmark(id);
+                refreshImage();
+            }catch(Exception e){
+                showPopup(context, "뷰어 오류", "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+                });
+            }
             if (pd.isShowing()) {
                 pd.dismiss();
             }

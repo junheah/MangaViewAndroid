@@ -45,6 +45,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.Utils.getScreenSize;
+import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity extends AppCompatActivity {
     String name;
@@ -433,13 +434,26 @@ public class ViewerActivity extends AppCompatActivity {
             spinner.setSelection(index);
             pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
             bookmarkRefresh();
-
-            if(title == null) title = manga.getTitle();
-            p.addRecent(title);
-            if(id>0) p.setBookmark(title.getName(), id);
-            result = new Intent();
-            result.putExtra("id",id);
-            setResult(RESULT_OK, result);
+            try {
+                if (title == null) title = manga.getTitle();
+                p.addRecent(title);
+                if (id > 0) p.setBookmark(title.getName(), id);
+                result = new Intent();
+                result.putExtra("id", id);
+                setResult(RESULT_OK, result);
+            }catch (Exception e){
+                showPopup(context, "뷰어 오류", "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        finish();
+                    }
+                });
+            }
             if (pd.isShowing()) {
                 pd.dismiss();
             }

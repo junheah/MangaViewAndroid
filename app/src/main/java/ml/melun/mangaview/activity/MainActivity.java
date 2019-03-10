@@ -506,11 +506,11 @@ public class MainActivity extends AppCompatActivity
                 case 1:
                     //favorite result
                     Boolean favorite_after = data.getBooleanExtra("favorite",true);
-                    if(!favorite_after) favoriteAdapter.notifyItemRemoved(selectedPosition);
+                    if(!favorite_after && favoriteAdapter != null) favoriteAdapter.notifyItemRemoved(selectedPosition);
                     break;
                 case 2:
                     //recent result
-                    recentAdapter.moveItemToTop(selectedPosition);
+                    if(recentAdapter != null)recentAdapter.moveItemToTop(selectedPosition);
                     break;
 
             }

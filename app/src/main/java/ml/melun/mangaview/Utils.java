@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -120,19 +121,23 @@ public class Utils {
         viewer.putExtra("manga",new Gson().toJson(manga));
         return viewer;
     }
-    public static void showPopup(Context context, String title, String content){
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //
-            }
-        };
+    public static void showPopup(Context context, String title, String content, DialogInterface.OnClickListener clickListener, DialogInterface.OnCancelListener cancelListener){
         AlertDialog.Builder builder;
         if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
         else builder = new AlertDialog.Builder(context);
         builder.setTitle(title)
                 .setMessage(content)
-                .setPositiveButton("확인", dialogClickListener)
+                .setPositiveButton("확인", clickListener)
+                .setOnCancelListener(cancelListener)
+                .show();
+    }
+    public static void showPopup(Context context, String title, String content){
+        AlertDialog.Builder builder;
+        if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setMessage(content)
+                .setPositiveButton("확인", null)
                 .show();
     }
 
