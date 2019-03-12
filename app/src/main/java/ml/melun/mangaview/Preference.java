@@ -31,6 +31,7 @@ public class Preference {
     static int startTab;
     static String url;
     static Boolean stretch;
+    static Boolean leftRight;
 
     //Offline manga has id of -1
     public Preference(Context context){
@@ -58,12 +59,21 @@ public class Preference {
             startTab = sharedPref.getInt("startTab", 0);
             url = sharedPref.getString("url", "http://188.214.128.5");
             stretch = sharedPref.getBoolean("stretch", false);
+            leftRight = sharedPref.getBoolean("leftRight", false);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
+    public static Boolean getLeftRight() {
+        return leftRight;
+    }
 
+    public static void setLeftRight(Boolean leftRight) {
+        Preference.leftRight = leftRight;
+        prefsEditor.putBoolean("leftRight", leftRight);
+        prefsEditor.commit();
+    }
 
     public static int getViewerType() {
         return viewerType;

@@ -49,7 +49,7 @@ import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity2 extends AppCompatActivity {
     Preference p;
-    Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, online, stretch;
+    Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, online, stretch, leftRight;
     Context context = this;
     String name;
     int id;
@@ -73,6 +73,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     AlertDialog.Builder alert;
     Spinner spinner;
     int width = 0;
+    Intent intent;
 
     Decoder d;
 
@@ -96,17 +97,28 @@ public class ViewerActivity2 extends AppCompatActivity {
         frame = this.findViewById(R.id.viewer_image);
         pageBtn = this.findViewById(R.id.viewerBtn1);
         pageBtn.setText("-/-");
-        nextPageBtn = this.findViewById(R.id.nextPageBtn);
-        prevPageBtn = this.findViewById(R.id.prevPageBtn);
+        leftRight = p.getLeftRight();
+        if(leftRight){
+            nextPageBtn = this.findViewById(R.id.nextPageBtn2);
+            prevPageBtn = this.findViewById(R.id.prevPageBtn2);
+        }else{
+            nextPageBtn = this.findViewById(R.id.nextPageBtn);
+            prevPageBtn = this.findViewById(R.id.prevPageBtn);
+        }
+        nextPageBtn.setVisibility(View.VISIBLE);
+        prevPageBtn.setVisibility(View.VISIBLE);
+
         touchToggleBtn = this.findViewById(R.id.viewerBtn2);
         touchToggleBtn.setText("입력 제한");
         commentBtn = this.findViewById(R.id.commentButton);
         spinner = this.findViewById(R.id.toolbar_spinner);
         stretch = p.getStretch();
+
+        //refreshBtn = this.findViewById(R.id.refreshButton);
         if(stretch) frame.setScaleType(ImageView.ScaleType.FIT_XY);
         width = getScreenSize(getWindowManager().getDefaultDisplay());
 
-        Intent intent = getIntent();
+        intent = getIntent();
 
         manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
         title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
@@ -117,6 +129,13 @@ public class ViewerActivity2 extends AppCompatActivity {
 
         toolbarTitle.setText(name);
         viewerBookmark = p.getViewerBookmark(id);
+
+//        refreshbtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                refreshImage();
+//            }
+//        });
 
 
         if(intent.getBooleanExtra("recent",false)){
@@ -256,18 +275,21 @@ public class ViewerActivity2 extends AppCompatActivity {
     }
 
     void nextPage(){
+        //refreshbtn.setVisibility(View.VISIBLE);
         if(viewerBookmark==imgs.size()-1 && ( type==-1 || type==1)){
             //end of manga
+            //refreshbtn.setVisibility(View.INVISIBLE);
         }else if(type==0){
             //is two page, current pos: right
             //dont add page
             //only change type
+            //refreshbtn.setVisibility(View.INVISIBLE);
             type = 1;
             int width = imgCache.getWidth();
             int height = imgCache.getHeight();
-
             if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
             else frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
+
         }else{
             //is single page OR unidentified
             //add page
@@ -290,6 +312,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                             @Override
                             public void onResourceReady(Bitmap bitmap,
                                                         Transition<? super Bitmap> transition) {
+                                //refreshbtn.setVisibility(View.INVISIBLE);
                                 Bitmap sample = getSample(d.decode(bitmap),width);
                                 int width = sample.getWidth();
                                 int height = sample.getHeight();
@@ -314,10 +337,13 @@ public class ViewerActivity2 extends AppCompatActivity {
         updatePageIndex();
     }
     void prevPage(){
+        //refreshbtn.setVisibility(View.VISIBLE);
         if(viewerBookmark==0 && (type==-1 || type==0)){
             //start of manga
+            //refreshbtn.setVisibility(View.INVISIBLE);
         } else if(type==1){
             //is two page, current pos: left
+            //refreshbtn.setVisibility(View.INVISIBLE);
             type = 0;
             int width = imgCache.getWidth();
             int height = imgCache.getHeight();
@@ -340,6 +366,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                             @Override
                             public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
                                 Bitmap sample = getSample(d.decode(bitmap), width);
+                                //refreshbtn.setVisibility(View.INVISIBLE);
                                 int width = sample.getWidth();
                                 int height = sample.getHeight();
                                 if(width>height){
@@ -371,6 +398,8 @@ public class ViewerActivity2 extends AppCompatActivity {
 
 
     void refreshImage(){
+        frame.setImageResource(R.drawable.placeholder);
+        //refreshbtn.setVisibility(View.VISIBLE);
         try {
             final String image = imgs.get(viewerBookmark);
             //placeholder
@@ -386,6 +415,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
                         @Override
                         public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                            //refreshbtn.setVisibility(View.INVISIBLE);
                             Bitmap sample = getSample(d.decode(bitmap), width);
                             int width = sample.getWidth();
                             int height = sample.getHeight();
@@ -456,7 +486,13 @@ public class ViewerActivity2 extends AppCompatActivity {
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
             else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
-            pd.setCancelable(false);
+            pd.setCancelable(true);
+            pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    finish();
+                }
+            });
             pd.show();
         }
 
@@ -484,10 +520,22 @@ public class ViewerActivity2 extends AppCompatActivity {
             toolbarTitle.setSingleLine(true);
             toolbarTitle.setSelected(true);
 
-            if(index==0) next.setEnabled(false);
-            else next.setEnabled(true);
-            if(index==eps.size()-1) prev.setEnabled(false);
-            else prev.setEnabled(true);
+            if(index==0){
+                next.setEnabled(false);
+                next.setColorFilter(Color.BLACK);
+            }
+            else {
+                next.setEnabled(true);
+                next.setColorFilter(null);
+            }
+            if(index==eps.size()-1) {
+                prev.setEnabled(false);
+                prev.setColorFilter(Color.BLACK);
+            }
+            else {
+                prev.setEnabled(true);
+                prev.setColorFilter(null);
+            }
             result = new Intent();
             result.putExtra("id",id);
             setResult(RESULT_OK, result);
@@ -517,6 +565,9 @@ public class ViewerActivity2 extends AppCompatActivity {
                     title = manga.getTitle();
                     p.addRecent(title);
                 }
+                //update intent : not sure this works TODO: test this shit
+                intent.putExtra("title", new Gson().toJson(title));
+                intent.putExtra("manga", new Gson().toJson(manga));
                 if (id > 0) p.setBookmark(title.getName(), id);
                 viewerBookmark = p.getViewerBookmark(id);
                 refreshImage();

@@ -28,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
     Context context;
     ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_viewer, s_reverse, s_dataSave, s_tab, s_url, s_stretch;
     Spinner s_tab_spinner, s_viewer_spinner;
-    Switch s_volumeKey_switch, s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch;
+    Switch s_volumeKey_switch, s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch, s_leftRight_switch;
     Preference p;
     Boolean dark;
     @Override
@@ -254,6 +254,23 @@ public class SettingsActivity extends AppCompatActivity {
                 p.setStretch(isChecked);
             }
         });
+
+        s_leftRight_switch = this.findViewById(R.id.setting_leftRight_switch);
+        s_leftRight_switch.setChecked(p.getLeftRight());
+        this.findViewById(R.id.setting_leftRight).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_leftRight_switch.toggle();
+            }
+        });
+        s_leftRight_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setLeftRight(isChecked);
+            }
+        });
+
+
 
     }
 

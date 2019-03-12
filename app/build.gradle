@@ -4,8 +4,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    signingConfigs{
-        debug{
+    signingConfigs {
+        debug {
             Properties properties = new Properties()
             properties.load(project.rootProject.file('local.properties').newDataInputStream())
             storeFile file(properties.getProperty('storeFile'))

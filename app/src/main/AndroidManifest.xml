@@ -6,8 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
-
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".MainApplication"
@@ -16,7 +15,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -27,8 +25,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <service android:name=".Downloader"
-            android:enabled="true"/>
+        <service
+            android:name=".Downloader"
+            android:enabled="true" />
+
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="orientation|screenSize"
@@ -62,7 +62,7 @@
         <activity
             android:name=".activity.ViewerActivity2"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.LicenseActivity"
             android:configChanges="orientation|screenSize" />
@@ -80,8 +80,9 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activity.NoticesActivity"
-            android:label="공지사항"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:label="공지사항" />
+        <activity android:name=".activity.WebActivity"></activity>
     </application>
 
 </manifest>

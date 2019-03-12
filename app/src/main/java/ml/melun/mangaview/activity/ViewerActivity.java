@@ -82,6 +82,7 @@ public class ViewerActivity extends AppCompatActivity {
     int viewerType=0;
     int width=0;
     Boolean online;
+    Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference(this);
@@ -107,7 +108,7 @@ public class ViewerActivity extends AppCompatActivity {
         //imageZoomHelper = new ImageZoomHelper(this);
 
         try {
-            Intent intent = getIntent();
+            intent = getIntent();
             title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
             manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
             online = intent.getBooleanExtra("online", true);
@@ -367,7 +368,13 @@ public class ViewerActivity extends AppCompatActivity {
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
             else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
-            pd.setCancelable(false);
+            pd.setCancelable(true);
+            pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    finish();
+                }
+            });
             pd.show();
         }
 
@@ -407,10 +414,22 @@ public class ViewerActivity extends AppCompatActivity {
 //            spinner.setAdapter(new ArrayAdapter<String>(context,
 //                    android.R.layout.simple_spinner_item, epsName));
             //set button enabled
-            if(index==0) next.setEnabled(false);
-            else next.setEnabled(true);
-            if(index==eps.size()-1) prev.setEnabled(false);
-            else prev.setEnabled(true);
+            if(index==0){
+                next.setEnabled(false);
+                next.setColorFilter(Color.BLACK);
+            }
+            else {
+                next.setEnabled(true);
+                next.setColorFilter(null);
+            }
+            if(index==eps.size()-1) {
+                prev.setEnabled(false);
+                prev.setColorFilter(Color.BLACK);
+            }
+            else {
+                prev.setEnabled(true);
+                prev.setColorFilter(null);
+            }
             swipe.setRefreshing(false);
 
             //refresh spinner
@@ -441,6 +460,9 @@ public class ViewerActivity extends AppCompatActivity {
                 result = new Intent();
                 result.putExtra("id", id);
                 setResult(RESULT_OK, result);
+                //update intent : not sure this works TODO: test this shit
+                intent.putExtra("title", new Gson().toJson(title));
+                intent.putExtra("manga", new Gson().toJson(manga));
             }catch (Exception e){
                 showPopup(context, "뷰어 오류", "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
                     @Override

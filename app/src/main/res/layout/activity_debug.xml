@@ -46,6 +46,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="저장된 객체들에서 화 목록 지우기" />
+            <Button
+                android:id="@+id/debug_webTest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="웹 테스트" />
 
             <TextView
                 android:id="@+id/debug_out"

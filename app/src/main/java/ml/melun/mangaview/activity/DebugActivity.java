@@ -1,6 +1,7 @@
 package ml.melun.mangaview.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,6 +36,12 @@ public class DebugActivity extends AppCompatActivity {
         Button pref =this.findViewById(R.id.debug_pref);
         output = this.findViewById(R.id.debug_out);
         context = this;
+        this.findViewById(R.id.debug_webTest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(context, WebActivity.class));
+            }
+        });
         scroll = this.findViewById(R.id.debug_scroll);
         pref.setOnClickListener(new View.OnClickListener() {
             @Override
