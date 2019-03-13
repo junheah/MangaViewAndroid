@@ -67,6 +67,7 @@ public class Manga {
             InputStream stream = null;
             try {
                 URL url = new URL(base + "/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                if(listener!=null) listener.setMessage("프로토콜 확인중");
                 switch(url.getProtocol()){
                     case "http":
                         connection = (HttpURLConnection) url.openConnection();
@@ -87,6 +88,7 @@ public class Manga {
                         stream = sconnection.getInputStream();
                         break;
                 }
+                if(listener!=null) listener.setMessage("페이지 읽는중");
                 reader = new BufferedReader(new InputStreamReader(stream));
                 //StringBuffer buffer = new StringBuffer();
                 String line = "";
@@ -96,6 +98,7 @@ public class Manga {
                     //save as raw html for jsoup
                     raw += line;
                     if(line.contains("var img_list")) {
+                        if(listener!=null) listener.setMessage("이미지 리스트 읽는중");
                         String imgStr = line;
                         if(imgStr!=null) {
                             String[] imgStrs = imgStr.split("\"");
@@ -108,6 +111,7 @@ public class Manga {
                             }
                         }
                     }else if(line.contains("var only_chapter")){
+                        if(listener!=null) listener.setMessage("화 목록 읽는중");
                         String epsStr = line;
                         String[] epsStrs = epsStr.split("\"");
                         //remove backslash
@@ -128,6 +132,7 @@ public class Manga {
                 }
 
                 //jsoup parsing
+                if(listener!=null) listener.setMessage("댓글 읽는중");
                 Document doc = Jsoup.parse(raw);
                 Elements cs = doc.select("section.comment-media").last().select("div.media");
                 System.out.println(cs.size());
@@ -256,6 +261,10 @@ public class Manga {
     public String getOfflineName(){
         return this.offlineName;
     }
+
+    public void setListener(Listener listener){
+        this.listener = listener;
+    }
     private int id;
     String name;
     List<Manga> eps;
@@ -266,5 +275,10 @@ public class Manga {
     Title title;
     String date;
     int seed;
+    Listener listener;
+
+    public interface Listener{
+        void setMessage(String msg);
+    }
 }
 

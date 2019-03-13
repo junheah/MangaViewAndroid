@@ -486,17 +486,28 @@ public class ViewerActivity2 extends AppCompatActivity {
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
             else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
-            pd.setCancelable(true);
-            pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            pd.setCancelable(false);
+            pd.setOnKeyListener(new DialogInterface.OnKeyListener() {
                 @Override
-                public void onCancel(DialogInterface dialog) {
-                    finish();
+                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                    if(keyCode == KeyEvent.KEYCODE_BACK){
+                        loadImages.super.cancel(true);
+                        pd.dismiss();
+                        finish();
+                    }
+                    return true;
                 }
             });
             pd.show();
         }
 
         protected Integer doInBackground(Void... params) {
+            manga.setListener(new Manga.Listener() {
+                @Override
+                public void setMessage(String msg) {
+                    pd.setMessage(msg);
+                }
+            });
             manga.fetch(p.getUrl());
             imgs = manga.getImgs();
             d = new Decoder(manga.getSeed(), manga.getId());

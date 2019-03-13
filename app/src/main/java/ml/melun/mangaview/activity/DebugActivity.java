@@ -132,6 +132,7 @@ public class DebugActivity extends AppCompatActivity {
             data.put("pageReverse",sharedPref.getBoolean("pageReverse",false));
             data.put("dataSave",sharedPref.getBoolean("dataSave", false));
             data.put("stretch",sharedPref.getBoolean("stretch", false));
+            data.put("leftRight", sharedPref.getBoolean("leftRight", false));
             data.put("startTab",sharedPref.getInt("startTab", 0));
             data.put("url",sharedPref.getString("url", "http://188.214.128.5"));
             data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
@@ -164,6 +165,7 @@ public class DebugActivity extends AppCompatActivity {
             editor.putString("notice",filter(data.getJSONArray("notice").toString()));
             editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
+            editor.putBoolean("leftRight", data.getBoolean("leftRight"));
             editor.commit();
         }catch (Exception e){
             showPopup(context,"오류",e.getMessage());
