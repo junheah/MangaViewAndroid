@@ -33,29 +33,26 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     Preference p;
 
     public TitleAdapter(Context context) {
-        p = new Preference(context);
-        dark = p.getDarkTheme();
-        save = p.getDataSave();
-        this.mInflater = LayoutInflater.from(context);
-        mainContext = context;
-        this.mData = new ArrayList<>();
-        setHasStableIds(true);
+        init(context);
     }
     public TitleAdapter(Context context, Boolean online) {
+        init(context);
+        if(!online) save = false;
+    }
+    void init(Context context){
         p = new Preference(context);
         dark = p.getDarkTheme();
         save = p.getDataSave();
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
-        setHasStableIds(true);
-        if(!online) save = false;
     }
 
     @Override
     public long getItemId(int position) {
         return position;
     }
+
     public void removeAll(){
         int originSize = mData.size();
         mData.clear();
@@ -85,6 +82,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     public void remove(int pos){
         mData.remove(pos);
+        notifyItemRemoved(pos);
     }
 
     @Override

@@ -505,7 +505,7 @@ public class MainActivity extends AppCompatActivity
                 case 1:
                     //favorite result
                     Boolean favorite_after = data.getBooleanExtra("favorite",true);
-                    if(!favorite_after && favoriteAdapter != null) favoriteAdapter.notifyItemRemoved(selectedPosition);
+                    if(!favorite_after && favoriteAdapter != null) favoriteAdapter.remove(selectedPosition);
                     break;
                 case 2:
                     //recent result
@@ -661,7 +661,6 @@ public class MainActivity extends AppCompatActivity
                         //delete (only in recent)
                         recentAdapter.remove(position);
                         p.removeRecent(position);
-                        recentAdapter.notifyItemRemoved(position);
                         break;
                     case R.id.favAdd:
                     case R.id.favDel:
@@ -669,7 +668,6 @@ public class MainActivity extends AppCompatActivity
                         p.toggleFavorite(title,0);
                         if(m==2){
                             favoriteAdapter.remove(position);
-                            favoriteAdapter.notifyItemRemoved(position);
                         }
                         break;
                     case R.id.remove:
@@ -683,7 +681,6 @@ public class MainActivity extends AppCompatActivity
                                         File folder = new File(homeDirStr, filterFolder(title.getName()));
                                         if(deleteRecursive(folder)) {
                                             offlineAdapter.remove(position);
-                                            offlineAdapter.notifyItemRemoved(position);
                                             Toast.makeText(context,"삭제가 완료되었습니다.",Toast.LENGTH_SHORT).show();
                                         }
                                         else showPopup(context, "알림","삭제를 실패했습니다");
