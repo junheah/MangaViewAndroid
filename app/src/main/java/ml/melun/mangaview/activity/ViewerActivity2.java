@@ -485,7 +485,10 @@ public class ViewerActivity2 extends AppCompatActivity {
         return super.onKeyDown(keyCode,event);
     }
 
-    private class loadImages extends AsyncTask<Void,Void,Integer> {
+    private class loadImages extends AsyncTask<Void,String,Integer> {
+        protected void onProgressUpdate(String... values) {
+            pd.setMessage(values[0]);
+        }
         protected void onPreExecute() {
             super.onPreExecute();
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
@@ -510,7 +513,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             manga.setListener(new Manga.Listener() {
                 @Override
                 public void setMessage(String msg) {
-                    pd.setMessage(msg);
+                    publishProgress(msg);
                 }
             });
             manga.fetch(p.getUrl());

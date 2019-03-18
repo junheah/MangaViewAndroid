@@ -356,7 +356,12 @@ public class ViewerActivity extends AppCompatActivity {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
 //    }
 
-    private class loadImages extends AsyncTask<Void,Void,Integer> {
+    private class loadImages extends AsyncTask<Void,String,Integer> {
+        @Override
+        protected void onProgressUpdate(String... values) {
+            pd.setMessage(values[0]);
+        }
+
         protected void onPreExecute() {
             super.onPreExecute();
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
@@ -381,7 +386,7 @@ public class ViewerActivity extends AppCompatActivity {
             manga.setListener(new Manga.Listener() {
                 @Override
                 public void setMessage(String msg) {
-                    pd.setMessage(msg);
+                    publishProgress(msg);
                 }
             });
             manga.fetch(p.getUrl());

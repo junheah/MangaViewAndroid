@@ -120,9 +120,9 @@ public class ViewerActivity3 extends AppCompatActivity {
                 pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
                 if(position == imgs.size()-1 || position == 0){
                     p.removeViewerBookmark(id);
-                    if(!toolbarshow) toggleToolbar();
                 }
                 else p.setViewerBookmark(id, viewerBookmark);
+                if(position == imgs.size()-1 && !toolbarshow) toggleToolbar();
             }
 
             @Override
@@ -295,8 +295,11 @@ public class ViewerActivity3 extends AppCompatActivity {
         //getWindow().setAttributes(attrs);
     }
 
-    private class LoadImages extends AsyncTask<Void, Void, Integer>{
+    private class LoadImages extends AsyncTask<Void, String, Integer>{
         ProgressDialog pd;
+        protected void onProgressUpdate(String... values) {
+            pd.setMessage(values[0]);
+        }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -323,7 +326,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             manga.setListener(new Manga.Listener() {
                 @Override
                 public void setMessage(String msg) {
-                    pd.setMessage(msg);
+                    publishProgress(msg);
                 }
             });
             manga.fetch(p.getUrl());
