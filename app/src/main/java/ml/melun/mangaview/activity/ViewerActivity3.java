@@ -295,30 +295,8 @@ public class ViewerActivity3 extends AppCompatActivity {
         //getWindow().setAttributes(attrs);
     }
 
-    private class LoadImages extends AsyncTask<Void, Integer, Integer>{
+    private class LoadImages extends AsyncTask<Void, Void, Integer>{
         ProgressDialog pd;
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            String msg = "";
-            switch(values[0]){
-                case 0:
-                    msg = "프로토콜 확인중";
-                    break;
-                case 1:
-                    msg = "페이지 읽는중";
-                    break;
-                case 2:
-                    msg = "이미지 리스트 읽는중";
-                    break;
-                case 3:
-                    msg = "화 목록 읽는중";
-                    break;
-                case 4:
-                    msg = "댓글 읽는중";
-                    break;
-            }
-            pd.setMessage(msg);
-        }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -337,17 +315,17 @@ public class ViewerActivity3 extends AppCompatActivity {
                     return true;
                 }
             });
-            manga.setListener(new Manga.Listener() {
-                @Override
-                public void setMessage(int p) {
-                    publishProgress(p);
-                }
-            });
             pd.show();
         }
 
         @Override
         protected Integer doInBackground(Void... voids) {
+            manga.setListener(new Manga.Listener() {
+                @Override
+                public void setMessage(String msg) {
+                    pd.setMessage(msg);
+                }
+            });
             manga.fetch(p.getUrl());
             imgs = manga.getImgs();
             return null;

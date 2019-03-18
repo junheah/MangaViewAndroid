@@ -356,30 +356,7 @@ public class ViewerActivity extends AppCompatActivity {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
 //    }
 
-    private class loadImages extends AsyncTask<Void,Integer,Integer> {
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            String msg = "";
-            switch(values[0]){
-                case 0:
-                    msg = "프로토콜 확인중";
-                    break;
-                case 1:
-                    msg = "페이지 읽는중";
-                    break;
-                case 2:
-                    msg = "이미지 리스트 읽는중";
-                    break;
-                case 3:
-                    msg = "화 목록 읽는중";
-                    break;
-                case 4:
-                    msg = "댓글 읽는중";
-                    break;
-            }
-            pd.setMessage(msg);
-        }
-
+    private class loadImages extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
             if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
@@ -398,16 +375,15 @@ public class ViewerActivity extends AppCompatActivity {
                 }
             });
             pd.show();
-            manga.setListener(new Manga.Listener() {
-                @Override
-                public void setMessage(int p) {
-                    publishProgress(p);
-                }
-            });
         }
 
         protected Integer doInBackground(Void... params) {
-
+            manga.setListener(new Manga.Listener() {
+                @Override
+                public void setMessage(String msg) {
+                    pd.setMessage(msg);
+                }
+            });
             manga.fetch(p.getUrl());
             imgs = manga.getImgs();
             seed = manga.getSeed();
