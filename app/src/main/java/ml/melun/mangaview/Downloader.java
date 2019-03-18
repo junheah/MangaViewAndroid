@@ -252,7 +252,7 @@ public class Downloader extends Service {
                     List<Manga> mangas = title.getEps();
 
                     float stepSize = maxProgress / selectedEps.length();
-                    for (int queueIndex = 0; queueIndex < selectedEps.length(); queueIndex++) {
+                    for (int queueIndex = selectedEps.length()-1; queueIndex >= 0; queueIndex--) {
                         if (isCancelled()) return 0;
 
                         //create dir for title
@@ -260,7 +260,7 @@ public class Downloader extends Service {
                         if (!titleDir.exists()) titleDir.mkdirs();
 
                         //if first manga, save title data
-                        if (queueIndex == 0) {
+                        if (queueIndex == selectedEps.length()-1) {
                             try {
                                 //save thumbnail
                                 String thumb = downloadFile(title.getThumb(), new File(titleDir, "thumb")).getName();
@@ -323,7 +323,7 @@ public class Downloader extends Service {
                             if (isCancelled()) return 0;
                             downloadImage(urls.get(i), new File(dir, new DecimalFormat("0000").format(i)), d);
                             progress += imgStepSize;
-                            updateNotification((queueIndex + 1) + "/" + selectedEps.length());
+                            updateNotification((selected.size() - queueIndex) + "/" + selectedEps.length());
                         }
                         downloadFlag.delete();
                     }

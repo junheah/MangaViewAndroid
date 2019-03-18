@@ -38,6 +38,12 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         dark = new Preference(m).getDarkTheme();
         selected = new Boolean[t.size()];
         Arrays.fill(selected,Boolean.FALSE);
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
     public void setSingleSelect(Boolean b){
         singleSelect = b;

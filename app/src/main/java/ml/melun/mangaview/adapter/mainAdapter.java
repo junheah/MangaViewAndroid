@@ -64,6 +64,12 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         //fetch main page data
         fetchMain fetch = new fetchMain();
         fetch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
 

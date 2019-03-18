@@ -79,7 +79,6 @@ public class ViewerActivity extends AppCompatActivity {
     Spinner spinner;
     int seed = 0;
     int epsCount = 0;
-    int viewerType=0;
     int width=0;
     Boolean online;
     Intent intent;
@@ -103,7 +102,6 @@ public class ViewerActivity extends AppCompatActivity {
         pageBtn.setText("-/-");
         spinner = this.findViewById(R.id.toolbar_spinner);
         commentBtn = this.findViewById(R.id.commentButton);
-        viewerType = p.getViewerType();
         width = getScreenSize(getWindowManager().getDefaultDisplay());
         //imageZoomHelper = new ImageZoomHelper(this);
 
@@ -121,11 +119,7 @@ public class ViewerActivity extends AppCompatActivity {
 
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);
-            if(viewerType==2){
-                manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                PagerSnapHelper snapHelper = new PagerSnapHelper();
-                snapHelper.attachToRecyclerView(strip);
-            }else manager.setOrientation(LinearLayoutManager.VERTICAL);
+            manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             if(intent.getBooleanExtra("recent",false)){
                 Intent resultIntent = new Intent();
@@ -138,6 +132,11 @@ public class ViewerActivity extends AppCompatActivity {
                     p.addRecent(title);
                     p.setBookmark(title.getName(),id);
                 }
+                toolbarTitle.setText(manga.getName());
+                toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+                toolbarTitle.setMarqueeRepeatLimit(-1);
+                toolbarTitle.setSingleLine(true);
+                toolbarTitle.setSelected(true);
                 spinner.setVisibility(View.GONE);
                 prev.setVisibility(View.GONE);
                 next.setVisibility(View.GONE);
@@ -191,14 +190,9 @@ public class ViewerActivity extends AppCompatActivity {
                         if (lastVisible >= imgs.size() - 1) {
                             p.removeViewerBookmark(id);
                         }
-                        if(viewerType==2) {
-                            if ((!strip.canScrollHorizontally(1)) && !toolbarshow) {
-                                toggleToolbar();
-                            }
-                        }else if(viewerType==0){
-                            if ((!strip.canScrollVertically(1)) && !toolbarshow) {
-                                toggleToolbar();
-                            }
+
+                        if ((!strip.canScrollVertically(1)) && !toolbarshow) {
+                            toggleToolbar();
                         }
                     }else if(newState==RecyclerView.SCROLL_STATE_DRAGGING){
                         if(toolbarshow){
@@ -471,7 +465,7 @@ public class ViewerActivity extends AppCompatActivity {
                 result = new Intent();
                 result.putExtra("id", id);
                 setResult(RESULT_OK, result);
-                //update intent : not sure this works TODO: test this shit
+                //update intent : not sure if this works TODO: test this
                 intent.putExtra("title", new Gson().toJson(title));
                 intent.putExtra("manga", new Gson().toJson(manga));
             }catch (Exception e){

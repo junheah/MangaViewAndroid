@@ -28,6 +28,7 @@ import javax.net.ssl.HttpsURLConnection;
 import ml.melun.mangaview.activity.EpisodeActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
+import ml.melun.mangaview.activity.ViewerActivity3;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -111,8 +112,10 @@ public class Utils {
         Intent viewer = null;
         switch (new Preference(context).getViewerType()){
             case 0:
-            case 2:
                 viewer = new Intent(context, ViewerActivity.class);
+                break;
+            case 2:
+                viewer = new Intent(context, ViewerActivity3.class);
                 break;
             case 1:
                 viewer = new Intent(context, ViewerActivity2.class);

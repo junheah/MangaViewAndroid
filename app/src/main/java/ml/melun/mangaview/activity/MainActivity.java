@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         p = new Preference(this);
-        p.init(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
@@ -473,7 +472,7 @@ public class MainActivity extends AppCompatActivity
             //그냥 코드 개더러워져도 액티비티 한개로 다할거임.. 귀찮고 이미 더러움...
             //원래 viewFlipper 도 비효율적이라 바꿔야지 했는데 이미 늦음
             //todo: viewflipper 갖다 버리고 fragment 사용하기
-            offlineAdapter = new TitleAdapter(context);
+            offlineAdapter = new TitleAdapter(context, false);
             offlineAdapter.noResume();
             savedList.setLayoutManager(new LinearLayoutManager(this));
             savedList.setAdapter(offlineAdapter);

@@ -145,6 +145,11 @@ public class ViewerActivity2 extends AppCompatActivity {
         if(!online) {
             //load local imgs
             //appbarBottom.setVisibility(View.GONE);
+            toolbarTitle.setText(manga.getName());
+            toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+            toolbarTitle.setMarqueeRepeatLimit(-1);
+            toolbarTitle.setSingleLine(true);
+            toolbarTitle.setSelected(true);
             next.setVisibility(View.GONE);
             prev.setVisibility(View.GONE);
             if(id>-1){

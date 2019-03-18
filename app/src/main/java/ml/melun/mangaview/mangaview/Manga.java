@@ -93,7 +93,6 @@ public class Manga {
                 //StringBuffer buffer = new StringBuffer();
                 String line = "";
                 String raw = "";
-
                 while ((line = reader.readLine()) != null) {
                     //save as raw html for jsoup
                     raw += line;

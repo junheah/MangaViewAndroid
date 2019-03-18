@@ -371,8 +371,10 @@ public class EpisodeActivity extends AppCompatActivity {
         Intent viewer = null;
         switch (p.getViewerType()){
             case 0:
-            case 2:
                 viewer = new Intent(context, ViewerActivity.class);
+                break;
+            case 2:
+                viewer = new Intent(context, ViewerActivity3.class);
                 break;
             case 1:
                 viewer = new Intent(context, ViewerActivity2.class);

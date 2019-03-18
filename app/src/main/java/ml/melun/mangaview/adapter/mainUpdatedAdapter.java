@@ -42,6 +42,12 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         //fetch data with async
         //data initialize
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @NonNull

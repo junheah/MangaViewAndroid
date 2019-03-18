@@ -59,6 +59,17 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         __seed = seed;
         d = new Decoder(seed, id);
         this.width = width;
+        setHasStableIds(true);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     public void removeAll(){
@@ -66,14 +77,14 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         notifyDataSetChanged();
     }
 
-    // inflates the row layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.item_strip, parent, false);
         return new ViewHolder(view);
     }
 
-    // binds the data to the TextView in each row
+
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int pos) {
         holder.frame.setImageResource(R.drawable.placeholder);
@@ -124,7 +135,6 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         else Glide.with(mainContext)
                 .asBitmap()
                 .load(imgs.get(pos))
-                .apply(new RequestOptions().dontTransform().placeholder(R.drawable.placeholder))
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {

@@ -63,6 +63,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             lm = new LinearLayoutManager(context);
             lm.setOrientation(LinearLayoutManager.HORIZONTAL);
         }
+        setHasStableIds(true);
+        if(!online) save = false;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override

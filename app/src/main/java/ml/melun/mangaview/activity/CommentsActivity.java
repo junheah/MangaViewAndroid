@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.commentsAdapter;
-import ml.melun.mangaview.fragment.tabFragment;
+import ml.melun.mangaview.fragment.CommentsTabFragment;
 import ml.melun.mangaview.mangaview.Comment;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -64,7 +64,7 @@ public class CommentsActivity extends AppCompatActivity {
             Gson gson = new Gson();
             comments = gson.fromJson(gsonData,new TypeToken<ArrayList<Comment>>(){}.getType());
             adapter = new commentsAdapter(context, comments);
-            getSupportActionBar().setTitle("댓글 "+comments.size());
+            getSupportActionBar().setTitle("댓글 " + comments.size());
         }else{
             getSupportActionBar().setTitle("댓글 없음");
         }
@@ -120,7 +120,7 @@ public class CommentsActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            tabFragment tab = new tabFragment();
+            CommentsTabFragment tab = new CommentsTabFragment();
             switch(position){
                 case 0:
                     //best

@@ -291,7 +291,6 @@ public class SettingsActivity extends AppCompatActivity {
             if(requestCode==2){
                 String tmp = data.getData().getPath();
                 String tmp2 = java.net.URLDecoder.decode(tmp, "UTF-8");
-                System.out.println("pppppp "+tmp2);
                 p.setHomeDir(tmp2);
             }
         }catch (Exception e){}

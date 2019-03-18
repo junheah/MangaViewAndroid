@@ -121,4 +121,5 @@
   <androidx.viewpager2/>
   <androidx.navigation/>
   <androidx.work/>
+  <androidx.sharetarget/>
 </metadata>

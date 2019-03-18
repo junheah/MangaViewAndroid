@@ -38,6 +38,12 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         save = new Preference(main).getDataSave();
         dark = new Preference(main).getDarkTheme();
         this.mInflater = LayoutInflater.from(main);
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     public void addData(ArrayList<Manga> data){
@@ -64,6 +70,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         h.date.setText(m.getDate());
         if(m.getThumb().length()>1 && !save) Glide.with(context).load(m.getThumb()).into(h.thumb);
         else h.thumb.setImageBitmap(null);
+        if(save) h.thumb.setVisibility(View.GONE);
     }
 
     @Override

@@ -42,6 +42,12 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         Arrays.fill(selected,Boolean.FALSE);
         dark = new Preference(context).getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     // inflates the row layout from xml when needed

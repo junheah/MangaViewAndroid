@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.Utils.showPopup;

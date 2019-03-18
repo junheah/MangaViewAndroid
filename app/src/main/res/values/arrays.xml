@@ -12,9 +12,9 @@
         <item>저장된 만화</item>
     </string-array>
     <string-array name="viewer">
-        <item>스크롤 뷰어 (세로)</item>
+        <item>스크롤 뷰어 (기본)</item>
         <item>터치 뷰어</item>
-        <item>beta - 스크롤 뷰어 (가로)</item>
+        <item>컷툰 뷰어</item>
     </string-array>
     <string-array name="searchMethods">
         <item>AND</item>

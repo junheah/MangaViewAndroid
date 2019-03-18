@@ -39,6 +39,22 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
+        setHasStableIds(true);
+    }
+    public TitleAdapter(Context context, Boolean online) {
+        p = new Preference(context);
+        dark = p.getDarkTheme();
+        save = p.getDataSave();
+        this.mInflater = LayoutInflater.from(context);
+        mainContext = context;
+        this.mData = new ArrayList<>();
+        setHasStableIds(true);
+        if(!online) save = false;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
     public void removeAll(){
         int originSize = mData.size();
@@ -85,8 +101,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.name.setText(title);
         holder.author.setText(author);
         holder.tags.setText(tags);
-        if(thumb.length()>1 && !save)Glide.with(mainContext).load(thumb).into(holder.thumb);
+        if(thumb.length()>1 && !save) Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
+        if(save) holder.thumb.setVisibility(View.GONE);
         if(bookmark>0 && resume) holder.resume.setVisibility(View.VISIBLE);
         else holder.resume.setVisibility(View.GONE);
 

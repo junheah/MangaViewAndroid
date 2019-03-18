@@ -82,7 +82,10 @@
             android:name=".activity.NoticesActivity"
             android:configChanges="orientation|screenSize"
             android:label="공지사항" />
-        <activity android:name=".activity.WebActivity"></activity>
+        <activity android:name=".activity.WebActivity" />
+        <activity android:name=".activity.ViewerActivity3"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

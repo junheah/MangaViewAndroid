@@ -28,6 +28,12 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         tags = t;
         this.mInflater = LayoutInflater.from(m);
         dark = new Preference(m).getDarkTheme();
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @NonNull
