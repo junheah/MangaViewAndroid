@@ -75,8 +75,8 @@ public class ViewerPageFragment extends Fragment {
                     @Override
                     public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
                         refresh.setVisibility(View.GONE);
-                        Bitmap decoded = getSample(decoder.decode(bitmap),width);
-                        frame.setImageBitmap(decoded);
+                        bitmap = decoder.decode(bitmap,width);
+                        frame.setImageBitmap(bitmap);
                     }
 
                     @Override

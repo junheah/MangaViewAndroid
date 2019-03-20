@@ -187,6 +187,6 @@ public class Utils {
     public static int getScreenSize(Display display){
         Point size = new Point();
         display.getSize(size);
-        return (size.x>=size.y)? size.x : size.y;
+        return size.x;
     }
 }

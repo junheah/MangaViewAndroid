@@ -3,6 +3,8 @@ package ml.melun.mangaview.mangaview;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
+import static ml.melun.mangaview.Utils.getSample;
+
 
 public class Decoder {
     int __seed=0;
@@ -27,6 +29,12 @@ public class Decoder {
             cy = 1;
         }
     }
+
+    public Bitmap decode(Bitmap input, int width){
+        input = getSample(input,width);
+        return decode(input);
+    }
+
     public Bitmap decode(Bitmap input){
         if(view_cnt==0) return input;
         int[][] order = new int[cx*cy][2];

@@ -100,24 +100,24 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                            Bitmap decoded = getSample(d.decode(bitmap),width);
-                            int width = decoded.getWidth();
-                            int height = decoded.getHeight();
+                            bitmap = d.decode(bitmap,width);
+                            int width = bitmap.getWidth();
+                            int height = bitmap.getHeight();
                             if(width>height){
                                 if(type==0) {
                                     if (reverse)
-                                        holder.frame.setImageBitmap(Bitmap.createBitmap(decoded, 0, 0, width / 2, height));
+                                        holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, width / 2, height));
                                     else
-                                        holder.frame.setImageBitmap(Bitmap.createBitmap(decoded, width / 2, 0, width / 2, height));
+                                        holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, width / 2, 0, width / 2, height));
                                 }else{
                                     if (reverse)
-                                        holder.frame.setImageBitmap(Bitmap.createBitmap(decoded, width / 2, 0, width / 2, height));
+                                        holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, width / 2, 0, width / 2, height));
                                     else
-                                        holder.frame.setImageBitmap(Bitmap.createBitmap(decoded, 0, 0, width / 2, height));
+                                        holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, width / 2, height));
                                 }
                             }else{
                                 if(type==0) {
-                                    holder.frame.setImageBitmap(decoded);
+                                    holder.frame.setImageBitmap(bitmap);
                                 }else{
                                     holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap.getWidth(), 1, Bitmap.Config.ARGB_8888));
                                 }
@@ -138,8 +138,8 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        Bitmap decoded = getSample(d.decode(resource),width);
-                        holder.frame.setImageBitmap(decoded);
+                        resource = d.decode(resource,width);
+                        holder.frame.setImageBitmap(resource);
                         holder.refresh.setVisibility(View.GONE);
                     }
 

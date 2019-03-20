@@ -318,17 +318,17 @@ public class ViewerActivity2 extends AppCompatActivity {
                             public void onResourceReady(Bitmap bitmap,
                                                         Transition<? super Bitmap> transition) {
                                 //refreshbtn.setVisibility(View.INVISIBLE);
-                                Bitmap sample = getSample(d.decode(bitmap),width);
-                                int width = sample.getWidth();
-                                int height = sample.getHeight();
+                                bitmap = d.decode(bitmap,width);
+                                int width = bitmap.getWidth();
+                                int height = bitmap.getHeight();
                                 if(width>height){
-                                    imgCache = sample;
+                                    imgCache = bitmap;
                                     type=0;
                                     if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
                                     else frame.setImageBitmap(Bitmap.createBitmap(imgCache,width/2,0,width/2,height));
                                 }else{
                                     type=-1;
-                                    frame.setImageBitmap(sample);
+                                    frame.setImageBitmap(bitmap);
                                 }
                                 preload();
                             }
@@ -370,18 +370,18 @@ public class ViewerActivity2 extends AppCompatActivity {
                         .into(new CustomTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                                Bitmap sample = getSample(d.decode(bitmap), width);
+                                bitmap = d.decode(bitmap, width);
                                 //refreshbtn.setVisibility(View.INVISIBLE);
-                                int width = sample.getWidth();
-                                int height = sample.getHeight();
+                                int width = bitmap.getWidth();
+                                int height = bitmap.getHeight();
                                 if(width>height){
-                                    imgCache = sample;
+                                    imgCache = bitmap;
                                     type=1;
                                     if(reverse) frame.setImageBitmap(Bitmap.createBitmap(imgCache, width/2, 0, width / 2, height));
                                     else frame.setImageBitmap(Bitmap.createBitmap(imgCache,0,0,width/2,height));
                                 }else{
                                     type=-1;
-                                    frame.setImageBitmap(sample);
+                                    frame.setImageBitmap(bitmap);
                                 }
                             }
 
@@ -421,11 +421,11 @@ public class ViewerActivity2 extends AppCompatActivity {
                         @Override
                         public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
                             //refreshbtn.setVisibility(View.INVISIBLE);
-                            Bitmap sample = getSample(d.decode(bitmap), width);
-                            int width = sample.getWidth();
-                            int height = sample.getHeight();
+                            bitmap = d.decode(bitmap, width);
+                            int width = bitmap.getWidth();
+                            int height = bitmap.getHeight();
                             if (width > height) {
-                                imgCache = sample;
+                                imgCache = bitmap;
                                 type = 0;
                                 if (reverse)
                                     frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
@@ -433,7 +433,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                                     frame.setImageBitmap(Bitmap.createBitmap(imgCache, width / 2, 0, width / 2, height));
                             } else {
                                 type = -1;
-                                frame.setImageBitmap(sample);
+                                frame.setImageBitmap(bitmap);
                             }
                             preload();
                         }
