@@ -8,6 +8,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -52,7 +57,8 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activity.SettingsActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:label="설정" />
         <activity
             android:name=".activity.FolderSelectActivity"
             android:configChanges="orientation|screenSize" />
@@ -83,9 +89,13 @@
             android:configChanges="orientation|screenSize"
             android:label="공지사항" />
         <activity android:name=".activity.WebActivity" />
-        <activity android:name=".activity.ViewerActivity3"
+        <activity
+            android:name=".activity.ViewerActivity3"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.LoginActivity"
+            android:label="@string/title_activity_login"></activity>
     </application>
 
 </manifest>

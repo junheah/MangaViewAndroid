@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_main) {
             // Handle the main action
             contentHolder.setDisplayedChild(0);
-        } else if (id == R.id.nav_search) {
+        }else if (id == R.id.nav_search) {
             // Handle the search action
             contentHolder.setDisplayedChild(1);
         }else if(id==R.id.nav_recent) {
@@ -300,6 +300,9 @@ public class MainActivity extends AppCompatActivity
             }else if(id==R.id.nav_donate){
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://junheah.ml/donate"));
                 startActivity(browserIntent);
+            }else if(id==R.id.nav_account){
+                startActivity(new Intent(context, LoginActivity.class));
+                return true;
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawer.closeDrawer(GravityCompat.START);

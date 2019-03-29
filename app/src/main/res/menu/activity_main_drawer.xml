@@ -24,6 +24,10 @@
     <item android:title="기타">
         <menu>
             <item
+                android:id="@+id/nav_account"
+                android:title="계정">
+            </item>
+            <item
                 android:id="@+id/nav_update"
                 android:title="업데이트 확인" />
             <item

@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Preference {
@@ -32,6 +33,7 @@ public class Preference {
     static String url;
     static Boolean stretch;
     static Boolean leftRight;
+    static Login login;
 
     //Offline manga has id of -1
     public Preference(Context context){
@@ -60,6 +62,7 @@ public class Preference {
             url = sharedPref.getString("url", "http://188.214.128.5");
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
+            login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -347,5 +350,14 @@ public class Preference {
         Gson gson = new Gson();
         prefsEditor.putString("favorite", gson.toJson(favorite));
         prefsEditor.commit();
+    }
+
+    public void setLogin(Login login){
+        Preference.login =login;
+        prefsEditor.putString("login", new Gson().toJson(login));
+        prefsEditor.commit();
+    }
+    public Login getLogin(){
+        return login;
     }
 }

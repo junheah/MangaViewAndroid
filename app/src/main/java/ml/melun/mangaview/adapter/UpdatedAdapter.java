@@ -38,7 +38,6 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         save = new Preference(main).getDataSave();
         dark = new Preference(main).getDarkTheme();
         this.mInflater = LayoutInflater.from(main);
-        setHasStableIds(true);
     }
 
     @Override

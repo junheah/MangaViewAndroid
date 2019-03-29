@@ -59,4 +59,5 @@ public class ViewerPagerAdapter extends FragmentStatePagerAdapter
     {
         return fragments.size();
     }
+
 }

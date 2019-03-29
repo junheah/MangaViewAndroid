@@ -70,6 +70,7 @@ public class commentsAdapter extends BaseAdapter {
         return data.get(position);
     }
 
+
     @Override
     public long getItemId(int position) {
         return 0;

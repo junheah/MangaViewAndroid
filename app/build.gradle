@@ -15,7 +15,7 @@ android {
         }
     }
 
-    compileSdkVersion 28
+    compileSdkVersion 27
     def date = new Date()
     def formattedDate = date.format('yyMMddHHmm')
     def code = formattedDate.toInteger()
@@ -23,7 +23,7 @@ android {
         applicationId "ml.melun.mangaview"
         minSdkVersion 18
         targetSdkVersion 27
-        versionName "1.12-" + code
+        versionName "1.13-" + code
         versionCode code
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -75,4 +75,6 @@ dependencies {
         // Excludes the support library because it's already included by Glide.
         transitive = false
     }
+//    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+//    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.12.2'
 }

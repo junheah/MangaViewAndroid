@@ -14,16 +14,14 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.Utils.showPopup;
@@ -57,7 +55,7 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Preference p = new Preference(context);
-                ArrayList<Title> titles = p.getRecent();
+                List<Title> titles = p.getRecent();
                 StringBuilder b = new StringBuilder();
                 for(Title t : titles){
                     if(t.getBookmark()>0) p.setBookmark(t.getName(),t.getBookmark());
@@ -119,6 +117,13 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
+        this.findViewById(R.id.debug_loginTest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, LoginActivity.class));
+            }
+        });
+
     }
     String pref(){
         SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
@@ -141,6 +146,7 @@ public class DebugActivity extends AppCompatActivity {
             data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
+            data.put("login",sharedPref.getString("login","{}"));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -169,6 +175,7 @@ public class DebugActivity extends AppCompatActivity {
             editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
+            editor.putString("login", data.getString("login"));
             editor.commit();
         }catch (Exception e){
             showPopup(context,"오류",e.getMessage());

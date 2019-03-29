@@ -167,6 +167,7 @@ public class ViewerActivity extends AppCompatActivity {
                     Gson gson = new Gson();
                     commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
                     commentActivity.putExtra("bestComments", gson.toJson(manga.getBestComments()));
+                    commentActivity.putExtra("id", manga.getId());
                     startActivity(commentActivity);
                 }
             });

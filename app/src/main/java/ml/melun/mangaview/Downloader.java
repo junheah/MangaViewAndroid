@@ -323,7 +323,7 @@ public class Downloader extends Service {
                             if (isCancelled()) return 0;
                             downloadImage(urls.get(i), new File(dir, new DecimalFormat("0000").format(i)), d);
                             progress += imgStepSize;
-                            updateNotification((selected.size() - queueIndex) + "/" + selectedEps.length());
+                            updateNotification((selectedEps.length() - queueIndex) + "/" + selectedEps.length());
                         }
                         downloadFlag.delete();
                     }
@@ -375,7 +375,7 @@ public class Downloader extends Service {
     void downloadImage(String urlStr, File outputFile, Decoder d){
         try {
             URL url = new URL(urlStr);
-            if(url.getProtocol().toLowerCase().matches("https")) {
+            if(url.getProtocol().toLowerCase().equals("https")) {
                 HttpsURLConnection init = (HttpsURLConnection) url.openConnection();
                 int responseCode = init.getResponseCode();
                 if (responseCode >= 300) {
@@ -412,7 +412,7 @@ public class Downloader extends Service {
         String name = "";
         try {
             URL url = new URL(urlStr);
-            if(url.getProtocol().toLowerCase().matches("https")) {
+            if(url.getProtocol().toLowerCase().equals("https")) {
                 HttpsURLConnection init = (HttpsURLConnection) url.openConnection();
                 int responseCode = init.getResponseCode();
                 if (responseCode >= 300) {

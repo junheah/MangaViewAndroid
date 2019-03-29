@@ -52,6 +52,11 @@
                 android:layout_height="wrap_content"
                 android:text="웹 테스트" />
 
+            <Button
+                android:id="@+id/debug_loginTest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="로그인 테스트" />
 
             <TextView
                 android:id="@+id/debug_out"

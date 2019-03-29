@@ -16,12 +16,20 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -29,6 +37,7 @@ import ml.melun.mangaview.activity.EpisodeActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
+import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -68,17 +77,29 @@ public class Utils {
         }
     }
 
-    public static String httpsGet(String urlin){
-        HttpsURLConnection connection = null;
+    public static String httpsGet(String urlin, String cookie){
         BufferedReader reader = null;
         try {
+            InputStream stream = null;
             URL url = new URL(urlin);
-            connection = (HttpsURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Accept-Encoding", "*");
-            connection.setRequestProperty("Accept", "*");
-            connection.connect();
-            InputStream stream = connection.getInputStream();
+            if(url.getProtocol().equals("http")){
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Accept-Encoding", "*");
+                connection.setRequestProperty("Accept", "*");
+                connection.setRequestProperty("Cookie",cookie);
+                connection.connect();
+                stream = connection.getInputStream();
+            }else if(url.getProtocol().equals("https")){
+                HttpsURLConnection connections = (HttpsURLConnection) url.openConnection();
+                connections.setInstanceFollowRedirects(false);
+                connections.setRequestMethod("GET");
+                connections.setRequestProperty("Accept-Encoding", "*");
+                connections.setRequestProperty("Accept", "*");
+                connections.setRequestProperty("Cookie",cookie);
+                connections.connect();
+                stream = connections.getInputStream();
+            }
             reader = new BufferedReader(new InputStreamReader(stream));
             StringBuffer buffer = new StringBuffer();
             String line = "";
@@ -89,9 +110,6 @@ public class Utils {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
             try {
                 if (reader != null) {
                     reader.close();
@@ -101,6 +119,10 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    public static String httpsGet(String urlin){
+        return httpsGet(urlin, "");
     }
     public static Intent episodeIntent(Context context,Title title){
         Intent episodeView = new Intent(context, EpisodeActivity.class);
@@ -187,6 +209,49 @@ public class Utils {
     public static int getScreenSize(Display display){
         Point size = new Point();
         display.getSize(size);
-        return size.x;
+        int width = size.x>size.y ? size.x : size.y;
+        //max pixels : 3000 ?
+        return width>3000 ? 3000 : width ;
+    }
+
+    public static Boolean writeComment(Login login, int id, String content, String baseUrl){
+        try {
+            String token = new JSONObject(httpsGet(baseUrl + "/bbs/ajax.comment_token.php", login.getCookie())).getString("token");
+            URL url = new URL(baseUrl + "/bbs/write_comment_update.php");
+            String param = "token="+token
+                    +"&w=c&bo_table=msm_manga&wr_id="+id
+                    +"&comment_id=&pim=&sca=&sfl=&stx=&spt=&page=&is_good=0&wr_content="+URLEncoder.encode(content, "UTF-8");
+            byte[] data = param.getBytes(Charset.forName("UTF-8"));
+            int responseCode = 0;
+            if(url.getProtocol().equals("http")){
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Cookie",login.getCookie());
+                connection.setRequestProperty("Accept", "*");
+                connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty( "Content-Length", Integer.toString(data.length));
+                connection.setRequestProperty("Referer", baseUrl+"/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+                new DataOutputStream(connection.getOutputStream()).write(data);
+                responseCode = connection.getResponseCode();
+            }else if(url.getProtocol().equals("https")){
+                HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                connection.setInstanceFollowRedirects(false);
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Cookie",login.getCookie());
+                connection.setRequestProperty("Accept", "*");
+                connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty( "Content-Length", Integer.toString(data.length));
+                connection.setRequestProperty("Referer", baseUrl+"/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+                new DataOutputStream(connection.getOutputStream()).write(data);
+                responseCode = connection.getResponseCode();
+            }
+            if(responseCode == 302)
+                return true;
+        }catch (Exception e){
+
+        }
+        return false;
     }
 }
