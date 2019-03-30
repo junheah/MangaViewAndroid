@@ -10,7 +10,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.jsoup.*;
@@ -53,41 +55,43 @@ public class Manga {
     }
 
 
-    public void fetch(String base) {
+    public void fetch(String base){
+        fetch(base,new HashMap<String, String>());
+    }
+    public void fetch(String base, Map<String, String> cookie) {
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
         comments = new ArrayList<>();
         bcomments = new ArrayList<>();
         int tries = 0;
+        String cookies = "";
+        for(String key : cookie.keySet()){
+            cookies += key + '=' + cookie.get(key) + "; ";
+        }
         //get images
         while(imgs.size()==0 && tries < 2) {
-            HttpURLConnection connection = null;
-            HttpsURLConnection sconnection = null;
+            URLConnection connection = null;
+            //HttpsURLConnection sconnection = null;
             BufferedReader reader = null;
             InputStream stream = null;
+            Boolean ssl = false;
             try {
                 URL url = new URL(base + "/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                ssl = url.getProtocol().equals("https");
                 if(listener!=null) listener.setMessage("프로토콜 확인중");
-                switch(url.getProtocol()){
-                    case "http":
-                        connection = (HttpURLConnection) url.openConnection();
-                        connection.setRequestMethod("GET");
-                        connection.setRequestProperty("Accept-Encoding", "*");
-                        connection.setRequestProperty("Accept", "*");
-                        connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-                        connection.connect();
-                        stream = connection.getInputStream();
-                        break;
-                    case "https":
-                        sconnection = (HttpsURLConnection) url.openConnection();
-                        sconnection.setRequestMethod("GET");
-                        sconnection.setRequestProperty("Accept-Encoding", "*");
-                        sconnection.setRequestProperty("Accept", "*");
-                        sconnection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-                        sconnection.connect();
-                        stream = sconnection.getInputStream();
-                        break;
+                if(!ssl) {
+                    connection = url.openConnection();
+                    ((HttpURLConnection)connection).setRequestMethod("GET");
+                }else{
+                    connection = url.openConnection();
+                    ((HttpsURLConnection)connection).setRequestMethod("GET");
                 }
+                connection.setRequestProperty("Accept-Encoding", "*");
+                connection.setRequestProperty("Accept", "*");
+                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+                connection.setRequestProperty("Cookie", cookies);
+                connection.connect();
+                stream = connection.getInputStream();
                 if(listener!=null) listener.setMessage("페이지 읽는중");
                 reader = new BufferedReader(new InputStreamReader(stream));
                 //StringBuffer buffer = new StringBuffer();
@@ -179,9 +183,8 @@ public class Manga {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                if (sconnection != null) {
-                    sconnection.disconnect();
-                }
+                if(ssl) ((HttpsURLConnection)connection).disconnect();
+                else ((HttpURLConnection)connection).disconnect();
                 try {
                     if (reader != null) {
                         reader.close();
@@ -264,6 +267,7 @@ public class Manga {
     public void setListener(Listener listener){
         this.listener = listener;
     }
+
     private int id;
     String name;
     List<Manga> eps;

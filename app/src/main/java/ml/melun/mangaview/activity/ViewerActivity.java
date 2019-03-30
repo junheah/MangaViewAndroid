@@ -36,11 +36,14 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.StripAdapter;
+import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -390,7 +393,16 @@ public class ViewerActivity extends AppCompatActivity {
                     publishProgress(msg);
                 }
             });
-            manga.fetch(p.getUrl());
+            Login login = p.getLogin();
+            Map<String, String> cookie = new HashMap<>();
+            if(login !=null) {
+                String php = p.getLogin().getCookie();
+                login.buildCookie(cookie);
+                cookie.put("last_wr_id",String.valueOf(id));
+                cookie.put("last_percent",String.valueOf(1));
+                cookie.put("last_page",String.valueOf(0));
+            }
+            manga.fetch(p.getUrl(), cookie);
             imgs = manga.getImgs();
             seed = manga.getSeed();
             stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);

@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
@@ -24,7 +25,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.MainPage;
 
 public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    ArrayList<Manga> mData;
+    List<Manga> mData;
     Context context;
     LayoutInflater mInflater;
     Boolean loaded = false;
@@ -104,7 +105,7 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.monclick = o;
     }
 
-    public void setData(ArrayList<Manga> data){
+    public void setData(List<Manga> data){
         mData = data;
         if(mData.size()==0){
             mData.add(new Manga(0,"결과 없음",""));

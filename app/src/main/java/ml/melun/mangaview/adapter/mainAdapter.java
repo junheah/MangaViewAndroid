@@ -10,13 +10,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
@@ -31,13 +31,15 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     onItemClick mainClickListener;
     mainTagAdapter nadapter, tadapter, radapter;
     Boolean dark, loaded = false;
+    Preference p;
 
-    ArrayList<Manga> ranking;
+    List<Manga> ranking;
 
     public mainAdapter(Context main) {
         super();
         mainContext = main;
-        dark = new Preference(mainContext).getDarkTheme();
+        p = new Preference(mainContext);
+        dark = p.getDarkTheme();
         this.mInflater = LayoutInflater.from(main);
         this.itemInflater = LayoutInflater.from(main);
 
@@ -137,7 +139,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return 5 + ranking.size();
     }
 
-    public void updateRanking(){
+    public void updateRankingWidgets(){
         if(ranking.size()>0) {
             notifyItemChanged(5);
             notifyItemRangeInserted(6, 5 + ranking.size());
@@ -273,7 +275,11 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         @Override
         protected MainPage doInBackground(Void... params) {
-            MainPage u = new MainPage(new Preference(mainContext).getUrl());
+            Map<String,String> cookie = new HashMap<>();
+            if(p.getLogin()!=null){
+                p.getLogin().buildCookie(cookie);
+            }
+            MainPage u = new MainPage(p.getUrl(),cookie);
             return u;
         }
 
@@ -284,7 +290,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             //update adapters?
             uadapter.setData(main.getRecent());
             ranking = main.getRanking();
-            updateRanking();
+            updateRankingWidgets();
         }
     }
 

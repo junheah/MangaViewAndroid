@@ -7,7 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -15,6 +17,7 @@ public class Login {
     private String user;
     private String pass;
     String cookie;
+
     public Login(String user, String pass){
         this.user = user;
         this.pass = pass;
@@ -66,6 +69,11 @@ public class Login {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public void buildCookie(Map<String,String> map){
+        //java always passes by reference
+        map.put(cookie.split("=")[0],cookie.split("=")[1].split(";")[0]);
     }
 
     public String getCookie() {
