@@ -45,10 +45,10 @@ public class MainPage {
 
             // online data
             Elements fav= rankingWidgets.get(0).select("li");
-            rankingWidgetLiParser(fav, ranking);
+            rankingWidgetLiParser(fav, favUpdate);
 
             Elements rec = rankingWidgets.get(1).select("li");
-            rankingWidgetLiParser(rec, ranking);
+            rankingWidgetLiParser(rec, onlineRecent);
 
             // ranking
             Elements rank = rankingWidgets.get(2).select("li");
@@ -77,6 +77,14 @@ public class MainPage {
 
     public List<Manga> getRecent() {
         return recent;
+    }
+
+    public List<Manga> getFavUpdate() {
+        return favUpdate;
+    }
+
+    public List<Manga> getOnlineRecent() {
+        return onlineRecent;
     }
 
     public List<Manga> getRanking() { return ranking; }

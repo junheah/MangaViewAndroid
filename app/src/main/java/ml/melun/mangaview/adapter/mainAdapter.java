@@ -3,8 +3,10 @@ package ml.melun.mangaview.adapter;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -33,7 +35,16 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Boolean dark, loaded = false;
     Preference p;
 
-    List<Manga> ranking;
+    List<Manga> ranking, recent, favUpdate;
+
+    final static int ADDED = 0;
+    final static int NAME = 1;
+    final static int GENRE = 2;
+    final static int RELEASE = 3;
+    final static int UPDATE = 4;
+    final static int RECENT = 5;
+    final static int RANKING = 6;
+
 
     public mainAdapter(Context main) {
         super();
@@ -60,7 +71,8 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
         ranking = new ArrayList<>();
-        ranking.add(new Manga(-1,"로드중..",""));
+        recent = new ArrayList<>();
+        favUpdate = new ArrayList<>();
 
 
         //fetch main page data
@@ -77,7 +89,12 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        return position;
+        int RECENT = this.RECENT + favUpdate.size();
+        int RANKING = this.RANKING + favUpdate.size() + recent.size();
+        if(position>=0 && position <=4) return position;
+        else if(position == RECENT) return this.RECENT;
+        else if(position == RANKING) return this.RANKING;
+        else return -1;
     }
 
     @NonNull
@@ -85,70 +102,110 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.main_tags, parent, false);
         switch (viewType){
-            case 0:
+            case ADDED:
                 return new addedHolder(view);
-            case 2:
+            case GENRE:
                 return new tagHolder(view);
-            case 1:
+            case NAME:
                 return new nameHolder(view);
-            case 3:
+            case RELEASE:
                 return new releaseHolder(view);
-            case 4:
+            case RANKING:
+            case RECENT:
+            case UPDATE:
                 //return ranking title
                 View rankingTitle = mInflater.inflate(R.layout.main_item_title,parent,false);
                 return new rankingHolder(rankingTitle);
         }
+        //ranking items
         View rankingItem = mInflater.inflate(R.layout.main_item_ranking,parent,false);
         return new rankingHolder(rankingItem);
+
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(position<5) {
-            switch (position) {
-                case 0:
-                    addedHolder rh = (addedHolder) holder;
-                    rh.title.setText("최근 추가된 만화 +");
-                    break;
-                case 2:
-                    tagHolder th = (tagHolder) holder;
-                    th.title.setText("장르별");
-                    break;
-                case 1:
-                    nameHolder nh = (nameHolder) holder;
-                    nh.title.setText("이름별");
-                    break;
-                case 3:
-                    releaseHolder rlh = (releaseHolder) holder;
-                    rlh.title.setText("발행별");
-                    break;
-                case 4:
-                    rankingHolder rkh = (rankingHolder) holder;
-                    rkh.title.setText("주간랭킹 TOP30");
-                    break;
-            }
-        }else {
+        int RECENT = this.RECENT + favUpdate.size();
+        int RANKING = this.RANKING + favUpdate.size() + recent.size();
+        if(position == ADDED){
+            addedHolder rh = (addedHolder) holder;
+            rh.title.setText("최근 추가된 만화 +");
+
+        }else if(position == GENRE){
+            tagHolder th = (tagHolder) holder;
+            th.title.setText("장르별");
+
+        }else if(position == NAME){
+            nameHolder nh = (nameHolder) holder;
+            nh.title.setText("이름별");
+
+        }else if(position == RELEASE){
+            releaseHolder rlh = (releaseHolder) holder;
+            rlh.title.setText("발행별");
+
+        }else if(position == UPDATE) {
+            rankingHolder rkh2 = (rankingHolder) holder;
+            rkh2.title.setText("북마크 업데이트");
+        }else if(position > UPDATE && position < RECENT){
+            //update item
+            rankingHolder h = (rankingHolder) holder;
+            h.setManga(favUpdate.get(position-UPDATE-1), 0);
+        }else if(position == RECENT){
+            rankingHolder rkh3 = (rankingHolder) holder;
+            rkh3.title.setText("최근에 본 만화");
+        }else if(position > RECENT && position < RANKING){
+            //recent item
+            rankingHolder h = (rankingHolder) holder;
+            h.setManga(recent.get(position-RECENT-1), 0);
+        }else if(position == RANKING) {
             rankingHolder rkh = (rankingHolder) holder;
-            rkh.title.setText(ranking.get(position - 5).getName());
-            rkh.rank.setText(position-4+"");
+            rkh.title.setText("주간랭킹 TOP30");
+        }else if(position > RANKING){
+            //ranking item
+            rankingHolder h = (rankingHolder) holder;
+            h.setManga(ranking.get(position-RANKING-1), position-RANKING);
         }
+
     }
 
     @Override
     public int getItemCount() {
-        return 5 + ranking.size();
+        return 7 + ranking.size() + favUpdate.size() + recent.size();
     }
 
     public void updateRankingWidgets(){
-        if(ranking.size()>0) {
-            notifyItemChanged(5);
-            notifyItemRangeInserted(6, 5 + ranking.size());
-            loaded = true;
+        int recentSize = recent.size();
+        int updateSize = favUpdate.size();
+        int rankingSize = ranking.size();
+        int RECENT = this.RECENT + updateSize;
+        int RANKING = this.RANKING + updateSize + recentSize;
+        if(updateSize>0){
+            notifyItemChanged(UPDATE+1);
+            if(updateSize>1)
+                notifyItemRangeInserted(UPDATE+2, updateSize-1);
+        }else{
+            favUpdate.add(new Manga(-1,"결과없음",""));
+            notifyItemChanged(UPDATE+1);
+        }
+
+        if(recentSize>0){
+            notifyItemChanged(RECENT+1);
+            if(recentSize>1)
+                notifyItemRangeInserted(RECENT+2, recentSize-1);
+        }else{
+            recent.add(new Manga(-1,"결과없음",""));
+            notifyItemChanged(RECENT+1);
+        }
+
+        if(rankingSize>0){
+            notifyItemChanged(RANKING+1);
+            if(rankingSize>1)
+                notifyItemRangeInserted(RANKING+2, rankingSize-1);
         }else{
             ranking.add(new Manga(-1,"결과없음",""));
-            notifyItemChanged(6);
-            loaded = false;
+            notifyItemChanged(RANKING+1);
         }
+
     }
 
     class addedHolder extends RecyclerView.ViewHolder{
@@ -178,26 +235,42 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView title;
         CardView card;
         TextView rank;
+        Manga manga;
+        View rankLayout;
+
         public rankingHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.ranking_title);
             card = itemView.findViewById(R.id.ranking_card);
             rank = itemView.findViewById(R.id.ranking_rank);
+            rankLayout = itemView.findViewById(R.id.ranking_rank_layout);
             if(card!=null){
-                if(dark){
+                if(dark) {
                     card.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
                 }
-                card.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(loaded) {
-                            mainClickListener.clickedManga(ranking.get(getAdapterPosition() - 5));
-                        }
-                    }
-                });
+            }
+        }
+
+        public void setManga(Manga m, int r){
+            manga = m;
+            title.setText(m.getName());
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(manga!=null && manga.getId()>0)
+                        mainClickListener.clickedManga(manga);
+                }
+            });
+
+            if(r>0){
+                rankLayout.setVisibility(View.VISIBLE);
+                rank.setText(String.valueOf(r));
+            }else{
+                rankLayout.setVisibility(View.GONE);
             }
         }
     }
+
 
     class tagHolder extends RecyclerView.ViewHolder{
         RecyclerView tagList;
@@ -289,7 +362,10 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             System.out.println("fetch update success");
             //update adapters?
             uadapter.setData(main.getRecent());
+
             ranking = main.getRanking();
+            recent = main.getOnlineRecent();
+            favUpdate = main.getFavUpdate();
             updateRankingWidgets();
         }
     }
