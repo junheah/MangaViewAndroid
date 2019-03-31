@@ -102,6 +102,7 @@ public class Search {
                     try {
                         tags = item.selectFirst("div.tags").select("a").eachText();
                     } catch (Exception e) {
+
                     }
                     int release = -1;
                     try{

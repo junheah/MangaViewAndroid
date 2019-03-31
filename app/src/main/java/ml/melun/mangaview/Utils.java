@@ -219,7 +219,7 @@ public class Utils {
             String token = new JSONObject(httpsGet(baseUrl + "/bbs/ajax.comment_token.php", login.getCookie())).getString("token");
             URL url = new URL(baseUrl + "/bbs/write_comment_update.php");
             String param = "token="+token
-                    +"&w=c&bo_table=msm_manga&wr_id="+id
+                    +"&w=c&bo_table=manga&wr_id="+id
                     +"&comment_id=&pim=&sca=&sfl=&stx=&spt=&page=&is_good=0&wr_content="+URLEncoder.encode(content, "UTF-8");
             byte[] data = param.getBytes(Charset.forName("UTF-8"));
             int responseCode = 0;

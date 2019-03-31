@@ -699,6 +699,7 @@ public class MainActivity extends AppCompatActivity
                         else builder = new AlertDialog.Builder(context);
                         builder.setMessage("정말로 삭제 하시겠습니까?").setPositiveButton("네", dialogClickListener)
                                 .setNegativeButton("아니오", dialogClickListener).show();
+                        break;
                 }
                 return false;
             }

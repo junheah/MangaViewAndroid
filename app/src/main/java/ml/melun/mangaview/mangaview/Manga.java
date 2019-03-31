@@ -76,7 +76,7 @@ public class Manga {
             InputStream stream = null;
             Boolean ssl = false;
             try {
-                URL url = new URL(base + "/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                URL url = new URL(base + "/bbs/board.php?bo_table=manga&wr_id="+id);
                 ssl = url.getProtocol().equals("https");
                 if(listener!=null) listener.setMessage("프로토콜 확인중");
                 if(!ssl) {
@@ -123,9 +123,6 @@ public class Manga {
                         }
                     }else if(line.contains("<h1>")){
                         name = line.substring(line.indexOf('>')+1,line.lastIndexOf('<'));
-                    }else if(line.contains("manga_name") && title==null){
-                        String name = line.substring(line.indexOf("manga_name")+11,line.indexOf("class=")-2);
-                        title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>(), -1);
                     }else if(line.contains("var view_cnt")){
                         String seedt = line.substring(0,line.length()-1);
                         seed = Integer.parseInt(seedt.split(" ")[3]);
@@ -134,9 +131,19 @@ public class Manga {
                     //if(imgs.size()>0 && eps.size()>0) break;
                 }
 
+                System.out.println(raw);
+
                 //jsoup parsing
-                if(listener!=null) listener.setMessage("댓글 읽는중");
                 Document doc = Jsoup.parse(raw);
+                //parse title
+                if(title==null){
+                    String href = doc.selectFirst("div.comic-navbar").select("a").get(3).attr("href");
+                    String name = href.substring(href.indexOf("manga_name=")+11);
+                    title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>(), -1);
+                }
+
+                if(listener!=null) listener.setMessage("댓글 읽는중");
+
                 Elements cs = doc.select("section.comment-media").last().select("div.media");
                 System.out.println(cs.size());
                 for(Element c:cs){

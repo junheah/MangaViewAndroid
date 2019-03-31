@@ -31,6 +31,7 @@ public class MainPage {
                     .cookies(cookie)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .get();
+            System.out.println(doc.text());
             Elements list = doc.selectFirst("div.msm-post-gallery").select("div.post-row");
             for(Element e:list){
                 String[] tmp_idStr = e.selectFirst("a").attr("href").toString().split("=");

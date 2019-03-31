@@ -487,6 +487,7 @@ public class ViewerActivity extends AppCompatActivity {
                 intent.putExtra("title", new Gson().toJson(title));
                 intent.putExtra("manga", new Gson().toJson(manga));
             }catch (Exception e){
+                e.printStackTrace();
                 showPopup(context, "뷰어 오류", "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
