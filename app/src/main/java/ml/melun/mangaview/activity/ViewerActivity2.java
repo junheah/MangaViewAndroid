@@ -35,11 +35,14 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Decoder;
+import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -517,7 +520,16 @@ public class ViewerActivity2 extends AppCompatActivity {
                     publishProgress(msg);
                 }
             });
-            manga.fetch(p.getUrl());
+            Login login = p.getLogin();
+            Map<String, String> cookie = new HashMap<>();
+            if(login !=null) {
+                String php = p.getLogin().getCookie();
+                login.buildCookie(cookie);
+                cookie.put("last_wr_id",String.valueOf(id));
+                cookie.put("last_percent",String.valueOf(1));
+                cookie.put("last_page",String.valueOf(0));
+            }
+            manga.fetch(p.getUrl(), cookie);
             imgs = manga.getImgs();
             d = new Decoder(manga.getSeed(), manga.getId());
             return null;

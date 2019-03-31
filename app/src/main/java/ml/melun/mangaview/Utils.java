@@ -230,7 +230,7 @@ public class Utils {
                 connection.setRequestProperty("Accept", "*");
                 connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
                 connection.setRequestProperty( "Content-Length", Integer.toString(data.length));
-                connection.setRequestProperty("Referer", baseUrl+"/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                connection.setRequestProperty("Referer", baseUrl+"/bbs/board.php?bo_table=manga&wr_id="+id);
                 connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
                 new DataOutputStream(connection.getOutputStream()).write(data);
                 responseCode = connection.getResponseCode();
@@ -242,7 +242,7 @@ public class Utils {
                 connection.setRequestProperty("Accept", "*");
                 connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
                 connection.setRequestProperty( "Content-Length", Integer.toString(data.length));
-                connection.setRequestProperty("Referer", baseUrl+"/bbs/board.php?bo_table=msm_manga&wr_id="+id);
+                connection.setRequestProperty("Referer", baseUrl+"/bbs/board.php?bo_table=manga&wr_id="+id);
                 connection.setRequestProperty("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
                 new DataOutputStream(connection.getOutputStream()).write(data);
                 responseCode = connection.getResponseCode();

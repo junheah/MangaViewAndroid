@@ -22,6 +22,7 @@ import java.util.Map;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Manga;
 
@@ -349,7 +350,8 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @Override
         protected MainPage doInBackground(Void... params) {
             Map<String,String> cookie = new HashMap<>();
-            if(p.getLogin()!=null){
+            Login login = p.getLogin();
+            if(login!=null && login.getCookie()!=null && login.getCookie().length()>0){
                 p.getLogin().buildCookie(cookie);
             }
             MainPage u = new MainPage(p.getUrl(),cookie);

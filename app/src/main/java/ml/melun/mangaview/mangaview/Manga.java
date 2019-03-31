@@ -200,21 +200,6 @@ public class Manga {
                     e.printStackTrace();
                 }
             }
-
-            //get string inside double quotes : 1,3,5,7,9,...
-
-            /*
-            Document items = Jsoup.connect("https://mangashow.me/bbs/board.php?bo_table=msm_manga&wr_id=" + id)
-                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                    .get();
-            //System.out.println(items.html());
-            //Deprecated since 18/12/25
-
-            for (Element e : items.selectFirst("div.view-content.scroll-viewer").select("img")) {
-                imgs.add(e.attr("src"));
-            }
-            */
-            //now its contained inside javascript var
             tries++;
         }
     }

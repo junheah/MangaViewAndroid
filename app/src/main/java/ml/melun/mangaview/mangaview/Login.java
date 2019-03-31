@@ -16,7 +16,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class Login {
     private String user;
     private String pass;
-    String cookie;
+    String cookie = "";
 
     public Login(String user, String pass){
         this.user = user;
@@ -59,7 +59,7 @@ public class Login {
                 for (String c : cookies) {
                     if (c.contains("PHPSESSID=")) {
                         System.out.println(c);
-                        cookie = c;
+                        cookie = c.substring(c.indexOf("=")+1,c.indexOf(";"));
                         return true;
                     }
                 }
@@ -73,7 +73,7 @@ public class Login {
 
     public void buildCookie(Map<String,String> map){
         //java always passes by reference
-        map.put(cookie.split("=")[0],cookie.split("=")[1].split(";")[0]);
+        map.put("PHPSESSID", cookie);
     }
 
     public String getCookie() {
