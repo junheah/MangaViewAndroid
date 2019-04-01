@@ -34,7 +34,7 @@
       <file leaf-file-name="ViewerActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/ViewerActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
+            <state relative-caret-position="10051">
               <caret line="495" column="16" lean-forward="false" selection-start-line="495" selection-start-column="16" selection-end-line="495" selection-end-column="43" />
               <folding />
             </state>
@@ -44,7 +44,7 @@
       <file leaf-file-name="ViewerActivity3.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/ViewerActivity3.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="212">
+            <state relative-caret-position="1219">
               <caret line="53" column="45" lean-forward="false" selection-start-line="53" selection-start-column="39" selection-end-line="53" selection-end-column="45" />
               <folding>
                 <element signature="e#12595#12596#0" expanded="true" />
@@ -57,7 +57,7 @@
       <file leaf-file-name="ViewerActivity2.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/ViewerActivity2.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
+            <state relative-caret-position="13317">
               <caret line="636" column="43" lean-forward="false" selection-start-line="636" selection-start-column="43" selection-end-line="636" selection-end-column="43" />
               <folding>
                 <element signature="e#6456#6457#0" expanded="true" />
@@ -71,12 +71,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MainApplication.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MainApplication.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/MainApplication.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="368">
               <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Preference.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Preference.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1334">
+              <caret line="72" column="8" lean-forward="false" selection-start-line="72" selection-start-column="8" selection-end-line="72" selection-end-column="22" />
+              <folding>
+                <element signature="e#2837#2838#0" expanded="true" />
+                <element signature="e#2866#2867#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -101,7 +114,7 @@
       <file leaf-file-name="DebugActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/DebugActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="552">
+            <state relative-caret-position="3381">
               <caret line="177" column="83" lean-forward="false" selection-start-line="177" selection-start-column="83" selection-end-line="177" selection-end-column="83" />
               <folding />
             </state>
@@ -111,7 +124,7 @@
       <file leaf-file-name="DownloadActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/DownloadActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
+            <state relative-caret-position="1219">
               <caret line="80" column="8" lean-forward="false" selection-start-line="80" selection-start-column="8" selection-end-line="80" selection-end-column="62" />
               <folding />
             </state>
@@ -121,7 +134,7 @@
       <file leaf-file-name="LoginActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/LoginActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
+            <state relative-caret-position="851">
               <caret line="77" column="62" lean-forward="false" selection-start-line="77" selection-start-column="62" selection-end-line="77" selection-end-column="62" />
               <folding />
             </state>
@@ -131,18 +144,8 @@
       <file leaf-file-name="SettingsActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/SettingsActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="167">
-              <caret line="219" column="39" lean-forward="false" selection-start-line="219" selection-start-column="39" selection-end-line="219" selection-end-column="39" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Downloader.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Downloader.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="325" column="74" lean-forward="false" selection-start-line="325" selection-start-column="74" selection-end-line="325" selection-end-column="74" />
+            <state relative-caret-position="696">
+              <caret line="233" column="14" lean-forward="false" selection-start-line="233" selection-start-column="14" selection-end-line="233" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -2294,7 +2297,6 @@
         <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/adapter/commentsAdapter.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/EpisodeActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/TagSearchActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Preference.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_login.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_comments.xml" />
@@ -2322,6 +2324,8 @@
         <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Utils.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/DebugActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/LoginActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Preference.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/SettingsActivity.java" />
       </list>
     </option>
   </component>
@@ -2377,20 +2381,6 @@
               <item name="app" type="feadf853:AndroidModuleNode" />
               <item name="java" type="edd41e36:AndroidSourceTypeNode" />
               <item name="mangaview" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="adapter" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MangaViewAndroid" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="mangaview" type="cbb59c9e:AndroidPsiDirectoryNode" />
-              <item name="fragment" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="MangaViewAndroid" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="mangaview" type="cbb59c9e:AndroidPsiDirectoryNode" />
               <item name="mangaview" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -2402,9 +2392,9 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="PackagesPane" />
-      <pane id="Scratches" />
       <pane id="ProjectPane" />
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2618,7 +2608,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.709236" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295325" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -2630,18 +2619,17 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23717217" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295325" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15963513" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15963513" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18635875" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30831409" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.668187" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.668187" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -2650,6 +2638,7 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -2891,13 +2880,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Preference.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="339" column="40" lean-forward="false" selection-start-line="339" selection-start-column="40" selection-end-line="339" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/mangaview/Search.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="773">
@@ -2925,13 +2907,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5543">
           <caret line="353" column="85" lean-forward="false" selection-start-line="353" selection-start-column="85" selection-end-line="353" selection-end-column="85" />
-          <folding>
-            <element signature="class#addedHolder#0;class#mainAdapter#0" expanded="false" />
-            <element signature="class#tagHolder#0;class#mainAdapter#0" expanded="false" />
-            <element signature="class#nameHolder#0;class#mainAdapter#0" expanded="false" />
-            <element signature="class#releaseHolder#0;class#mainAdapter#0" expanded="false" />
-            <element signature="class#onItemClick#0;class#mainAdapter#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2947,7 +2922,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="249">
           <caret line="91" column="28" lean-forward="false" selection-start-line="91" selection-start-column="28" selection-end-line="91" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2955,7 +2929,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="368">
           <caret line="144" column="36" lean-forward="false" selection-start-line="144" selection-start-column="36" selection-end-line="144" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2991,7 +2964,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Downloader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
+        <state relative-caret-position="6394">
           <caret line="325" column="74" lean-forward="false" selection-start-line="325" selection-start-column="74" selection-end-line="325" selection-end-column="74" />
           <folding />
         </state>
@@ -2999,7 +2972,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/ViewerActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
+        <state relative-caret-position="10051">
           <caret line="495" column="16" lean-forward="false" selection-start-line="495" selection-start-column="16" selection-end-line="495" selection-end-column="43" />
           <folding />
         </state>
@@ -3007,7 +2980,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/ViewerActivity2.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
+        <state relative-caret-position="13317">
           <caret line="636" column="43" lean-forward="false" selection-start-line="636" selection-start-column="43" selection-end-line="636" selection-end-column="43" />
           <folding>
             <element signature="e#6456#6457#0" expanded="true" />
@@ -3022,20 +2995,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/ViewerActivity3.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="212">
+        <state relative-caret-position="1219">
           <caret line="53" column="45" lean-forward="false" selection-start-line="53" selection-start-column="39" selection-end-line="53" selection-end-column="45" />
           <folding>
             <element signature="e#12595#12596#0" expanded="true" />
             <element signature="e#12655#12656#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/SettingsActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="167">
-          <caret line="219" column="39" lean-forward="false" selection-start-line="219" selection-start-column="39" selection-end-line="219" selection-end-column="39" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -3056,7 +3021,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/DebugActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
+        <state relative-caret-position="3381">
           <caret line="177" column="83" lean-forward="false" selection-start-line="177" selection-start-column="83" selection-end-line="177" selection-end-column="83" />
           <folding />
         </state>
@@ -3064,7 +3029,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/DownloadActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
+        <state relative-caret-position="1219">
           <caret line="80" column="8" lean-forward="false" selection-start-line="80" selection-start-column="8" selection-end-line="80" selection-end-column="62" />
           <folding />
         </state>
@@ -3072,7 +3037,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/LoginActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
+        <state relative-caret-position="851">
           <caret line="77" column="62" lean-forward="false" selection-start-line="77" selection-start-column="62" selection-end-line="77" selection-end-column="62" />
           <folding />
         </state>
@@ -3083,6 +3048,25 @@
         <state relative-caret-position="368">
           <caret line="30" column="0" lean-forward="false" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/activity/SettingsActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="696">
+          <caret line="233" column="14" lean-forward="false" selection-start-line="233" selection-start-column="14" selection-end-line="233" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/ml/melun/mangaview/Preference.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1334">
+          <caret line="72" column="8" lean-forward="false" selection-start-line="72" selection-start-column="8" selection-end-line="72" selection-end-column="22" />
+          <folding>
+            <element signature="e#2837#2838#0" expanded="true" />
+            <element signature="e#2866#2867#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

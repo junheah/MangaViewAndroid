@@ -34,6 +34,7 @@ public class Preference {
     static Boolean stretch;
     static Boolean leftRight;
     static Login login;
+    static final String defUrl = "https://manamoa.net";
 
     //Offline manga has id of -1
     public Preference(Context context){
@@ -59,13 +60,17 @@ public class Preference {
             reverse = sharedPref.getBoolean("pageReverse",false);
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
-            url = sharedPref.getString("url", "http://188.214.128.5");
+            url = sharedPref.getString("url", defUrl);
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static String getDefUrl() {
+        return defUrl;
     }
 
     public static Boolean getLeftRight() {
