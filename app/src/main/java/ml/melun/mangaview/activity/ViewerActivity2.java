@@ -48,6 +48,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.Utils.getSample;
 import static ml.melun.mangaview.Utils.getScreenSize;
+import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity2 extends AppCompatActivity {
@@ -336,7 +337,17 @@ public class ViewerActivity2 extends AppCompatActivity {
                                 }
                                 preload();
                             }
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                if(image.contains("img.")) {
+                                    for (int i = 0; i < imgs.size(); i++) {
+                                        imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                                    }
+                                    nextPage();
+                                }
+                            }
                         });
+
             }catch (Exception e){
                 viewerBookmark--;
             }
@@ -393,6 +404,16 @@ public class ViewerActivity2 extends AppCompatActivity {
                             public void onLoadCleared(@Nullable Drawable placeholder) {
 
                             }
+
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                if(image.contains("img.")) {
+                                    for (int i = 0; i < imgs.size(); i++) {
+                                        imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                                    }
+                                    prevPage();
+                                }
+                            }
                         });
             }catch (Exception e){
                 viewerBookmark++;
@@ -441,10 +462,19 @@ public class ViewerActivity2 extends AppCompatActivity {
                             }
                             preload();
                         }
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            if(image.contains("img.")) {
+                                for (int i = 0; i < imgs.size(); i++) {
+                                    imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                                }
+                                refreshImage();
+                            }
+                        }
                     });
             updatePageIndex();
         }catch(Exception e) {
-            showPopup(context, "뷰어 오류", "이미지를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.");
+            showErrorPopup(context, e);
         }
     }
 
@@ -604,17 +634,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                 viewerBookmark = p.getViewerBookmark(id);
                 refreshImage();
             }catch(Exception e){
-                showPopup(context, "뷰어 오류", "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                }, new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        finish();
-                    }
-                });
+                showErrorPopup(context, e);
             }
             if (pd.isShowing()) {
                 pd.dismiss();

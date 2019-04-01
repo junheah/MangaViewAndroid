@@ -1,6 +1,8 @@
 package ml.melun.mangaview;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -156,6 +158,74 @@ public class Utils {
                 .setOnCancelListener(cancelListener)
                 .show();
     }
+
+    public static void showErrorPopup(Context context, Exception e){
+        AlertDialog.Builder builder;
+        String title = "뷰어 오류";
+        String content = "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.";
+        if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setMessage(content)
+                .setNeutralButton("자세히", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showStackTrace(context, e);
+                    }
+                })
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ((Activity)context).finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        ((Activity)context).finish();
+                    }
+                })
+                .show();
+    }
+
+    private static void showStackTrace(Context context, Exception e){
+        StringBuilder sbuilder = new StringBuilder();
+        for(StackTraceElement s : e.getStackTrace()){
+            sbuilder.append(s+"\n");
+        }
+        final String error = sbuilder.toString();
+        AlertDialog.Builder builder;
+        String title = "STACK TRACE";
+        if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setMessage(error)
+                .setNeutralButton("복사", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("stack_trace", error);
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(context,"클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
+                        ((Activity)context).finish();
+                    }
+                })
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ((Activity)context).finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        ((Activity)context).finish();
+                    }
+                })
+                .show();
+    }
+
+
     public static void showPopup(Context context, String title, String content){
         AlertDialog.Builder builder;
         if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
@@ -215,8 +285,9 @@ public class Utils {
     }
 
     public static Boolean writeComment(Login login, int id, String content, String baseUrl){
+        String cookie = "PHPSESSID="+login.getCookie()+';';
         try {
-            String token = new JSONObject(httpsGet(baseUrl + "/bbs/ajax.comment_token.php", login.getCookie())).getString("token");
+            String token = new JSONObject(httpsGet(baseUrl + "/bbs/ajax.comment_token.php?_="+System.currentTimeMillis(), cookie)).getString("token");
             URL url = new URL(baseUrl + "/bbs/write_comment_update.php");
             String param = "token="+token
                     +"&w=c&bo_table=manga&wr_id="+id
@@ -226,7 +297,7 @@ public class Utils {
             if(url.getProtocol().equals("http")){
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
-                connection.setRequestProperty("Cookie",login.getCookie());
+                connection.setRequestProperty("Cookie",cookie);
                 connection.setRequestProperty("Accept", "*");
                 connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
                 connection.setRequestProperty( "Content-Length", Integer.toString(data.length));
@@ -238,7 +309,7 @@ public class Utils {
                 HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
                 connection.setInstanceFollowRedirects(false);
                 connection.setRequestMethod("POST");
-                connection.setRequestProperty("Cookie",login.getCookie());
+                connection.setRequestProperty("Cookie",cookie);
                 connection.setRequestProperty("Accept", "*");
                 connection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
                 connection.setRequestProperty( "Content-Length", Integer.toString(data.length));

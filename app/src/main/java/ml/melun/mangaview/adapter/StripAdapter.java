@@ -16,7 +16,10 @@ import android.widget.ImageView;
 import android.graphics.Bitmap;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.CustomViewTarget;
@@ -89,6 +92,10 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     public void onBindViewHolder(final ViewHolder holder, final int pos) {
         holder.frame.setImageResource(R.drawable.placeholder);
         holder.refresh.setVisibility(View.VISIBLE);
+        glideBind(holder, pos);
+    }
+
+    void glideBind(ViewHolder holder, int pos){
         if(autoCut) {
             final int position = pos / 2;
             final int type = pos % 2;
@@ -130,6 +137,19 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                             holder.frame.setImageDrawable(placeholder);
                             holder.refresh.setVisibility(View.VISIBLE);
                         }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            holder.frame.setImageResource(R.drawable.placeholder);
+                            holder.refresh.setVisibility(View.VISIBLE);
+                            //retry?
+                            if(image.contains("img.")){
+                                String newImage = image.replace("img.","s3.");
+                                imgs.set(pos,newImage);
+                                //retry recursive
+                                glideBind(holder,pos);
+                            }
+                        }
                     });
         }
         else Glide.with(mainContext)
@@ -147,6 +167,19 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                     public void onLoadCleared(@Nullable Drawable placeholder) {
                         holder.frame.setImageDrawable(placeholder);
                         holder.refresh.setVisibility(View.VISIBLE);
+                    }
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        holder.frame.setImageResource(R.drawable.placeholder);
+                        holder.refresh.setVisibility(View.VISIBLE);
+                        String image = imgs.get(pos);
+                        //retry?
+                        if(image.contains("img")){
+                            String newImage = image.replace("img","s3");
+                            imgs.set(pos,newImage);
+                            //retry recursive
+                            glideBind(holder,pos);
+                        }
                     }
                 });
     }

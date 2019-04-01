@@ -146,7 +146,7 @@ public class DebugActivity extends AppCompatActivity {
             data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
-            data.put("login",sharedPref.getString("login","{}"));
+            data.put("login",new JSONObject(sharedPref.getString("login","{}")));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -175,7 +175,7 @@ public class DebugActivity extends AppCompatActivity {
             editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putString("login", data.getString("login"));
+            editor.putString("login", filter(data.getJSONObject("login").toString()));
             editor.commit();
         }catch (Exception e){
             showPopup(context,"오류",e.getMessage());

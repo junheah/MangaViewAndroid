@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Set up the login form.
         context = this;
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);

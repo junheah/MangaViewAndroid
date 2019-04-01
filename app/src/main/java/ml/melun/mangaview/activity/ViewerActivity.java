@@ -1,5 +1,6 @@
 package ml.melun.mangaview.activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,6 +49,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.Utils.getScreenSize;
+import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity extends AppCompatActivity {
@@ -107,7 +109,6 @@ public class ViewerActivity extends AppCompatActivity {
         commentBtn = this.findViewById(R.id.commentButton);
         width = getScreenSize(getWindowManager().getDefaultDisplay());
         //imageZoomHelper = new ImageZoomHelper(this);
-
         try {
             intent = getIntent();
             title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
@@ -487,18 +488,12 @@ public class ViewerActivity extends AppCompatActivity {
                 intent.putExtra("title", new Gson().toJson(title));
                 intent.putExtra("manga", new Gson().toJson(manga));
             }catch (Exception e){
-                e.printStackTrace();
-                showPopup(context, "뷰어 오류", "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                }, new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        finish();
-                    }
-                });
+                StackTraceElement[] stack = e.getStackTrace();
+                String message = "";
+                for(StackTraceElement s : stack){
+                    message +=s.toString()+'\n';
+                }
+                showErrorPopup(context, e);
             }
             if (pd.isShowing()) {
                 pd.dismiss();

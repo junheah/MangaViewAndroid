@@ -319,9 +319,18 @@ public class Downloader extends Service {
                         //create download flag
                         File downloadFlag = new File(dir,"downloading");
                         downloadFlag.createNewFile();
+                        Boolean changeS3 = false;
                         for (int i = 0; i < urls.size(); i++) {
                             if (isCancelled()) return 0;
-                            downloadImage(urls.get(i), new File(dir, new DecimalFormat("0000").format(i)), d);
+                            String url = urls.get(i);
+                            if(changeS3) url = url.replace("img.", "s3.");
+
+                            if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d) && !changeS3){
+                                //change image server name and retry
+                                changeS3 = true;
+                                i--;
+                                continue;
+                            }//else : success
                             progress += imgStepSize;
                             updateNotification((selectedEps.length() - queueIndex) + "/" + selectedEps.length());
                         }
@@ -372,7 +381,7 @@ public class Downloader extends Service {
         }
     }
 
-    void downloadImage(String urlStr, File outputFile, Decoder d){
+    Boolean downloadImage(String urlStr, File outputFile, Decoder d){
         try {
             URL url = new URL(urlStr);
             if(url.getProtocol().toLowerCase().equals("https")) {
@@ -404,7 +413,10 @@ public class Downloader extends Service {
             outputStream.close(); // do not forget to close the stream
         } catch (Exception e) {
             e.printStackTrace();
+            //retry if old image server
+            return false;
         }
+        return true;
     }
 
     File downloadFile(String urlStr, File outputFile){

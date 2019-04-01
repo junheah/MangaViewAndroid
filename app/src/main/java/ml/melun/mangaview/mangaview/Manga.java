@@ -108,8 +108,7 @@ public class Manga {
                             //remove backslash
                             for (int i = 1; i < imgStrs.length; i += 2) {
                                 String imgUrl = imgStrs[i].replace("\\","")
-                                        .replace(".mangashow2.me", ".mangashow3.me")
-                                        + "?v=2";
+                                        + "?quick";
                                 imgs.add(imgUrl);
                             }
                         }
@@ -121,8 +120,6 @@ public class Manga {
                         for (int i = 3; i < epsStrs.length; i += 4) {
                             eps.add(new Manga(Integer.parseInt(epsStrs[i]),epsStrs[i-2],""));
                         }
-                    }else if(line.contains("<h1>")){
-                        name = line.substring(line.indexOf('>')+1,line.lastIndexOf('<'));
                     }else if(line.contains("var view_cnt")){
                         String seedt = line.substring(0,line.length()-1);
                         seed = Integer.parseInt(seedt.split(" ")[3]);
@@ -131,10 +128,10 @@ public class Manga {
                     //if(imgs.size()>0 && eps.size()>0) break;
                 }
 
-                System.out.println(raw);
 
                 //jsoup parsing
                 Document doc = Jsoup.parse(raw);
+
                 //parse title
                 if(title==null){
                     String href = doc.selectFirst("div.comic-navbar").select("a").get(3).attr("href");
@@ -142,10 +139,12 @@ public class Manga {
                     title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>(), -1);
                 }
 
+                //parse name
+                this.name = doc.selectFirst("div.toon-title").ownText();
+
                 if(listener!=null) listener.setMessage("댓글 읽는중");
 
                 Elements cs = doc.select("section.comment-media").last().select("div.media");
-                System.out.println(cs.size());
                 for(Element c:cs){
                     String icon, user, timestamp, content;
                     int indent, likes, level;
@@ -168,7 +167,6 @@ public class Manga {
                 }
 
                 cs = doc.select("section.comment-media.best-comment").last().select("div.media");
-                System.out.println(cs.size());
                 for(Element c:cs){
                     String icon, user, timestamp, content;
                     int indent, likes, level;

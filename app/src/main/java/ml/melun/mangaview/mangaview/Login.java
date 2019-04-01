@@ -54,11 +54,9 @@ public class Login {
                 responseCode = connections.getResponseCode();
                 cookies = connections.getHeaderFields().get("Set-Cookie");
             }
-            System.out.println(responseCode);
             if(responseCode == 302) {
                 for (String c : cookies) {
                     if (c.contains("PHPSESSID=")) {
-                        System.out.println(c);
                         cookie = c.substring(c.indexOf("=")+1,c.indexOf(";"));
                         return true;
                     }
