@@ -1,4 +1,5 @@
 package ml.melun.mangaview.mangaview;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class Title {
         //fetch episodes
         try {
             eps = new ArrayList<>();
-            Document items = Jsoup.connect(base + "/bbs/page.php?hid=manga_detail&manga_name="+name)
+            Document items = Jsoup.connect(base + "/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"))
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .get();
             for(Element e:items.select("div.slot")) {

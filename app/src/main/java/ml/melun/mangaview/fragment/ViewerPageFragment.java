@@ -86,11 +86,13 @@ public class ViewerPageFragment extends Fragment {
 
                     @Override
                     public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        frame.setImageResource(R.drawable.placeholder);
-                        refresh.setVisibility(View.VISIBLE);
-                        if(image.contains("img.")){
-                            image = image.replace("img.","s3.");
-                            loadImage(frame,refresh);
+                        if(image.length()>0) {
+                            frame.setImageResource(R.drawable.placeholder);
+                            refresh.setVisibility(View.VISIBLE);
+                            if (image.contains("img.")) {
+                                image = image.replace("img.", "s3.");
+                                loadImage(frame, refresh);
+                            }
                         }
                     }
                 });

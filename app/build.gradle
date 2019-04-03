@@ -75,6 +75,6 @@ dependencies {
         // Excludes the support library because it's already included by Glide.
         transitive = false
     }
-//    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+    //implementation 'com.squareup.okhttp3:okhttp:3.12.2'
 //    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.12.2'
 }

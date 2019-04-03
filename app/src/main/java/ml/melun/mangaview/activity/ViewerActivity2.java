@@ -28,8 +28,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -339,11 +343,13 @@ public class ViewerActivity2 extends AppCompatActivity {
                             }
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                if(image.contains("img.")) {
-                                    for (int i = 0; i < imgs.size(); i++) {
-                                        imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                                if(imgs.size()>0) {
+                                    if (image.contains("img.")) {
+                                        for (int i = 0; i < imgs.size(); i++) {
+                                            imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                                        }
+                                        nextPage();
                                     }
-                                    nextPage();
                                 }
                             }
                         });
@@ -407,11 +413,13 @@ public class ViewerActivity2 extends AppCompatActivity {
 
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                if(image.contains("img.")) {
-                                    for (int i = 0; i < imgs.size(); i++) {
-                                        imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                                if(imgs.size()>0) {
+                                    if (image.contains("img.")) {
+                                        for (int i = 0; i < imgs.size(); i++) {
+                                            imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                                        }
+                                        prevPage();
                                     }
-                                    prevPage();
                                 }
                             }
                         });
@@ -464,11 +472,14 @@ public class ViewerActivity2 extends AppCompatActivity {
                         }
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                            if(image.contains("img.")) {
-                                for (int i = 0; i < imgs.size(); i++) {
-                                    imgs.set(i, imgs.get(i).replace("img.", "s3."));
+                            if(imgs.size()>0) {
+                                if (image.contains("img.")) {
+                                    imgs.set(viewerBookmark, image.replace("img.", "s3."));
+//                                    for (int i = 0; i < imgs.size(); i++) {
+//                                        imgs.set(i, imgs.get(i).replace("img.", "s3."));
+//                                    }
+                                    refreshImage();
                                 }
-                                refreshImage();
                             }
                         }
                     });
@@ -481,9 +492,27 @@ public class ViewerActivity2 extends AppCompatActivity {
     void preload(){
         if(viewerBookmark<imgs.size()-1)
             Glide.with(context)
-                    .asBitmap()
-                    .load(imgs.get(viewerBookmark+1))
-                    .preload();
+                .asBitmap()
+                .load(imgs.get(viewerBookmark+1))
+                .addListener(new RequestListener<Bitmap>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        if(imgs.size()>0) {
+                            String image = imgs.get(viewerBookmark+1);
+                            if (image.contains("img.")) {
+                                imgs.set(viewerBookmark+1, image.replace("img.", "s3."));
+                                preload();
+                            }
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                        return false;
+                    }
+                })
+                .preload();
     }
     void updatePageIndex(){
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());

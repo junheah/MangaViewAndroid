@@ -179,7 +179,7 @@ public class Preference {
     }
 
     public void addRecent(Title tmp){
-        //FUCK YOU JAVA FOR NOT IMPLEMENTING POINTERS
+        //FUCK YOU JAVA FOR NOT USING POINTERS
         Title title = new Title(tmp.getName(),tmp.getThumb(),tmp.getAuthor(),tmp.getTags(),tmp.getRelease());
         int position = getIndexOf(title);
         if(position>-1) {
@@ -209,7 +209,7 @@ public class Preference {
     private int getIndexOf(Title title){
         String targetT = title.getName();
         for(int i=0; i<recent.size(); i++){
-            if(match(targetT,recent.get(i).getName())) return i;
+            if(targetT.equals(recent.get(i).getName())) return i;
         }
         return -1;
     }
@@ -310,7 +310,7 @@ public class Preference {
     }
     public int findFavorite(Title title){
         for(int i=0; i<favorite.size();i++){
-            if(match(title.getName(),favorite.get(i).getName())) return i;
+            if(title.getName().equals(favorite.get(i).getName())) return i;
         }
         return -1;
     }
@@ -327,25 +327,25 @@ public class Preference {
         return pagebookmark.has(id+"");
     }
 
-    public Boolean match(String s1, String s2){
-        return filterString(s1).matches(filterString(s2));
-    }
-    private String filterString(String input){
-        int i=0, j=0, m=0, k=0;
-        while(i>-1||j>-1||m>-1||k>-1){
-            i = input.indexOf('(');
-            j = input.indexOf(')');
-            m = input.indexOf('/');
-            k = input.indexOf('?');
-            char[] tmp = input.toCharArray();
-            if(i>-1) tmp[i] = ' ';
-            if(j>-1) tmp[j] = ' ';
-            if(m>-1) tmp[m] = ' ';
-            if(k>-1) tmp[k] = ' ';
-            input = String.valueOf(tmp);
-        }
-        return input;
-    }
+//    public Boolean match(String s1, String s2){
+//        return filterString(s1).matches(filterString(s2));
+//    }
+//    private String filterString(String input){
+//        int i=0, j=0, m=0, k=0;
+//        while(i>-1||j>-1||m>-1||k>-1){
+//            i = input.indexOf('(');
+//            j = input.indexOf(')');
+//            m = input.indexOf('/');
+//            k = input.indexOf('?');
+//            char[] tmp = input.toCharArray();
+//            if(i>-1) tmp[i] = ' ';
+//            if(j>-1) tmp[j] = ' ';
+//            if(m>-1) tmp[m] = ' ';
+//            if(k>-1) tmp[k] = ' ';
+//            input = String.valueOf(tmp);
+//        }
+//        return input;
+//    }
 
     //for debug
     public void removeEpsFromData(){

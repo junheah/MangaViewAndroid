@@ -223,8 +223,10 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog.Builder builder;
                 if(dark) builder = new AlertDialog.Builder(this,R.style.darkDialog);
                 else builder = new AlertDialog.Builder(this);
-                builder.setMessage("정말로 종료 하시겠습니까?").setPositiveButton("네", dialogClickListener)
-                        .setNegativeButton("아니오", dialogClickListener).show();
+                builder.setMessage("정말로 종료 하시겠습니까?")
+                        .setPositiveButton("네", dialogClickListener)
+                        .setNegativeButton("아니오", dialogClickListener)
+                        .show();
             }else{
                 contentHolder.setDisplayedChild(startTab);
                 navigationView.getMenu().getItem(startTab).setChecked(true);

@@ -140,14 +140,16 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
 
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                            holder.frame.setImageResource(R.drawable.placeholder);
-                            holder.refresh.setVisibility(View.VISIBLE);
-                            //retry?
-                            if(image.contains("img.")){
-                                String newImage = image.replace("img.","s3.");
-                                imgs.set(pos,newImage);
-                                //retry recursive
-                                glideBind(holder,pos);
+                            if(imgs.size()>0) {
+                                holder.frame.setImageResource(R.drawable.placeholder);
+                                holder.refresh.setVisibility(View.VISIBLE);
+                                //retry?
+                                if (image.contains("img.")) {
+                                    String newImage = image.replace("img.", "s3.");
+                                    imgs.set(pos, newImage);
+                                    //retry recursive
+                                    glideBind(holder, pos);
+                                }
                             }
                         }
                     });

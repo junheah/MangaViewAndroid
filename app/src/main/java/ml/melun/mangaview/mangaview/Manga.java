@@ -100,7 +100,7 @@ public class Manga {
                 while ((line = reader.readLine()) != null) {
                     //save as raw html for jsoup
                     raw += line;
-                    if(line.contains("var img_list")) {
+                    if(line.contains("var img_list =")) {
                         if(listener!=null) listener.setMessage("이미지 리스트 읽는중");
                         String imgStr = line;
                         if(imgStr!=null) {
@@ -112,7 +112,7 @@ public class Manga {
                                 imgs.add(imgUrl);
                             }
                         }
-                    }else if(line.contains("var only_chapter")){
+                    }else if(line.contains("var only_chapter =")){
                         if(listener!=null) listener.setMessage("화 목록 읽는중");
                         String epsStr = line;
                         String[] epsStrs = epsStr.split("\"");
@@ -120,7 +120,7 @@ public class Manga {
                         for (int i = 3; i < epsStrs.length; i += 4) {
                             eps.add(new Manga(Integer.parseInt(epsStrs[i]),epsStrs[i-2],""));
                         }
-                    }else if(line.contains("var view_cnt")){
+                    }else if(line.contains("var view_cnt =")){
                         String seedt = line.substring(0,line.length()-1);
                         seed = Integer.parseInt(seedt.split(" ")[3]);
                     }
