@@ -2,15 +2,15 @@ package ml.melun.mangaview;
 
 import android.app.Application;
 import android.content.Context;
-import android.widget.Toast;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
 import org.acra.annotation.AcraDialog;
 import org.acra.annotation.AcraMailSender;
 
+import ml.melun.mangaview.mangaview.CustomHttpClient;
+
 import static org.acra.ReportField.ANDROID_VERSION;
-import static org.acra.ReportField.APPLICATION_LOG;
 import static org.acra.ReportField.APP_VERSION_NAME;
 import static org.acra.ReportField.PHONE_MODEL;
 import static org.acra.ReportField.REPORT_ID;
@@ -22,9 +22,17 @@ import static org.acra.ReportField.STACK_TRACE;
 @AcraDialog(resText=R.string.acra_dialog_text)
 
 public class MainApplication extends Application{
+    public static CustomHttpClient httpClient;
+    Preference p;
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         ACRA.init(this);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        httpClient = new CustomHttpClient(new Preference(this));
     }
 }

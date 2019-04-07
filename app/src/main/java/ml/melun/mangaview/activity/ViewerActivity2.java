@@ -32,7 +32,6 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
@@ -50,7 +49,7 @@ import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
-import static ml.melun.mangaview.Utils.getSample;
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
@@ -68,7 +67,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
     int viewerBookmark = -1;
-    List<String> imgs;
+    List<String> imgs, imgs1;
     List<Integer> types;
     ProgressDialog pd;
     List<Manga> eps;
@@ -82,6 +81,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Spinner spinner;
     int width = 0;
     Intent intent;
+    Boolean useSecond = false;
 
     Decoder d;
 
@@ -310,7 +310,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark++;
             try {
-                final String image = imgs.get(viewerBookmark);
+                final String image = useSecond ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -349,6 +349,9 @@ public class ViewerActivity2 extends AppCompatActivity {
                                             imgs.set(i, imgs.get(i).replace("img.", "s3."));
                                         }
                                         nextPage();
+                                    }else if(!useSecond && imgs1 !=null && imgs1.size()>0){
+                                        useSecond = true;
+                                        nextPage();
                                     }
                                 }
                             }
@@ -381,7 +384,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark--;
             try {
-                final String image = imgs.get(viewerBookmark);
+                final String image = useSecond ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -419,6 +422,9 @@ public class ViewerActivity2 extends AppCompatActivity {
                                             imgs.set(i, imgs.get(i).replace("img.", "s3."));
                                         }
                                         prevPage();
+                                    }else if(!useSecond && imgs1 !=null && imgs1.size()>0){
+                                        useSecond = true;
+                                        prevPage();
                                     }
                                 }
                             }
@@ -439,7 +445,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         frame.setImageResource(R.drawable.placeholder);
         //refreshbtn.setVisibility(View.VISIBLE);
         try {
-            final String image = imgs.get(viewerBookmark);
+            final String image = useSecond ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
             //placeholder
             //frame.setImageResource(R.drawable.placeholder);
             Glide.with(context)
@@ -479,6 +485,9 @@ public class ViewerActivity2 extends AppCompatActivity {
 //                                        imgs.set(i, imgs.get(i).replace("img.", "s3."));
 //                                    }
                                     refreshImage();
+                                } else if(!useSecond && imgs1 !=null && imgs1.size()>0){
+                                    useSecond = true;
+                                    refreshImage();
                                 }
                             }
                         }
@@ -498,9 +507,12 @@ public class ViewerActivity2 extends AppCompatActivity {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                         if(imgs.size()>0) {
-                            String image = imgs.get(viewerBookmark+1);
+                            String image = useSecond ? imgs1.get(viewerBookmark+1) : imgs.get(viewerBookmark+1);
                             if (image.contains("img.")) {
                                 imgs.set(viewerBookmark+1, image.replace("img.", "s3."));
+                                preload();
+                            }else if(!useSecond && imgs1 !=null && imgs1.size()>0){
+                                useSecond = true;
                                 preload();
                             }
                         }
@@ -588,8 +600,9 @@ public class ViewerActivity2 extends AppCompatActivity {
                 cookie.put("last_percent",String.valueOf(1));
                 cookie.put("last_page",String.valueOf(0));
             }
-            manga.fetch(p.getUrl(), cookie);
+            manga.fetch(httpClient);
             imgs = manga.getImgs();
+            imgs1 = manga.getImgs(true);
             d = new Decoder(manga.getSeed(), manga.getId());
             return null;
         }
@@ -667,6 +680,9 @@ public class ViewerActivity2 extends AppCompatActivity {
             }
             if (pd.isShowing()) {
                 pd.dismiss();
+            }
+            if(manga.getReported()){
+                showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
             }
         }
     }

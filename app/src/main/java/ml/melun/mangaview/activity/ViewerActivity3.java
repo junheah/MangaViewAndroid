@@ -8,20 +8,14 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.FragmentManager;
-
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -41,20 +35,20 @@ import java.util.Map;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.adapter.StripAdapter;
 import ml.melun.mangaview.adapter.ViewerPagerAdapter;
 import ml.melun.mangaview.interfaces.PageInterface;
-import ml.melun.mangaview.mangaview.Decoder;
+
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity3 extends AppCompatActivity {
-    List<String> imgs;
+    List<String> imgs, imgs1;
     Manga manga;
     Preference p;
     Context context;
@@ -343,8 +337,9 @@ public class ViewerActivity3 extends AppCompatActivity {
                 cookie.put("last_percent",String.valueOf(1));
                 cookie.put("last_page",String.valueOf(0));
             }
-            manga.fetch(p.getUrl(), cookie);
+            manga.fetch(httpClient);
             imgs = manga.getImgs();
+            imgs1 = manga.getImgs(true);
             return null;
         }
 
@@ -428,6 +423,11 @@ public class ViewerActivity3 extends AppCompatActivity {
             pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
             bookmarkRefresh();
             viewPager.addOnPageChangeListener(listener);
+
+
+            if(manga.getReported()){
+                showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
+            }
 
             if(pd.isShowing()) pd.dismiss();
         }

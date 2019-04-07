@@ -3,10 +3,8 @@ package ml.melun.mangaview.adapter;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,6 +23,8 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Manga;
+
+import static ml.melun.mangaview.MainApplication.httpClient;
 
 public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mainContext;
@@ -354,7 +354,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if(login!=null && login.getCookie()!=null && login.getCookie().length()>0){
                 p.getLogin().buildCookie(cookie);
             }
-            MainPage u = new MainPage(p.getUrl(),cookie);
+            MainPage u = new MainPage(httpClient);
             return u;
         }
 

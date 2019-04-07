@@ -7,6 +7,8 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Response;
+
 public class Search {
     /* mode
     * 0 : 제목
@@ -54,7 +56,7 @@ public class Search {
     }
     */
 
-    public void fetch(String base) {
+    public void fetch(CustomHttpClient client) {
         result = new ArrayList<>();
         if(!last) {
             try {
@@ -64,28 +66,28 @@ public class Search {
                 String searchUrl = "";
                 switch(mode){
                     case 0:
-                        searchUrl = base + "/bbs/search.php?stx=";
+                        searchUrl = "/bbs/search.php?stx=";
                         break;
                     case 1:
-                        searchUrl = base + "/bbs/page.php?hid=manga_list&page=0&sfl=4&stx=";
+                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=4&stx=";
                         break;
                     case 2:
-                        searchUrl = base + "/bbs/page.php?hid=manga_list&sfl=3&stx=";
+                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=3&stx=";
                         break;
                     case 3:
-                        searchUrl = base + "/bbs/page.php?hid=manga_list&sfl=1&stx=";
+                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=1&stx=";
                         break;
                     case 4:
-                        searchUrl = base + "/bbs/page.php?hid=manga_list&sfl=2&stx=";
+                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=2&stx=";
                         break;
                     case 6:
-                        searchUrl = base + "/bbs/page.php?hid=manga_list&";
+                        searchUrl = "/bbs/page.php?hid=manga_list&";
                         break;
                 }
 
-                Document search = Jsoup.connect(searchUrl + query + "&page=" + page)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-                        .get();
+
+                Response response = client.get(searchUrl + query + "&page=" + page);
+                Document search = Jsoup.parse(response.body().string());
                 Elements items = search.select("div.post-row");
                 if (items.size() < 1) last = true;
 
@@ -113,6 +115,7 @@ public class Search {
                     result.add(new Title(ntmp, ttmp, atmp, tags, release));
                 }
                 if (items.size() < 30) last = true;
+                response.close();
 
             } catch (Exception e) {
                 page--;
@@ -120,19 +123,7 @@ public class Search {
             }
         }
     }
-//    public String filter(String input){
-//        int i = input.indexOf('(');
-//        int j = input.indexOf(')');
-//        int m = input.indexOf('?');
-//        if(i>-1||j>-1||m>-1){
-//            char[] tmp = input.toCharArray();
-//            if(i>-1) tmp[i] = ' ';
-//            if(j>-1) tmp[j] = ' ';
-//            if(m>-1) tmp[m] = ' ';
-//            input = String.valueOf(tmp);
-//        }
-//        return input;
-//    }
+
 
     public ArrayList<Title> getResult(){
         return result;

@@ -23,7 +23,7 @@ android {
         applicationId "ml.melun.mangaview"
         minSdkVersion 18
         targetSdkVersion 27
-        versionName "2.0-" + code
+        versionName "2.1-" + code
         versionCode code
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -75,6 +75,7 @@ dependencies {
         // Excludes the support library because it's already included by Glide.
         transitive = false
     }
-    //implementation 'com.squareup.okhttp3:okhttp:3.12.2'
-//    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.12.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+    implementation 'dnsjava:dnsjava:2.1.7'
+    //implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:3.12.2'
 }

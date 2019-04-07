@@ -1,24 +1,20 @@
 package ml.melun.mangaview.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,7 +25,6 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-//import com.viven.imagezoom.ImageZoomHelper;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -48,6 +43,7 @@ import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
@@ -148,7 +144,10 @@ public class ViewerActivity extends AppCompatActivity {
                 commentBtn.setVisibility(View.GONE);
                 swipe.setEnabled(false);
                 imgs = manga.getImgs();
-                stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
+                if(imgs == null || imgs.size()==0) {
+                    showErrorPopup(context);
+                }
+                stripAdapter = new StripAdapter(context,imgs,null, autoCut, seed, id, width);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                     public void onItemClick() {
@@ -335,7 +334,7 @@ public class ViewerActivity extends AppCompatActivity {
             cut.setBackgroundResource(R.drawable.button_bg_on);
             //viewerBookmark *= 2;
         }
-        stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
+        stripAdapter = new StripAdapter(context,imgs,manga.getImgs(true), autoCut, seed, id, width);
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
             public void onItemClick() {
@@ -403,16 +402,25 @@ public class ViewerActivity extends AppCompatActivity {
                 cookie.put("last_percent",String.valueOf(1));
                 cookie.put("last_page",String.valueOf(0));
             }
-            manga.fetch(p.getUrl(), cookie);
+            manga.fetch(httpClient);
             imgs = manga.getImgs();
             seed = manga.getSeed();
-            stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
-            return null;
+            if(imgs == null || imgs.size()==0) {
+                return 1;
+            }
+            stripAdapter = new StripAdapter(context, imgs, manga.getImgs(true), autoCut, seed, id, width);
+            return 0;
         }
 
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
+
+            if(res == 1){
+                //error occured
+                showErrorPopup(context);
+                return;
+            }
             strip.setAdapter(stripAdapter);
 
             stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
@@ -498,6 +506,10 @@ public class ViewerActivity extends AppCompatActivity {
             if (pd.isShowing()) {
                 pd.dismiss();
             }
+            if(manga.getReported()){
+                showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
+            }
         }
+
     }
 }

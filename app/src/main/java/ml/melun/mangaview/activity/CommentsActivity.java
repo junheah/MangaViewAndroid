@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -30,6 +29,7 @@ import ml.melun.mangaview.fragment.CommentsTabFragment;
 import ml.melun.mangaview.mangaview.Comment;
 import ml.melun.mangaview.mangaview.Login;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.writeComment;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -213,11 +213,11 @@ public class CommentsActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Void... voids) {
-            if(writeComment(login, id, content, baseUrl)) return 0;
+            if(writeComment(httpClient, login, id, content, baseUrl)) return 0;
             else{
                 //login again and try again
-                login.submit(baseUrl);
-                if(writeComment(login, id, content, baseUrl)) return 0;
+                login.submit(httpClient);
+                if(writeComment(httpClient, login, id, content, baseUrl)) return 0;
             }
             return 1;
         }

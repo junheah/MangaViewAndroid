@@ -9,7 +9,6 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Title;

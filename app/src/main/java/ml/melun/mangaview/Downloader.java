@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -25,7 +24,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,6 +43,7 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.filterFolder;
 
 public class Downloader extends Service {
@@ -248,7 +247,7 @@ public class Downloader extends Service {
                     notiTitle = title.getName();
                     updateNotification("준비중");
 
-                    if (title.getEps() == null) title.fetchEps(baseUrl);
+                    if (title.getEps() == null) title.fetchEps(httpClient);
                     List<Manga> mangas = title.getEps();
 
                     float stepSize = maxProgress / selectedEps.length();
@@ -304,7 +303,7 @@ public class Downloader extends Service {
                         Manga target = mangas.get(listIndex);
 
                         //fetch info of target
-                        target.fetch(baseUrl);
+                        target.fetch(httpClient, false);
                         Decoder d = new Decoder(target.getSeed(), target.getId());
                         List<String> urls = target.getImgs();
 

@@ -1,17 +1,17 @@
 package ml.melun.mangaview.mangaview;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class Login {
     private String user;
@@ -23,7 +23,7 @@ public class Login {
         this.pass = pass;
     }
 
-    public Boolean submit(String baseUrl){
+    public Boolean oldsubmit(String baseUrl){
         try{
             URL url = new URL(baseUrl + "/bbs/login_check.php");
             String param = "mb_id="+user+"&mb_password="+pass;
@@ -69,9 +69,44 @@ public class Login {
         return false;
     }
 
+    public Boolean submit(CustomHttpClient client){
+        try{
+            RequestBody requestBody = new FormBody.Builder()
+                    .addEncoded("mb_id",user)
+                    .addEncoded("mb_password",pass)
+                    .build();
+
+            System.out.println("pppp"+requestBody.toString());
+
+            Response response = client.post("/bbs/login_check.php",requestBody);
+            int responseCode = response.code();
+            System.out.println("pppp"+responseCode);
+            List<String> cookies = response.headers("Set-Cookie");
+
+            response.close();
+            if(responseCode == 302) {
+                for (String c : cookies) {
+                    if (c.contains("PHPSESSID=")) {
+                        cookie = c.substring(c.indexOf("=")+1,c.indexOf(";"));
+                        return true;
+                    }
+                }
+            }
+            else return false;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public void buildCookie(Map<String,String> map){
         //java always passes by reference
         map.put("PHPSESSID", cookie);
+    }
+
+    public String getCookie(Boolean format){
+        if(format) return "PHPSESSID=" +cookie +';';
+        return cookie;
     }
 
     public String getCookie() {

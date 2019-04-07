@@ -1,13 +1,10 @@
 package ml.melun.mangaview.adapter;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,32 +13,19 @@ import android.widget.ImageView;
 import android.graphics.Bitmap;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.Request;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.CustomViewTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.mangaview.DecodeTransform;
 import ml.melun.mangaview.mangaview.Decoder;
 
-import static ml.melun.mangaview.Utils.getSample;
 
 public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
 
-    private List<String> imgs;
+    private List<String> imgs, imgs1;
     private LayoutInflater mInflater;
     private Context mainContext;
     private StripAdapter.ItemClickListener mClickListener;
@@ -50,10 +34,11 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     int __seed;
     Decoder d;
     int width;
+    Boolean useSecond = false;
 
 
     // data is passed into the constructor
-    public StripAdapter(Context context, List<String> data, Boolean cut, int seed, int id, int width) {
+    public StripAdapter(Context context, List<String> data, List<String> data1, Boolean cut, int seed, int id, int width) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.imgs = data;
@@ -99,7 +84,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         if(autoCut) {
             final int position = pos / 2;
             final int type = pos % 2;
-            String image = imgs.get(position);
+            final String image = useSecond ? imgs1.get(position) : imgs.get(position);
             //set image to holder view
             Glide.with(mainContext)
                     .asBitmap()
@@ -149,6 +134,9 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                                     imgs.set(pos, newImage);
                                     //retry recursive
                                     glideBind(holder, pos);
+                                }else if(!useSecond && imgs1 !=null && imgs1.size()>0){
+                                    useSecond = true;
+                                    glideBind(holder, pos);
                                 }
                             }
                         }
@@ -181,6 +169,9 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                             imgs.set(pos,newImage);
                             //retry recursive
                             glideBind(holder,pos);
+                        }else if(!useSecond && imgs1 !=null && imgs1.size()>0){
+                            useSecond = true;
+                            glideBind(holder, pos);
                         }
                     }
                 });

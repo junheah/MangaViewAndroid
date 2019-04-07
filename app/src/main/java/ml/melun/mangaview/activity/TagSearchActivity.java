@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -26,6 +25,7 @@ import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
 import ml.melun.mangaview.mangaview.UpdatedList;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
@@ -129,7 +129,7 @@ public class TagSearchActivity extends AppCompatActivity {
             super.onPreExecute();
         }
         protected String doInBackground(String... params){
-            search.fetch(p.getUrl());
+            search.fetch(httpClient);
             return null;
         }
         @Override
@@ -179,7 +179,7 @@ public class TagSearchActivity extends AppCompatActivity {
             super.onPreExecute();
         }
         protected String doInBackground(String... params){
-            updated.fetch(p.getUrl());
+            updated.fetch(httpClient);
             return null;
         }
         @Override

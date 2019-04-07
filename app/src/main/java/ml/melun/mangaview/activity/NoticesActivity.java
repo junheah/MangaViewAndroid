@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,13 +19,15 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ml.melun.mangaview.Notice;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import okhttp3.Response;
 
-import static ml.melun.mangaview.Utils.httpsGet;
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class NoticesActivity extends AppCompatActivity {
@@ -117,7 +118,9 @@ public class NoticesActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             //get all notices
             try {
-                String rawdata = httpsGet("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json");
+                Response response = httpClient.getRaw("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json", new HashMap<>());
+                String rawdata = response.body().string();
+                response.close();
                 loaded = new Gson().fromJson(rawdata, new TypeToken<List<Notice>>(){}.getType());
             } catch (Exception e) {
                 e.printStackTrace();

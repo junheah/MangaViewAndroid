@@ -94,7 +94,7 @@ public class AdvSearchActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String query = "search_type="+(searchMethod.getSelectedItemPosition()+1)+"&_1="+na.getSelectedIndex()+"&_2="+ra.getSelectedIndex()+"&_3="+ta.getSelectedValues();
+                String query = "search_type="+(searchMethod.getSelectedItemPosition()+1)+"&0=&_1="+na.getSelectedIndex()+"&_2="+ra.getSelectedIndex()+"&_3="+ta.getSelectedValues();
                 Intent searchActivity = new Intent(context, TagSearchActivity.class);
                 searchActivity.putExtra("query", query);
                 searchActivity.putExtra("mode", 6);

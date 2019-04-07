@@ -24,7 +24,6 @@ import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.SelectEpisodeAdapter;
-import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 public class DownloadActivity extends AppCompatActivity {

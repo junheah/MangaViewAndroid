@@ -11,9 +11,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 

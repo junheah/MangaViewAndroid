@@ -15,12 +15,14 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
 
-import static ml.melun.mangaview.Utils.httpsGet;
+import ml.melun.mangaview.mangaview.CustomHttpClient;
+import okhttp3.Response;
+
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class CheckInfo {
@@ -28,8 +30,10 @@ public class CheckInfo {
     updateCheck uc;
     noticeCheck nc;
     SharedPreferences sharedPref;
-    public CheckInfo(Context context){
+    CustomHttpClient client;
+    public CheckInfo(Context context, CustomHttpClient client){
         this.context = context;
+        this.client = client;
         uc = new updateCheck();
         nc = new noticeCheck();
         sharedPref = context.getSharedPreferences("mangaView",Context.MODE_PRIVATE);
@@ -75,7 +79,9 @@ public class CheckInfo {
         protected Integer doInBackground(Void... params) {
             //get all notices
             try {
-                String rawdata = httpsGet("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notice.json");
+                Response response = client.getRaw("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notice.json", new HashMap<>());
+                String rawdata = response.body().string();
+                response.close();
                 notice = new Gson().fromJson(rawdata, new TypeToken<Notice>(){}.getType());
             }catch (Exception e){
                 e.printStackTrace();
@@ -107,7 +113,9 @@ public class CheckInfo {
 
         protected Integer doInBackground(Void... params) {
             try {
-                String rawdata = httpsGet("https://api.github.com/repos/junheah/MangaViewAndroid/releases/latest");
+                Response response = client.getRaw("https://api.github.com/repos/junheah/MangaViewAndroid/releases/latest",new HashMap<>());
+                String rawdata = response.body().string();
+                response.close();
                 data = new JSONObject(rawdata);
                 newVersion = Integer.parseInt(data.getString("tag_name"));
                 if(version<newVersion) {

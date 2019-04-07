@@ -1,14 +1,11 @@
 package ml.melun.mangaview.activity;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -20,7 +17,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -48,9 +44,7 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirec
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +59,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.filterFolder;
@@ -178,7 +173,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.getMenu().getItem(startTab).setChecked(true);
 
         //check for update, notices
-        new CheckInfo(context).all(false);
+        new CheckInfo(context,httpClient).all(false);
     }
 
     public int getTabId(int i){
@@ -286,7 +281,7 @@ public class MainActivity extends AppCompatActivity
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update
-                new CheckInfo(context).all(true);
+                new CheckInfo(context,httpClient).all(true);
             }else if(id==R.id.nav_notice){
                 Intent noticesIntent = new Intent(context, NoticesActivity.class);
                 startActivity(noticesIntent);
@@ -526,7 +521,7 @@ public class MainActivity extends AppCompatActivity
             super.onPreExecute();
         }
         protected String doInBackground(String... params){
-            search.fetch(p.getUrl());
+            search.fetch(httpClient);
             return null;
         }
         @Override

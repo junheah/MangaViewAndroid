@@ -1,6 +1,5 @@
 package ml.melun.mangaview.activity;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -36,6 +35,7 @@ import ml.melun.mangaview.adapter.TagAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.filterFolder;
 
 
@@ -351,7 +351,7 @@ public class EpisodeActivity extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... params) {
-            title.fetchEps(p.getUrl());
+            title.fetchEps(httpClient);
             episodes = title.getEps();
             episodeAdapter = new EpisodeAdapter(context, episodes, title, online);
             return null;

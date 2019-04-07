@@ -1,7 +1,7 @@
 package ml.melun.mangaview.adapter;
 
 import android.content.Context;
-import android.os.AsyncTask;
+
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
@@ -15,14 +15,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
-import ml.melun.mangaview.mangaview.MainPage;
 
 public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<Manga> mData;

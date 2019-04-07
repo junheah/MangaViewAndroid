@@ -2,13 +2,11 @@ package ml.melun.mangaview.mangaview;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+
+import okhttp3.Response;
 
 public class Title {
     public Title(String n, String t, String a, List<String> tg, int r) {
@@ -29,13 +27,12 @@ public class Title {
     }
     public int getRelease() { return release; }
 
-    public void fetchEps(String base) {
+    public void fetchEps(CustomHttpClient client) {
         //fetch episodes
         try {
             eps = new ArrayList<>();
-            Document items = Jsoup.connect(base + "/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"))
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-                    .get();
+            Response response = client.get("/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"));
+            Document items = Jsoup.parse(response.body().string());
             for(Element e:items.select("div.slot")) {
                 eps.add(new Manga(Integer.parseInt(e.attr("data-wrid"))
                         ,e.selectFirst("div.title").ownText()
@@ -53,10 +50,13 @@ public class Title {
             }catch (Exception e){
 
             }
+            response.close();
         }catch(Exception e) {
             e.printStackTrace();
         }
     }
+
+
     public String getAuthor(){
         if(author==null) return "";
         return author;

@@ -14,9 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;

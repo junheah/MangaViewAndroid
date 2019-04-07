@@ -1,24 +1,19 @@
 package ml.melun.mangaview.mangaview;
 
-import android.content.Context;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.HttpCookie;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import ml.melun.mangaview.Preference;
+import okhttp3.Response;
 
 
 public class MainPage {
     List<Manga> recent, ranking, favUpdate, onlineRecent;
-    void fetch(String url,Map<String,String> cookie) {
+
+    void fetch(CustomHttpClient client) {
 
         recent = new ArrayList<>();
         ranking = new ArrayList<>();
@@ -27,10 +22,9 @@ public class MainPage {
 
 
         try{
-            Document doc = Jsoup.connect(url)
-                    .cookies(cookie)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-                    .get();
+            Response response = client.get("");
+            Document doc = Jsoup.parse(response.body().string());
+
             Elements list = doc.selectFirst("div.msm-post-gallery").select("div.post-row");
             for(Element e:list){
                 String[] tmp_idStr = e.selectFirst("a").attr("href").toString().split("=");
@@ -54,9 +48,12 @@ public class MainPage {
             Elements rank = rankingWidgets.get(2).select("li");
             rankingWidgetLiParser(rank, ranking);
 
+            //close response
+            response.close();
+
 
         }catch (Exception e){
-
+            e.printStackTrace();
         }
     }
 
@@ -68,11 +65,8 @@ public class MainPage {
             output.add(new Manga(tmp_id, tmp_title,""));
         }
     }
-    public MainPage(String url){
-        fetch(url, new HashMap<>());
-    }
-    public MainPage(String url, Map<String, String> cookie){
-        fetch(url, cookie);
+    public MainPage(CustomHttpClient client) {
+        fetch(client);
     }
 
     public List<Manga> getRecent() {

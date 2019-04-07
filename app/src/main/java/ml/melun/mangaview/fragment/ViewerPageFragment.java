@@ -25,15 +25,17 @@ import ml.melun.mangaview.mangaview.Decoder;
 import static ml.melun.mangaview.Utils.getSample;
 
 public class ViewerPageFragment extends Fragment {
-    String image;
+    String image, image1;
     Decoder decoder;
     Context context;
     PageInterface i;
     int width;
+    Boolean useSecond = false;
     public ViewerPageFragment(){
     }
-    public Fragment init(String image, Decoder decoder, int width, Context context, PageInterface i){
+    public Fragment init(String image,String image1, Decoder decoder, int width, Context context, PageInterface i){
         this.image = image;
+        this.image1 = image1;
         this.decoder = decoder;
         this.width = width;
         this.context = context;
@@ -70,7 +72,7 @@ public class ViewerPageFragment extends Fragment {
     void loadImage(ImageView frame, ImageButton refresh){
         Glide.with(context)
                 .asBitmap()
-                .load(image)
+                .load(useSecond ? image1 : image)
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
@@ -91,6 +93,9 @@ public class ViewerPageFragment extends Fragment {
                             refresh.setVisibility(View.VISIBLE);
                             if (image.contains("img.")) {
                                 image = image.replace("img.", "s3.");
+                                loadImage(frame, refresh);
+                            }else if(!useSecond){
+                                useSecond = true;
                                 loadImage(frame, refresh);
                             }
                         }

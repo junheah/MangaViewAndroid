@@ -5,22 +5,22 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import okhttp3.Response;
 
 public class UpdatedList {
     public void UpdatedList(){
         //
     }
-    public void fetch(String base){
+    public void fetch(CustomHttpClient client){
         result = new ArrayList<>();
-        String url = base + "/bbs/board.php?bo_table=manga&page=";
+        String url = "/bbs/board.php?bo_table=manga&page=";
         if(!last) {
             try {
                 page++;
-                Document document = Jsoup.connect(url + page)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-                        .get();
+                Response response= client.get(url+page);
+                Document document = Jsoup.parse(response.body().string());
                 Elements items = document.select("div.post-row");
                 if (items.size() < 50) last = true;
                 for(Element item : items){
@@ -38,6 +38,7 @@ public class UpdatedList {
                     tmp.addThumb(ttmp);
                     result.add(tmp);
                 }
+                response.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 page--;

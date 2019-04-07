@@ -1,14 +1,8 @@
 package ml.melun.mangaview.mangaview;
-import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.net.ssl.HttpsURLConnection;
-
-import ml.melun.mangaview.Preference;
+import okhttp3.Response;
 
 public class Manga {
     String base;
@@ -37,7 +29,6 @@ public class Manga {
     public String getName() {
         return name;
     }
-    public String getImg(int index){return imgs.get(index);}
     public void addThumb(String src){
         thumb = src;
     }
@@ -54,46 +45,28 @@ public class Manga {
         return thumb;
     }
 
-
-    public void fetch(String base){
-        fetch(base,new HashMap<String, String>());
+    public void fetch(CustomHttpClient client){
+        fetch(client, true);
     }
-    public void fetch(String base, Map<String, String> cookie) {
+    public void fetch(CustomHttpClient client, Boolean doLogin) {
         imgs = new ArrayList<>();
+        imgs1 = new ArrayList<>();
         eps = new ArrayList<>();
         comments = new ArrayList<>();
         bcomments = new ArrayList<>();
         int tries = 0;
-        String cookies = "";
-        for(String key : cookie.keySet()){
-            cookies += key + '=' + cookie.get(key) + "; ";
-        }
-        //get images
+
         while(imgs.size()==0 && tries < 2) {
-            URLConnection connection = null;
-            //HttpsURLConnection sconnection = null;
-            BufferedReader reader = null;
-            InputStream stream = null;
-            Boolean ssl = false;
+            Map<String,String> cookie = new HashMap<>();
+            cookie.put("last_wr_id",String.valueOf(id));
+            cookie.put("last_percent",String.valueOf(1));
+            cookie.put("last_page",String.valueOf(0));
+
+            Response response = client.get("/bbs/board.php?bo_table=manga&wr_id="+id, doLogin, cookie);
             try {
-                URL url = new URL(base + "/bbs/board.php?bo_table=manga&wr_id="+id);
-                ssl = url.getProtocol().equals("https");
-                if(listener!=null) listener.setMessage("프로토콜 확인중");
-                if(!ssl) {
-                    connection = url.openConnection();
-                    ((HttpURLConnection)connection).setRequestMethod("GET");
-                }else{
-                    connection = url.openConnection();
-                    ((HttpsURLConnection)connection).setRequestMethod("GET");
-                }
-                connection.setRequestProperty("Accept-Encoding", "*");
-                connection.setRequestProperty("Accept", "*");
-                connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-                connection.setRequestProperty("Cookie", cookies);
-                connection.connect();
-                stream = connection.getInputStream();
+                InputStream stream = response.body().byteStream();
                 if(listener!=null) listener.setMessage("페이지 읽는중");
-                reader = new BufferedReader(new InputStreamReader(stream));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 //StringBuffer buffer = new StringBuffer();
                 String line = "";
                 String raw = "";
@@ -107,9 +80,20 @@ public class Manga {
                             String[] imgStrs = imgStr.split("\"");
                             //remove backslash
                             for (int i = 1; i < imgStrs.length; i += 2) {
-                                String imgUrl = imgStrs[i].replace("\\","")
-                                        + "?quick";
+                                String imgUrl = imgStrs[i].replace("\\","");
+                                if(imgUrl.contains("img.")) imgUrl += "?quick";
                                 imgs.add(imgUrl);
+                            }
+                        }
+                    }else if(line.contains("var img_list1 =")) {
+                        if(listener!=null) listener.setMessage("이미지 리스트 (보조) 읽는중");
+                        String imgStr = line;
+                        if(imgStr!=null) {
+                            String[] imgStrs = imgStr.split("\"");
+                            //remove backslash
+                            for (int i = 1; i < imgStrs.length; i += 2) {
+                                String imgUrl = imgStrs[i].replace("\\","");
+                                imgs1.add(imgUrl);
                             }
                         }
                     }else if(line.contains("var only_chapter =")){
@@ -123,6 +107,8 @@ public class Manga {
                     }else if(line.contains("var view_cnt =")){
                         String seedt = line.substring(0,line.length()-1);
                         seed = Integer.parseInt(seedt.split(" ")[3]);
+                    }else if(line.contains("var manga404 = ")){
+                        reported = Boolean.parseBoolean(line.split("=")[1].split(";")[0].split(" ")[1]);
                     }
 
                     //if(imgs.size()>0 && eps.size()>0) break;
@@ -187,20 +173,12 @@ public class Manga {
 
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                if(ssl) ((HttpsURLConnection)connection).disconnect();
-                else ((HttpURLConnection)connection).disconnect();
-                try {
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
             tries++;
+            response.close();
         }
     }
+
 
     public List<Manga> getEps() {
         return eps;
@@ -258,10 +236,19 @@ public class Manga {
         this.listener = listener;
     }
 
+    public Boolean getReported() {
+        return reported;
+    }
+
+    public List<String> getImgs(Boolean second) {
+        if(second) return imgs1;
+        return imgs;
+    }
+
     private int id;
     String name;
     List<Manga> eps;
-    List<String> imgs;
+    List<String> imgs, imgs1;
     List<Comment> comments, bcomments;
     String offlineName;
     String thumb;
@@ -269,6 +256,7 @@ public class Manga {
     String date;
     int seed;
     Listener listener;
+    Boolean reported = false;
 
     public interface Listener{
         void setMessage(String msg);
