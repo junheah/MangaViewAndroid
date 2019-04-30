@@ -18,7 +18,7 @@ import com.bumptech.glide.request.transition.Transition;
 
 import java.util.List;
 
-import ml.melun.mangaview.Preference;
+import static ml.melun.mangaview.MainApplication.p;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Decoder;
 
@@ -31,10 +31,12 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     private StripAdapter.ItemClickListener mClickListener;
     Boolean autoCut = false;
     Boolean reverse;
+    Boolean error = false;
     int __seed;
     Decoder d;
     int width;
     Boolean useSecond = false;
+
 
 
     // data is passed into the constructor
@@ -42,8 +44,9 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.imgs = data;
+        this.imgs1 = data1;
         autoCut = cut;
-        reverse = new Preference(context).getReverse();
+        reverse = p.getReverse();
         __seed = seed;
         d = new Decoder(seed, id);
         this.width = width;
@@ -84,7 +87,8 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         if(autoCut) {
             final int position = pos / 2;
             final int type = pos % 2;
-            final String image = useSecond ? imgs1.get(position) : imgs.get(position);
+            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(position) : imgs.get(position);
+            if(error) image = image.replace("img.","s3.");
             //set image to holder view
             Glide.with(mainContext)
                     .asBitmap()
@@ -128,13 +132,46 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                             if(imgs.size()>0) {
                                 holder.frame.setImageResource(R.drawable.placeholder);
                                 holder.refresh.setVisibility(View.VISIBLE);
-                                //retry?
-                                if (image.contains("img.")) {
-                                    String newImage = image.replace("img.", "s3.");
-                                    imgs.set(pos, newImage);
-                                    //retry recursive
+                                if(!error){
+                                    error = true;
+                                    glideBind(holder,pos);
+                                }else{
+                                    useSecond = true;
+                                    glideBind(holder,pos);
+                                }
+                            }
+                        }
+                    });
+        }
+        else {
+            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(pos) : imgs.get(pos);
+            if(error) image = image.replace("img.","s3.");
+            Glide.with(mainContext)
+                    .asBitmap()
+                    .load(image)
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            resource = d.decode(resource, width);
+                            holder.frame.setImageBitmap(resource);
+                            holder.refresh.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                            holder.frame.setImageDrawable(placeholder);
+                            holder.refresh.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            if (imgs.size() > 0) {
+                                holder.frame.setImageResource(R.drawable.placeholder);
+                                holder.refresh.setVisibility(View.VISIBLE);
+                                if (!error) {
+                                    error = true;
                                     glideBind(holder, pos);
-                                }else if(!useSecond && imgs1 !=null && imgs1.size()>0){
+                                } else if(!useSecond) {
                                     useSecond = true;
                                     glideBind(holder, pos);
                                 }
@@ -142,39 +179,6 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                         }
                     });
         }
-        else Glide.with(mainContext)
-                .asBitmap()
-                .load(imgs.get(pos))
-                .into(new CustomTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                        resource = d.decode(resource,width);
-                        holder.frame.setImageBitmap(resource);
-                        holder.refresh.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onLoadCleared(@Nullable Drawable placeholder) {
-                        holder.frame.setImageDrawable(placeholder);
-                        holder.refresh.setVisibility(View.VISIBLE);
-                    }
-                    @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        holder.frame.setImageResource(R.drawable.placeholder);
-                        holder.refresh.setVisibility(View.VISIBLE);
-                        String image = imgs.get(pos);
-                        //retry?
-                        if(image.contains("img")){
-                            String newImage = image.replace("img","s3");
-                            imgs.set(pos,newImage);
-                            //retry recursive
-                            glideBind(holder,pos);
-                        }else if(!useSecond && imgs1 !=null && imgs1.size()>0){
-                            useSecond = true;
-                            glideBind(holder, pos);
-                        }
-                    }
-                });
     }
 
 
@@ -197,6 +201,8 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                 @Override
                 public void onClick(View v) {
                     //refresh image
+                    error = false;
+                    useSecond = false;
                     notifyItemChanged(getAdapterPosition());
                 }
             });

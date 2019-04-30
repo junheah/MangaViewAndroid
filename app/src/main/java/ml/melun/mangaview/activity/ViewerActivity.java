@@ -44,6 +44,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
@@ -55,7 +56,6 @@ public class ViewerActivity extends AppCompatActivity {
     RecyclerView strip;
     ProgressDialog pd;
     Context context = this;
-    Preference p;
     StripAdapter stripAdapter;
     android.support.v7.widget.Toolbar toolbar;
     boolean toolbarshow = true;
@@ -85,7 +85,6 @@ public class ViewerActivity extends AppCompatActivity {
     Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         dark = p.getDarkTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
@@ -147,7 +146,7 @@ public class ViewerActivity extends AppCompatActivity {
                 if(imgs == null || imgs.size()==0) {
                     showErrorPopup(context);
                 }
-                stripAdapter = new StripAdapter(context,imgs,null, autoCut, seed, id, width);
+                stripAdapter = new StripAdapter(context, imgs, null, autoCut, seed, id, width);
                 strip.setAdapter(stripAdapter);
                 stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
                     public void onItemClick() {
@@ -218,6 +217,7 @@ public class ViewerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(index>0) {
+                    lockUi(true);
                     index--;
                     manga = eps.get(index);
                     id = manga.getId();
@@ -229,6 +229,7 @@ public class ViewerActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(index<eps.size()-1) {
+                    lockUi(true);
                     index++;
                     manga = eps.get(index);
                     id = manga.getId();
@@ -416,6 +417,8 @@ public class ViewerActivity extends AppCompatActivity {
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
 
+            lockUi(false);
+
             if(res == 1){
                 //error occured
                 showErrorPopup(context);
@@ -471,6 +474,7 @@ public class ViewerActivity extends AppCompatActivity {
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
                     ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
                     if(index!= position) {
+                        lockUi(true);
                         index = position;
                         manga = eps.get(index);
                         id = manga.getId();
@@ -511,5 +515,15 @@ public class ViewerActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    void lockUi(Boolean lock){
+        commentBtn.setEnabled(!lock);
+        next.setEnabled(!lock);
+        prev.setEnabled(!lock);
+        pageBtn.setEnabled(!lock);
+        cut.setEnabled(!lock);
+        strip.setEnabled(!lock);
+        spinner.setEnabled(!lock);
     }
 }

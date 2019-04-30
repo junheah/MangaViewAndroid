@@ -20,6 +20,8 @@ import android.widget.Toast;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class SettingsActivity extends AppCompatActivity {
 
     //다운로드 위치 설정
@@ -29,11 +31,9 @@ public class SettingsActivity extends AppCompatActivity {
     ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_viewer, s_reverse, s_dataSave, s_tab, s_url, s_stretch;
     Spinner s_tab_spinner, s_viewer_spinner;
     Switch s_volumeKey_switch, s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch, s_leftRight_switch;
-    Preference p;
     Boolean dark;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         dark = p.getDarkTheme();
 
         if(dark) setTheme(R.style.AppThemeDark);

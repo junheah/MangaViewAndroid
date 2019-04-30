@@ -14,34 +14,32 @@ import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Preference {
-    static SharedPreferences sharedPref;
-    static Context context;
-    //static ArrayList<Title> recent;
-    static ArrayList<Title> recent;
-    static ArrayList<Title> favorite;
-    static SharedPreferences.Editor prefsEditor;
-    static JSONObject pagebookmark;
-    static JSONObject bookmark;
-    static String homeDir;
-    static Boolean volumeControl;
-    static Boolean darkTheme;
-    static int viewerType;
-    static Boolean reverse;
-    static Boolean dataSave;
-    static int startTab;
-    static String url;
-    static Boolean stretch;
-    static Boolean leftRight;
-    static Login login;
-    static final String defUrl = "https://manamoa.net";
+    SharedPreferences sharedPref;
+    //ArrayList<Title> recent;
+    ArrayList<Title> recent;
+    ArrayList<Title> favorite;
+    SharedPreferences.Editor prefsEditor;
+    JSONObject pagebookmark;
+    JSONObject bookmark;
+    String homeDir;
+    Boolean volumeControl;
+    Boolean darkTheme;
+    int viewerType;
+    Boolean reverse;
+    Boolean dataSave;
+    int startTab;
+    String url;
+    Boolean stretch;
+    Boolean leftRight;
+    Login login;
+    final String defUrl = "https://manamoa.net";
 
     //Offline manga has id of -1
     public Preference(Context context){
-        if(this.context==null) init(context);
+        init(context);
     }
     public void init(Context mcontext){
         sharedPref = mcontext.getSharedPreferences("mangaView",Context.MODE_PRIVATE);
-        context = mcontext;
         prefsEditor = sharedPref.edit();
         try {
             Gson gson = new Gson();
@@ -68,107 +66,107 @@ public class Preference {
         }
     }
 
-    public static String getDefUrl() {
+    public String getDefUrl() {
         return defUrl;
     }
 
-    public static Boolean getLeftRight() {
+    public Boolean getLeftRight() {
         return leftRight;
     }
 
-    public static void setLeftRight(Boolean leftRight) {
-        Preference.leftRight = leftRight;
+    public void setLeftRight(Boolean leftRight) {
+        this.leftRight = leftRight;
         prefsEditor.putBoolean("leftRight", leftRight);
         prefsEditor.commit();
     }
 
-    public static int getViewerType() {
+    public int getViewerType() {
         return viewerType;
     }
 
-    public static void setViewerType(int viewerType) {
-        Preference.viewerType = viewerType;
+    public void setViewerType(int viewerType) {
+        this.viewerType = viewerType;
         prefsEditor.putInt("viewerType", viewerType);
         prefsEditor.commit();
     }
 
-    public static Boolean getStretch() {
+    public Boolean getStretch() {
         return stretch;
     }
 
-    public static void setStretch(Boolean stretch) {
-        Preference.stretch = stretch;
+    public void setStretch(Boolean stretch) {
+        this.stretch = stretch;
         prefsEditor.putBoolean("stretch", stretch);
         prefsEditor.commit();
     }
 
-    public static String getUrl() {
+    public String getUrl() {
         return url;
     }
 
-    public static void setUrl(String url) {
-        Preference.url = url;
+    public void setUrl(String url) {
+        this.url = url;
         prefsEditor.putString("url", url);
         prefsEditor.commit();
     }
 
-    public static int getStartTab() {
+    public int getStartTab() {
         return startTab;
     }
 
-    public static void setStartTab(int startTab) {
-        Preference.startTab = startTab;
+    public void setStartTab(int startTab) {
+        this.startTab = startTab;
         prefsEditor.putInt("startTab", startTab);
         prefsEditor.commit();
     }
 
-    public static Boolean getDataSave() {
+    public Boolean getDataSave() {
         return dataSave;
     }
 
-    public static void setDataSave(Boolean dataSave) {
-        Preference.dataSave = dataSave;
+    public void setDataSave(Boolean dataSave) {
+        this.dataSave = dataSave;
         prefsEditor.putBoolean("dataSave", dataSave);
         prefsEditor.commit();
     }
 
-    public static Boolean getReverse() {
+    public Boolean getReverse() {
         return reverse;
     }
 
-    public static void setReverse(Boolean reverse) {
-        Preference.reverse = reverse;
+    public void setReverse(Boolean reverse) {
+        this.reverse = reverse;
         prefsEditor.putBoolean("pageReverse", reverse);
         prefsEditor.commit();
     }
 
 
-    public static Boolean getDarkTheme() {
+    public Boolean getDarkTheme() {
         return darkTheme;
     }
 
-    public static void setDarkTheme(Boolean darkTheme) {
-        Preference.darkTheme = darkTheme;
+    public void setDarkTheme(Boolean darkTheme) {
+        this.darkTheme = darkTheme;
         prefsEditor.putBoolean("darkTheme", darkTheme);
         prefsEditor.commit();
     }
 
-    public static Boolean getVolumeControl() {
+    public Boolean getVolumeControl() {
         return volumeControl;
     }
 
-    public static void setVolumeControl(Boolean volumeControl) {
-        Preference.volumeControl = volumeControl;
+    public void setVolumeControl(Boolean volumeControl) {
+        this.volumeControl = volumeControl;
         prefsEditor.putBoolean("volumeControl", volumeControl);
         prefsEditor.commit();
     }
 
-    public static String getHomeDir() {
+    public String getHomeDir() {
         return homeDir;
     }
 
-    public static void setHomeDir(String homeDir) {
-        Preference.homeDir = homeDir;
+    public void setHomeDir(String homeDir) {
+        this.homeDir = homeDir;
         prefsEditor.putString("homeDir", homeDir);
         prefsEditor.commit();
     }
@@ -357,7 +355,7 @@ public class Preference {
     }
 
     public void setLogin(Login login){
-        Preference.login =login;
+        this.login = login;
         prefsEditor.putString("login", new Gson().toJson(login));
         prefsEditor.commit();
     }

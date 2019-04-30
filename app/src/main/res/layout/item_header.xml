@@ -86,6 +86,17 @@
                 android:scaleType="centerCrop"
                 app:srcCompat="@drawable/star_off" />
 
+            <ImageView
+                android:id="@+id/HeaderBookmark"
+                android:layout_margin="3dp"
+                android:padding="6dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/button_bg"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/bookmark_off"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/HeaderDownload"
@@ -98,17 +109,7 @@
                 android:text="다운로드"
                 android:layout_weight="1"
                 android:textColor="@android:color/white" />
-            <!--<Button-->
-                <!--android:layout_weight="1"-->
-                <!--android:id="@+id/HeaderSubscribe"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="40dp"-->
-                <!--android:background="@drawable/button_bg"-->
-                <!--android:foreground="?android:attr/selectableItemBackground"-->
-                <!--android:enabled="true"-->
-                <!--android:layout_margin="3dp"-->
-                <!--android:text="구독"-->
-                <!--android:textColor="@android:color/white" />-->
+
 
         </android.support.v7.widget.LinearLayoutCompat>
 

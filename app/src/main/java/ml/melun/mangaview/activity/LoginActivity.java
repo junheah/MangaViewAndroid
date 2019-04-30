@@ -26,6 +26,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Login;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 
 /**
  * A login screen that offers login via email/password.
@@ -52,11 +53,9 @@ public class LoginActivity extends AppCompatActivity {
     private View mLoginFormView;
     private Button logoutBtn;
     Context context;
-    Preference p;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);

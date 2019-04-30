@@ -330,4 +330,8 @@ public class Utils {
         }
         return false;
     }
+
+    static public void addToFavorite(){
+
+    }
 }

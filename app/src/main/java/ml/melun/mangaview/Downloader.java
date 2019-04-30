@@ -102,29 +102,31 @@ public class Downloader extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        switch(intent.getAction()){
-            case ACTION_START:
-                break;
-            case ACTION_QUEUE:
-                startNotification();
-                if(dt==null) dt = new downloadTitle();
-                try {
-                    Title target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
-                    }.getType());
-                    JSONArray selection = new JSONArray(intent.getStringExtra("selected"));
-                    queueTitle(target,selection);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                break;
-            case ACTION_STOP:
-                dt.cancel(true);
-                break;
-            case ACTION_UPDATE:
-                if(dt==null) dt = new downloadTitle();
-                String url = intent.getStringExtra("url");
-                update(url);
-                break;
+        if(intent!=null) {
+            switch (intent.getAction()) {
+                case ACTION_START:
+                    break;
+                case ACTION_QUEUE:
+                    startNotification();
+                    if (dt == null) dt = new downloadTitle();
+                    try {
+                        Title target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+                        }.getType());
+                        JSONArray selection = new JSONArray(intent.getStringExtra("selected"));
+                        queueTitle(target, selection);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case ACTION_STOP:
+                    dt.cancel(true);
+                    break;
+                case ACTION_UPDATE:
+                    if (dt == null) dt = new downloadTitle();
+                    String url = intent.getStringExtra("url");
+                    update(url);
+                    break;
+            }
         }
         return START_STICKY;
     }
@@ -306,6 +308,7 @@ public class Downloader extends Service {
                         target.fetch(httpClient, false);
                         Decoder d = new Decoder(target.getSeed(), target.getId());
                         List<String> urls = target.getImgs();
+                        List<String> urls1 = target.getImgs(true);
 
                         //set stepsize
                         float imgStepSize = stepSize / urls.size();
@@ -318,16 +321,29 @@ public class Downloader extends Service {
                         //create download flag
                         File downloadFlag = new File(dir,"downloading");
                         downloadFlag.createNewFile();
-                        Boolean changeS3 = false;
+                        Boolean error = false;
+                        Boolean useSecond = false;
                         for (int i = 0; i < urls.size(); i++) {
                             if (isCancelled()) return 0;
-                            String url = urls.get(i);
-                            if(changeS3) url = url.replace("img.", "s3.");
-
-                            if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d) && !changeS3){
+                            String url = useSecond && urls1.size()>0 ? urls1.get(i) : urls.get(i);
+                            if(error) url = url.replace("img.", "s3.");
+                            if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d)){
                                 //change image server name and retry
-                                changeS3 = true;
-                                i--;
+                                if(!error && !useSecond){
+                                    error = true;
+                                    i--;
+                                }else if(error && !useSecond){
+                                    error = false;
+                                    useSecond = true;
+                                    i--;
+                                }else if(!error && useSecond){
+                                    error = true;
+                                    useSecond = true;
+                                    i--;
+                                }else if(error && useSecond){
+                                    error = false;
+                                    useSecond = false;
+                                }
                                 continue;
                             }//else : success
                             progress += imgStepSize;
@@ -386,19 +402,29 @@ public class Downloader extends Service {
             if(url.getProtocol().toLowerCase().equals("https")) {
                 HttpsURLConnection init = (HttpsURLConnection) url.openConnection();
                 int responseCode = init.getResponseCode();
-                if (responseCode >= 300) {
+                if (responseCode >= 300 && responseCode<400) {
                     url = new URL(init.getHeaderField("location"));
+                }else if(responseCode>=400){
+                    return false;
                 }
             }else{
                 HttpURLConnection init = (HttpURLConnection) url.openConnection();
                 int responseCode = init.getResponseCode();
-                if (responseCode >= 300) {
+                if (responseCode >= 300 && responseCode<400) {
                     url = new URL(init.getHeaderField("location"));
+                }else if(responseCode>=400){
+                    return false;
                 }
             }
             //String fileType = url.toString().substring(url.toString().lastIndexOf('.') + 1);
             URLConnection connection = url.openConnection();
 
+            String type = connection.getHeaderField("Content-Type");
+
+            if(!type.startsWith("image/")) {
+                //following file is not image
+                return false;
+            }
             //load image as bitmap
             InputStream in = connection.getInputStream();
             Bitmap bitmap = BitmapFactory.decodeStream(in);

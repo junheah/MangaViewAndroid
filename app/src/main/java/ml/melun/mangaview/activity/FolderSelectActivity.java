@@ -27,6 +27,7 @@ import java.util.Arrays;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.checkWriteable;
 import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.showPopup;
@@ -37,7 +38,6 @@ public class FolderSelectActivity extends AppCompatActivity {
     Button select, changeSource;
     File currentDir;
     ArrayList<String> folders;
-    Preference p;
     Context context;
     int requestCode;
     ActionBar actionBar;
@@ -47,7 +47,6 @@ public class FolderSelectActivity extends AppCompatActivity {
     Boolean dark;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);

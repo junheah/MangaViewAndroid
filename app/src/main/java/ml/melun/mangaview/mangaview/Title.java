@@ -2,6 +2,7 @@ package ml.melun.mangaview.mangaview;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -27,6 +28,11 @@ public class Title {
     }
     public int getRelease() { return release; }
 
+    public Boolean getBookmarked() {
+        if(bookmarked==null) return false;
+        return bookmarked;
+    }
+
     public void fetchEps(CustomHttpClient client) {
         //fetch episodes
         try {
@@ -39,7 +45,11 @@ public class Title {
                         ,e.selectFirst("div.addedAt").ownText().split(" ")[0]));
             }
             thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
-            author = items.selectFirst("a.author").ownText();
+            try {
+                author = items.selectFirst("a.author").ownText();
+            }catch (Exception e){
+                //noauthor
+            }
             tags = new ArrayList<>();
             for(Element e:items.selectFirst("div.manga-tags").select("a.tag")){
                 tags.add(e.ownText());
@@ -50,10 +60,19 @@ public class Title {
             }catch (Exception e){
 
             }
+            Element bookmark = items.selectFirst("div.favorit");
+            bookmarked = bookmark.attr("class").contains("active");
+            bookmarkLink = bookmark.attr("onclick").split("='")[1].split("'")[0];
+
             response.close();
         }catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void toggleBookmark(CustomHttpClient client){
+        Response r = client.get(bookmarkLink,true);
+        r.close();
     }
 
 
@@ -109,5 +128,7 @@ public class Title {
     String author;
     List<String> tags;
     int release;
+    Boolean bookmarked = false;
+    String bookmarkLink;
 }
 

@@ -36,6 +36,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
 
 
@@ -45,7 +46,6 @@ public class EpisodeActivity extends AppCompatActivity {
     EpisodeAdapter episodeAdapter;
     Context context = this;
     RecyclerView episodeList;
-    Preference p;
     Boolean favoriteResult = false;
     Boolean recentResult = false;
     int position;
@@ -99,7 +99,6 @@ public class EpisodeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
@@ -280,6 +279,18 @@ public class EpisodeActivity extends AppCompatActivity {
             }
         });
         episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
+
+            @Override
+            public void onBookmarkClick() {
+                new AsyncTask<Void,Void, Void>(){
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        title.toggleBookmark(httpClient);
+                        return null;
+                    }
+                }.execute();
+            }
+
             @Override
             public void onItemClick(int position, Manga selected) {
                 //add local images to manga

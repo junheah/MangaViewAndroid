@@ -170,12 +170,13 @@ public class Manga {
                     bcomments.add(new Comment(user, timestamp, icon, content,indent, likes, level));
                 }
 
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if(response!=null){
+                response.close();
+            }
             tries++;
-            response.close();
         }
     }
 
@@ -189,6 +190,12 @@ public class Manga {
     }
 
     public List<String> getImgs(){
+        return getImgs(false);
+    }
+    public List<String> getImgs(Boolean second){
+        if(second){
+            return imgs1;
+        }
         return imgs;
     }
     public List<Comment> getComments(){ return comments; }
@@ -238,11 +245,6 @@ public class Manga {
 
     public Boolean getReported() {
         return reported;
-    }
-
-    public List<String> getImgs(Boolean second) {
-        if(second) return imgs1;
-        return imgs;
     }
 
     private int id;

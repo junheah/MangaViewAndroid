@@ -18,6 +18,8 @@ import java.util.List;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     Context mcontext;
@@ -35,7 +37,7 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         tags = t;
         this.type = type;
         this.mInflater = LayoutInflater.from(m);
-        dark = new Preference(m).getDarkTheme();
+        dark = p.getDarkTheme();
         selected = new Boolean[t.size()];
         Arrays.fill(selected,Boolean.FALSE);
         setHasStableIds(true);

@@ -36,11 +36,11 @@ public class ViewerPagerAdapter extends FragmentStatePagerAdapter
         for(int i = 0; i<imgs.size(); i++){
             String s = imgs.get(i);
             String s1 = "";
-            if(imgs1!=null && imgs1.size() == imgs.size()){
+            if(imgs1 != null && imgs1.size()>0) {
                 s1 = imgs1.get(i);
             }
 
-            fragments.add(new ViewerPageFragment().init(s,s1, new Decoder(m.getSeed(), m.getId()), width, context, new PageInterface() {
+            fragments.add(new ViewerPageFragment().init(s, s1, new Decoder(m.getSeed(), m.getId()), width, context, new PageInterface() {
                 @Override
                 public void onPageClick() {
                     itf.onPageClick();

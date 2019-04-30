@@ -18,6 +18,8 @@ import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Comment;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class commentsAdapter extends BaseAdapter {
     Context context;
     ArrayList<Comment> data;
@@ -26,8 +28,8 @@ public class commentsAdapter extends BaseAdapter {
     Boolean save;
     public commentsAdapter(Context context, ArrayList<Comment> data) {
         super();
-        this.dark = new Preference(context).getDarkTheme();
-        this.save = new Preference(context).getDataSave();
+        this.dark = p.getDarkTheme();
+        this.save = p.getDataSave();
         this.context = context;
         this.data = data;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

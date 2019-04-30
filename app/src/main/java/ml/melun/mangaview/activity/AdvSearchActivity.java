@@ -18,8 +18,9 @@ import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.mainTagAdapter;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class AdvSearchActivity extends AppCompatActivity {
-    Preference preference;
     List<String> tags,names,releases;
     mainTagAdapter ta, ra, na;
     Context context;
@@ -30,8 +31,7 @@ public class AdvSearchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        preference = new Preference(this);
-        if(preference.getDarkTheme()) setTheme(R.style.AppThemeDark);
+        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adv_search);
         context = this;
@@ -39,7 +39,7 @@ public class AdvSearchActivity extends AppCompatActivity {
         searchMethod = this.findViewById(R.id.searchMethod);
         search = this.findViewById(R.id.advSearch);
 
-        if(preference.getDarkTheme()) searchMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        if(p.getDarkTheme()) searchMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
 
         nr = this.findViewById(R.id.search_name);
         rr = this.findViewById(R.id.search_release);

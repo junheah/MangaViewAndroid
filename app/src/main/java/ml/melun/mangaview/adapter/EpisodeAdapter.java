@@ -21,10 +21,11 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
-import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
+
+import static ml.melun.mangaview.MainApplication.p;
 
 
 public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -35,6 +36,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private Context mainContext;
     String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
     Boolean favorite = false;
+    Boolean bookmarked = false;
     TypedValue outValue;
     private int bookmark = -1;
     //header is in index 0
@@ -43,7 +45,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     LinearLayoutManager lm;
     Boolean dark;
     Boolean save;
-    Boolean online;
+    Boolean online = false;
+    Boolean login;
 
     // data is passed into the constructor
     public EpisodeAdapter(Context context, List<Manga> data, Title title, Boolean online) {
@@ -53,8 +56,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.header = title;
         this.online = online;
         outValue = new TypedValue();
-        dark = new Preference(context).getDarkTheme();
-        save = new Preference(context).getDataSave();
+        dark = p.getDarkTheme();
+        save = p.getDataSave();
+        bookmarked = title.getBookmarked();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         if(title.getTags()!=null) {
             ta = new TagAdapter(context, title.getTags());
@@ -63,6 +67,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         setHasStableIds(true);
         if(!online) save = false;
+        login = p.getLogin() != null && online;
     }
 
     @Override
@@ -103,15 +108,21 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             else h.h_release.setText("");
             if(favorite) h.h_star.setImageResource(R.drawable.star_on);
             else h.h_star.setImageResource(R.drawable.star_off);
+            if(bookmarked) h.h_bookmark.setImageResource(R.drawable.bookmark_on);
+            else h.h_bookmark.setImageResource(R.drawable.bookmark_off);
+
             if(!save) Glide.with(mainContext)
                     .load(thumb)
                     .apply(new RequestOptions().dontTransform())
                     .into(h.h_thumb);
             if(online){
-                ((HeaderHolder) holder).h_download.setVisibility(View.VISIBLE);
+                h.h_download.setVisibility(View.VISIBLE);
             }else{
-                ((HeaderHolder) holder).h_download.setVisibility(View.GONE);
+                h.h_download.setVisibility(View.GONE);
             }
+            if(login){
+                h.h_bookmark.setVisibility(View.VISIBLE);
+            }else h.h_bookmark.setVisibility(View.GONE);
         }else {
             ViewHolder h = (ViewHolder) holder;
             int Dposition = position-1;
@@ -162,6 +173,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView h_title, h_author, h_release;
         ImageView h_thumb;
         ImageView h_star;
+        ImageView h_bookmark;
         Button h_download;
         RecyclerView h_tags;
         HeaderHolder(View itemView) {
@@ -173,6 +185,16 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h_tags = itemView.findViewById(R.id.tagsContainer);
             h_author = itemView.findViewById(R.id.headerAuthor);
             h_release = itemView.findViewById(R.id.HeaderRelease);
+            h_bookmark = itemView.findViewById(R.id.HeaderBookmark);
+            h_bookmark.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //set bookmark
+                    mClickListener.onBookmarkClick();
+                    bookmarked = !bookmarked;
+                    notifyItemChanged(0);
+                }
+            });
             h_star.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -232,5 +254,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void onStarClick();
         void onDownloadClick();
         void onAuthorClick();
+        void onBookmarkClick();
     }
 }

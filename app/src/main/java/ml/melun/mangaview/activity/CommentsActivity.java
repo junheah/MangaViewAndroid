@@ -30,6 +30,7 @@ import ml.melun.mangaview.mangaview.Comment;
 import ml.melun.mangaview.mangaview.Login;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.writeComment;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -48,7 +49,6 @@ public class CommentsActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    Preference p;
     ArrayList<Comment> comments, bcomments;
     public commentsAdapter adapter, badapter;
     Context context;
@@ -59,7 +59,6 @@ public class CommentsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         if(p.getDarkTheme()) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
@@ -127,7 +126,7 @@ public class CommentsActivity extends AppCompatActivity {
 
         submit = this.findViewById(R.id.commentButton);
         input = this.findViewById(R.id.comment_editText);
-        Login login = p.getLogin();
+        final Login login = p.getLogin();
         if(login == null) this.findViewById(R.id.comment_input).setVisibility(View.GONE);
         else {
             submit.setOnClickListener(new View.OnClickListener() {

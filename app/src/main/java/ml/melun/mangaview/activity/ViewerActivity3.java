@@ -43,14 +43,14 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity3 extends AppCompatActivity {
-    List<String> imgs, imgs1;
+    List<String> imgs;
     Manga manga;
-    Preference p;
     Context context;
     ViewPager viewPager;
     Boolean dark;
@@ -79,7 +79,6 @@ public class ViewerActivity3 extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
@@ -231,6 +230,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(index>0) {
+                    lockUi(true);
                     index--;
                     manga = eps.get(index);
                     id = manga.getId();
@@ -242,6 +242,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(index<eps.size()-1) {
+                    lockUi(true);
                     index++;
                     manga = eps.get(index);
                     id = manga.getId();
@@ -339,13 +340,13 @@ public class ViewerActivity3 extends AppCompatActivity {
             }
             manga.fetch(httpClient);
             imgs = manga.getImgs();
-            imgs1 = manga.getImgs(true);
             return null;
         }
 
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
+            lockUi(false);
             viewPager.removeOnPageChangeListener(listener);
             //refresh views
             toolbarTitle.setText(manga.getName());
@@ -431,5 +432,13 @@ public class ViewerActivity3 extends AppCompatActivity {
 
             if(pd.isShowing()) pd.dismiss();
         }
+    }
+    void lockUi(Boolean lock){
+        commentBtn.setEnabled(!lock);
+        next.setEnabled(!lock);
+        prev.setEnabled(!lock);
+        pageBtn.setEnabled(!lock);
+        cut.setEnabled(!lock);
+        spinner.setEnabled(!lock);
     }
 }

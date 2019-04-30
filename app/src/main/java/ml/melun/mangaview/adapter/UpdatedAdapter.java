@@ -21,6 +21,8 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context context;
     ArrayList<Manga> mData;
@@ -33,8 +35,8 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         super();
         context = main;
         mData = new ArrayList<>();
-        save = new Preference(main).getDataSave();
-        dark = new Preference(main).getDarkTheme();
+        save = p.getDataSave();
+        dark = p.getDarkTheme();
         this.mInflater = LayoutInflater.from(main);
     }
 

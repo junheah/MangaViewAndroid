@@ -26,6 +26,7 @@ import ml.melun.mangaview.mangaview.Title;
 import ml.melun.mangaview.mangaview.UpdatedList;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
@@ -39,13 +40,11 @@ public class TagSearchActivity extends AppCompatActivity {
     Search search;
     UpdatedList updated;
     TextView noresult;
-    Preference p;
     SwipyRefreshLayout swipe;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_search);

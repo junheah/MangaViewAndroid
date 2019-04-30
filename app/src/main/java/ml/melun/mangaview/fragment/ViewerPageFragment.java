@@ -25,15 +25,17 @@ import ml.melun.mangaview.mangaview.Decoder;
 import static ml.melun.mangaview.Utils.getSample;
 
 public class ViewerPageFragment extends Fragment {
-    String image, image1;
+    String image;
+    String image1;
     Decoder decoder;
     Context context;
     PageInterface i;
     int width;
+    Boolean error = false;
     Boolean useSecond = false;
     public ViewerPageFragment(){
     }
-    public Fragment init(String image,String image1, Decoder decoder, int width, Context context, PageInterface i){
+    public Fragment init(String image, String image1, Decoder decoder, int width, Context context, PageInterface i){
         this.image = image;
         this.image1 = image1;
         this.decoder = decoder;
@@ -56,6 +58,7 @@ public class ViewerPageFragment extends Fragment {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                error = false;
                 loadImage(frame, refresh);
             }
         });
@@ -70,9 +73,10 @@ public class ViewerPageFragment extends Fragment {
     }
 
     void loadImage(ImageView frame, ImageButton refresh){
+        String target = useSecond && image1.length()>1 ? image1 : image;
         Glide.with(context)
                 .asBitmap()
-                .load(useSecond ? image1 : image)
+                .load(error? target.replace("img.","s3.") : target)
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
@@ -91,12 +95,16 @@ public class ViewerPageFragment extends Fragment {
                         if(image.length()>0) {
                             frame.setImageResource(R.drawable.placeholder);
                             refresh.setVisibility(View.VISIBLE);
-                            if (image.contains("img.")) {
-                                image = image.replace("img.", "s3.");
+                            if (!error && !useSecond) {
+                                error = true;
                                 loadImage(frame, refresh);
-                            }else if(!useSecond){
+                            }else if(error && !useSecond){
+                                error = false;
                                 useSecond = true;
                                 loadImage(frame, refresh);
+                            }else{
+                                error = false;
+                                useSecond = false;
                             }
                         }
                     }

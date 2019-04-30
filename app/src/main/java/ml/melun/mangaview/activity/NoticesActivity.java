@@ -21,6 +21,7 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirec
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ml.melun.mangaview.Notice;
 import ml.melun.mangaview.Preference;
@@ -118,7 +119,7 @@ public class NoticesActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             //get all notices
             try {
-                Response response = httpClient.getRaw("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json", new HashMap<>());
+                Response response = httpClient.getRaw("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json", (Map)new HashMap<>());
                 String rawdata = response.body().string();
                 response.close();
                 loaded = new Gson().fromJson(rawdata, new TypeToken<List<Notice>>(){}.getType());

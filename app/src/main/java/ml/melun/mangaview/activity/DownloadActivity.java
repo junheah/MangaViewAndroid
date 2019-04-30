@@ -26,17 +26,17 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.SelectEpisodeAdapter;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class DownloadActivity extends AppCompatActivity {
     Title title;
     SelectEpisodeAdapter adapter;
     RecyclerView eplist;
-    Preference p;
     Boolean dark;
     JSONArray selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        p = new Preference(this);
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDark);
         super.onCreate(savedInstanceState);

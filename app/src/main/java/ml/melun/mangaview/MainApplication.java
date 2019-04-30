@@ -23,7 +23,7 @@ import static org.acra.ReportField.STACK_TRACE;
 
 public class MainApplication extends Application{
     public static CustomHttpClient httpClient;
-    Preference p;
+    public static Preference p;
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -33,6 +33,7 @@ public class MainApplication extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        httpClient = new CustomHttpClient(new Preference(this));
+        p = new Preference(this);
+        httpClient = new CustomHttpClient(p);
     }
 }

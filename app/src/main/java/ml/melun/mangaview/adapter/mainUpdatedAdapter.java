@@ -22,6 +22,8 @@ import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<Manga> mData;
     Context context;
@@ -36,8 +38,8 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         mData = new ArrayList<>();
         mData.add(new Manga(0,"로드중...",""));
         this.mInflater = LayoutInflater.from(c);
-        dark = new Preference(c).getDarkTheme();
-        save = new Preference(c).getDataSave();
+        dark = p.getDarkTheme();
+        save = p.getDataSave();
 
         //fetch data with async
         //data initialize

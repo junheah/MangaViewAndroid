@@ -16,9 +16,10 @@ import org.json.JSONArray;
 import java.util.Arrays;
 import java.util.List;
 
-import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
+
+import static ml.melun.mangaview.MainApplication.p;
 
 public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -39,7 +40,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         outValue = new TypedValue();
         selected = new Boolean[list.size()];
         Arrays.fill(selected,Boolean.FALSE);
-        dark = new Preference(context).getDarkTheme();
+        dark = p.getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         setHasStableIds(true);
     }

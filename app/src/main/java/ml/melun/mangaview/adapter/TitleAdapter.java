@@ -19,6 +19,8 @@ import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> {
 
     private ArrayList<Title> mData;
@@ -30,7 +32,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     Boolean resume = true;
     Boolean updated = false;
     String path = "";
-    Preference p;
 
     public TitleAdapter(Context context) {
         init(context);
