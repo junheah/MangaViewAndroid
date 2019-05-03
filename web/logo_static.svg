@@ -3,9 +3,6 @@
         <polygon fill="#db49de" stroke-width="0" points = "0 220, 75 0, 125 0, 180 170, 235 0, 285 0, 360 220, 310 220 ,260 50, 210 220, 150 220, 100 50, 40 220"/>
     </g>
     <g class="v">
-        <polygon fill="#dddddd" stroke-width="0" points = "285 0, 360 220, 410 220, 480 0, 430 0, 385 170, 335 0"/>
-    </g>
-    <g class="shadow">
-        <rect fill="#00000" fill-opacity="0.2" x="0" y="-110" width="480" height="220"></rect>
+        <polygon fill="#333333" stroke-width="0" points = "285 0, 360 220, 410 220, 480 0, 430 0, 385 170, 335 0"/>
     </g>
 </svg>
