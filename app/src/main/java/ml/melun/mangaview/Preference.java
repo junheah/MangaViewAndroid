@@ -9,6 +9,8 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Title;
@@ -16,8 +18,8 @@ import ml.melun.mangaview.mangaview.Title;
 public class Preference {
     SharedPreferences sharedPref;
     //ArrayList<Title> recent;
-    ArrayList<Title> recent;
-    ArrayList<Title> favorite;
+    List<Title> recent;
+    List<Title> favorite;
     SharedPreferences.Editor prefsEditor;
     JSONObject pagebookmark;
     JSONObject bookmark;
@@ -177,26 +179,23 @@ public class Preference {
 
     public void addRecent(Title tmp){
         //FUCK YOU JAVA FOR NOT USING POINTERS
-        Title title = new Title(tmp.getName(),tmp.getThumb(),tmp.getAuthor(),tmp.getTags(),tmp.getRelease());
-        int position = getIndexOf(title);
-        if(position>-1) {
-            recent.add(0,recent.get(position));
-            recent.remove(position+1);
-        } else recent.add(0,title);
-        writeRecent();
+        if(tmp.getId()>0) {
+            Title title = tmp.clone();
+            int position = getIndexOf(title);
+            if (position > -1) {
+                recent.add(0, recent.get(position));
+                recent.remove(position + 1);
+            } else recent.add(0, title);
+            writeRecent();
+        }
     }
+
     public void updateRecentData(Title title){
-        recent.get(0).setName(title.getName());
-        recent.get(0).setThumb(title.getThumb());
-        recent.get(0).setAuthor(title.getAuthor());
-        recent.get(0).setTags(title.getTags());
+        recent.set(0, title.clone());
         writeRecent();
         int index = findFavorite(title);
         if(index>-1){
-            favorite.get(index).setName(title.getName());
-            favorite.get(index).setThumb(title.getThumb());
-            favorite.get(index).setAuthor(title.getAuthor());
-            favorite.get(index).setTags(title.getTags());
+            favorite.set(index,title.clone());
             Gson gson = new Gson();
             prefsEditor.putString("favorite", gson.toJson(favorite));
             prefsEditor.commit();
@@ -204,27 +203,32 @@ public class Preference {
     }
 
     private int getIndexOf(Title title){
-        String targetT = title.getName();
-        for(int i=0; i<recent.size(); i++){
-            if(targetT.equals(recent.get(i).getName())) return i;
+        if(title.getId()>0) {
+            return recent.indexOf(title);
         }
         return -1;
     }
 
-    public void setBookmark(String title, int id){
-        try {
-            bookmark.put(title, id);
-        } catch (Exception e) {
-            //
+    public void setBookmark(Title title, int id){
+        int titleId = title.getId();
+        if(titleId>0) {
+            try {
+                bookmark.put(String.valueOf(title.getId()), id);
+            } catch (Exception e) {
+                //
+            }
+            writeBookmark();
         }
-        writeBookmark();
     }
-    public int getBookmark(String title){
+    public int getBookmark(Title title){
         //return recent.get(0).getBookmark();
-        try {
-            return  bookmark.getInt(title);
-        } catch (Exception e) {
-            //
+        int titleId = title.getId();
+        if(titleId>0) {
+            try {
+                return bookmark.getInt(String.valueOf(titleId));
+            } catch (Exception e) {
+                //
+            }
         }
         return -1;
     }
@@ -291,7 +295,7 @@ public class Preference {
     public Boolean toggleFavorite(Title tmp, int position){
         int index = findFavorite(tmp);
         if(index==-1){
-            Title title = new Title(tmp.getName(),tmp.getThumb(),tmp.getAuthor(),tmp.getTags(),tmp.getRelease());
+            Title title = tmp.clone();
             favorite.add(position,title);
             Gson gson = new Gson();
             prefsEditor.putString("favorite", gson.toJson(favorite));
@@ -306,17 +310,33 @@ public class Preference {
         }
     }
     public int findFavorite(Title title){
-        for(int i=0; i<favorite.size();i++){
-            if(title.getName().equals(favorite.get(i).getName())) return i;
+        if(title.getId()>0){
+            return favorite.indexOf(title);
         }
         return -1;
     }
 
-    public ArrayList<Title> getFavorite(){
+    public List<Title> getFavorite(){
         return favorite;
     }
+    public void setFavorites(List<Title> fav){
+        this.favorite = fav;
+        Gson gson = new Gson();
+        prefsEditor.putString("favorite", gson.toJson(favorite));
+        prefsEditor.commit();
+    }
 
-    public ArrayList<Title> getRecent(){
+    public void setRecents(List<Title> rec){
+        this.recent = rec;
+        writeRecent();
+    }
+
+    public void setBookmarks(JSONObject book){
+        this.bookmark = book;
+        writeBookmark();
+    }
+
+    public List<Title> getRecent(){
         return recent;
     }
 
@@ -359,7 +379,30 @@ public class Preference {
         prefsEditor.putString("login", new Gson().toJson(login));
         prefsEditor.commit();
     }
+
+    public Boolean check(){
+        for(Title t: recent){
+            if(t.getId()<=0) return false;
+        }
+        for(Title t: favorite){
+            if(t.getId()<=0) return false;
+        }
+        Iterator<String> keys = bookmark.keys();
+        try {
+            while (keys.hasNext()) {
+                Integer.parseInt(keys.next());
+            }
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
     public Login getLogin(){
         return login;
+    }
+
+    public JSONObject getBookmarkObject() {
+        return bookmark;
     }
 }

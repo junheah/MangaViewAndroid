@@ -92,7 +92,9 @@ public class Search {
                 if (items.size() < 1) last = true;
 
                 for (Element item : items) {
-                    String ntmp = (item.selectFirst("div.manga-subject").selectFirst("a").ownText());
+                    Element manga_subject = item.selectFirst("div.manga-subject").selectFirst("a");
+                    String ntmp = (manga_subject.ownText());
+                    String idtmp = manga_subject.attr("href").split("manga_id=")[1];
                     String ttmp = (item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
                     String atmp = "";
                     try {
@@ -112,7 +114,7 @@ public class Search {
                     }catch (Exception e){
 
                     }
-                    result.add(new Title(ntmp, ttmp, atmp, tags, release));
+                    result.add(new Title(ntmp, ttmp, atmp, tags, release, Integer.parseInt(idtmp)));
                 }
                 if (items.size() < 30) last = true;
                 response.close();

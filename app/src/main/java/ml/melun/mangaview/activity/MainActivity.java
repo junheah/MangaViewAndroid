@@ -46,6 +46,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import ml.melun.mangaview.CheckInfo;
@@ -53,6 +54,7 @@ import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.mainAdapter;
+import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -101,6 +103,34 @@ public class MainActivity extends AppCompatActivity
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //check prefs
+        if(!p.check()){
+            //popup to fix preferences
+            System.out.println("needs fix");
+
+            AlertDialog.Builder builder;
+            if (p.getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+            else builder = new AlertDialog.Builder(context);
+            builder.setTitle("기록 업데이트 필요")
+                    .setCancelable(false)
+                    .setMessage("저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?")
+                    .setPositiveButton("네", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //update data
+                            new DataUpdater().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        }
+                    })
+                    .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //reset pref
+                            showPopup(context,"알림","예기치 못한 오류가 발생할 수 있습니다. 앱의 데이터를 초기화 하거나 데이터 업데이트를 진행 해 주세요.");
+                        }
+                    })
+                    .show();
+        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -649,8 +679,10 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
         //좋아요 추가/제거 중 하나만 남김
-        if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
-        else popup.getMenu().removeItem(R.id.favDel);
+        if(m!=2) {
+            if (p.findFavorite(title) > -1) popup.getMenu().removeItem(R.id.favAdd);
+            else popup.getMenu().removeItem(R.id.favDel);
+        }
 
         //registering popup with OnMenuItemClickListener
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -707,5 +739,147 @@ public class MainActivity extends AppCompatActivity
         Intent viewer = viewerIntent(context,manga);
         viewer.putExtra("online",true);
         startActivityForResult(viewer, code);
+    }
+
+
+    private class DataUpdater extends AsyncTask<Void,Void,Integer>{
+        ProgressDialog pd;
+        int sum = 0;
+        int current = 0;
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            pd.setMessage(current +" / " + sum+"\n 앱을 종료하지 말아주세요.");
+        }
+        @Override
+        protected void onPreExecute() {
+            if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
+            else pd = new ProgressDialog(context);
+            pd.setMessage("시작중");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+
+            Search a = new Search("아이",0);
+            a.fetch(httpClient);
+            if(a.getResult().size()<=0){
+                return 1;
+            }
+
+
+            List<Title> recents = p.getRecent();
+            sum += recents.size();
+            List<Title> favorites = p.getFavorite();
+            sum += favorites.size();
+            JSONObject bookmarks = p.getBookmarkObject();
+            sum += bookmarks.length();
+            //recent data
+
+            //test only favorites
+            titleList(favorites);
+            removeDups(favorites);
+
+            titleList(recents);
+            removeDups(recents);
+
+
+            Iterator<String> keys = bookmarks.keys();
+            JSONObject newBookMark = new JSONObject();
+            while(keys.hasNext()){
+                try {
+                    current++;
+                    publishProgress();
+                    String key = keys.next();
+                    try {
+                        Integer.parseInt(key);
+                        newBookMark.put(key, bookmarks.get(key));
+                    } catch (Exception e) {
+                        //is not number
+                        int id = findId(key);
+                        if (id > 0) {
+                            newBookMark.put(String.valueOf(id), bookmarks.get(key));
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            p.setFavorites(favorites);
+            p.setRecents(recents);
+            p.setBookmarks(newBookMark);
+
+            return 0;
+        }
+
+        void removeDups(List<Title> titles){
+            for(int i=0; i<titles.size(); i++){
+                Title target = titles.get(i);
+                for(int j =0 ; j<titles.size(); j++){
+                    if(j!=i && titles.get(j).getId() == target.getId()){
+                        titles.remove(i);
+                        i--;
+                        break;
+                    }
+                }
+            }
+        }
+
+        void titleList(List<Title> titles){
+            for(int i = 0; i<titles.size(); i++){
+                current++;
+                publishProgress();
+                Title target = titles.get(i);
+                if(target.getId() <= 0){
+                    int newId = findId(target);
+                    if(newId<0){
+                        titles.remove(i);
+                        i--;
+                    }else{
+                        target.setId(newId);
+                    }
+                }
+            }
+        }
+
+        int findId(String title){
+            return findId(new Title(title,"","",new ArrayList<>(),-1,-1));
+        }
+
+        int findId(Title title){
+            String name = title.getName();
+            Search s = new Search(name,0);
+            while(!s.isLast()){
+                s.fetch(httpClient);
+                for(Title t : s.getResult()){
+                    if(t.getName().equals(name)){
+                        System.out.println(t.getName()+"..."+ t.getId());
+                        return t.getId();
+                    }
+                }
+            }
+            return -1;
+        }
+
+        @Override
+        protected void onPostExecute(Integer resCode) {
+            if(pd.isShowing()){
+                pd.dismiss();
+            }
+
+            if(resCode == 0) showPopup(context,"알림","데이터 업데이트 완료");
+            else if(resCode == 1) showPopup(context,"연결 오류","연결을 확인하고 다시 시도해 주세요.");
+        }
+
+        @Override
+        protected void onCancelled() {
+            if(pd.isShowing()){
+                pd.dismiss();
+            }
+
+
+        }
     }
 }

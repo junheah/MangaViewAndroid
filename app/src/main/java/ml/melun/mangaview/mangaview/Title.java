@@ -9,14 +9,37 @@ import org.jsoup.nodes.Element;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.Utils.getIdWithName;
+
 public class Title {
+
     public Title(String n, String t, String a, List<String> tg, int r) {
         name = n;
         thumb = t;
         author = a;
         tags = tg;
         release = r;
+        id = -1;
     }
+
+    public Title(String n, String t, String a, List<String> tg, int r, int id) {
+        name = n;
+        thumb = t;
+        author = a;
+        tags = tg;
+        release = r;
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ((Title)obj).getId() == this.id;
+    }
+
     public String getName() {
         return name;
     }
@@ -36,8 +59,16 @@ public class Title {
     public void fetchEps(CustomHttpClient client) {
         //fetch episodes
         try {
+            System.out.println(id);
+            if(id<0){
+                this.id = getIdWithName(client, this.name);
+                if(this.id<0) return;
+            }
+
             eps = new ArrayList<>();
-            Response response = client.get("/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"));
+            //now uses id, not name
+            //Response response = client.get("/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"));
+            Response response = client.get("/bbs/page.php?hid=manga_detail&manga_id="+id);
             Document items = Jsoup.parse(response.body().string());
             for(Element e:items.select("div.slot")) {
                 eps.add(new Manga(Integer.parseInt(e.attr("data-wrid"))
@@ -45,6 +76,7 @@ public class Title {
                         ,e.selectFirst("div.addedAt").ownText().split(" ")[0]));
             }
             thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
+            name = items.selectFirst("div.manga-subject").selectFirst("div.title").ownText();
             try {
                 author = items.selectFirst("a.author").ownText();
             }catch (Exception e){
@@ -72,7 +104,7 @@ public class Title {
 
     public void toggleBookmark(CustomHttpClient client){
         Response r = client.get(bookmarkLink,true);
-        r.close();
+        if(r!=null) r.close();
     }
 
 
@@ -96,7 +128,9 @@ public class Title {
     public void setThumb(String thumb) {
         this.thumb = thumb;
     }
-    public int getBookmark(){ return bookmark;}
+    public int getBookmark(){
+        return bookmark;
+    }
     public int getEpsCount(){ return eps.size();}
     public List<String> getTags(){
         if(tags==null) return new ArrayList<>();
@@ -121,14 +155,25 @@ public class Title {
 
     public void setBookmark(int b){bookmark = b;}
 
+
+    @Override
+    public Title clone(){
+        return new Title(name, thumb, author, tags, release, id);
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private String name;
+    private int id;
     private String thumb;
     private List<Manga> eps;
-    private int bookmark=-1;
+    int bookmark;
     String author;
     List<String> tags;
     int release;
-    Boolean bookmarked = false;
+    Boolean bookmarked;
     String bookmarkLink;
 }
 

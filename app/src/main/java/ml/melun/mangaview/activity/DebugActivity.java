@@ -57,7 +57,7 @@ public class DebugActivity extends AppCompatActivity {
                 List<Title> titles = p.getRecent();
                 StringBuilder b = new StringBuilder();
                 for(Title t : titles){
-                    if(t.getBookmark()>0) p.setBookmark(t.getName(),t.getBookmark());
+                    if(t.getBookmark()>0) p.setBookmark(t,t.getBookmark());
                     b.append("제목: "+t.getName() +" | 북마크: "+t.getBookmark() +'\n');
                 }
                 b.append("북마크 이전이 완료되었습니다.");

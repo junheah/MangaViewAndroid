@@ -107,7 +107,7 @@ public class EpisodeActivity extends AppCompatActivity {
         upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
         title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
         online = intent.getBooleanExtra("online", true);
-        bookmarkId = p.getBookmark(title.getName());
+        bookmarkId = p.getBookmark(title);
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
@@ -115,11 +115,13 @@ public class EpisodeActivity extends AppCompatActivity {
         progress = this.findViewById(R.id.progress);
         episodeList.setLayoutManager(new LinearLayoutManager(this));
         homeDir = p.getHomeDir();
+
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
         if(recentResult){
             Intent resultIntent = new Intent();
             setResult(RESULT_OK,resultIntent);
         }
+
         actionBar = getSupportActionBar();
         if(actionBar!=null){
             actionBar.setTitle(title.getName());
@@ -232,6 +234,11 @@ public class EpisodeActivity extends AppCompatActivity {
 
     public void afterLoad(){
         //find bookmark
+        actionBar = getSupportActionBar();
+        if(actionBar!=null){
+            actionBar.setTitle(title.getName());
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         if(bookmarkId>-1){
             for(int i=0; i< episodes.size(); i++){
                 if(episodes.get(i).getId()==bookmarkId){

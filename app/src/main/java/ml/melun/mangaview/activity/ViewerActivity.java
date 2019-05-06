@@ -129,7 +129,7 @@ public class ViewerActivity extends AppCompatActivity {
                 if(id>-1){
                     //if manga has id = manga has title = update bookmark and add to recent
                     p.addRecent(title);
-                    p.setBookmark(title.getName(),id);
+                    p.setBookmark(title,id);
                 }
                 toolbarTitle.setText(manga.getName());
                 toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
@@ -492,7 +492,7 @@ public class ViewerActivity extends AppCompatActivity {
             try {
                 if (title == null) title = manga.getTitle();
                 p.addRecent(title);
-                if (id > 0) p.setBookmark(title.getName(), id);
+                if (id > 0) p.setBookmark(title, id);
                 result = new Intent();
                 result.putExtra("id", id);
                 setResult(RESULT_OK, result);

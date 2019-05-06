@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.List;
 
 import ml.melun.mangaview.activity.EpisodeActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
@@ -331,7 +332,8 @@ public class Utils {
         return false;
     }
 
-    static public void addToFavorite(){
 
+    static public int getIdWithName(CustomHttpClient client, String name){
+        return -1;
     }
 }

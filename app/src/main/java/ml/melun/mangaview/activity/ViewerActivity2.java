@@ -162,7 +162,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             if(id>-1){
                 //if manga has id = manga has title = update bookmark and add to recent
                 p.addRecent(title);
-                p.setBookmark(title.getName(),id);
+                p.setBookmark(title,id);
             }
             imgs = manga.getImgs();
             types = new ArrayList<>();
@@ -695,7 +695,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                 //update intent : not sure this works TODO: test this shit
                 intent.putExtra("title", new Gson().toJson(title));
                 intent.putExtra("manga", new Gson().toJson(manga));
-                if (id > 0) p.setBookmark(title.getName(), id);
+                if (id > 0) p.setBookmark(title, id);
                 viewerBookmark = p.getViewerBookmark(id);
                 refreshImage();
             }catch(Exception e){

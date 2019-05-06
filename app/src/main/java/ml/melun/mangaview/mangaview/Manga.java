@@ -3,6 +3,7 @@ package ml.melun.mangaview.mangaview;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,6 +110,12 @@ public class Manga {
                         seed = Integer.parseInt(seedt.split(" ")[3]);
                     }else if(line.contains("var manga404 = ")){
                         reported = Boolean.parseBoolean(line.split("=")[1].split(";")[0].split(" ")[1]);
+                    }else if(line.contains("var link =")){
+                        String idStr = line.substring(line.indexOf("manga_id=")+9, line.indexOf("&"));
+                        System.out.println(idStr);
+                        String titleName = URLDecoder.decode(line.substring(line.indexOf("manga_name=")+11,line.length()-2),"UTF-8");
+                        System.out.println(titleName);
+                        title = new Title(titleName,"","",new ArrayList<String>(), -1, Integer.parseInt(idStr));
                     }
 
                     //if(imgs.size()>0 && eps.size()>0) break;
@@ -121,8 +128,8 @@ public class Manga {
                 //parse title
                 if(title==null){
                     String href = doc.selectFirst("div.comic-navbar").select("a").get(3).attr("href");
-                    String name = href.substring(href.indexOf("manga_name=")+11);
-                    title = new Title(java.net.URLDecoder.decode(name, "UTF-8"),"","",new ArrayList<String>(), -1);
+                    String idStr = href.substring(href.indexOf("manga_id=")+11);
+                    title = new Title("","","",new ArrayList<String>(), -1, Integer.parseInt(idStr));
                 }
 
                 //parse name

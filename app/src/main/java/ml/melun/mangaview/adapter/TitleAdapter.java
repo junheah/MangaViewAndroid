@@ -68,7 +68,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public void addData(List<Title> t){
         int oSize = mData.size();
         for(Title d:t){
-            d.setBookmark(p.getBookmark(d.getName()));
+            d.setBookmark(p.getBookmark(d));
         }
         mData.addAll(t);
         notifyItemRangeInserted(oSize,t.size());
@@ -151,7 +151,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             resume.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mData.get(getAdapterPosition()).getName()));
+                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mData.get(getAdapterPosition())));
                 }
             });
 

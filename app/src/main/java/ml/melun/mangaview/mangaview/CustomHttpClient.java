@@ -1,6 +1,10 @@
 package ml.melun.mangaview.mangaview;
 
 
+import android.app.Activity;
+
+import org.mozilla.javascript.Context;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -16,7 +20,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import ml.melun.mangaview.MainApplication;
 import ml.melun.mangaview.Preference;
+import ml.melun.mangaview.activity.MainActivity;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -26,14 +32,15 @@ import okhttp3.Response;
 
 public class CustomHttpClient {
     OkHttpClient client;
-    Preference p ;
+    Preference p;
+    //Map<String,String> cfc;
 
     public CustomHttpClient(Preference p){
         this.p = p;
         this.client = getUnsafeOkHttpClient().followRedirects(false).followSslRedirects(false).build();
+        //this.cfc = new HashMap<>();
         //this.client = new OkHttpClient.Builder().build();
     }
-
 
     public Response getRaw(String url, Map<String, String> cookies){
 //        if(!isloaded){
@@ -46,6 +53,10 @@ public class CustomHttpClient {
             for(String key : cookies.keySet()){
                 cookie += key + '=' + cookies.get(key) + "; ";
             }
+//            for(String key : cfc.keySet()){
+//                cookie +=  key + '=' + cfc.get(key)+ "; ";
+//            }
+
             Request request = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .addHeader("Cookie", cookie)
@@ -54,6 +65,11 @@ public class CustomHttpClient {
                     .build();
             response = client.newCall(request)
                     .execute();
+//            if(response != null){
+//                if(response.code()>=500){
+//                    System.out.println("cf");
+//                }
+//            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -91,6 +107,9 @@ public class CustomHttpClient {
             if(p.getLogin()!=null){
                 cookie = p.getLogin().getCookie(true);
             }
+//            for(String key : cfc.keySet()){
+//                cookie +=  key + '=' + cfc.get(key)+ "; ";
+//            }
             Request request = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .addHeader("Cookie", cookie)
@@ -151,5 +170,20 @@ public class CustomHttpClient {
             throw new RuntimeException(e);
         }
 
+    }
+
+
+    public void setCookie(String raw){
+        //this.cfc = new HashMap<>();
+        String[] splitted = raw.split(";");
+        for(String s : splitted){
+            String[] s2 = s.split("=");
+            String key = s2[0];
+            String val = s2[1];
+            if(key.indexOf(' ')==0){
+                key = key.substring(1);
+            }
+            //if(key.contains("cfduid")) cfc.put(key,val);
+        }
     }
 }
