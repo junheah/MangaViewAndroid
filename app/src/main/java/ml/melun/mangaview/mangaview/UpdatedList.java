@@ -21,27 +21,31 @@ public class UpdatedList {
                 page++;
                 Response response= client.get(url+page);
                 Document document = Jsoup.parse(response.body().string());
-                Elements items = document.select("div.post-row");
+                Elements items = document.select("div.media.post-list");
                 if (items.size() < 50) last = true;
                 for(Element item : items){
-                    String ttmp = item.selectFirst("div.img-item").selectFirst("img").attr("src");
-                    String ntmp = item.selectFirst("div.post-subject").selectFirst("a").ownText().replace('\n',' ');
-                    String idStr = item.selectFirst("div.post-info").selectFirst("a").attr("href").split("manga_id=")[1];
-                    int id = Integer.parseInt(idStr);
+                    try {
+                        String ttmp = item.selectFirst("div.img-item").selectFirst("img").attr("src");
+                        String ntmp = item.selectFirst("div.post-subject").selectFirst("a").ownText().replace('\n', ' ');
+                        String idStr = item.selectFirst("div.post-info").selectFirst("a").attr("href").split("manga_id=")[1];
+                        int id = Integer.parseInt(idStr);
 
-                    String idRaw = item.selectFirst("div.post-image").selectFirst("a.ellipsis").attr("href");
-                    int itmp = Integer.parseInt(idRaw.substring(idRaw.lastIndexOf("=")+1));
+                        String idRaw = item.selectFirst("div.post-image").selectFirst("a.ellipsis").attr("href");
+                        int itmp = Integer.parseInt(idRaw.substring(idRaw.lastIndexOf("=") + 1));
 
-                    String dtmp = item.selectFirst("div.post-info").selectFirst("span").ownText();
+                        String dtmp = item.selectFirst("div.post-info").selectFirst("span").ownText();
 
-                    Manga tmp = new Manga(itmp,ntmp,dtmp);
-                    tmp.setTitle(new Title("","","",new ArrayList<String>(), -1, id));
-                    tmp.addThumb(ttmp);
-                    result.add(tmp);
+                        Manga tmp = new Manga(itmp, ntmp, dtmp);
+                        tmp.setTitle(new Title("", "", "", new ArrayList<String>(), -1, id));
+                        tmp.addThumb(ttmp);
+                        result.add(tmp);
+                    }catch(Exception e){
+                        continue;
+                    }
                 }
                 response.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("pppppp"+e.getMessage());
                 page--;
             }
         }

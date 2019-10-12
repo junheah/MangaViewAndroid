@@ -233,7 +233,7 @@ public class SettingsActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 //Toast.makeText(context,"아직 공식 대피소가 없습니다. 오픈 톡방을 이용해 주세요", Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/manamoa19")));
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/manamoa20")));
                             }
                         })
                         .show();
