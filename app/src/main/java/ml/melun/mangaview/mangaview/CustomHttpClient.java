@@ -3,7 +3,6 @@ package ml.melun.mangaview.mangaview;
 
 import android.app.Activity;
 
-import org.mozilla.javascript.Context;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -33,13 +32,13 @@ import okhttp3.Response;
 public class CustomHttpClient {
     OkHttpClient client;
     Preference p;
-    //Map<String,String> cfc;
 
     public CustomHttpClient(Preference p){
         this.p = p;
         this.client = getUnsafeOkHttpClient().followRedirects(false).followSslRedirects(false).build();
         //this.cfc = new HashMap<>();
         //this.client = new OkHttpClient.Builder().build();
+        System.out.println("ccccccc " + p.getSession());
     }
 
     public Response getRaw(String url, Map<String, String> cookies){
@@ -56,6 +55,7 @@ public class CustomHttpClient {
 //            for(String key : cfc.keySet()){
 //                cookie +=  key + '=' + cfc.get(key)+ "; ";
 //            }
+            System.out.println("cccccc " +cookie);
 
             Request request = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
@@ -78,9 +78,8 @@ public class CustomHttpClient {
 
     public Response get(String url, Boolean doLogin){
         Map<String, String> cookies = new HashMap<>();
-        Login login = p.getLogin();
-        if(doLogin && login!=null){
-            login.buildCookie(cookies);
+        if(doLogin && p.getSession().length()>0) {
+            cookies.put("PHPSESSID", p.getSession());
         }
         return getRaw(p.getUrl()+url,cookies);
     }
@@ -89,9 +88,8 @@ public class CustomHttpClient {
     }
 
     public Response get(String url,Boolean doLogin, Map<String, String> customCookie){
-        Login login = p.getLogin();
-        if(doLogin && login!=null){
-            login.buildCookie(customCookie);
+        if(doLogin && p.getSession().length()>0){
+            customCookie.put("PHPSESSID", p.getSession());
         }
         return getRaw(p.getUrl()+url, customCookie);
     }
@@ -104,12 +102,6 @@ public class CustomHttpClient {
         Response response = null;
         try {
             String cookie = "";
-            if(p.getLogin()!=null){
-                cookie = p.getLogin().getCookie(true);
-            }
-//            for(String key : cfc.keySet()){
-//                cookie +=  key + '=' + cfc.get(key)+ "; ";
-//            }
             Request request = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .addHeader("Cookie", cookie)
@@ -172,18 +164,4 @@ public class CustomHttpClient {
 
     }
 
-
-    public void setCookie(String raw){
-        //this.cfc = new HashMap<>();
-        String[] splitted = raw.split(";");
-        for(String s : splitted){
-            String[] s2 = s.split("=");
-            String key = s2[0];
-            String val = s2[1];
-            if(key.indexOf(' ')==0){
-                key = key.substring(1);
-            }
-            //if(key.contains("cfduid")) cfc.put(key,val);
-        }
-    }
 }

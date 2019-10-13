@@ -351,7 +351,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         protected MainPage doInBackground(Void... params) {
             Map<String,String> cookie = new HashMap<>();
             Login login = p.getLogin();
-            if(login!=null && login.getCookie()!=null && login.getCookie().length()>0){
+            if(login!=null && login.isValid()){
                 p.getLogin().buildCookie(cookie);
             }
             MainPage u = new MainPage(httpClient);

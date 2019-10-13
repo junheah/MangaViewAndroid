@@ -127,8 +127,7 @@ public class CommentsActivity extends AppCompatActivity {
         submit = this.findViewById(R.id.commentButton);
         input = this.findViewById(R.id.comment_editText);
         final Login login = p.getLogin();
-        if(login == null) this.findViewById(R.id.comment_input).setVisibility(View.GONE);
-        else {
+        if(login != null && login.isValid()){
             submit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -140,6 +139,9 @@ public class CommentsActivity extends AppCompatActivity {
                     }
                 }
             });
+        }
+        else {
+            this.findViewById(R.id.comment_input).setVisibility(View.GONE);
         }
 
     }

@@ -67,6 +67,7 @@ public class ViewerActivity3 extends AppCompatActivity {
     Intent intent;
     Title title;
     String name;
+    boolean captchaChecked = false;
     int id;
     int viewerBookmark;
     int seed;
@@ -253,6 +254,7 @@ public class ViewerActivity3 extends AppCompatActivity {
     }
 
     void refresh(){
+        captchaChecked = false;
         new LoadImages().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -340,12 +342,33 @@ public class ViewerActivity3 extends AppCompatActivity {
             }
             manga.fetch(httpClient);
             imgs = manga.getImgs();
-            return null;
+            if(imgs == null || imgs.size()==0){
+                return 1;
+            }
+            return 0;
         }
 
         @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
+        protected void onPostExecute(Integer res) {
+            super.onPostExecute(res);
+            if(res == 1){
+                //captcha?
+                if(!captchaChecked) {
+                    Intent ci = new Intent(context, CaptchaActivity.class);
+                    ci.putExtra("id", id);
+                    startActivityForResult(ci, 1);
+                    captchaChecked = true;
+                    if (pd.isShowing()) {
+                        pd.dismiss();
+                    }
+                    lockUi(true);
+                    return;
+                }else {
+                    //error occured
+                    showErrorPopup(context);
+                    return;
+                }
+            }
             lockUi(false);
             viewPager.removeOnPageChangeListener(listener);
             //refresh views
@@ -433,6 +456,16 @@ public class ViewerActivity3 extends AppCompatActivity {
             if(pd.isShowing()) pd.dismiss();
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            refresh();
+        }else
+            finish();
+    }
+
     void lockUi(Boolean lock){
         commentBtn.setEnabled(!lock);
         next.setEnabled(!lock);

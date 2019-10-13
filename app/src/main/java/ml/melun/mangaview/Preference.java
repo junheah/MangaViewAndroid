@@ -35,6 +35,7 @@ public class Preference {
     Boolean leftRight;
     Login login;
     final String defUrl = "https://manamoa.net";
+    String session;
 
     //Offline manga has id of -1
     public Preference(Context context){
@@ -63,6 +64,10 @@ public class Preference {
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
+            session = sharedPref.getString("session", "");
+            if(login != null && login.isValid()){
+                setSession(login.getCookie());
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -376,7 +381,10 @@ public class Preference {
 
     public void setLogin(Login login){
         this.login = login;
-        prefsEditor.putString("login", new Gson().toJson(login));
+        if(login == null)
+            prefsEditor.putString("login", "{}");
+        else
+            prefsEditor.putString("login", new Gson().toJson(login));
         prefsEditor.commit();
     }
 
@@ -404,5 +412,15 @@ public class Preference {
 
     public JSONObject getBookmarkObject() {
         return bookmark;
+    }
+
+    public String getSession() {
+        return session;
+    }
+
+    public void setSession(String session) {
+        this.session = session;
+        prefsEditor.putString("session", session);
+        prefsEditor.commit();
     }
 }

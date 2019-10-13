@@ -81,6 +81,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Spinner spinner;
     int width = 0;
     Intent intent;
+    boolean captchaChecked = false;
 
     Decoder d;
     Boolean error = false, useSecond = false;
@@ -624,13 +625,36 @@ public class ViewerActivity2 extends AppCompatActivity {
             manga.fetch(httpClient);
             imgs = manga.getImgs();
             imgs1 = manga.getImgs(true);
+            if(imgs == null || imgs.size()==0) {
+                return 1;
+            }
+
             d = new Decoder(manga.getSeed(), manga.getId());
-            return null;
+            return 0;
         }
 
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
+
+            if(res == 1){
+                //captcha?
+                if(!captchaChecked) {
+                    Intent ci = new Intent(context, CaptchaActivity.class);
+                    ci.putExtra("id", id);
+                    startActivityForResult(ci, 1);
+                    captchaChecked = true;
+                    if (pd.isShowing()) {
+                        pd.dismiss();
+                    }
+                    lockUi(true);
+                    return;
+                }else {
+                    //error occured
+                    showErrorPopup(context);
+                    return;
+                }
+            }
             lockUi(false);
             eps = manga.getEps();
             List<String> epsName = new ArrayList<>();
@@ -708,6 +732,20 @@ public class ViewerActivity2 extends AppCompatActivity {
                 showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
             }
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            //reload current ep
+            lockUi(true);
+            id = manga.getId();
+            captchaChecked = false;
+            loadImages l = new loadImages();
+            l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }else
+            finish();
     }
 
     void lockUi(Boolean lock){

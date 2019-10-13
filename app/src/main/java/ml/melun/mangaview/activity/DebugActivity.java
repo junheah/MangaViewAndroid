@@ -128,8 +128,8 @@ public class DebugActivity extends AppCompatActivity {
         SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
         JSONObject data = new JSONObject();
         try {
-            data.put("recent",new JSONArray(sharedPref.getString("recent", "")));
-            data.put("favorite",new JSONArray(sharedPref.getString("favorite", "")));
+            data.put("recent",new JSONArray(sharedPref.getString("recent", "[]")));
+            data.put("favorite",new JSONArray(sharedPref.getString("favorite", "[]")));
             data.put("homeDir",sharedPref.getString("homeDir","/sdcard/MangaView/saved"));
             data.put("darkTheme",sharedPref.getBoolean("darkTheme", false));
             data.put("volumeControl",sharedPref.getBoolean("volumeControl",false));
@@ -146,6 +146,7 @@ public class DebugActivity extends AppCompatActivity {
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
             data.put("login",new JSONObject(sharedPref.getString("login","{}")));
+            data.put("session", sharedPref.getString("session", ""));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -175,6 +176,7 @@ public class DebugActivity extends AppCompatActivity {
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
             editor.putString("login", filter(data.getJSONObject("login").toString()));
+            editor.putString("session", data.getString("session"));
             editor.commit();
         }catch (Exception e){
             showPopup(context,"오류",e.getMessage());

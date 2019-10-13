@@ -87,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
         logoutBtn = findViewById(R.id.logout_button);
 
-        if(p.getLogin() != null){
+        if(p.getLogin() != null && p.getLogin().isValid()){
             mLoginFormView.setVisibility(View.GONE);
             logoutBtn.setVisibility(View.VISIBLE);
         }
@@ -96,6 +96,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 p.setLogin(null);
+                p.setSession("");
                 mLoginFormView.setVisibility(View.VISIBLE);
                 logoutBtn.setVisibility(View.GONE);
             }

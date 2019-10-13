@@ -44,6 +44,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
 
 public class Downloader extends Service {
@@ -305,7 +306,7 @@ public class Downloader extends Service {
                         Manga target = mangas.get(listIndex);
 
                         //fetch info of target
-                        target.fetch(httpClient, false);
+                        target.fetch(httpClient, true);
                         Decoder d = new Decoder(target.getSeed(), target.getId());
                         List<String> urls = target.getImgs();
                         List<String> urls1 = target.getImgs(true);

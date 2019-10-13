@@ -1,5 +1,7 @@
 package ml.melun.mangaview.mangaview;
 
+import android.webkit.WebView;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -120,7 +122,6 @@ public class Manga {
 
                     //if(imgs.size()>0 && eps.size()>0) break;
                 }
-
 
                 //jsoup parsing
                 Document doc = Jsoup.parse(raw);

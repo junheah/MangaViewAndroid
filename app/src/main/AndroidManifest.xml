@@ -96,7 +96,8 @@
         <activity
             android:name=".activity.LoginActivity"
             android:configChanges="orientation|screenSize"
-            android:label="계정"></activity>
+            android:label="계정" />
+        <activity android:name=".activity.CaptchaActivity"></activity>
     </application>
 
 </manifest>

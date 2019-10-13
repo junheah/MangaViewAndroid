@@ -13,6 +13,8 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class Login {
     private String user;
     private String pass;
@@ -88,6 +90,8 @@ public class Login {
                 for (String c : cookies) {
                     if (c.contains("PHPSESSID=")) {
                         cookie = c.substring(c.indexOf("=")+1,c.indexOf(";"));
+                        // session : copy of login that is used more frequently
+                        p.setSession(cookie);
                         return true;
                     }
                 }
@@ -98,10 +102,13 @@ public class Login {
         }
         return false;
     }
-
     public void buildCookie(Map<String,String> map){
         //java always passes by reference
         map.put("PHPSESSID", cookie);
+    }
+
+    public boolean isValid(){
+        return cookie !=null && cookie.length()>0;
     }
 
     public String getCookie(Boolean format){

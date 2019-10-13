@@ -83,6 +83,7 @@ public class ViewerActivity extends AppCompatActivity {
     int width=0;
     Boolean online;
     Intent intent;
+    boolean captchaChecked = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
@@ -286,6 +287,7 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     void refresh(){
+        captchaChecked = false;
         if(stripAdapter!=null) stripAdapter.removeAll();
         loadImages l = new loadImages();
         l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -416,14 +418,26 @@ public class ViewerActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
+            if(res == 1){
+                //captcha?
+                if(!captchaChecked) {
+                    Intent ci = new Intent(context, CaptchaActivity.class);
+                    ci.putExtra("id", id);
+                    startActivityForResult(ci, 1);
+                    captchaChecked = true;
+                    if (pd.isShowing()) {
+                        pd.dismiss();
+                    }
+                    lockUi(true);
+                    return;
+                }else {
+                    //error occured
+                    showErrorPopup(context);
+                    return;
+                }
+            }
 
             lockUi(false);
-
-            if(res == 1){
-                //error occured
-                showErrorPopup(context);
-                return;
-            }
             strip.setAdapter(stripAdapter);
 
             stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
@@ -515,6 +529,15 @@ public class ViewerActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            refresh();
+        }else
+            finish();
     }
 
     void lockUi(Boolean lock){

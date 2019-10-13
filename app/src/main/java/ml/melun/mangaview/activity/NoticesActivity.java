@@ -90,7 +90,11 @@ public class NoticesActivity extends AppCompatActivity {
         try{
             String[] list = new String[notices.size()];
             for(int i=0;i<notices.size();i++){
-                list[i] = notices.get(i).getTitle();
+                String title = notices.get(i).getTitle();
+                if(title == null)
+                    list[i] = "";
+                else
+                    list[i] = notices.get(i).getTitle();
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
             //populate listview and set click listener

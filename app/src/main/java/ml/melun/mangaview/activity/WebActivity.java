@@ -48,7 +48,6 @@ public class WebActivity extends AppCompatActivity {
                 System.out.println("All the cookies in a string:" + cookies);
                 if(cookies.contains("cf_clearance")){
                     //success
-                    httpClient.setCookie(cookies);
                     finish();
                 }
             }

@@ -67,7 +67,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         setHasStableIds(true);
         if(!online) save = false;
-        login = p.getLogin() != null && online;
+        login = online && p.getLogin() != null && p.getLogin().isValid();
     }
 
     @Override
