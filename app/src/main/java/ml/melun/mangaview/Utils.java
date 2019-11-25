@@ -11,6 +11,10 @@ import android.graphics.Point;
 
 import android.support.v7.app.AlertDialog;
 import android.view.Display;
+import android.webkit.CookieManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -20,7 +24,9 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ml.melun.mangaview.activity.EpisodeActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
@@ -335,5 +341,55 @@ public class Utils {
 
     static public int getIdWithName(CustomHttpClient client, String name){
         return -1;
+    }
+
+    static public void checkCaptcha(Preference p, Context context, int id, Runnable callback){
+        String url = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=" + id;
+
+        WebView webView = new WebView(context);
+
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        CookieManager cookiem = CookieManager.getInstance();
+        cookiem.removeAllCookie();
+
+        webView.setWebViewClient(new WebViewClient() {
+            boolean catchNextRequest = false;
+
+            public boolean shouldOverrideUrlLoading(WebView view, String url){
+                String cookies = CookieManager.getInstance().getCookie(url);
+                if(catchNextRequest){
+                    String cookieStr = cookiem.getCookie(url);
+                    for(String s: cookieStr.split(";")){
+                        if(s.contains("PHPSESSID=")){
+                            System.out.println(s);
+                            String cookie = s.substring(s.indexOf("=")+1);
+                            p.setSession(cookie);
+                            callback.run();
+                            break;
+                        }
+                    }
+                } else if(url.contains("sign_captcha.php")) {
+                    catchNextRequest = true;
+                    view.loadUrl(url);
+                }else
+                    view.loadUrl(url);
+                return false; // then it is not handled by default action
+            }
+        });
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+
+        Login login = p.getLogin();
+
+        // if logged-in, get session from login
+        if(login != null && login.isValid()){
+            cookiem.setCookie(p.getUrl(), login.getCookie(true));
+        }else if(p.getSession().length()>0){
+            // else, use session
+            cookiem.setCookie(p.getUrl(), "PHPSESSID=" + p.getSession() + "; ");
+        }
+        webView.loadUrl(url, headers);
     }
 }

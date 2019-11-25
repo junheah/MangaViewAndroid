@@ -31,9 +31,6 @@ public class CaptchaActivity extends AppCompatActivity {
         int id = intent.getIntExtra("id", 0);
         String url = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=" + id;
 
-
-        System.out.println("ppppppppppp" + p.getSession());
-
         WebView webView = this.findViewById(R.id.captchaWebView);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
