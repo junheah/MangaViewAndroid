@@ -10,6 +10,8 @@
     <color name="colorText">#121212</color>
     <color name="colorBackground">#ffffff</color>
 
+    <color name="rangeSelected">#4CAF50</color>
+
 
     <color name="colorDarkBackground">#2c2c2c</color>
     <color name="nav_enable">#a2a2a2</color>

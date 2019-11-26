@@ -45,6 +45,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.checkCaptcha;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
@@ -421,9 +422,12 @@ public class ViewerActivity extends AppCompatActivity {
             if(res == 1){
                 //captcha?
                 if(!captchaChecked) {
-                    Intent ci = new Intent(context, CaptchaActivity.class);
-                    ci.putExtra("id", id);
-                    startActivityForResult(ci, 1);
+                    checkCaptcha(p, context, id, new Runnable(){
+                        @Override
+                        public void run() {
+                            refresh();
+                        }
+                    });
                     captchaChecked = true;
                     if (pd.isShowing()) {
                         pd.dismiss();
@@ -529,15 +533,6 @@ public class ViewerActivity extends AppCompatActivity {
             }
         }
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            refresh();
-        }else
-            finish();
     }
 
     void lockUi(Boolean lock){

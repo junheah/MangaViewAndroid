@@ -323,7 +323,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             radapter.setClickListener(new mainTagAdapter.tagOnclick() {
                 @Override
                 public void onClick(int position, String tag) {
-                    mainClickListener.clickedRelease(position);
+                    mainClickListener.clickedRelease(position+1);
                 }
             });
         }

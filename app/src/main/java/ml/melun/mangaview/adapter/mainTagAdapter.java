@@ -168,14 +168,14 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public String getSelectedIndex(){
         String res = "";
         if(singleSelect) {
-            if(selection>-1) return selection + "";
+            if(selection>-1) return Integer.toString(type==2 ? selection+1 : selection);
             else return "";
         }
 
         for(int i=0; i<tags.size(); i++){
             if(selected[i]){
-                if(res.length()>0) res += ","+i;
-                else res = ""+i;
+                if(res.length()>0) res += ","+ Integer.toString(type==2 ? i+1 : i);
+                else res = Integer.toString(type==2 ? i+1 : i);
             }
         }
         return res;

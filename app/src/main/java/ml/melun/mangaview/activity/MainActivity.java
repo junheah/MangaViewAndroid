@@ -3,9 +3,11 @@ package ml.melun.mangaview.activity;
 import android.Manifest;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -31,6 +33,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -50,6 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import ml.melun.mangaview.CheckInfo;
+import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
@@ -61,6 +65,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static ml.melun.mangaview.Downloader.BROADCAST_STOP;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.deleteRecursive;
@@ -230,13 +235,52 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if(contentHolder.getDisplayedChild()==startTab){
+
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                //Yes button clicked
-                                MainActivity.super.onBackPressed();
+
+                                //block interactivity
+                                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+                                if(Downloader.running){
+                                    //downloader is running
+                                    //show info prompt
+                                    findViewById(R.id.waiting_panel).setVisibility(View.VISIBLE);
+
+                                    //stop downloader service
+                                    Intent downloader = new Intent(getApplicationContext(),Downloader.class);
+                                    downloader.setAction(Downloader.ACTION_FORCE_STOP);
+                                    if (Build.VERSION.SDK_INT >= 26) {
+                                        startForegroundService(downloader);
+                                    }else{
+                                        startService(downloader);
+                                    }
+
+                                    //broadcast receiver
+                                    BroadcastReceiver statusReceiver = new BroadcastReceiver() {
+                                        @Override
+                                        public void onReceive(Context context, Intent intent) {
+                                            if(intent.getAction().matches(BROADCAST_STOP)){
+                                                //service stopped
+                                                finishAffinity();
+                                                System.runFinalization();
+                                                System.exit(0);
+                                            }
+                                        }
+                                    };
+                                    IntentFilter infil = new IntentFilter();
+                                    infil.addAction(BROADCAST_STOP);
+                                    registerReceiver(statusReceiver, infil);
+
+                                }else{
+                                    //kill application
+                                    finishAffinity();
+                                    System.runFinalization();
+                                    System.exit(0);
+                                }
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 //No button clicked
@@ -247,7 +291,7 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog.Builder builder;
                 if(dark) builder = new AlertDialog.Builder(this,R.style.darkDialog);
                 else builder = new AlertDialog.Builder(this);
-                builder.setMessage("정말로 종료 하시겠습니까?")
+                builder.setMessage(Downloader.running ? "다운로드가 진행중입니다. 정말로 종료 하시겠습니까?" : "정말로 종료 하시겠습니까?")
                         .setPositiveButton("네", dialogClickListener)
                         .setNegativeButton("아니오", dialogClickListener)
                         .show();
@@ -878,8 +922,6 @@ public class MainActivity extends AppCompatActivity
             if(pd.isShowing()){
                 pd.dismiss();
             }
-
-
         }
     }
 }

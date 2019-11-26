@@ -6,14 +6,14 @@ android {
     }
 
     signingConfigs {
-        debug {
-            Properties properties = new Properties()
-            properties.load(project.rootProject.file('local.properties').newDataInputStream())
-            storeFile file(properties.getProperty('storeFile'))
-            keyAlias properties.getProperty('keyAlias')
-            storePassword properties.getProperty('storePassword')
-            keyPassword properties.getProperty('keyPassword')
-        }
+//        debug {
+//            Properties properties = new Properties()
+//            properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//            storeFile file(properties.getProperty('storeFile'))
+//            keyAlias properties.getProperty('keyAlias')
+//            storePassword properties.getProperty('storePassword')
+//            keyPassword properties.getProperty('keyPassword')
+//        }
     }
 
     compileSdkVersion 27
@@ -24,7 +24,7 @@ android {
         applicationId "ml.melun.mangaview"
         minSdkVersion 18
         targetSdkVersion 27
-        versionName "2.3-" + code
+        versionName "2.4-" + code
         versionCode code
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true

@@ -1,5 +1,6 @@
 package ml.melun.mangaview;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -44,7 +45,6 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
-import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
 
 public class Downloader extends Service {
@@ -55,21 +55,22 @@ public class Downloader extends Service {
     float progress = 0;
     int maxProgress=1000;
     String notiTitle="";
-    Boolean running = false;
+    public static Boolean running = false;
     NotificationCompat.Builder notification;
     public static final String ACTION_START = "ml.melun.mangaview.action.START";
     public static final String ACTION_STOP = "ml.melun.mangaview.action.STOP";
     public static final String ACTION_QUEUE = "ml.melun.mangaview.action.QUEUE";
     public static final String ACTION_UPDATE = "ml.melun.mangaview.action.UPDATE";
+    public static final String ACTION_FORCE_STOP = "ml.melun.mangaview.action.FORCE_STOP";
+    public static final String BROADCAST_STOP = "ml.melun.mangaview.broadcast.STOP";
     downloadTitle dt;
     Download d;
     NotificationManager notificationManager;
-    int nid = 16848323;
-    String channeld = "MangaViewDL";
+    public static final int nid = 16848323;
+    public static final String channeld = "MangaViewDL";
     PendingIntent pendingIntent;
     PendingIntent stopIntent;
     Context serviceContext;
-
 
     @Override
     public void onCreate() {
@@ -120,6 +121,7 @@ public class Downloader extends Service {
                     }
                     break;
                 case ACTION_STOP:
+                case ACTION_FORCE_STOP:
                     dt.cancel(true);
                     break;
                 case ACTION_UPDATE:
@@ -325,28 +327,33 @@ public class Downloader extends Service {
                         Boolean error = false;
                         Boolean useSecond = false;
                         for (int i = 0; i < urls.size(); i++) {
-                            if (isCancelled()) return 0;
-                            String url = useSecond && urls1.size()>0 ? urls1.get(i) : urls.get(i);
-                            if(error) url = url.replace("img.", "s3.");
-                            if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d)){
-                                //change image server name and retry
-                                if(!error && !useSecond){
-                                    error = true;
-                                    i--;
-                                }else if(error && !useSecond){
-                                    error = false;
-                                    useSecond = true;
-                                    i--;
-                                }else if(!error && useSecond){
-                                    error = true;
-                                    useSecond = true;
-                                    i--;
-                                }else if(error && useSecond){
-                                    error = false;
-                                    useSecond = false;
+                            int tries = 0;
+                            while(tries < 5){
+                                // retry for 5 cycles
+                                if (isCancelled()) return 0;
+                                String url = useSecond && urls1.size()>0 ? urls1.get(i) : urls.get(i);
+                                if(error && !useSecond){
+                                    url = url.indexOf("img.") > -1 ? url.replace("img.","s3.") : url.replace("://", "://s3.");
                                 }
-                                continue;
-                            }//else : success
+                                if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d)) {
+                                    //change image server name and retry
+                                    if (!error && !useSecond) {
+                                        error = true;
+                                    } else if (error && !useSecond) {
+                                        error = false;
+                                        useSecond = true;
+                                    } else if (!error && useSecond) {
+                                        error = true;
+                                        useSecond = true;
+                                    } else if (error && useSecond) {
+                                        error = false;
+                                        useSecond = false;
+                                        // one cycle = one try
+                                        tries++;
+                                    }
+                                }else //else : success
+                                    break;
+                            }
                             progress += imgStepSize;
                             updateNotification((selectedEps.length() - queueIndex) + "/" + selectedEps.length());
                         }
@@ -370,6 +377,7 @@ public class Downloader extends Service {
             endNotification();
             running = false;
             if(!updateDownloading) stopSelf();
+            sendBroadcast(new Intent().setAction(ACTION_STOP));
         }
 
         @Override
@@ -394,6 +402,7 @@ public class Downloader extends Service {
             notificationManager.cancel(nid);
             stopNotification(why);
             if(!updateDownloading) stopSelf();
+            sendBroadcast(new Intent().setAction(BROADCAST_STOP));
         }
     }
 
@@ -506,10 +515,10 @@ public class Downloader extends Service {
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
                 .setContentTitle(notiTitle)
-                .setSubText("대기열: "+ titles.size())
+                .setSubText("대기열: " + titles.size())
                 .setContentText(text)
                 .addAction(R.drawable.blank, "중지", stopIntent)
-                .setProgress(maxProgress, (int)progress, !(progress > 0))
+                .setProgress(maxProgress, (int) progress, !(progress > 0))
                 .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(true);
         notificationManager.notify(nid, notification.build());
@@ -522,7 +531,7 @@ public class Downloader extends Service {
                 .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(false);
         notificationManager.notify(nid, notification.build());
-    }
+}
 
     private void finishNotification(){
         notification = new NotificationCompat.Builder(this, channeld)
@@ -539,6 +548,8 @@ public class Downloader extends Service {
                 .setContentTitle("다운로드가 취소되었습니다.")
                 .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(false);
-        notificationManager.notify(nid+2, notification.build());
+        notificationManager.notify(nid + 2, notification.build());
     }
+
+
 }

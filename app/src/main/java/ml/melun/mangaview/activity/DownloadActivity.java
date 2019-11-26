@@ -34,6 +34,7 @@ public class DownloadActivity extends AppCompatActivity {
     RecyclerView eplist;
     Boolean dark;
     JSONArray selected;
+    boolean singleSelect = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,22 @@ public class DownloadActivity extends AppCompatActivity {
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Button selectionMode = findViewById(R.id.dl_mode_btn);
+        selectionMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(singleSelect){
+                    singleSelect = false;
+                    selectionMode.setText("범위 선택 모드");
+                    adapter.setSelectionMode(singleSelect);
+                }else{
+                    singleSelect = true;
+                    selectionMode.setText("단일 선택 모드");
+                    adapter.setSelectionMode(singleSelect);
+                }
+            }
+        });
     }
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
