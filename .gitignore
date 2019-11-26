@@ -22,3 +22,8 @@
 hs_err_pid*
 
 local.properties
+.gradle/
+.idea/
+.DS_Store
+build/
+app/build/
