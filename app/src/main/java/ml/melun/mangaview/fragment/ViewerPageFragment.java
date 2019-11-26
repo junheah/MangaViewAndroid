@@ -74,9 +74,12 @@ public class ViewerPageFragment extends Fragment {
 
     void loadImage(ImageView frame, ImageButton refresh){
         String target = useSecond && image1.length()>1 ? image1 : image;
+        if(error && !useSecond){
+            image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+        }
         Glide.with(context)
                 .asBitmap()
-                .load(error? target.replace("img.","s3.") : target)
+                .load(error && !useSecond ? target.indexOf("img.") > -1 ? target.replace("img.","s3.") : target.replace("://", "://s3.") : target)
                 .into(new CustomTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {

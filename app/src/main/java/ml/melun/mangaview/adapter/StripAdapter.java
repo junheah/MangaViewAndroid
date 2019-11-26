@@ -88,7 +88,9 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
             final int position = pos / 2;
             final int type = pos % 2;
             String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(position) : imgs.get(position);
-            if(error) image = image.replace("img.","s3.");
+            if(error && !useSecond){
+                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+            }
             //set image to holder view
             Glide.with(mainContext)
                     .asBitmap()
@@ -145,7 +147,9 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         }
         else {
             String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(pos) : imgs.get(pos);
-            if(error) image = image.replace("img.","s3.");
+            if(error && !useSecond){
+                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+            }
             Glide.with(mainContext)
                     .asBitmap()
                     .load(image)

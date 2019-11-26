@@ -313,7 +313,9 @@ public class ViewerActivity2 extends AppCompatActivity {
             viewerBookmark++;
             try {
                 String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-                if(error) image = image.replace("img.","s3.");
+                if(error && !useSecond){
+                    image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+                }
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -394,7 +396,9 @@ public class ViewerActivity2 extends AppCompatActivity {
             viewerBookmark--;
             try {
                 String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-                if(error) image = image.replace("img.","s3.");
+                if(error && !useSecond){
+                    image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+                }
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -460,7 +464,9 @@ public class ViewerActivity2 extends AppCompatActivity {
         //refreshbtn.setVisibility(View.VISIBLE);
         try {
             String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-            if(error) image = image.replace("img.","s3.");
+            if(error && !useSecond){
+                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+            }
             //placeholder
             //frame.setImageResource(R.drawable.placeholder);
             Glide.with(context)
@@ -517,7 +523,9 @@ public class ViewerActivity2 extends AppCompatActivity {
     void preload(){
         if(viewerBookmark<imgs.size()-1) {
             String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark+1) : imgs.get(viewerBookmark+1);
-            if(error) image = image.replace("img.","s3.");
+            if(error && !useSecond){
+                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+            }
             Glide.with(context)
                     .asBitmap()
                     .load(image)

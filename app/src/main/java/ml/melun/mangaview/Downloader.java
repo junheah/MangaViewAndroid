@@ -325,28 +325,33 @@ public class Downloader extends Service {
                         Boolean error = false;
                         Boolean useSecond = false;
                         for (int i = 0; i < urls.size(); i++) {
-                            if (isCancelled()) return 0;
-                            String url = useSecond && urls1.size()>0 ? urls1.get(i) : urls.get(i);
-                            if(error) url = url.replace("img.", "s3.");
-                            if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d)){
-                                //change image server name and retry
-                                if(!error && !useSecond){
-                                    error = true;
-                                    i--;
-                                }else if(error && !useSecond){
-                                    error = false;
-                                    useSecond = true;
-                                    i--;
-                                }else if(!error && useSecond){
-                                    error = true;
-                                    useSecond = true;
-                                    i--;
-                                }else if(error && useSecond){
-                                    error = false;
-                                    useSecond = false;
+                            int tries = 0;
+                            while(tries < 5){
+                                // retry for 5 cycles
+                                if (isCancelled()) return 0;
+                                String url = useSecond && urls1.size()>0 ? urls1.get(i) : urls.get(i);
+                                if(error && !useSecond){
+                                    url = url.indexOf("img.") > -1 ? url.replace("img.","s3.") : url.replace("://", "://s3.");
                                 }
-                                continue;
-                            }//else : success
+                                if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d)) {
+                                    //change image server name and retry
+                                    if (!error && !useSecond) {
+                                        error = true;
+                                    } else if (error && !useSecond) {
+                                        error = false;
+                                        useSecond = true;
+                                    } else if (!error && useSecond) {
+                                        error = true;
+                                        useSecond = true;
+                                    } else if (error && useSecond) {
+                                        error = false;
+                                        useSecond = false;
+                                        // one cycle = one try
+                                        tries++;
+                                    }
+                                }else //else : success
+                                    break;
+                            }
                             progress += imgStepSize;
                             updateNotification((selectedEps.length() - queueIndex) + "/" + selectedEps.length());
                         }

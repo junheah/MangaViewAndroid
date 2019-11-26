@@ -25,6 +25,7 @@
             <include layout="@layout/viewer_toolbar"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
+
     <ImageView
         android:id="@+id/viewer_image"
         android:layout_width="match_parent"

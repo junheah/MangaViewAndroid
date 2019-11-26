@@ -344,7 +344,7 @@ public class Utils {
     }
 
     static public void checkCaptcha(Preference p, Context context, int id, Runnable callback){
-        String url = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=" + id;
+            String url = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=" + id;
 
         WebView webView = new WebView(context);
 
