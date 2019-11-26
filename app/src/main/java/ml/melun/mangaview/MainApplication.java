@@ -27,6 +27,7 @@ public class MainApplication extends Application{
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
+        System.out.println("ppppppppppppppppppppp appstart");
         ACRA.init(this);
     }
 

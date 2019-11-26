@@ -26,11 +26,13 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     private List<Manga> data;
     private LayoutInflater mInflater;
     private Context mainContext;
-    Boolean favorite = false;
+    boolean favorite = false;
     TypedValue outValue;
     Boolean[] selected;
     ItemClickListener mClickListener;
-    Boolean dark;
+    boolean dark;
+    boolean single = true;
+    int rs = -1, re = -1;
 
     // data is passed into the constructor
     public SelectEpisodeAdapter(Context context, List<Manga> list) {
@@ -72,6 +74,10 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
                 if(dark)h.itemView.setBackgroundResource(R.drawable.item_bg_dark);
                 else h.itemView.setBackgroundResource(R.drawable.item_bg);
             }
+
+            if(position == rs || position == re){
+                h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.rangeSelected));
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -84,9 +90,49 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     public void select(int position){
-        if(selected[position]) selected[position] = false;
-        else selected[position] = true;
-        notifyItemChanged(position);
+        if(single) {
+            selected[position] = !selected[position];
+            notifyItemChanged(position);
+        }else{
+            //range start
+            if(rs == -1 && re == -1){
+                rs = position;
+            }
+            //selected pos = range start
+            else if(position == rs){
+                rs = -1;
+                re = -1;
+            }
+            //range end
+            else if(rs != -1 && re == -1){
+                re = position;
+                while(rs != re){
+                    selected[rs] = !selected[rs];
+                    notifyItemChanged(rs);
+
+                    if(rs>re) rs--;
+                    else rs++;
+                }
+                selected[rs] = !selected[rs];
+                notifyItemChanged(rs);
+
+                rs = -1;
+                re = -1;
+            }
+            notifyItemChanged(rs);
+            notifyItemChanged(re);
+            notifyItemChanged(position);
+        }
+    }
+
+    public void setSelectionMode(boolean single){
+        this.single = single;
+        int tmps = rs;
+        int tmpe = re;
+        rs = -1;
+        re = -1;
+        notifyItemChanged(tmps);
+        notifyItemChanged(tmpe);
     }
 
     // stores and recycles views as they are scrolled off screen
@@ -107,7 +153,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onItemClick(v, getAdapterPosition());
+                    mClickListener.onItemClick(v,getAdapterPosition());
                 }
             });
         }

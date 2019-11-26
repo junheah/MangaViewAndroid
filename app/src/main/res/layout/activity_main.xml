@@ -22,4 +22,16 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 
+    <TextView
+        android:id="@+id/waiting_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#BC000000"
+        android:gravity="center"
+        android:text="다운로더 서비스 종료중..."
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        android:textSize="20sp" />
+
 </android.support.v4.widget.DrawerLayout>
