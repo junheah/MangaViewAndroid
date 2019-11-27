@@ -350,18 +350,16 @@ public class ViewerActivity2 extends AppCompatActivity {
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 if(imgs.size()>0) {
                                     if(!error && !useSecond) {
-                                        viewerBookmark--;
                                         error= true;
-                                        nextPage();
                                     }else if(!useSecond && error){
-                                        viewerBookmark--;
                                         useSecond = true;
                                         error= false;
-                                        nextPage();
                                     }else{
                                         error = false;
                                         useSecond = false;
                                     }
+                                    viewerBookmark--;
+                                    nextPage();
                                 }
                             }
                         });
@@ -432,18 +430,16 @@ public class ViewerActivity2 extends AppCompatActivity {
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 if(imgs.size()>0) {
                                     if(!error && !useSecond) {
-                                        viewerBookmark++;
                                         error = true;
-                                        prevPage();
                                     }else if(!useSecond && error){
-                                        viewerBookmark++;
                                         error = false;
                                         useSecond = true;
-                                        prevPage();
                                     }else{
                                         error = false;
                                         useSecond = false;
                                     }
+                                    viewerBookmark++;
+                                    prevPage();
                                 }
                             }
                         });
@@ -502,15 +498,14 @@ public class ViewerActivity2 extends AppCompatActivity {
                             if(imgs.size()>0) {
                                 if(!error && !useSecond) {
                                     error = true;
-                                    refreshImage();
                                 }else if(!useSecond && error){
                                     useSecond = true;
                                     error = false;
-                                    refreshImage();
                                 }else{
                                     error = false;
                                     useSecond = false;
                                 }
+                                refreshImage();
                             }
                         }
                     });
@@ -535,15 +530,14 @@ public class ViewerActivity2 extends AppCompatActivity {
                             if (imgs.size() > 0) {
                                 if(!error && !useSecond){
                                     error = true;
-                                    preload();
                                 }else if(!useSecond){
                                     error = false;
                                     useSecond = true;
-                                    preload();
                                 }else{
                                     error = false;
                                     useSecond = false;
                                 }
+                                preload();
                             }
                             return false;
                         }

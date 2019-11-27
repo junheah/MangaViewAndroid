@@ -108,6 +108,7 @@ public class ViewerPageFragment extends Fragment {
                             }else{
                                 error = false;
                                 useSecond = false;
+                                loadImage(frame, refresh);
                             }
                         }
                     }
