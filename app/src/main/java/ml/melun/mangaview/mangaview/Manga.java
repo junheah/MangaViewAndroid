@@ -1,6 +1,5 @@
 package ml.melun.mangaview.mangaview;
 
-import android.webkit.WebView;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -20,7 +19,6 @@ import org.jsoup.select.Elements;
 import okhttp3.Response;
 
 public class Manga {
-    String base;
     public Manga(int i, String n, String d) {
         id = i;
         name = n;

@@ -34,8 +34,9 @@ public class Preference {
     Boolean stretch;
     Boolean leftRight;
     Login login;
-    final String defUrl = "https://manamoa.net";
+    final String defUrl = "https://manamoa.net/";
     String session;
+    Boolean autoUrl;
 
     //Offline manga has id of -1
     public Preference(Context context){
@@ -65,6 +66,7 @@ public class Preference {
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
             session = sharedPref.getString("session", "");
+            autoUrl = sharedPref.getBoolean("autoUrl", true);
             if(login != null && login.isValid()){
                 setSession(login.getCookie());
             }
@@ -421,6 +423,16 @@ public class Preference {
     public void setSession(String session) {
         this.session = session;
         prefsEditor.putString("session", session);
+        prefsEditor.commit();
+    }
+
+    public Boolean getAutoUrl() {
+        return autoUrl;
+    }
+
+    public void setAutoUrl(Boolean autoUrl) {
+        this.autoUrl = autoUrl;
+        prefsEditor.putBoolean("autoUrl", autoUrl);
         prefsEditor.commit();
     }
 }

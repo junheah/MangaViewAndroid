@@ -55,7 +55,6 @@ public class CustomHttpClient {
 //            for(String key : cfc.keySet()){
 //                cookie +=  key + '=' + cfc.get(key)+ "; ";
 //            }
-            System.out.println("cccccc " +cookie);
 
             Request request = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")

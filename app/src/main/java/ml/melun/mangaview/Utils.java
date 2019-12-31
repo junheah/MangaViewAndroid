@@ -40,6 +40,8 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
+
 public class Utils {
     public static Boolean deleteRecursive(File fileOrDirectory) {
         if(!checkWriteable(fileOrDirectory)) return false;
@@ -391,5 +393,18 @@ public class Utils {
             cookiem.setCookie(p.getUrl(), "PHPSESSID=" + p.getSession() + "; ");
         }
         webView.loadUrl(url, headers);
+    }
+
+    public static String fetchURL(){
+        // URL 자동 설정
+        String res = "";
+        try{
+            Response r = httpClient.getRaw("https://mnmnmnmnm.xyz", new HashMap<>());
+            String raw = r.body().string();
+            res = raw.split("주소는 ")[1].split(" ")[0];
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return res;
     }
 }
