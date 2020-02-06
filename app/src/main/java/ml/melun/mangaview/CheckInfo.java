@@ -146,7 +146,7 @@ public class CheckInfo {
 
     void showPrompt(JSONObject data){
         try{
-            final String page = "http://mangaview.ml";
+            final String page = "https://junheah.github.io/MangaViewAndroid/";
             final String message = "버전: " + data.getString("tag_name") +"\n체인지 로그:\n"+ data.getString("body");
             final String url = data.getJSONArray("assets").getJSONObject(0).getString("browser_download_url");
             AlertDialog.Builder builder;
