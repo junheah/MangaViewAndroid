@@ -48,7 +48,6 @@ public class CaptchaActivity extends AppCompatActivity {
                     String cookieStr = cookiem.getCookie(url);
                     for(String s: cookieStr.split(";")){
                         if(s.contains("PHPSESSID=")){
-                            System.out.println(s);
                             submit(s.substring(s.indexOf("=")+1));
                             break;
                         }

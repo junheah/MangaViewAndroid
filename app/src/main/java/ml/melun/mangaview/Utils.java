@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import net.jhavar.main.DdosGuardBypass;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -39,6 +41,8 @@ import ml.melun.mangaview.mangaview.Title;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static ml.melun.mangaview.MainApplication.httpClient;
 
 public class Utils {
     public static Boolean deleteRecursive(File fileOrDirectory) {
@@ -305,7 +309,7 @@ public class Utils {
 
     public static Boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
         try {
-            Response tokenResponse = client.get("/bbs/ajax.comment_token.php?_="+System.currentTimeMillis());
+            Response tokenResponse = client.get("/bbs/ajax.comment_token.php?_="+ System.currentTimeMillis());
             String token = new JSONObject(tokenResponse.body().string()).getString("token");
             tokenResponse.close();
 //
@@ -327,7 +331,16 @@ public class Utils {
                     .addEncoded("is_good","0")
                     .addEncoded("wr_content",content)
                     .build();
-            Response commentResponse = client.post("/bbs/write_comment_update.php", requestBody);
+
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Cookie", login.getCookie(true));
+//            headers.put("Content-Type","application/x-www-form-urlencoded");
+//            headers.put("Origin", "https://manamoa.net");
+//            headers.put("Accept", "*");
+//            headers.put("Accept-Encoding", "*");
+//            headers.put("Accept-Language", "*");
+
+            Response commentResponse = client.post("/bbs/write_comment_update.php", requestBody, headers);
             int responseCode = commentResponse.code();
             commentResponse.close();
             if(responseCode == 302)
@@ -362,7 +375,6 @@ public class Utils {
                     String cookieStr = cookiem.getCookie(url);
                     for(String s: cookieStr.split(";")){
                         if(s.contains("PHPSESSID=")){
-                            System.out.println(s);
                             String cookie = s.substring(s.indexOf("=")+1);
                             p.setSession(cookie);
                             callback.run();
@@ -391,5 +403,22 @@ public class Utils {
             cookiem.setCookie(p.getUrl(), "PHPSESSID=" + p.getSession() + "; ");
         }
         webView.loadUrl(url, headers);
+    }
+
+    // TODO: implement this in CustomHttpClient
+    public static String fetchURL(){
+        // URL 자동 설정
+        String res = "";
+        try{
+            DdosGuardBypass ddg = new DdosGuardBypass("https://mnmnmnmnm.xyz");
+            ddg.bypass();
+            //Response r = httpClient.getRaw("https://mnmnmnmnm.xyz", new HashMap<>());
+            //String raw = r.body().string();
+            String raw = ddg.get("https://mnmnmnmnm.xyz");
+            res = raw.split("주소는 ")[1].split(" ")[0];
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return res;
     }
 }

@@ -8,14 +8,18 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
@@ -210,30 +214,62 @@ public class SettingsActivity extends AppCompatActivity {
         this.findViewById(R.id.setting_url).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final LinearLayout layout = new LinearLayout(context);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                final LinearLayout switch_layout = new LinearLayout(context);
+                switch_layout.setOrientation(LinearLayout.HORIZONTAL);
+                switch_layout.setGravity(Gravity.RIGHT);
+                switch_layout.setPadding(0,0,10,0);
                 final EditText input = new EditText(context);
+                final TextView toggle_lbl = new TextView(context);
+                toggle_lbl.setText("URL 자동 설정");
+                final Switch toggle = new Switch(context);
+                //TODO: implement this
+                toggle.setEnabled(false);
+                switch_layout.addView(toggle_lbl);
+                switch_layout.addView(toggle);
+                layout.addView(input);
+                layout.addView(switch_layout);
+
+                toggle.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        if(b){
+                            input.setEnabled(false);
+                            input.setText("...");
+                        }else{
+                            input.setEnabled(true);
+                            input.setText(p.getUrl());
+                        }
+                    }
+                });
+
+                toggle.setChecked(p.getAutoUrl());
+
                 input.setText(p.getUrl());
                 input.setHint(p.getDefUrl());
                 AlertDialog.Builder builder;
                 if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
                 else builder = new AlertDialog.Builder(context);
                 builder.setTitle("URL 설정")
-                        .setView(input)
+                        .setView(layout)
                         .setPositiveButton("설정", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int button) {
-                                if(input.getText().length()>0) p.setUrl(input.getText().toString());
-                                else p.setUrl(input.getHint().toString());
+                                if(toggle.isChecked()){
+                                    // 자동 설정
+                                    p.setAutoUrl(true);
+                                }else {
+                                    // 수동 설정
+                                    p.setAutoUrl(false);
+                                    if (input.getText().length() > 0)
+                                        p.setUrl(input.getText().toString());
+                                    else p.setUrl(input.getHint().toString());
+                                }
                             }
                         })
                         .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int button) {
                                 //do nothing
-                            }
-                        })
-                        .setNeutralButton("주소 확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //Toast.makeText(context,"아직 공식 대피소가 없습니다. 오픈 톡방을 이용해 주세요", Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/manamoa20")));
                             }
                         })
                         .show();

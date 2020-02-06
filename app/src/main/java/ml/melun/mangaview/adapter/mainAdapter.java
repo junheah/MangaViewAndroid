@@ -361,7 +361,6 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @Override
         protected void onPostExecute(MainPage main) {
             super.onPostExecute(main);
-            System.out.println("fetch update success");
             //update adapters?
             uadapter.setData(main.getRecent());
 

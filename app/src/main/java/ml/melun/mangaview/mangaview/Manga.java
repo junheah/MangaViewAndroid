@@ -1,6 +1,5 @@
 package ml.melun.mangaview.mangaview;
 
-import android.webkit.WebView;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -20,7 +19,6 @@ import org.jsoup.select.Elements;
 import okhttp3.Response;
 
 public class Manga {
-    String base;
     public Manga(int i, String n, String d) {
         id = i;
         name = n;
@@ -57,6 +55,7 @@ public class Manga {
         eps = new ArrayList<>();
         comments = new ArrayList<>();
         bcomments = new ArrayList<>();
+        cdn_domains = new ArrayList<>();
         int tries = 0;
 
         while(imgs.size()==0 && tries < 2) {
@@ -84,7 +83,12 @@ public class Manga {
                             //remove backslash
                             for (int i = 1; i < imgStrs.length; i += 2) {
                                 String imgUrl = imgStrs[i].replace("\\","");
+                                String cdn = cdn_domains.get((id + 4 * (i-1)) % cdn_domains.size());
+                                imgUrl = imgUrl.replace("cdntigermask.xyz", cdn);
+                                imgUrl = imgUrl.replace("cdnmadmax.xyz", cdn);
+                                imgUrl = imgUrl.replace("filecdn.xyz", cdn);
                                 if(imgUrl.contains("img.")) imgUrl += "?quick";
+                                System.out.println("pppp  " + imgUrl);
                                 imgs.add(imgUrl);
                             }
                         }
@@ -96,6 +100,10 @@ public class Manga {
                             //remove backslash
                             for (int i = 1; i < imgStrs.length; i += 2) {
                                 String imgUrl = imgStrs[i].replace("\\","");
+                                String cdn = cdn_domains.get((id + 4 * (i-1)) % cdn_domains.size());
+                                imgUrl = imgUrl.replace("cdntigermask.xyz", cdn);
+                                imgUrl = imgUrl.replace("cdnmadmax.xyz", cdn);
+                                imgUrl = imgUrl.replace("filecdn.xyz", cdn);
                                 imgs1.add(imgUrl);
                             }
                         }
@@ -118,6 +126,14 @@ public class Manga {
                         String titleName = URLDecoder.decode(line.substring(line.indexOf("manga_name=")+11,line.length()-2),"UTF-8");
                         System.out.println(titleName);
                         title = new Title(titleName,"","",new ArrayList<String>(), -1, Integer.parseInt(idStr));
+                    }else if(line.contains("var cdn_domains = ")){
+                        if(listener!=null) listener.setMessage("cdn 목록 읽는중");
+                        String[] cdnStrs = line.split("\"");
+                        for(int i=1; i < cdnStrs.length; i += 2){
+                            if(cdnStrs[i] != null && cdnStrs[i].length()>0)
+                                cdn_domains.add(cdnStrs[i]);
+                        }
+
                     }
 
                     //if(imgs.size()>0 && eps.size()>0) break;
@@ -258,7 +274,7 @@ public class Manga {
     private int id;
     String name;
     List<Manga> eps;
-    List<String> imgs, imgs1;
+    List<String> imgs, imgs1, cdn_domains;
     List<Comment> comments, bcomments;
     String offlineName;
     String thumb;

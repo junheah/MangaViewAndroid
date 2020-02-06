@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(settingIntent);
                 return true;
             }else if(id==R.id.nav_donate){
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://junheah.ml/donate"));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://junheah.github.io/donate"));
                 startActivity(browserIntent);
             }else if(id==R.id.nav_account){
                 startActivity(new Intent(context, LoginActivity.class));
@@ -899,7 +899,6 @@ public class MainActivity extends AppCompatActivity
                 s.fetch(httpClient);
                 for(Title t : s.getResult()){
                     if(t.getName().equals(name)){
-                        System.out.println(t.getName()+"..."+ t.getId());
                         return t.getId();
                     }
                 }
