@@ -22,6 +22,7 @@ import javax.net.ssl.X509TrustManager;
 import ml.melun.mangaview.MainApplication;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.activity.MainActivity;
+import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -38,7 +39,6 @@ public class CustomHttpClient {
         this.client = getUnsafeOkHttpClient().followRedirects(false).followSslRedirects(false).build();
         //this.cfc = new HashMap<>();
         //this.client = new OkHttpClient.Builder().build();
-        System.out.println("ccccccc " + p.getSession());
     }
 
     public Response getRaw(String url, Map<String, String> cookies){
@@ -93,7 +93,7 @@ public class CustomHttpClient {
         return getRaw(p.getUrl()+url, customCookie);
     }
 
-    public Response post(String url, RequestBody body){
+    public Response post(String url, RequestBody body, Map<String,String> headers){
 //        if(!isloaded){
 //            cloudflareDns.init();
 //            isloaded = true;
@@ -101,12 +101,23 @@ public class CustomHttpClient {
         Response response = null;
         try {
             String cookie = "";
-            Request request = new Request.Builder()
+            Request.Builder builder = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .addHeader("Cookie", cookie)
                     .url(p.getUrl() + url)
-                    .post(body)
-                    .build();
+                    .post(body);
+
+            for(String key: headers.keySet()){
+                builder.addHeader(key, headers.get(key));
+            }
+
+            Request request = builder.build();
+//            for(String key : request.headers().toMultimap().keySet()){
+//                System.out.println("pppp " + key);
+//                for(String v : request.headers().toMultimap().get(key)){
+//                    System.out.println("pppp\t " + v);
+//                }
+//            }
             response = client.newCall(request)
                     .execute();
         }catch (Exception e){
@@ -114,6 +125,17 @@ public class CustomHttpClient {
         }
         return response;
 
+    }
+
+
+
+
+    public Response post(String url, RequestBody body){
+//        if(!isloaded){
+//            cloudflareDns.init();
+//            isloaded = true;
+//        }
+        return post(url, body, new HashMap<>());
     }
 
     /*

@@ -78,11 +78,8 @@ public class Login {
                     .addEncoded("mb_password",pass)
                     .build();
 
-            System.out.println("pppp"+requestBody.toString());
-
             Response response = client.post("/bbs/login_check.php",requestBody);
             int responseCode = response.code();
-            System.out.println("pppp"+responseCode);
             List<String> cookies = response.headers("Set-Cookie");
 
             response.close();

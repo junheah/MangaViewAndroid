@@ -149,7 +149,6 @@ public class TagSearchActivity extends AppCompatActivity {
                     public void onItemClick(int position) {
                         // start intent : Episode viewer
                         Title selected = adapter.getItem(position);
-                        //System.out.println("onItemClick position: " + position);
                         Intent episodeView = episodeIntent(context, selected);
                         episodeView.putExtra("online", true);
                         startActivity(episodeView);

@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import static ml.melun.mangaview.MainApplication.p;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Title;
@@ -147,6 +148,7 @@ public class DebugActivity extends AppCompatActivity {
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
             data.put("login",new JSONObject(sharedPref.getString("login","{}")));
             data.put("session", sharedPref.getString("session", ""));
+            data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -177,7 +179,10 @@ public class DebugActivity extends AppCompatActivity {
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
             editor.putString("login", filter(data.getJSONObject("login").toString()));
             editor.putString("session", data.getString("session"));
+            editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
             editor.commit();
+            // reload preference
+            p = new Preference(this);
         }catch (Exception e){
             showPopup(context,"오류",e.getMessage());
             e.printStackTrace();

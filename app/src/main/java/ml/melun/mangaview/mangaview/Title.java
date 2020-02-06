@@ -76,6 +76,7 @@ public class Title {
                         ,e.selectFirst("div.addedAt").ownText().split(" ")[0]));
             }
             thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
+            System.out.println("pppp"+thumb);
             name = items.selectFirst("div.manga-subject").selectFirst("div.title").ownText();
             try {
                 author = items.selectFirst("a.author").ownText();

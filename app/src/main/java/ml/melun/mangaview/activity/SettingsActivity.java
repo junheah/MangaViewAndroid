@@ -224,6 +224,8 @@ public class SettingsActivity extends AppCompatActivity {
                 final TextView toggle_lbl = new TextView(context);
                 toggle_lbl.setText("URL 자동 설정");
                 final Switch toggle = new Switch(context);
+                //TODO: implement this
+                toggle.setEnabled(false);
                 switch_layout.addView(toggle_lbl);
                 switch_layout.addView(toggle);
                 layout.addView(input);
@@ -258,6 +260,7 @@ public class SettingsActivity extends AppCompatActivity {
                                     p.setAutoUrl(true);
                                 }else {
                                     // 수동 설정
+                                    p.setAutoUrl(false);
                                     if (input.getText().length() > 0)
                                         p.setUrl(input.getText().toString());
                                     else p.setUrl(input.getHint().toString());
