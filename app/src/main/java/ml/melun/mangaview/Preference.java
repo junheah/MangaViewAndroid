@@ -228,7 +228,7 @@ public class Preference {
         }
     }
     public int getBookmark(Title title){
-        //return recent.get(0).getBookmark();
+        //return recent.mget(0).getBookmark();
         int titleId = title.getId();
         if(titleId>0) {
             try {

@@ -397,7 +397,7 @@ public class MainActivity extends AppCompatActivity
             mainadapter.setMainClickListener(new mainAdapter.onItemClick() {
                 @Override
                 public void clickedManga(Manga m) {
-                    //get title from manga m and start intent for manga m
+                    //mget title from manga m and start intent for manga m
                     //getTitleFromManga intentStarter = new getTitleFromManga();
                     //intentStarter.execute(m);
                     openViewer(m,-1);

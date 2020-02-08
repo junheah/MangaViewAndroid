@@ -1,10 +1,11 @@
 package net.jhavar.main;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Base64;
+import android.util.Base64;
 import java.util.HashMap;
 
 import net.jhavar.exceptions.NotSameHostException;
@@ -12,12 +13,14 @@ import net.jhavar.exceptions.NotYetBypassedException;
 import net.jhavar.http.HttpGet;
 import net.jhavar.http.HttpPost;
 
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okio.BufferedSink;
+
 public class DdosGuardBypass {
 	
 	private HttpGet hg;
-	
-	private String proxyIp;
-	private int proxyPort;
 	
 	private boolean isBypassed;
 	
@@ -27,33 +30,23 @@ public class DdosGuardBypass {
 		this.url = new URL(url);
 	}
 	
-	public DdosGuardBypass(String url, String proxyIp, int proxyPort) throws MalformedURLException {
-		this(url);
-		
-		this.proxyIp = proxyIp;
-		this.proxyPort = proxyPort;
-	}
-	
 	public String bypass() {
 		
 		try {
-			if(proxyIp != null)
-				this.hg = new HttpGet(url.toString(), false, this.proxyIp, this.proxyPort);
-			else
-				this.hg = new HttpGet(url.toString(), false);
+			this.hg = new HttpGet(url.toString(), false);
 		} catch (MalformedURLException e1) {
 			System.out.println("The URL you entered was not proper.");
 			return null;
 		}
-		//Send first get request
+		//Send first mget request
 		this.hg.get();
 		//Prepare POST request
 		//Form parameters
-		String h = Base64.getEncoder().encodeToString((url.getProtocol() + "://" + url.getHost()).getBytes());
-		String u = Base64.getEncoder().encodeToString("/".getBytes());
+		String h = new String(Base64.encode((url.getProtocol() + "://" + url.getHost()).getBytes(), Base64.DEFAULT));
+		String u = new String(Base64.encode("/".getBytes(), Base64.DEFAULT));
 		String p = "";
 		if(url.getPort() != -1)
-			p = Base64.getEncoder().encodeToString((Integer.toString(url.getPort())).getBytes());
+			p = new String(Base64.encode((Integer.toString(url.getPort())).getBytes(), Base64.DEFAULT));
 		
 		try {
 			h = URLEncoder.encode(h, "UTF-8");
@@ -62,24 +55,19 @@ public class DdosGuardBypass {
 		} catch(UnsupportedEncodingException e) {
 			System.out.println("Internal error occured in bypass. (UTF-8 encoding not supported?)");
 		}
-		
-		String postContent = String.format("u=%s&h=%s&p=%s", u, h, p);
+		RequestBody postContent = new FormBody.Builder()
+				.addEncoded("u", u)
+				.addEncoded("h", h)
+				.addEncoded("p", p)
+				.build();
 		try {
 			HttpPost hp;
-			if(this.proxyIp != null) {
-				hp = new HttpPost(url.getProtocol() + "://ddgu.ddos-guard.net/ddgu/", postContent, false, this.proxyIp, this.proxyPort);				
-			} else {
-				hp = new HttpPost(url.getProtocol() + "://ddgu.ddos-guard.net/ddgu/", postContent, false);
-			}
-			//Sleep 5 seconds
-			try {
-				Thread.sleep(5000);
-			} catch(InterruptedException e) {
-				System.out.println("bypass was not given enough time to pause as thread was interrupted.");
-			}
+			hp = new HttpPost(url.getProtocol() + "://ddgu.ddos-guard.net/ddgu/", postContent, false);
+
 			//Get the redirect URL
 			//hp.post(true) returns the HTML response, while hp.post(false) returns the location from a HTTP 301 code
 			String redirUrl = hp.post(false);
+			System.out.println("ppp" + redirUrl);
 			
 			//The following request will require cookie storage, so use that.
 			this.hg.setStoreCookies(true);

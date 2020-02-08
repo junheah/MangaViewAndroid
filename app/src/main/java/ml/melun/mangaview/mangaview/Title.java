@@ -1,5 +1,4 @@
 package ml.melun.mangaview.mangaview;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +66,8 @@ public class Title {
 
             eps = new ArrayList<>();
             //now uses id, not name
-            //Response response = client.get("/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"));
-            Response response = client.get("/bbs/page.php?hid=manga_detail&manga_id="+id);
+            //Response response = client.mget("/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"));
+            Response response = client.mget("/bbs/page.php?hid=manga_detail&manga_id="+id);
             Document items = Jsoup.parse(response.body().string());
             for(Element e:items.select("div.slot")) {
                 eps.add(new Manga(Integer.parseInt(e.attr("data-wrid"))
@@ -104,7 +103,7 @@ public class Title {
     }
 
     public void toggleBookmark(CustomHttpClient client){
-        Response r = client.get(bookmarkLink,true);
+        Response r = client.mget(bookmarkLink,true);
         if(r!=null) r.close();
     }
 

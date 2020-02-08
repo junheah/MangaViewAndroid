@@ -64,7 +64,7 @@ public class Manga {
             cookie.put("last_percent",String.valueOf(1));
             cookie.put("last_page",String.valueOf(0));
 
-            Response response = client.get("/bbs/board.php?bo_table=manga&wr_id="+id, doLogin, cookie);
+            Response response = client.mget("/bbs/board.php?bo_table=manga&wr_id="+id, doLogin, cookie);
             try {
                 InputStream stream = response.body().byteStream();
                 if(listener!=null) listener.setMessage("페이지 읽는중");

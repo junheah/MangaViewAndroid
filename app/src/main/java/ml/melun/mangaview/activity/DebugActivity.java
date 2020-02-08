@@ -3,6 +3,7 @@ package ml.melun.mangaview.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -14,15 +15,23 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import net.jhavar.exceptions.NotSameHostException;
+import net.jhavar.main.DdosGuardBypass;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.List;
 
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Title;
+import okhttp3.Response;
 
 import static ml.melun.mangaview.Utils.showPopup;
 
@@ -124,6 +133,13 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
+        this.findViewById(R.id.ddgbTest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new ddgBypassTest().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        });
+
     }
     String pref(){
         SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
@@ -206,4 +222,32 @@ public class DebugActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    private class ddgBypassTest extends AsyncTask<Void, Void, Integer> {
+        String result;
+        protected void onPreExecute() {
+
+        }
+        protected Integer doInBackground(Void... params) {
+            try {
+                Response r = httpClient.get("https://mnmnmnmnm.xyz/", new HashMap<>());
+                if(r.code() == 403) {
+                    DdosGuardBypass ddg = new DdosGuardBypass("https://mnmnmnmnm.xyz/");
+                    ddg.bypass();
+                    result = ddg.get("https://mnmnmnmnm.xyz/");
+                }else
+                    result = "no ddos guard";
+            }catch (Exception e){
+                result = e.getMessage();
+                e.printStackTrace();
+            }
+            return null;
+        }
+        protected void onPostExecute(Integer result) {
+            if(result != null)
+                output.setText(result);
+        }
+    }
+
 }

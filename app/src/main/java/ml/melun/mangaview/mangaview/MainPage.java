@@ -22,7 +22,7 @@ public class MainPage {
 
 
         try{
-            Response response = client.get("");
+            Response response = client.mget("");
             Document doc = Jsoup.parse(response.body().string());
 
             Elements list = doc.selectFirst("div.msm-post-gallery").select("div.post-row");

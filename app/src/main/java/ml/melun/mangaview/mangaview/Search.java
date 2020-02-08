@@ -86,7 +86,7 @@ public class Search {
                 }
 
 
-                Response response = client.get(searchUrl + query + "&page=" + page);
+                Response response = client.mget(searchUrl + query + "&page=" + page);
                 Document search = Jsoup.parse(response.body().string());
                 Elements items = search.select("div.post-row");
                 if (items.size() < 1) last = true;

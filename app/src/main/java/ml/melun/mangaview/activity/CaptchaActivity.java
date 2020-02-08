@@ -67,7 +67,7 @@ public class CaptchaActivity extends AppCompatActivity {
 
         Login login = p.getLogin();
 
-        // if logged-in, get session from login
+        // if logged-in, mget session from login
         if(login != null && login.isValid()){
             cookiem.setCookie(p.getUrl(), login.getCookie(true));
         }else if(p.getSession().length()>0){

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.view.Display;
 import android.webkit.CookieManager;
@@ -27,7 +28,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ml.melun.mangaview.activity.EpisodeActivity;
@@ -41,8 +41,6 @@ import ml.melun.mangaview.mangaview.Title;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import static ml.melun.mangaview.MainApplication.httpClient;
 
 public class Utils {
     public static Boolean deleteRecursive(File fileOrDirectory) {
@@ -309,7 +307,7 @@ public class Utils {
 
     public static Boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
         try {
-            Response tokenResponse = client.get("/bbs/ajax.comment_token.php?_="+ System.currentTimeMillis());
+            Response tokenResponse = client.mget("/bbs/ajax.comment_token.php?_="+ System.currentTimeMillis());
             String token = new JSONObject(tokenResponse.body().string()).getString("token");
             tokenResponse.close();
 //
@@ -395,7 +393,7 @@ public class Utils {
 
         Login login = p.getLogin();
 
-        // if logged-in, get session from login
+        // if logged-in, mget session from login
         if(login != null && login.isValid()){
             cookiem.setCookie(p.getUrl(), login.getCookie(true));
         }else if(p.getSession().length()>0){
@@ -421,4 +419,5 @@ public class Utils {
         }
         return res;
     }
+
 }

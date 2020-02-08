@@ -121,9 +121,9 @@ public class NoticesActivity extends AppCompatActivity {
             sharedPref.edit().putLong("lastNoticeTime", System.currentTimeMillis()).commit();
         }
         protected Integer doInBackground(Void... params) {
-            //get all notices
+            //mget all notices
             try {
-                Response response = httpClient.getRaw("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json", (Map)new HashMap<>());
+                Response response = httpClient.get("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json", new HashMap<>());
                 String rawdata = response.body().string();
                 response.close();
                 loaded = new Gson().fromJson(rawdata, new TypeToken<List<Notice>>(){}.getType());
@@ -153,6 +153,4 @@ public class NoticesActivity extends AppCompatActivity {
             populate();
         }
     }
-
-
 }

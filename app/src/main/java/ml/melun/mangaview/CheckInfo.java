@@ -78,9 +78,9 @@ public class CheckInfo {
             sharedPref.edit().putLong("lastNoticeTime", System.currentTimeMillis()).commit();
         }
         protected Integer doInBackground(Void... params) {
-            //get all notices
+            //mget all notices
             try {
-                Response response = client.getRaw("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notice.json", (Map) new HashMap<>());
+                Response response = client.get("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notice.json", new HashMap<>());
                 String rawdata = response.body().string();
                 response.close();
                 notice = new Gson().fromJson(rawdata, new TypeToken<Notice>(){}.getType());
@@ -114,7 +114,7 @@ public class CheckInfo {
 
         protected Integer doInBackground(Void... params) {
             try {
-                Response response = client.getRaw("https://api.github.com/repos/junheah/MangaViewAndroid/releases/latest",(Map) new HashMap<>());
+                Response response = client.get("https://api.github.com/repos/junheah/MangaViewAndroid/releases/latest", new HashMap<>());
                 String rawdata = response.body().string();
                 response.close();
                 data = new JSONObject(rawdata);

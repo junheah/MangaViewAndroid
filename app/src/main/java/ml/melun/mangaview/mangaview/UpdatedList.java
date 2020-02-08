@@ -19,7 +19,7 @@ public class UpdatedList {
         if(!last) {
             try {
                 page++;
-                Response response= client.get(url+page);
+                Response response= client.mget(url+page);
                 Document document = Jsoup.parse(response.body().string());
                 Elements items = document.select("div.media.post-list");
                 if (items.size() < 50) last = true;

@@ -1,12 +1,6 @@
 package ml.melun.mangaview.mangaview;
 
 
-import android.app.Activity;
-
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -19,12 +13,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import ml.melun.mangaview.MainApplication;
 import ml.melun.mangaview.Preference;
-import ml.melun.mangaview.activity.MainActivity;
-import okhttp3.Headers;
-import okhttp3.HttpUrl;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -41,29 +30,27 @@ public class CustomHttpClient {
         //this.client = new OkHttpClient.Builder().build();
     }
 
-    public Response getRaw(String url, Map<String, String> cookies){
+    public Response get(String url, Map<String, String> headers){
 //        if(!isloaded){
 //            cloudflareDns.init();
 //            isloaded = true;
 //        }
         Response response = null;
         try {
-            String cookie = "";
-            for(String key : cookies.keySet()){
-                cookie += key + '=' + cookies.get(key) + "; ";
-            }
 //            for(String key : cfc.keySet()){
-//                cookie +=  key + '=' + cfc.get(key)+ "; ";
+//                cookie +=  key + '=' + cfc.mget(key)+ "; ";
 //            }
-
-            Request request = new Request.Builder()
+            Request.Builder builder = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
-                    .addHeader("Cookie", cookie)
                     .url(url)
-                    .get()
-                    .build();
-            response = client.newCall(request)
-                    .execute();
+                    .get();
+
+            for(String k : headers.keySet()){
+                builder.addHeader(k, headers.get(k));
+            }
+
+            Request request = builder.build();
+            response = client.newCall(request).execute();
 //            if(response != null){
 //                if(response.code()>=500){
 //                    System.out.println("cf");
@@ -75,29 +62,29 @@ public class CustomHttpClient {
         return response;
     }
 
-    public Response get(String url, Boolean doLogin){
-        Map<String, String> cookies = new HashMap<>();
-        if(doLogin && p.getSession().length()>0) {
-            cookies.put("PHPSESSID", p.getSession());
-        }
-        return getRaw(p.getUrl()+url,cookies);
+    public Response mget(String url, Boolean doLogin){
+        return mget(url, doLogin, new HashMap<>());
     }
-    public Response get(String url){
-        return get(url,true);
+    public Response mget(String url){
+        return mget(url,true);
     }
 
-    public Response get(String url,Boolean doLogin, Map<String, String> customCookie){
+    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
         if(doLogin && p.getSession().length()>0){
             customCookie.put("PHPSESSID", p.getSession());
         }
-        return getRaw(p.getUrl()+url, customCookie);
+        String cookie = "";
+        for(String key : customCookie.keySet()){
+            cookie += key + '=' + customCookie.get(key) + "; ";
+        }
+        Map headers = new HashMap<String, String>();
+        headers.put("Cookie", cookie);
+
+        return get(p.getUrl()+url, headers);
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){
-//        if(!isloaded){
-//            cloudflareDns.init();
-//            isloaded = true;
-//        }
+
         Response response = null;
         try {
             String cookie = "";
@@ -112,13 +99,7 @@ public class CustomHttpClient {
             }
 
             Request request = builder.build();
-//            for(String key : request.headers().toMultimap().keySet()){
-//                System.out.println("pppp " + key);
-//                for(String v : request.headers().toMultimap().get(key)){
-//                    System.out.println("pppp\t " + v);
-//                }
-//            }
-            response = client.newCall(request)
+            response = this.client.newCall(request)
                     .execute();
         }catch (Exception e){
 

@@ -245,7 +245,7 @@ public class Downloader extends Service {
                     //reset progress
                     progress = 0;
 
-                    //get item from queue
+                    //mget item from queue
                     Title title = titles.get(0);
                     JSONArray selectedEps = selected.get(0);
 
@@ -276,7 +276,7 @@ public class Downloader extends Service {
 //                                JSONArray ids = new JSONArray();
 //                                for (int i = mangas.size() - 1; i >= 0; i--) {
 //                                    //save manga id to JSONArray
-//                                    ids.put(mangas.get(i).getId());
+//                                    ids.put(mangas.mget(i).getId());
 //                                }
 //                                json.put("ids", ids);
 
@@ -297,7 +297,7 @@ public class Downloader extends Service {
                             }
                         }
 
-                        //get index from JSONArray
+                        //mget index from JSONArray
                         int listIndex = 0;
                         try {
                             listIndex = selectedEps.getInt(queueIndex);
