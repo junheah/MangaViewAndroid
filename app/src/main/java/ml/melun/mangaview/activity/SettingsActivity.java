@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ import android.widget.ToggleButton;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.p;
 
@@ -224,8 +226,6 @@ public class SettingsActivity extends AppCompatActivity {
                 final TextView toggle_lbl = new TextView(context);
                 toggle_lbl.setText("URL 자동 설정");
                 final Switch toggle = new Switch(context);
-                //TODO: implement this
-                toggle.setEnabled(false);
                 switch_layout.addView(toggle_lbl);
                 switch_layout.addView(toggle);
                 layout.addView(input);
@@ -258,6 +258,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 if(toggle.isChecked()){
                                     // 자동 설정
                                     p.setAutoUrl(true);
+                                    new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                                 }else {
                                     // 수동 설정
                                     p.setAutoUrl(false);

@@ -8,7 +8,6 @@ import org.jsoup.nodes.Element;
 
 import okhttp3.Response;
 
-import static ml.melun.mangaview.Utils.getIdWithName;
 
 public class Title {
 
@@ -59,10 +58,10 @@ public class Title {
         //fetch episodes
         try {
             System.out.println(id);
-            if(id<0){
-                this.id = getIdWithName(client, this.name);
-                if(this.id<0) return;
-            }
+//            if(id<0){
+//                this.id = getIdWithName(client, this.name);
+//                if(this.id<0) return;
+//            }
 
             eps = new ArrayList<>();
             //now uses id, not name

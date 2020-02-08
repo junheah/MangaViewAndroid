@@ -78,7 +78,7 @@ public class Login {
                     .addEncoded("mb_password",pass)
                     .build();
 
-            Response response = client.post("/bbs/login_check.php",requestBody);
+            Response response = client.post(p.getUrl() + "/bbs/login_check.php", requestBody);
             int responseCode = response.code();
             List<String> cookies = response.headers("Set-Cookie");
 

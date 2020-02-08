@@ -46,28 +46,12 @@ public class HttpPost {
 
 	public String post(boolean getResponseString) {
 
-		URL obj;
 		Map<String, String> headers = new HashMap<>();
-
-		// Form URL
-		System.out.println("pppp   "+url);
-		try {
-			obj = new URL(url);
-		} catch (MalformedURLException e) {
-			System.out.println("Bad URL in HttpPost");
-			return null;
-		}
-
-		// If connection is open, proceed. Otherwise, return null.
 
 		try {
 
 			// Set headers to represent a Chrome browser request
 			setHeaders(headers);
-
-			// Write POST content
-
-			// Receive HTML response
 			Response r = httpClient.post(url, this.postContent);
 			if (getResponseString == true) {
 				return readAndGetResponse(r);
@@ -76,7 +60,7 @@ public class HttpPost {
 			}
 
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 		// Return null. If there was valid content, it would have been returned in

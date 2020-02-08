@@ -307,6 +307,14 @@ public class Utils {
 
     public static Boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
         try {
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Cookie", login.getCookie(true));
+//            headers.put("Content-Type","application/x-www-form-urlencoded");
+//            headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+//            headers.put("Accept-Encoding", "gzip, deflate, br");
+//            headers.put("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7");
+
+
             Response tokenResponse = client.mget("/bbs/ajax.comment_token.php?_="+ System.currentTimeMillis());
             String token = new JSONObject(tokenResponse.body().string()).getString("token");
             tokenResponse.close();
@@ -330,15 +338,10 @@ public class Utils {
                     .addEncoded("wr_content",content)
                     .build();
 
-            Map<String, String> headers = new HashMap<>();
-            headers.put("Cookie", login.getCookie(true));
-//            headers.put("Content-Type","application/x-www-form-urlencoded");
-//            headers.put("Origin", "https://manamoa.net");
-//            headers.put("Accept", "*");
-//            headers.put("Accept-Encoding", "*");
-//            headers.put("Accept-Language", "*");
+            System.out.println("ppppp " + id);
 
-            Response commentResponse = client.post("/bbs/write_comment_update.php", requestBody, headers);
+
+            Response commentResponse = client.post(baseUrl + "/bbs/write_comment_update.php", requestBody, headers);
             int responseCode = commentResponse.code();
             commentResponse.close();
             if(responseCode == 302)
@@ -349,10 +352,6 @@ public class Utils {
         return false;
     }
 
-
-    static public int getIdWithName(CustomHttpClient client, String name){
-        return -1;
-    }
 
     static public void checkCaptcha(Preference p, Context context, int id, Runnable callback){
             String url = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=" + id;
@@ -402,22 +401,4 @@ public class Utils {
         }
         webView.loadUrl(url, headers);
     }
-
-    // TODO: implement this in CustomHttpClient
-    public static String fetchURL(){
-        // URL 자동 설정
-        String res = "";
-        try{
-            DdosGuardBypass ddg = new DdosGuardBypass("https://mnmnmnmnm.xyz");
-            ddg.bypass();
-            //Response r = httpClient.getRaw("https://mnmnmnmnm.xyz", new HashMap<>());
-            //String raw = r.body().string();
-            String raw = ddg.get("https://mnmnmnmnm.xyz");
-            res = raw.split("주소는 ")[1].split(" ")[0];
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return res;
-    }
-
 }

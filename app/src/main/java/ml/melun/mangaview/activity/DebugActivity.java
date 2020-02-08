@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
@@ -225,7 +226,7 @@ public class DebugActivity extends AppCompatActivity {
 
 
     private class ddgBypassTest extends AsyncTask<Void, Void, Integer> {
-        String result;
+        String result = "hello";
         protected void onPreExecute() {
 
         }
@@ -239,14 +240,12 @@ public class DebugActivity extends AppCompatActivity {
                 }else
                     result = "no ddos guard";
             }catch (Exception e){
-                result = e.getMessage();
                 e.printStackTrace();
             }
             return null;
         }
-        protected void onPostExecute(Integer result) {
-            if(result != null)
-                output.setText(result);
+        protected void onPostExecute(Integer r) {
+            output.setText(result);
         }
     }
 

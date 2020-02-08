@@ -38,8 +38,8 @@ public class DdosGuardBypass {
 			System.out.println("The URL you entered was not proper.");
 			return null;
 		}
-		//Send first mget request
-		this.hg.get();
+		//Send first get request
+		//this.hg.get();
 		//Prepare POST request
 		//Form parameters
 		String h = new String(Base64.encode((url.getProtocol() + "://" + url.getHost()).getBytes(), Base64.DEFAULT));
@@ -47,14 +47,7 @@ public class DdosGuardBypass {
 		String p = "";
 		if(url.getPort() != -1)
 			p = new String(Base64.encode((Integer.toString(url.getPort())).getBytes(), Base64.DEFAULT));
-		
-		try {
-			h = URLEncoder.encode(h, "UTF-8");
-			u = URLEncoder.encode(u, "UTF-8");
-			p = URLEncoder.encode(p, "UTF-8");	
-		} catch(UnsupportedEncodingException e) {
-			System.out.println("Internal error occured in bypass. (UTF-8 encoding not supported?)");
-		}
+
 		RequestBody postContent = new FormBody.Builder()
 				.addEncoded("u", u)
 				.addEncoded("h", h)
@@ -67,14 +60,13 @@ public class DdosGuardBypass {
 			//Get the redirect URL
 			//hp.post(true) returns the HTML response, while hp.post(false) returns the location from a HTTP 301 code
 			String redirUrl = hp.post(false);
-			System.out.println("ppp" + redirUrl);
 			
 			//The following request will require cookie storage, so use that.
 			this.hg.setStoreCookies(true);
 			try {
 				this.hg.setUrl(redirUrl);
 			} catch (NotSameHostException e) {
-				System.out.println(e.getMessage());
+				e.printStackTrace();
 			}			
 			this.hg.get();
 			

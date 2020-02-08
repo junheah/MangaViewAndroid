@@ -56,6 +56,7 @@ import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.mainAdapter;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
@@ -136,6 +137,9 @@ public class MainActivity extends AppCompatActivity
                     })
                     .show();
         }
+        // url updater
+        if(p.getAutoUrl())
+            new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
