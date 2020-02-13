@@ -61,13 +61,7 @@ public class EpisodeActivity extends AppCompatActivity {
     List<File> offlineEpisodes;
     int mode = 0;
     ProgressBar progress;
-    /*
-    mode:
-    0 = online
-    1 = offline - old
-    2 = offline - old (title.data)
-    3 = offline - new (title.gson)
-     */
+
 
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
@@ -133,7 +127,10 @@ public class EpisodeActivity extends AppCompatActivity {
             g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }else{
             //offline title
+            //initialize eps list
             episodes = new ArrayList<>();
+
+            //get child folder list of title dir
             offlineEpisodes = getOfflineEpisodes();
             //read ids and folder names
             File titleDir = new File(homeDir,filterFolder(title.getName()));
@@ -164,6 +161,8 @@ public class EpisodeActivity extends AppCompatActivity {
                         }catch(Exception e){
                             manga = new Manga(-1,episodeName, "");
                         }
+                        manga.setMode(mode);
+                        manga.setOfflinePath(offlineEpisodes.get(i));
                         episodes.add(manga);
                     }
                 }
@@ -172,17 +171,17 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }else if(data.exists()){
                 mode = 3;
-                //new reader
                 p.addRecent(title);
                 episodes =  title.getEps();
                 offlineEpisodes = new ArrayList<>();
                 for(File folder : getOfflineEpisodes()){
-                    //mget id from folders
+                    //get id from folders
                     String name = folder.getName();
                     try {
                         int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)),"",""));
                         if(index>-1){
-                            episodes.get(index).setOfflineName(name);
+                            episodes.get(index).setOfflinePath(folder);
+                            episodes.get(index).setMode(mode);
                         }
                     }catch(Exception e){
                         // folder name is not properly formatted
@@ -190,7 +189,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
                 //for loop to remove non-existing episodes
                 for(int i = episodes.size()-1;i>=0 ;i--){
-                    if(episodes.get(i).getOfflineName()==null) episodes.remove(i);
+                    if(episodes.get(i).getOfflinePath()==null) episodes.remove(i);
                 }
 
             } else {
@@ -198,8 +197,12 @@ public class EpisodeActivity extends AppCompatActivity {
                 for (File f : offlineEpisodes) {
                     Manga manga;
                     manga = new Manga(-1, f.getName(), "");
+                    manga.setMode(mode);
+                    manga.setOfflinePath(f);
                     //add local images to manga
                     episodes.add(manga);
+                    // set eps to title object
+                    title.setEps(episodes);
                 }
             }
             //set up adapter
@@ -301,25 +304,6 @@ public class EpisodeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position, Manga selected) {
                 //add local images to manga
-                if(!online) {
-                    List<String> localImgs = new ArrayList<>();
-                    File[] imgs = new File[0];
-                    switch(mode){
-                        case 1:
-                        case 2:
-                            imgs = offlineEpisodes.get(position).listFiles();
-                            break;
-                        case 3:
-                            File titleDir = new File(homeDir,filterFolder(title.getName()));
-                            imgs = new File(titleDir, selected.getOfflineName()).listFiles();
-                            break;
-                    }
-                    Arrays.sort(imgs);
-                    for (File img : imgs) {
-                        localImgs.add(img.getAbsolutePath());
-                    }
-                    selected.setImgs(localImgs);
-                }
                 openViewer(selected,0);
             }
             @Override
@@ -401,7 +385,6 @@ public class EpisodeActivity extends AppCompatActivity {
         viewer.putExtra("manga", new Gson().toJson(manga));
         viewer.putExtra("title", new Gson().toJson(title));
         viewer.putExtra("recent",true);
-        viewer.putExtra("online",online);
         startActivityForResult(viewer, code);
     }
 }

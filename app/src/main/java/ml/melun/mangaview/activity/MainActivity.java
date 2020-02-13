@@ -54,12 +54,10 @@ import java.util.List;
 
 import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
-import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.mainAdapter;
-import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -571,7 +569,7 @@ public class MainActivity extends AppCompatActivity
                     //not used
                 }
             });
-            getSavedTitles get = new getSavedTitles();
+            GetSavedTitles get = new GetSavedTitles();
             get.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -641,7 +639,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    private class getSavedTitles extends AsyncTask<Void, Void, Integer>{
+    private class GetSavedTitles extends AsyncTask<Void, Void, Integer>{
         List<Title> titles;
         @Override
         protected void onPreExecute() {

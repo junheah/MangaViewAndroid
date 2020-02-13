@@ -82,7 +82,6 @@ public class ViewerActivity extends AppCompatActivity {
     int seed = 0;
     int epsCount = 0;
     int width=0;
-    Boolean online;
     Intent intent;
     boolean captchaChecked = false;
     @Override
@@ -110,7 +109,6 @@ public class ViewerActivity extends AppCompatActivity {
             intent = getIntent();
             title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
             manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
-            online = intent.getBooleanExtra("online", true);
 
             name = manga.getName();
             id = manga.getId();
@@ -126,40 +124,15 @@ public class ViewerActivity extends AppCompatActivity {
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK,resultIntent);
             }
-            if(!online){
+            if(manga.getMode() != 0){
+                // is offline
                 //load local imgs
-                if(id>-1){
-                    //if manga has id = manga has title = update bookmark and add to recent
-                    p.addRecent(title);
-                    p.setBookmark(title,id);
-                }
-                toolbarTitle.setText(manga.getName());
-                toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-                toolbarTitle.setMarqueeRepeatLimit(-1);
-                toolbarTitle.setSingleLine(true);
-                toolbarTitle.setSelected(true);
-                spinner.setVisibility(View.GONE);
-                prev.setVisibility(View.GONE);
-                next.setVisibility(View.GONE);
-                spinner.setVisibility(View.GONE);
                 commentBtn.setVisibility(View.GONE);
                 swipe.setEnabled(false);
-                imgs = manga.getImgs();
-                if(imgs == null || imgs.size()==0) {
-                    showErrorPopup(context);
-                }
-                stripAdapter = new StripAdapter(context, imgs, null, autoCut, seed, id, width);
-                strip.setAdapter(stripAdapter);
-                stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
-                    public void onItemClick() {
-                        // show/hide toolbar
-                        toggleToolbar();
-                    }
-                });
-                if(id>-1){
-                    bookmarkRefresh();
-                }
-                pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
+
+
+                reloadManga();
+
             }else {
                 refresh();
             }
@@ -223,7 +196,11 @@ public class ViewerActivity extends AppCompatActivity {
                     index--;
                     manga = eps.get(index);
                     id = manga.getId();
-                    refresh();
+                    name = manga.getName();
+                    if(manga.getMode() == 0)
+                        refresh();
+                    else
+                        reloadManga();
                 }
             }
         });
@@ -235,7 +212,11 @@ public class ViewerActivity extends AppCompatActivity {
                     index++;
                     manga = eps.get(index);
                     id = manga.getId();
-                    refresh();
+                    name = manga.getName();
+                    if(manga.getMode() == 0)
+                        refresh();
+                    else
+                        reloadManga();
                 }
             }
         });
@@ -350,15 +331,6 @@ public class ViewerActivity extends AppCompatActivity {
         else strip.getLayoutManager().scrollToPosition(viewerBookmark);
     }
 
-    public void bookmarkRefresh(){
-        if(viewerBookmark!=-1){
-            strip.scrollToPosition(viewerBookmark);
-        }
-        if(!autoCut) strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id));
-        else strip.getLayoutManager().scrollToPosition(p.getViewerBookmark(id)*2);
-    }
-
-
 
 //    public boolean dispatchTouchEvent(MotionEvent ev) {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
@@ -421,110 +393,27 @@ public class ViewerActivity extends AppCompatActivity {
             super.onPostExecute(res);
             if(res == 1){
                 //captcha?
-                if(!captchaChecked) {
-                    checkCaptcha(p, context, id, new Runnable(){
-                        @Override
-                        public void run() {
-                            refresh();
-                        }
-                    });
-                    captchaChecked = true;
-                    if (pd.isShowing()) {
-                        pd.dismiss();
-                    }
-                    lockUi(true);
-                    return;
-                }else {
+//                if(!captchaChecked) {
+//                    checkCaptcha(p, context, id, new Runnable(){
+//                        @Override
+//                        public void run() {
+//                            refresh();
+//                        }
+//                    });
+//                    captchaChecked = true;
+//                    if (pd.isShowing()) {
+//                        pd.dismiss();
+//                    }
+//                    lockUi(true);
+//                    return;
+//                }else {
                     //error occured
                     showErrorPopup(context);
                     return;
-                }
+//                }
             }
+            reloadManga();
 
-            lockUi(false);
-            strip.setAdapter(stripAdapter);
-
-            stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
-                public void onItemClick() {
-                    // show/hide toolbar
-                    toggleToolbar();
-                }
-            });
-            eps = manga.getEps();
-            List<String> epsName = new ArrayList<>();
-            for(int i=0; i<eps.size(); i++){
-                if(eps.get(i).getId()==id){
-                    index = i;
-                }
-                epsName.add(eps.get(i).getName());
-            }
-            toolbarTitle.setText(manga.getName());
-            toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-            toolbarTitle.setMarqueeRepeatLimit(-1);
-            toolbarTitle.setSingleLine(true);
-            toolbarTitle.setSelected(true);
-
-//            spinner.setAdapter(new ArrayAdapter<String>(context,
-//                    android.R.layout.simple_spinner_item, epsName));
-            //set button enabled
-            if(index==0){
-                next.setEnabled(false);
-                next.setColorFilter(Color.BLACK);
-            }
-            else {
-                next.setEnabled(true);
-                next.setColorFilter(null);
-            }
-            if(index==eps.size()-1) {
-                prev.setEnabled(false);
-                prev.setColorFilter(Color.BLACK);
-            }
-            else {
-                prev.setEnabled(true);
-                prev.setColorFilter(null);
-            }
-            swipe.setRefreshing(false);
-
-            //refresh spinner
-            spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, epsName));
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
-                    ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
-                    if(index!= position) {
-                        lockUi(true);
-                        index = position;
-                        manga = eps.get(index);
-                        id = manga.getId();
-                        refresh();
-                    }
-                }
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-            spinner.setSelection(index);
-            pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
-            bookmarkRefresh();
-            try {
-                if (title == null) title = manga.getTitle();
-                p.addRecent(title);
-                if (id > 0) p.setBookmark(title, id);
-                result = new Intent();
-                result.putExtra("id", id);
-                setResult(RESULT_OK, result);
-                //update intent : not sure if this works TODO: test this
-                intent.putExtra("title", new Gson().toJson(title));
-                intent.putExtra("manga", new Gson().toJson(manga));
-            }catch (Exception e){
-                StackTraceElement[] stack = e.getStackTrace();
-                String message = "";
-                for(StackTraceElement s : stack){
-                    message +=s.toString()+'\n';
-                }
-                showErrorPopup(context, e);
-            }
             if (pd.isShowing()) {
                 pd.dismiss();
             }
@@ -533,6 +422,134 @@ public class ViewerActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    public void reloadManga(){
+        try {
+            lockUi(false);
+            if(manga.getMode() != 0){
+                imgs = manga.getImgs();
+                if(imgs == null || imgs.size()==0) {
+                    showErrorPopup(context);
+                }
+                stripAdapter = new StripAdapter(context, imgs, null, autoCut, seed, id, width);
+            }
+            refreshAdapter();
+            bookmarkRefresh();
+            refreshToolbar();
+            updateIntent();
+
+        }catch (Exception e){
+            StackTraceElement[] stack = e.getStackTrace();
+            String message = "";
+            for(StackTraceElement s : stack){
+                message +=s.toString()+'\n';
+            }
+            showErrorPopup(context, e);
+        }
+    }
+
+    public void bookmarkRefresh(){
+        if(id>0) {
+            viewerBookmark = p.getViewerBookmark(id);
+            if (viewerBookmark != -1) {
+                strip.scrollToPosition(viewerBookmark);
+            }
+            if (!autoCut) strip.scrollToPosition(viewerBookmark);
+            else strip.scrollToPosition(viewerBookmark * 2);
+        }
+        if(manga.getMode() == 0 || manga.getMode() == 3) {
+            // if manga is online or has title.gson
+            if (title == null) title = manga.getTitle();
+            p.addRecent(title);
+            if (id > 0) p.setBookmark(title, id);
+        }
+    }
+
+    public void updateIntent(){
+        result = new Intent();
+        result.putExtra("id", id);
+        setResult(RESULT_OK, result);
+        //update intent : not sure if this works TODO: test this
+        intent.putExtra("title", new Gson().toJson(title));
+        intent.putExtra("manga", new Gson().toJson(manga));
+    }
+
+    public void refreshAdapter(){
+        strip.setAdapter(stripAdapter);
+        stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
+            public void onItemClick() {
+                // show/hide toolbar
+                toggleToolbar();
+            }
+        });
+    }
+
+    public void refreshToolbar(){
+        eps = manga.getEps();
+        if(eps == null || eps.size() == 0){
+            eps = title.getEps();
+        }
+        List<String> epsName = new ArrayList<>();
+        for(int i=0; i<eps.size(); i++){
+            if(id>0) {
+                if (eps.get(i).getId() == id)
+                    index = i;
+            }else{
+                if(eps.get(i).getName().equals(name))
+                    index = i;
+            }
+            epsName.add(eps.get(i).getName());
+        }
+        toolbarTitle.setText(manga.getName());
+        toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        toolbarTitle.setMarqueeRepeatLimit(-1);
+        toolbarTitle.setSingleLine(true);
+        toolbarTitle.setSelected(true);
+
+        if(index==0){
+            next.setEnabled(false);
+            next.setColorFilter(Color.BLACK);
+        }
+        else {
+            next.setEnabled(true);
+            next.setColorFilter(null);
+        }
+        if(index==eps.size()-1) {
+            prev.setEnabled(false);
+            prev.setColorFilter(Color.BLACK);
+        }
+        else {
+            prev.setEnabled(true);
+            prev.setColorFilter(null);
+        }
+        swipe.setRefreshing(false);
+
+        //refresh spinner
+        spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, epsName));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
+                ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
+                if(index!= position) {
+                    lockUi(true);
+                    index = position;
+                    manga = eps.get(index);
+                    id = manga.getId();
+                    name = manga.getName();
+                    if(manga.getMode() == 0)
+                        refresh();
+                    else
+                        reloadManga();
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spinner.setSelection(index);
+        pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
     }
 
     void lockUi(Boolean lock){

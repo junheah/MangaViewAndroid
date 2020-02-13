@@ -66,7 +66,7 @@ public class Preference {
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
             session = sharedPref.getString("session", "");
-            autoUrl = sharedPref.getBoolean("autoUrl", false);
+            autoUrl = sharedPref.getBoolean("autoUrl", true);
             if(login != null && login.isValid()){
                 setSession(login.getCookie());
             }

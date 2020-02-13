@@ -51,11 +51,12 @@
     <Spinner
         android:dropDownWidth="100dp"
         android:id="@+id/toolbar_spinner"
-        android:layout_width="wrap_content"
+
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:foreground="?android:attr/selectableItemBackground"
         android:background="?android:attr/selectableItemBackground"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/toolbar_next"

@@ -2,10 +2,12 @@ package ml.melun.mangaview.mangaview;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import okhttp3.Response;
+
+    /*
+    mode:
+    0 = online
+    1 = offline - old
+    2 = offline - old (title.data)
+    3 = offline - new (title.gson)
+     */
 
 public class Manga {
     public Manga(int i, String n, String d) {
@@ -217,10 +227,31 @@ public class Manga {
         return getImgs(false);
     }
     public List<String> getImgs(Boolean second){
-        if(second){
-            return imgs1;
+        if(mode == 0) {
+            if (second)
+                return imgs1;
+            return imgs;
+        }else{
+            if(imgs == null) {
+                imgs = new ArrayList<>();
+                //is offline : read image list
+                File[] offimgs = null;
+                switch (mode) {
+                    case 1:
+                    case 2:
+                        offimgs = offlinePath.listFiles();
+                        break;
+                    case 3:
+                        offimgs = offlinePath.listFiles();
+                        break;
+                }
+                Arrays.sort(offimgs);
+                for (File img : offimgs) {
+                    imgs.add(img.getAbsolutePath());
+                }
+            }
+             return imgs;
         }
-        return imgs;
     }
     public List<Comment> getComments(){ return comments; }
 
@@ -255,12 +286,12 @@ public class Manga {
         return id;
     }
 
-    public void setOfflineName(String offlineName) {
-        this.offlineName = offlineName;
+    public void setOfflinePath(File offlinePath) {
+        this.offlinePath = offlinePath;
     }
 
-    public String getOfflineName(){
-        return this.offlineName;
+    public File getOfflinePath(){
+        return this.offlinePath;
     }
 
     public void setListener(Listener listener){
@@ -271,16 +302,23 @@ public class Manga {
         return reported;
     }
 
+    public int getMode(){return mode;}
+
+    public void setMode(int mode){
+        this.mode = mode;
+    }
+
     private int id;
     String name;
     List<Manga> eps;
     List<String> imgs, imgs1, cdn_domains;
     List<Comment> comments, bcomments;
-    String offlineName;
+    File offlinePath;
     String thumb;
     Title title;
     String date;
     int seed;
+    int mode = 0;
     Listener listener;
     Boolean reported = false;
 

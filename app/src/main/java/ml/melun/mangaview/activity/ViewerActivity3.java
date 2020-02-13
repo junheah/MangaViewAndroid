@@ -54,7 +54,6 @@ public class ViewerActivity3 extends AppCompatActivity {
     Context context;
     ViewPager viewPager;
     Boolean dark;
-    Boolean online;
     ImageButton next, prev;
     TextView toolbarTitle;
     AppBarLayout appbar, appbarBottom;
@@ -138,7 +137,6 @@ public class ViewerActivity3 extends AppCompatActivity {
             intent = getIntent();
             title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
             manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
-            online = intent.getBooleanExtra("online", true);
 
             name = manga.getName();
             id = manga.getId();
@@ -150,7 +148,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK,resultIntent);
             }
-            if(!online){
+            if(manga.getMode() != 0){
                 //load local imgs
                 if(id>-1){
                     //if manga has id = manga has title = update bookmark and add to recent

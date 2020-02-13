@@ -177,24 +177,24 @@ public class DebugActivity extends AppCompatActivity {
             SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
             JSONObject data = new JSONObject(edit.toString());
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("recent",filter(data.getJSONArray("recent").toString()));
-            editor.putString("favorite",filter(data.getJSONArray("favorite").toString()));
-            editor.putString("homeDir",filter(data.getString("homeDir")));
+            editor.putString("recent",data.getJSONArray("recent").toString());
+            editor.putString("favorite",data.getJSONArray("favorite").toString());
+            editor.putString("homeDir",data.getString("homeDir"));
             editor.putBoolean("darkTheme",data.getBoolean("darkTheme"));
             editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
-            editor.putString("bookmark",filter(data.getJSONObject("bookmark(viewer)").toString()));
-            editor.putString("bookmark2",filter(data.getJSONObject("bookmark(episode)").toString()));
+            editor.putString("bookmark",data.getJSONObject("bookmark(viewer)").toString());
+            editor.putString("bookmark2",data.getJSONObject("bookmark(episode)").toString());
             editor.putInt("viewerType",data.getInt("viewerType"));
             editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
             editor.putBoolean("dataSave",data.getBoolean("dataSave"));
             editor.putBoolean("stretch",data.getBoolean("stretch"));
             editor.putInt("startTab",data.getInt("startTab"));
             editor.putString("url",data.getString("url").toString());
-            editor.putString("notice",filter(data.getJSONArray("notice").toString()));
+            editor.putString("notice",data.getJSONArray("notice").toString());
             editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putString("login", filter(data.getJSONObject("login").toString()));
+            editor.putString("login", data.getJSONObject("login").toString());
             editor.putString("session", data.getString("session"));
             editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
             editor.commit();
@@ -205,8 +205,13 @@ public class DebugActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-    String filter(String input){return input.replaceAll("(?<!\\\\)\\\\(?!\\\\)", "");}
+    String filter(String input){
+        // keep newline and filter everything else
+        return input.replace("\\n", "/n")
+                .replace("\\","")
+                .replace("/n", "\\n");
+    }
+//    String filter(String input){return input.replaceAll("(?<!\\\\)\\\\(?!\\\\)", "");}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -226,7 +231,7 @@ public class DebugActivity extends AppCompatActivity {
 
 
     private class ddgBypassTest extends AsyncTask<Void, Void, Integer> {
-        String result = "hello";
+        String result = "";
         protected void onPreExecute() {
 
         }

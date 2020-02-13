@@ -56,7 +56,7 @@ import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class ViewerActivity2 extends AppCompatActivity {
-    Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, online, stretch, leftRight;
+    Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, stretch, leftRight;
     Context context = this;
     String name;
     int id;
@@ -131,7 +131,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
         title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
 
-        online = intent.getBooleanExtra("online",true);
         name = manga.getName();
         id = manga.getId();
 
@@ -150,7 +149,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             Intent resultIntent = new Intent();
             setResult(RESULT_OK,resultIntent);
         }
-        if(!online) {
+        if(manga.getMode() != 0) {
             //load local imgs
             //appbarBottom.setVisibility(View.GONE);
             toolbarTitle.setText(manga.getName());
