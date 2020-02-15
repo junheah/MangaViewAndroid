@@ -98,7 +98,7 @@ public class Manga {
                                 imgUrl = imgUrl.replace("cdnmadmax.xyz", cdn);
                                 imgUrl = imgUrl.replace("filecdn.xyz", cdn);
                                 if(imgUrl.contains("img.")) imgUrl += "?quick";
-                                System.out.println("pppp  " + imgUrl);
+
                                 imgs.add(imgUrl);
                             }
                         }
@@ -132,9 +132,7 @@ public class Manga {
                         reported = Boolean.parseBoolean(line.split("=")[1].split(";")[0].split(" ")[1]);
                     }else if(line.contains("var link =")){
                         String idStr = line.substring(line.indexOf("manga_id=")+9, line.indexOf("&"));
-                        System.out.println(idStr);
                         String titleName = URLDecoder.decode(line.substring(line.indexOf("manga_name=")+11,line.length()-2),"UTF-8");
-                        System.out.println(titleName);
                         title = new Title(titleName,"","",new ArrayList<String>(), -1, Integer.parseInt(idStr));
                     }else if(line.contains("var cdn_domains = ")){
                         if(listener!=null) listener.setMessage("cdn 목록 읽는중");

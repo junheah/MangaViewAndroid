@@ -16,6 +16,7 @@ import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -338,7 +340,6 @@ public class Utils {
                     .addEncoded("wr_content",content)
                     .build();
 
-            System.out.println("ppppp " + id);
 
 
             Response commentResponse = client.post(baseUrl + "/bbs/write_comment_update.php", requestBody, headers);
@@ -400,5 +401,15 @@ public class Utils {
             cookiem.setCookie(p.getUrl(), "PHPSESSID=" + p.getSession() + "; ");
         }
         webView.loadUrl(url, headers);
+    }
+
+    public static void hideSpinnerDropDown(Spinner spinner) {
+        try {
+            Method method = Spinner.class.getDeclaredMethod("onDetachedFromWindow");
+            method.setAccessible(true);
+            method.invoke(spinner);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

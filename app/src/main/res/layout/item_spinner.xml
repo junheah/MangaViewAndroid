@@ -2,9 +2,15 @@
 
 <CheckedTextView
     android:id="@android:id/text1"
-    android:layout_width="match_parent"
+    android:ellipsize="marquee"
+    android:focusable="true"
+    android:singleLine="true"
+    android:marqueeRepeatLimit="marquee_forever"
+    android:scrollHorizontally="true"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="TextViewfasdfsdfadsff"
+    android:text=""
+    android:maxLines="2"
     android:paddingTop="15dp"
     android:paddingBottom="15dp"
     android:paddingStart="8dp"

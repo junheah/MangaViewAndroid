@@ -1,32 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:visibility="visible">
 
     <ImageButton
         android:id="@+id/toolbar_next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_media_next"
+        android:layout_marginVertical="5dp"
+        android:layout_marginEnd="4dp"
         android:background="?android:attr/selectableItemBackground"
-        android:text="Button"
-        android:padding="8dp"
-        android:layout_margin="8dp"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="3dp"
+        android:src="@android:drawable/ic_media_next"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Spinner
+        android:id="@+id/toolbar_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="4dp"
+        android:paddingHorizontal="3dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:dropDownWidth="200dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/toolbar_next"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <ImageButton
         android:id="@+id/toolbar_previous"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="5dp"
+        android:layout_marginEnd="4dp"
         android:background="?android:attr/selectableItemBackground"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="3dp"
         android:src="@android:drawable/ic_media_previous"
-        android:text="Button"
-        android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/toolbar_spinner"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,47 +52,36 @@
         android:id="@+id/viewerBtn1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:textColor="@android:color/white"
-        android:text="기능1"
-        android:paddingStart="15dp"
-        android:paddingEnd="15dp"
-        android:minWidth="0dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/button_bg"
         android:foreground="?android:attr/selectableItemBackground"
+        android:minWidth="0dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="기능1"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <Spinner
-        android:dropDownWidth="100dp"
-        android:id="@+id/toolbar_spinner"
 
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:background="?android:attr/selectableItemBackground"
-        android:layout_width="100dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/toolbar_next"
-        app:layout_constraintTop_toTopOf="parent"/>
     <Button
         android:id="@+id/viewerBtn2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:minWidth="0dp"
-        android:padding="5dp"
-        android:textColor="@android:color/white"
-        android:text="기능2"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/button_bg"
         android:foreground="?android:attr/selectableItemBackground"
+        android:minWidth="0dp"
+        android:padding="5dp"
+        android:text="기능2"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/viewerBtn1"
         app:layout_constraintTop_toTopOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>

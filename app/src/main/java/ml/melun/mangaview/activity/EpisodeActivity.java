@@ -206,7 +206,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }
             //set up adapter
-            episodeAdapter = new EpisodeAdapter(context, episodes, title, online);
+            episodeAdapter = new EpisodeAdapter(context, episodes, title, mode);
             afterLoad();
         }
     }
@@ -355,7 +355,7 @@ public class EpisodeActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             title.fetchEps(httpClient);
             episodes = title.getEps();
-            episodeAdapter = new EpisodeAdapter(context, episodes, title, online);
+            episodeAdapter = new EpisodeAdapter(context, episodes, title, mode);
             return null;
         }
 

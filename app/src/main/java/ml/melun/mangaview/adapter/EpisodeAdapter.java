@@ -45,16 +45,16 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     LinearLayoutManager lm;
     Boolean dark;
     Boolean save;
-    Boolean online = false;
+    int mode = 0;
     Boolean login;
 
     // data is passed into the constructor
-    public EpisodeAdapter(Context context, List<Manga> data, Title title, Boolean online) {
+    public EpisodeAdapter(Context context, List<Manga> data, Title title, int mode) {
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = data;
         this.header = title;
-        this.online = online;
+        this.mode = mode;
         outValue = new TypedValue();
         dark = p.getDarkTheme();
         save = p.getDataSave();
@@ -66,8 +66,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             lm.setOrientation(LinearLayoutManager.HORIZONTAL);
         }
         setHasStableIds(true);
-        if(!online) save = false;
-        login = online && p.getLogin() != null && p.getLogin().isValid();
+        if(mode != 0) save = false;
+        login = mode == 0 && p.getLogin() != null && p.getLogin().isValid();
     }
 
     @Override
@@ -115,7 +115,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .load(thumb)
                     .apply(new RequestOptions().dontTransform())
                     .into(h.h_thumb);
-            if(online){
+            if(mode == 0 || mode == 3)
+                h.h_star.setVisibility(View.VISIBLE);
+            else
+                h.h_star.setVisibility(View.GONE);
+
+            if(mode == 0){
                 h.h_download.setVisibility(View.VISIBLE);
             }else{
                 h.h_download.setVisibility(View.GONE);

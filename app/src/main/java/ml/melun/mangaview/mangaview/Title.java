@@ -57,7 +57,6 @@ public class Title {
     public void fetchEps(CustomHttpClient client) {
         //fetch episodes
         try {
-            System.out.println(id);
 //            if(id<0){
 //                this.id = getIdWithName(client, this.name);
 //                if(this.id<0) return;
@@ -74,7 +73,7 @@ public class Title {
                         ,e.selectFirst("div.addedAt").ownText().split(" ")[0]));
             }
             thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
-            System.out.println("pppp"+thumb);
+
             name = items.selectFirst("div.manga-subject").selectFirst("div.title").ownText();
             try {
                 author = items.selectFirst("a.author").ownText();

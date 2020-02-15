@@ -45,7 +45,7 @@ public class UpdatedList {
                 }
                 response.close();
             } catch (Exception e) {
-                System.out.println("pppppp"+e.getMessage());
+                e.printStackTrace();
                 page--;
             }
         }

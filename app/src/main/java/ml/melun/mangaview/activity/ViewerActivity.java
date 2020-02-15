@@ -16,9 +16,11 @@ import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -36,8 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.adapter.CustomSpinnerAdapter;
 import ml.melun.mangaview.adapter.StripAdapter;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
@@ -45,8 +47,8 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.checkCaptcha;
 import static ml.melun.mangaview.Utils.getScreenSize;
+import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
@@ -63,14 +65,12 @@ public class ViewerActivity extends AppCompatActivity {
     TextView toolbarTitle;
     AppBarLayout appbar, appbarBottom;
     int viewerBookmark;
-    String[] localImgs;
     Boolean volumeControl;
-    int pageForVolume;
     LinearLayoutManager manager;
     ImageButton next, prev;
     Button cut, pageBtn;
     List<Manga> eps;
-    int index;
+    int index = -1;
     Title title;
     Boolean autoCut = false;
     List<String> imgs;
@@ -78,12 +78,13 @@ public class ViewerActivity extends AppCompatActivity {
     Intent result;
     SwipyRefreshLayout swipe;
     ImageButton commentBtn;
-    Spinner spinner;
     int seed = 0;
     int epsCount = 0;
     int width=0;
     Intent intent;
     boolean captchaChecked = false;
+    Spinner spinner;
+    CustomSpinnerAdapter spinnerAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
@@ -101,8 +102,8 @@ public class ViewerActivity extends AppCompatActivity {
         cut.setText("자동 분할");
         pageBtn = this.findViewById(R.id.viewerBtn1);
         pageBtn.setText("-/-");
-        spinner = this.findViewById(R.id.toolbar_spinner);
         commentBtn = this.findViewById(R.id.commentButton);
+        spinner = this.findViewById(R.id.toolbar_spinner);
         width = getScreenSize(getWindowManager().getDefaultDisplay());
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
@@ -124,9 +125,34 @@ public class ViewerActivity extends AppCompatActivity {
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK,resultIntent);
             }
+            spinnerAdapter = new CustomSpinnerAdapter(context);
+            spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
+                @Override
+                public void onClick(int position) {
+                    if(index!= position) {
+                        lockUi(true);
+                        index = position;
+                        manga = eps.get(index);
+                        id = manga.getId();
+                        name = manga.getName();
+                        spinner.setSelection(position, true);
+                        hideSpinnerDropDown(spinner);
+                        if(manga.getMode() == 0)
+                            refresh();
+                        else
+                            reloadManga();
+                    }else {
+                        spinner.setSelection(position, true);
+                        hideSpinnerDropDown(spinner);
+                    }
+                }
+            });
+            spinner.setAdapter(spinnerAdapter);
+
             if(manga.getMode() != 0){
                 // is offline
                 //load local imgs
+
                 commentBtn.setVisibility(View.GONE);
                 swipe.setEnabled(false);
 
@@ -379,12 +405,6 @@ public class ViewerActivity extends AppCompatActivity {
                 cookie.put("last_page",String.valueOf(0));
             }
             manga.fetch(httpClient);
-            imgs = manga.getImgs();
-            seed = manga.getSeed();
-            if(imgs == null || imgs.size()==0) {
-                return 1;
-            }
-            stripAdapter = new StripAdapter(context, imgs, manga.getImgs(true), autoCut, seed, id, width);
             return 0;
         }
 
@@ -392,25 +412,9 @@ public class ViewerActivity extends AppCompatActivity {
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
             if(res == 1){
-                //captcha?
-//                if(!captchaChecked) {
-//                    checkCaptcha(p, context, id, new Runnable(){
-//                        @Override
-//                        public void run() {
-//                            refresh();
-//                        }
-//                    });
-//                    captchaChecked = true;
-//                    if (pd.isShowing()) {
-//                        pd.dismiss();
-//                    }
-//                    lockUi(true);
-//                    return;
-//                }else {
-                    //error occured
-                    showErrorPopup(context);
-                    return;
-//                }
+                //error occured
+                showErrorPopup(context);
+                return;
             }
             reloadManga();
 
@@ -427,13 +431,12 @@ public class ViewerActivity extends AppCompatActivity {
     public void reloadManga(){
         try {
             lockUi(false);
-            if(manga.getMode() != 0){
-                imgs = manga.getImgs();
-                if(imgs == null || imgs.size()==0) {
-                    showErrorPopup(context);
-                }
-                stripAdapter = new StripAdapter(context, imgs, null, autoCut, seed, id, width);
+            imgs = manga.getImgs();
+            if(imgs == null || imgs.size()==0) {
+                showErrorPopup(context);
             }
+            stripAdapter = new StripAdapter(context, imgs, manga.getImgs(true), autoCut, manga.getSeed(), id, width);
+
             refreshAdapter();
             bookmarkRefresh();
             refreshToolbar();
@@ -446,6 +449,7 @@ public class ViewerActivity extends AppCompatActivity {
                 message +=s.toString()+'\n';
             }
             showErrorPopup(context, e);
+            e.printStackTrace();
         }
     }
 
@@ -457,12 +461,12 @@ public class ViewerActivity extends AppCompatActivity {
             }
             if (!autoCut) strip.scrollToPosition(viewerBookmark);
             else strip.scrollToPosition(viewerBookmark * 2);
-        }
-        if(manga.getMode() == 0 || manga.getMode() == 3) {
-            // if manga is online or has title.gson
-            if (title == null) title = manga.getTitle();
-            p.addRecent(title);
-            if (id > 0) p.setBookmark(title, id);
+            if (manga.getMode() == 0 || manga.getMode() == 3) {
+                // if manga is online or has title.gson
+                if (title == null) title = manga.getTitle();
+                p.addRecent(title);
+                if (id > 0) p.setBookmark(title, id);
+            }
         }
     }
 
@@ -490,6 +494,7 @@ public class ViewerActivity extends AppCompatActivity {
         if(eps == null || eps.size() == 0){
             eps = title.getEps();
         }
+
         List<String> epsName = new ArrayList<>();
         for(int i=0; i<eps.size(); i++){
             if(id>0) {
@@ -501,10 +506,14 @@ public class ViewerActivity extends AppCompatActivity {
             }
             epsName.add(eps.get(i).getName());
         }
+        //refresh spinner
+
+        spinnerAdapter.setData(epsName, index);
+        spinner.setSelection(index);
+
+
+
         toolbarTitle.setText(manga.getName());
-        toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-        toolbarTitle.setMarqueeRepeatLimit(-1);
-        toolbarTitle.setSingleLine(true);
         toolbarTitle.setSelected(true);
 
         if(index==0){
@@ -525,31 +534,13 @@ public class ViewerActivity extends AppCompatActivity {
         }
         swipe.setRefreshing(false);
 
-        //refresh spinner
-        spinner.setAdapter(new ArrayAdapter(context, R.layout.spinner_item, epsName));
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long idt) {
-                ((TextView)parent.getChildAt(0)).setTextColor(Color.rgb(249, 249, 249));
-                if(index!= position) {
-                    lockUi(true);
-                    index = position;
-                    manga = eps.get(index);
-                    id = manga.getId();
-                    name = manga.getName();
-                    if(manga.getMode() == 0)
-                        refresh();
-                    else
-                        reloadManga();
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
 
-            }
-        });
-        spinner.setSelection(index);
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
+    }
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        return super.onMenuOpened(featureId, menu);
     }
 
     void lockUi(Boolean lock){

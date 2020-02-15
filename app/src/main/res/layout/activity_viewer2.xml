@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.ViewerActivity2">
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/viewerAppbar"
         android:layout_width="match_parent"
@@ -25,6 +26,8 @@
             <include layout="@layout/viewer_toolbar"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
+
+
 
     <ImageView
         android:id="@+id/viewer_image"
@@ -70,6 +73,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+
+
     <Button
         android:id="@+id/prevPageBtn2"
         android:layout_width="100dp"
@@ -80,6 +86,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+
 
     <!--<ImageButton-->
         <!--android:id="@+id/refreshButton"-->
@@ -95,27 +103,42 @@
         <!--app:srcCompat="@drawable/baseline_refresh_black_48" />-->
 
     <android.support.design.widget.AppBarLayout
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/viewerAppbarBottom"
-        android:layout_gravity="bottom"
-        android:alpha="0.8"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_gravity="bottom"
+        android:alpha="0.8"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
         <android.support.v7.widget.Toolbar
             android:id="@+id/viewerToolbarBottom"
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
             android:background="?attr/colorPrimary"
-            app:contentInsetStart="0dp"
             app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
             app:popupTheme="@style/AppTheme.PopupOverlay">
-            <include layout="@layout/viewer_toolbar_bottom"/>
+
+            <include layout="@layout/viewer_toolbar_bottom" />
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
+    <ImageButton
+        android:id="@+id/toolbar_toggleBtn"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_margin="6dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="10dp"
+        android:visibility="gone"
+        android:elevation="2dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_menu_open_24px" />
 
 
 </android.support.constraint.ConstraintLayout>
