@@ -1,9 +1,9 @@
 package ml.melun.mangaview.adapter;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class ViewerPagerAdapter extends FragmentStatePagerAdapter
         return POSITION_NONE;
     }
     @Override
-    public android.support.v4.app.Fragment getItem(int position)
+    public Fragment getItem(int position)
     {
         return fragments.get(position);
     }

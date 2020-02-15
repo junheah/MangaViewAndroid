@@ -9,17 +9,15 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -63,7 +61,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     int id;
     Manga manga;
     ImageButton next, prev, commentBtn;
-    android.support.v7.widget.Toolbar toolbar;
+    androidx.appcompat.widget.Toolbar toolbar;
     Button pageBtn, nextPageBtn, prevPageBtn, touchToggleBtn;
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
@@ -485,6 +483,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
             if(error && !useSecond){
                 image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+
             }
             //placeholder
             //frame.setImageResource(R.drawable.placeholder);
@@ -682,6 +681,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         try{
             lockUi(false);
             imgs = manga.getImgs();
+            imgs1 = manga.getImgs(true);
             if(imgs == null || imgs.size()==0) {
                 showErrorPopup(context);
             }

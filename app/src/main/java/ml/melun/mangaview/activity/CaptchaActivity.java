@@ -1,23 +1,20 @@
 package ml.melun.mangaview.activity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Login;
-import okhttp3.Response;
 
-import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
 public class CaptchaActivity extends AppCompatActivity {

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.Menu;
@@ -15,16 +15,13 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import net.jhavar.exceptions.NotSameHostException;
 import net.jhavar.main.DdosGuardBypass;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;

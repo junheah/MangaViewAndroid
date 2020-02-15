@@ -93,12 +93,11 @@ public class Manga {
                             //remove backslash
                             for (int i = 1; i < imgStrs.length; i += 2) {
                                 String imgUrl = imgStrs[i].replace("\\","");
-                                String cdn = cdn_domains.get((id + 4 * (i-1)) % cdn_domains.size());
+                                String cdn = cdn_domains.get((id + 4 * ((i-1)/2)) % cdn_domains.size());
                                 imgUrl = imgUrl.replace("cdntigermask.xyz", cdn);
                                 imgUrl = imgUrl.replace("cdnmadmax.xyz", cdn);
                                 imgUrl = imgUrl.replace("filecdn.xyz", cdn);
-                                if(imgUrl.contains("img.")) imgUrl += "?quick";
-
+                                imgUrl += "?quick";
                                 imgs.add(imgUrl);
                             }
                         }
@@ -110,7 +109,7 @@ public class Manga {
                             //remove backslash
                             for (int i = 1; i < imgStrs.length; i += 2) {
                                 String imgUrl = imgStrs[i].replace("\\","");
-                                String cdn = cdn_domains.get((id + 4 * (i-1)) % cdn_domains.size());
+                                String cdn = cdn_domains.get((id + 4 * ((i-1)/2)) % cdn_domains.size());
                                 imgUrl = imgUrl.replace("cdntigermask.xyz", cdn);
                                 imgUrl = imgUrl.replace("cdnmadmax.xyz", cdn);
                                 imgUrl = imgUrl.replace("filecdn.xyz", cdn);

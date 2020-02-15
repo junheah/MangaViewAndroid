@@ -1,8 +1,7 @@
 package ml.melun.mangaview.activity;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
@@ -15,7 +14,6 @@ import java.util.Map;
 
 import ml.melun.mangaview.R;
 
-import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
 public class WebActivity extends AppCompatActivity {

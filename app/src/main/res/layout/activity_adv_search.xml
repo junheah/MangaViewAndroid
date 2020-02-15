@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:paddingStart="8dp"
                 android:text="이름"
                 android:textSize="16dp" />
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/search_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -43,7 +43,7 @@
                 android:paddingStart="8dp"
                 android:text="발행"
                 android:textSize="16dp" />
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/search_release"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -57,12 +57,12 @@
                 android:paddingStart="8dp"
                 android:text="장르"
                 android:textSize="16dp" />
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/search_tags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            </android.support.v7.widget.RecyclerView>
+            </androidx.recyclerview.widget.RecyclerView>
 
             <TextView
                 android:layout_width="match_parent"
@@ -92,4 +92,4 @@
 
         </LinearLayout>
     </ScrollView>
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

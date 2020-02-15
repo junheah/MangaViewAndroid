@@ -2,12 +2,12 @@ package ml.melun.mangaview.activity;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.PopupMenu;
+import androidx.appcompat.widget.PopupMenu;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 
 import static ml.melun.mangaview.MainApplication.p;

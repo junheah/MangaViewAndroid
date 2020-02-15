@@ -5,6 +5,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -20,12 +21,18 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class CustomHttpClient {
-    OkHttpClient client;
+    public OkHttpClient client;
     Preference p;
 
     public CustomHttpClient(Preference p){
+        System.out.println("http client init");
         this.p = p;
-        this.client = getUnsafeOkHttpClient().followRedirects(false).followSslRedirects(false).build();
+        this.client = getUnsafeOkHttpClient()
+                .followRedirects(false)
+                .followSslRedirects(false)
+                .connectTimeout(20, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .build();
         //this.cfc = new HashMap<>();
         //this.client = new OkHttpClient.Builder().build();
     }

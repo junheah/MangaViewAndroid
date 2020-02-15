@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,14 +7,14 @@
     android:fitsSystemWindows="true"
     tools:context=".activity.ViewerActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/viewerAppbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
         android:alpha="0.8">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/viewerToolbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
@@ -24,9 +24,9 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
             <include layout="@layout/viewer_toolbar"/>
 
-        </android.support.v7.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
         android:id="@+id/viewerSwipe"
         app:srl_direction="top">
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/strip"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -42,7 +42,7 @@
             />
     </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/viewerAppbarBottom"
         android:layout_gravity="bottom"
         android:alpha="0.8"
@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/viewerToolbarBottom"
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
@@ -61,7 +61,7 @@
         <include layout="@layout/viewer_toolbar_bottom"/>
 
 
-    </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

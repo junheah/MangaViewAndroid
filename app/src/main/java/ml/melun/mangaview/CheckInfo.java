@@ -9,7 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -19,7 +19,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import okhttp3.Response;

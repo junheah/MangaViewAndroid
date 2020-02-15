@@ -9,8 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 
-import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.view.Display;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
@@ -20,8 +19,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-
-import net.jhavar.main.DdosGuardBypass;
 
 import org.json.JSONObject;
 
@@ -213,6 +210,7 @@ public class Utils {
     }
     private static void showStackTrace(Context context, Exception e){
         StringBuilder sbuilder = new StringBuilder();
+        sbuilder.append(e.getMessage()+"\n");
         for(StackTraceElement s : e.getStackTrace()){
             sbuilder.append(s+"\n");
         }
