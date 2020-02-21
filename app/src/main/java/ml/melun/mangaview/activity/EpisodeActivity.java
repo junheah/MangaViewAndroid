@@ -76,11 +76,14 @@ public class EpisodeActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode== RESULT_OK && requestCode==0){
             int newid = data.getIntExtra("id", -1);
+            System.out.println("pppp newid:" + newid);
+            System.out.println("pppp oldid:" + bookmarkId);
             if(newid>0 && newid!=bookmarkId){
                 bookmarkId = newid;
                 //find index of bookmark;
                 for(int i=0; i< episodes.size(); i++){
                     if(episodes.get(i).getId()==bookmarkId){
+                        System.out.println("ppp index: " + i);
                         bookmarkIndex = i+1;
                         episodeAdapter.setBookmark(bookmarkIndex);
                         break;

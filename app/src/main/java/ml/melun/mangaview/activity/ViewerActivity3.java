@@ -174,9 +174,10 @@ public class ViewerActivity3 extends AppCompatActivity {
             toolbarTitle.setText(name);
             viewerBookmark = p.getViewerBookmark(id);
 
-            if(intent.getBooleanExtra("recent",false)){
-                Intent resultIntent = new Intent();
-                setResult(RESULT_OK,resultIntent);
+            if(manga.getMode() == 0 || manga.getMode() == 3){
+                result = new Intent();
+                result.putExtra("id", id);
+                setResult(RESULT_OK,result);
             }
             if(manga.getMode() != 0){
                 //load local imgs
@@ -241,6 +242,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                     lockUi(true);
                     index--;
                     manga = eps.get(index);
+                    System.out.println("ppp " + manga.getName());
                     id = manga.getId();
                     name = manga.getName();
                     if(manga.getMode() == 0)
@@ -408,9 +410,12 @@ public class ViewerActivity3 extends AppCompatActivity {
     }
 
     public void updateIntent(){
-        result = new Intent();
-        result.putExtra("id", id);
-        setResult(RESULT_OK, result);
+        if(manga.getMode() == 0 || manga.getMode() == 3) {
+            System.out.println("pppppp " + id);
+            result = new Intent();
+            result.putExtra("id", id);
+            setResult(RESULT_OK, result);
+        }
         //update intent : not sure if this works TODO: test this
         intent.putExtra("title", new Gson().toJson(title));
         intent.putExtra("manga", new Gson().toJson(manga));
@@ -465,15 +470,6 @@ public class ViewerActivity3 extends AppCompatActivity {
             prev.setColorFilter(null);
         }
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            refresh();
-        }else
-            finish();
     }
 
     void lockUi(Boolean lock){
