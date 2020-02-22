@@ -15,13 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.adapter.mainTagAdapter;
+import ml.melun.mangaview.adapter.MainTagAdapter;
 
 import static ml.melun.mangaview.MainApplication.p;
 
 public class AdvSearchActivity extends AppCompatActivity {
     List<String> tags,names,releases;
-    mainTagAdapter ta, ra, na;
+    MainTagAdapter ta, ra, na;
     Context context;
     RecyclerView tr, rr, nr;
     LinearLayoutManager tm, rm, nm;
@@ -59,30 +59,30 @@ public class AdvSearchActivity extends AppCompatActivity {
         names = Arrays.asList(getResources().getStringArray(R.array.tag_name));
         releases = Arrays.asList(getResources().getStringArray(R.array.tag_release));
         tags = Arrays.asList(getResources().getStringArray(R.array.tag_genre));
-        na = new mainTagAdapter(context, names,1);
+        na = new MainTagAdapter(context, names,1);
         //na.setSingleSelect(true);
-        ra = new mainTagAdapter(context, releases, 2);
-        ta = new mainTagAdapter(context, tags, 0);
+        ra = new MainTagAdapter(context, releases, 2);
+        ta = new MainTagAdapter(context, tags, 0);
 
         nr.setAdapter(na);
         rr.setAdapter(ra);
         tr.setAdapter(ta);
         //clicked name 1
-        na.setClickListener(new mainTagAdapter.tagOnclick() {
+        na.setClickListener(new MainTagAdapter.tagOnclick() {
             @Override
             public void onClick(int position, String value) {
                 na.toggleSelect(position);
             }
         });
         //clicked release 2
-        ra.setClickListener(new mainTagAdapter.tagOnclick() {
+        ra.setClickListener(new MainTagAdapter.tagOnclick() {
             @Override
             public void onClick(int position, String value) {
                 ra.toggleSelect(position);
             }
         });
         //clicked tag 3
-        ta.setClickListener(new mainTagAdapter.tagOnclick() {
+        ta.setClickListener(new MainTagAdapter.tagOnclick() {
             @Override
             public void onClick(int position, String value) {
                 ta.toggleSelect(position);

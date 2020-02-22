@@ -8,6 +8,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -47,6 +49,7 @@ import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity extends AppCompatActivity {
     String name;
@@ -291,7 +294,6 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     void refresh(){
-        captchaChecked = false;
         if(stripAdapter!=null) stripAdapter.removeAll();
         loadImages l = new loadImages();
         l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -407,11 +409,6 @@ public class ViewerActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(res == 1){
-                //error occured
-                showErrorPopup(context);
-                return;
-            }
             reloadManga();
 
             if (pd.isShowing()) {
@@ -421,7 +418,6 @@ public class ViewerActivity extends AppCompatActivity {
                 showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
             }
         }
-
     }
 
     public void reloadManga(){
@@ -430,6 +426,7 @@ public class ViewerActivity extends AppCompatActivity {
             imgs = manga.getImgs();
             if(imgs == null || imgs.size()==0) {
                 showErrorPopup(context);
+                return;
             }
             stripAdapter = new StripAdapter(context, imgs, manga.getImgs(true), autoCut, manga.getSeed(), id, width);
 
@@ -547,5 +544,12 @@ public class ViewerActivity extends AppCompatActivity {
         cut.setEnabled(!lock);
         strip.setEnabled(!lock);
         spinner.setEnabled(!lock);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_CAPTCHA) {
+            refresh();
+        }
     }
 }

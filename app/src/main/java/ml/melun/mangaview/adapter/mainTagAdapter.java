@@ -19,7 +19,7 @@ import ml.melun.mangaview.R;
 
 import static ml.melun.mangaview.MainApplication.p;
 
-public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class MainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     Context mcontext;
     List<String> tags;
@@ -31,7 +31,7 @@ public class mainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     Boolean singleSelect = false;
     int selection = -1;
 
-    public mainTagAdapter(Context m, List<String> t , int type) {
+    public MainTagAdapter(Context m, List<String> t , int type) {
         mcontext = m;
         tags = t;
         this.type = type;

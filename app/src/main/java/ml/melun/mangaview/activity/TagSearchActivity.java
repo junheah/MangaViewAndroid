@@ -3,6 +3,8 @@ package ml.melun.mangaview.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import ml.melun.mangaview.mangaview.UpdatedList;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
+import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
 public class TagSearchActivity extends AppCompatActivity {
@@ -122,17 +125,19 @@ public class TagSearchActivity extends AppCompatActivity {
     }
 
 
-    private class searchManga extends AsyncTask<String,String,String> {
+    private class searchManga extends AsyncTask<String,String,Integer> {
         protected void onPreExecute(){
             super.onPreExecute();
         }
-        protected String doInBackground(String... params){
-            search.fetch(httpClient);
-            return null;
+        protected Integer doInBackground(String... params){
+            return search.fetch(httpClient);
         }
         @Override
-        protected void onPostExecute(String res){
+        protected void onPostExecute(Integer res){
             super.onPostExecute(res);
+            if(res != 0){
+                showErrorPopup(context);
+            }
             if(adapter.getItemCount()==0) {
                 adapter.addData(search.getResult());
                 searchResult.setAdapter(adapter);
@@ -182,6 +187,10 @@ public class TagSearchActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String res){
             super.onPostExecute(res);
+            if(updated.getResult().size() == 0 && uadapter.getItemCount() == 0){
+                //error
+                showErrorPopup(context);
+            }
             if(uadapter.getItemCount()==0) {
                 uadapter.addData(updated.getResult());
                 searchResult.setAdapter(uadapter);
@@ -241,5 +250,12 @@ public class TagSearchActivity extends AppCompatActivity {
             }
         });
         popup.show(); //showing popup menu
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        finish();
+        startActivity(getIntent());
     }
 }

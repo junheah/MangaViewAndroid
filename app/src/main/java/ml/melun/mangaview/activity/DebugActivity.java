@@ -47,7 +47,7 @@ public class DebugActivity extends AppCompatActivity {
         this.findViewById(R.id.debug_webTest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(context, WebActivity.class));
+                startActivity(new Intent(context, CaptchaActivity.class));
             }
         });
         scroll = this.findViewById(R.id.debug_scroll);
@@ -161,7 +161,6 @@ public class DebugActivity extends AppCompatActivity {
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
             data.put("login",new JSONObject(sharedPref.getString("login","{}")));
-            data.put("session", sharedPref.getString("session", ""));
             data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
         }catch(Exception e){
             e.printStackTrace();
@@ -192,7 +191,6 @@ public class DebugActivity extends AppCompatActivity {
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
             editor.putString("login", data.getJSONObject("login").toString());
-            editor.putString("session", data.getString("session"));
             editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
             editor.commit();
             // reload preference

@@ -23,7 +23,7 @@ import ml.melun.mangaview.mangaview.Manga;
 
 import static ml.melun.mangaview.MainApplication.p;
 
-public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<Manga> mData;
     Context context;
     LayoutInflater mInflater;
@@ -31,11 +31,8 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     onclick monclick;
     Boolean dark, save;
 
-    public mainUpdatedAdapter(Context c) {
-        super();
+    public MainUpdatedAdapter(Context c) {
         context = c;
-        mData = new ArrayList<>();
-        mData.add(new Manga(0,"로드중...",""));
         this.mInflater = LayoutInflater.from(c);
         dark = p.getDarkTheme();
         save = p.getDataSave();
@@ -43,6 +40,17 @@ public class mainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         //fetch data with async
         //data initialize
         setHasStableIds(true);
+    }
+
+    public void setLoad(){
+        if(mData != null){
+            mData.clear();
+            loaded = false;
+        }
+        else
+            mData = new ArrayList<>();
+        mData.add(new Manga(0,"로드중...",""));
+        notifyDataSetChanged();
     }
 
     @Override

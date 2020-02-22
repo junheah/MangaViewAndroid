@@ -43,7 +43,6 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url){
                 String cookies = CookieManager.getInstance().getCookie(url);
-                System.out.println("All the cookies in a string:" + cookies);
                 if(cookies.contains("cf_clearance")){
                     //success
                     finish();

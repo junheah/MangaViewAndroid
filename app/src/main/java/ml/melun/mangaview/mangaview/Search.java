@@ -56,7 +56,7 @@ public class Search {
     }
     */
 
-    public void fetch(CustomHttpClient client) {
+    public int fetch(CustomHttpClient client) {
         result = new ArrayList<>();
         if(!last) {
             try {
@@ -89,7 +89,11 @@ public class Search {
                 Response response = client.mget(searchUrl + query + "&page=" + page);
                 Document search = Jsoup.parse(response.body().string());
                 Elements items = search.select("div.post-row");
-                if (items.size() < 1) last = true;
+                if(response.code()>=400){
+                    //has error
+                    return 1;
+                } else if (items.size() < 1)
+                    last = true;
 
                 for (Element item : items) {
                     Element manga_subject = item.selectFirst("div.manga-subject").selectFirst("a");
@@ -100,30 +104,35 @@ public class Search {
                     try {
                         atmp = item.selectFirst("div.author").selectFirst("div").text();
                     } catch (Exception e) {
-
+                        //e.printStackTrace();
                     }
                     List<String> tags = new ArrayList<>();
                     try {
                         tags = item.selectFirst("div.tags").select("a").eachText();
                     } catch (Exception e) {
-
+                        //e.printStackTrace();
                     }
                     int release = -1;
                     try{
                         release = Integer.parseInt(item.selectFirst("div.publish-type").attr("onclick").split("\\(")[1].split("\\)")[0]);
                     }catch (Exception e){
-
+                        //e.printStackTrace();
                     }
                     result.add(new Title(ntmp, ttmp, atmp, tags, release, Integer.parseInt(idtmp)));
                 }
                 if (items.size() < 30) last = true;
                 response.close();
 
+                if(result.size()==0)
+                    page--;
+
             } catch (Exception e) {
                 page--;
                 e.printStackTrace();
+                return 1;
             }
         }
+        return 0;
     }
 
 

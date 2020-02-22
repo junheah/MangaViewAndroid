@@ -57,7 +57,7 @@ import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.adapter.TitleAdapter;
-import ml.melun.mangaview.adapter.mainAdapter;
+import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -71,8 +71,10 @@ import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.filterFolder;
 import static ml.melun.mangaview.Utils.readFileToString;
+import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
+import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity
     NotificationManagerCompat notificationManagerc;
     NotificationManager notificationManager;
     Toolbar toolbar;
+    MainAdapter mainadapter;
 
 
     @Override
@@ -107,6 +110,12 @@ public class MainActivity extends AppCompatActivity
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+//        //captcha test
+//        Intent captchaIntent = new Intent(context, CaptchaActivity.class);
+//        startActivity(captchaIntent);
+
 
         //check prefs
         if(!p.check()){
@@ -393,10 +402,10 @@ public class MainActivity extends AppCompatActivity
             //main content
             // 최근 추가된 만화
             mainRecycler = this.findViewById(R.id.main_recycler);
-            mainAdapter mainadapter = new mainAdapter(context);
+            mainadapter = new MainAdapter(context);
             mainRecycler.setLayoutManager(new LinearLayoutManager(context));
             mainRecycler.setAdapter(mainadapter);
-            mainadapter.setMainClickListener(new mainAdapter.onItemClick() {
+            mainadapter.setMainClickListener(new MainAdapter.onItemClick() {
                 @Override
                 public void clickedManga(Manga m) {
                     //mget title from manga m and start intent for manga m
@@ -588,20 +597,35 @@ public class MainActivity extends AppCompatActivity
                     break;
 
             }
+        }else if(resultCode == RESULT_CAPTCHA){
+            switch(requestCode){
+                case 3:
+                    //main page
+                    mainadapter.fetch();
+                    break;
+                case 4:
+                    //search
+                    
+                    break;
+            }
         }
     }
 
-    private class searchManga extends AsyncTask<String,String,String>{
+    private class searchManga extends AsyncTask<String,String,Integer>{
         protected void onPreExecute(){
             super.onPreExecute();
         }
-        protected String doInBackground(String... params){
-            search.fetch(httpClient);
-            return null;
+        protected Integer doInBackground(String... params){
+            return search.fetch(httpClient);
         }
         @Override
-        protected void onPostExecute(String res){
+        protected void onPostExecute(Integer res){
             super.onPostExecute(res);
+            if(res != 0){
+                // error
+                showErrorPopup(context, 4);
+            }
+
             if(searchAdapter.getItemCount()==0) {
                 searchAdapter.addData(search.getResult());
                 searchResult.setAdapter(searchAdapter);

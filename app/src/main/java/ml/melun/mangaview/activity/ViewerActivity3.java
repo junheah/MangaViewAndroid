@@ -8,6 +8,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,6 +48,7 @@ import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity3 extends AppCompatActivity {
     List<String> imgs;
@@ -242,7 +245,6 @@ public class ViewerActivity3 extends AppCompatActivity {
                     lockUi(true);
                     index--;
                     manga = eps.get(index);
-                    System.out.println("ppp " + manga.getName());
                     id = manga.getId();
                     name = manga.getName();
                     if(manga.getMode() == 0)
@@ -358,10 +360,6 @@ public class ViewerActivity3 extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(res == 1){
-                showErrorPopup(context);
-                return;
-            }
             reloadManga();
             if(manga.getReported()){
                 showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
@@ -376,6 +374,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             imgs = manga.getImgs();
             if(imgs == null || imgs.size()==0) {
                 showErrorPopup(context);
+                return;
             }
             refreshAdapter();
             bookmarkRefresh();
@@ -411,7 +410,6 @@ public class ViewerActivity3 extends AppCompatActivity {
 
     public void updateIntent(){
         if(manga.getMode() == 0 || manga.getMode() == 3) {
-            System.out.println("pppppp " + id);
             result = new Intent();
             result.putExtra("id", id);
             setResult(RESULT_OK, result);
@@ -468,6 +466,7 @@ public class ViewerActivity3 extends AppCompatActivity {
         else {
             prev.setEnabled(true);
             prev.setColorFilter(null);
+            prev.setColorFilter(null);
         }
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
     }
@@ -479,5 +478,12 @@ public class ViewerActivity3 extends AppCompatActivity {
         pageBtn.setEnabled(!lock);
         cut.setEnabled(!lock);
         spinner.setEnabled(!lock);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_CAPTCHA) {
+            refresh();
+        }
     }
 }

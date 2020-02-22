@@ -23,9 +23,11 @@ import okhttp3.Response;
 public class CustomHttpClient {
     public OkHttpClient client;
     Preference p;
+    Map<String, String> cookies;
 
     public CustomHttpClient(Preference p){
         System.out.println("http client init");
+        this.cookies = new HashMap<>();
         this.p = p;
         this.client = getUnsafeOkHttpClient()
                 .followRedirects(false)
@@ -37,16 +39,17 @@ public class CustomHttpClient {
         //this.client = new OkHttpClient.Builder().build();
     }
 
+    public void setCookie(String k, String v){
+        cookies.put(k, v);
+    }
+
+    public String getCookie(String k){
+        return cookies.get(k);
+    }
+
     public Response get(String url, Map<String, String> headers){
-//        if(!isloaded){
-//            cloudflareDns.init();
-//            isloaded = true;
-//        }
         Response response = null;
         try {
-//            for(String key : cfc.keySet()){
-//                cookie +=  key + '=' + cfc.mget(key)+ "; ";
-//            }
             Request.Builder builder = new Request.Builder()
                     .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .url(url)
@@ -58,11 +61,6 @@ public class CustomHttpClient {
 
             Request request = builder.build();
             response = this.client.newCall(request).execute();
-//            if(response != null){
-//                if(response.code()>=500){
-//                    System.out.println("cf");
-//                }
-//            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -77,13 +75,20 @@ public class CustomHttpClient {
     }
 
     public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
-        if(doLogin && p.getSession().length()>0){
-            customCookie.put("PHPSESSID", p.getSession());
+        if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
+            customCookie.put("PHPSESSID", p.getLogin().cookie);
         }
         String cookie = "";
+
+        // local cookies
+        for(String key : this.cookies.keySet()){
+            customCookie.put(key, this.cookies.get(key));
+        }
+
         for(String key : customCookie.keySet()){
             cookie += key + '=' + customCookie.get(key) + "; ";
         }
+
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cookie);
 
@@ -91,6 +96,19 @@ public class CustomHttpClient {
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){
+
+        String cs = "";
+        //get cookies from headers
+        if(headers.get("Cookie") != null)
+            cs += headers.get("Cookie");
+
+        // add local cookies
+        for(String key : this.cookies.keySet()){
+            cs += key + '=' + this.cookies.get(key) + "; ";
+        }
+
+        headers.put("Cookie", cs);
+
 
         Response response = null;
         try {

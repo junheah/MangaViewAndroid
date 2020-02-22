@@ -19,13 +19,13 @@ import ml.melun.mangaview.mangaview.Comment;
 
 import static ml.melun.mangaview.MainApplication.p;
 
-public class commentsAdapter extends BaseAdapter {
+public class CommentsAdapter extends BaseAdapter {
     Context context;
     ArrayList<Comment> data;
     LayoutInflater inflater;
     Boolean dark;
     Boolean save;
-    public commentsAdapter(Context context, ArrayList<Comment> data) {
+    public CommentsAdapter(Context context, ArrayList<Comment> data) {
         super();
         this.dark = p.getDarkTheme();
         this.save = p.getDataSave();
