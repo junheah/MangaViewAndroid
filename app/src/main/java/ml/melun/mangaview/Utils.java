@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import ml.melun.mangaview.activity.CaptchaActivity;
 import ml.melun.mangaview.activity.EpisodeActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
@@ -157,57 +158,63 @@ public class Utils {
                 .show();
     }
 
-    public static void showErrorPopup(Context context, Exception e){
+    public static void showErrorPopup(Context context, int code, Exception e, boolean force_close){
         AlertDialog.Builder builder;
-        String title = "뷰어 오류";
-        String content = "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.";
+        String title = "오류";
+        String content = "정보를 불러오는데 실패하였습니다. CAPTCHA를 재인증 하겠습니까?";
         if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
         else builder = new AlertDialog.Builder(context);
         builder.setTitle(title)
                 .setMessage(content)
-                .setNeutralButton("자세히", new DialogInterface.OnClickListener() {
+                .setNegativeButton("취소", new DialogInterface.OnClickListener(){
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showStackTrace(context, e);
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(force_close) ((Activity)context).finish();
                     }
                 })
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((Activity)context).finish();
+                        startCaptchaActivity(context, code);
                     }
                 })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
-                    public void onCancel(DialogInterface dialog) {
-                        ((Activity)context).finish();
+                    public void onCancel(DialogInterface dialogInterface) {
+                        if(force_close) ((Activity)context).finish();
                     }
-                })
-                .show();
+                });
+        if(e != null) {
+            builder.setNeutralButton("자세히", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showStackTrace(context, e);
+                }
+            });
+        }
+        builder.show();
+    }
+
+    static void startCaptchaActivity(Context context, int code){
+        Intent captchaIntent = new Intent(context, CaptchaActivity.class);
+        ((Activity)context).startActivityForResult(captchaIntent, code);
+    }
+
+    public static void showErrorPopup(Context context, Exception e) {
+        // viewer call
+        showErrorPopup(context, 0, e, true);
+    }
+
+    public static void showErrorPopup(Context context, int code){
+        // menu call
+        showErrorPopup(context, code, null, false);
     }
 
     public static void showErrorPopup(Context context){
-        AlertDialog.Builder builder;
-        String title = "뷰어 오류";
-        String content = "만화 정보를 불러오는데 실패하였습니다. 연결 상태를 확인하고 다시 시도해 주세요.";
-        if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
-        else builder = new AlertDialog.Builder(context);
-        builder.setTitle(title)
-                .setMessage(content)
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ((Activity)context).finish();
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        ((Activity)context).finish();
-                    }
-                })
-                .show();
+        // viewer call
+        showErrorPopup(context, 0, null, true);
     }
+
     private static void showStackTrace(Context context, Exception e){
         StringBuilder sbuilder = new StringBuilder();
         sbuilder.append(e.getMessage()+"\n");
@@ -352,54 +359,55 @@ public class Utils {
     }
 
 
-    static public void checkCaptcha(Preference p, Context context, int id, Runnable callback){
-            String url = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=" + id;
-
-        WebView webView = new WebView(context);
-
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        CookieManager cookiem = CookieManager.getInstance();
-        cookiem.removeAllCookie();
-
-        webView.setWebViewClient(new WebViewClient() {
-            boolean catchNextRequest = false;
-
-            public boolean shouldOverrideUrlLoading(WebView view, String url){
-                String cookies = CookieManager.getInstance().getCookie(url);
-                if(catchNextRequest){
-                    String cookieStr = cookiem.getCookie(url);
-                    for(String s: cookieStr.split(";")){
-                        if(s.contains("PHPSESSID=")){
-                            String cookie = s.substring(s.indexOf("=")+1);
-                            p.setSession(cookie);
-                            callback.run();
-                            break;
-                        }
-                    }
-                } else if(url.contains("sign_captcha.php")) {
-                    catchNextRequest = true;
-                    view.loadUrl(url);
-                }else
-                    view.loadUrl(url);
-                return false; // then it is not handled by default action
-            }
-        });
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-
-        Login login = p.getLogin();
-
-        // if logged-in, mget session from login
-        if(login != null && login.isValid()){
-            cookiem.setCookie(p.getUrl(), login.getCookie(true));
-        }else if(p.getSession().length()>0){
-            // else, use session
-            cookiem.setCookie(p.getUrl(), "PHPSESSID=" + p.getSession() + "; ");
-        }
-        webView.loadUrl(url, headers);
-    }
+//    static public void checkCaptcha(Preference p, Context context, Runnable callback){
+//        String url = p.getUrl();
+//
+//        System.out.println("pppp checkcaptcha init!");
+//        WebView webView = new WebView(context);
+//
+//        WebSettings settings = webView.getSettings();
+//        settings.setJavaScriptEnabled(true);
+//        CookieManager cookiem = CookieManager.getInstance();
+//        cookiem.removeAllCookie();
+//
+//        webView.setWebViewClient(new WebViewClient() {
+//            boolean catchNextRequest = false;
+//
+//            public boolean shouldOverrideUrlLoading(WebView view, String url){
+//                System.out.println("ppp" + url);
+//                String cookies = CookieManager.getInstance().getCookie(url);
+//                if(catchNextRequest){
+//                    String cookieStr = cookiem.getCookie(url);
+//                    for(String s: cookieStr.split(";")){
+//                        if(s.contains("PHPSESSID=")){
+//                            String cookie = s.substring(s.indexOf("=")+1);
+//                            callback.run();
+//                            break;
+//                        }
+//                    }
+//                } else if(url.contains("sign_captcha.php")) {
+//                    catchNextRequest = true;
+//                    view.loadUrl(url);
+//                }else
+//                    view.loadUrl(url);
+//                return false; // then it is not handled by default action
+//            }
+//        });
+//
+//        Map<String, String> headers = new HashMap<>();
+//        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+//
+//        Login login = p.getLogin();
+//
+//        // if logged-in, mget session from login
+//        if(login != null && login.isValid()){
+//            cookiem.setCookie(p.getUrl(), login.getCookie(true));
+//        }else if(p.login.getCookie().length()>0){
+//            // else, use session
+//            cookiem.setCookie(p.getUrl(), "PHPSESSID=" + p.login.getCookie() + "; ");
+//        }
+//        webView.loadUrl(url, headers);
+//    }
 
     public static void hideSpinnerDropDown(Spinner spinner) {
         try {

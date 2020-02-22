@@ -53,6 +53,7 @@ import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity2 extends AppCompatActivity {
     Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, stretch, leftRight;
@@ -661,11 +662,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(res == 1){
-                //error occured
-                showErrorPopup(context);
-                return;
-            }
             reloadManga();
 
             if (pd.isShowing()) {
@@ -684,6 +680,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             imgs1 = manga.getImgs(true);
             if(imgs == null || imgs.size()==0) {
                 showErrorPopup(context);
+                return;
             }
             d = new Decoder(manga.getSeed(), manga.getId());
             bookmarkRefresh();
@@ -769,17 +766,10 @@ public class ViewerActivity2 extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            //reload current ep
-            lockUi(true);
-            id = manga.getId();
-            captchaChecked = false;
-            loadImages l = new loadImages();
-            l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }else
-            finish();
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_CAPTCHA) {
+            refresh();
+        }
     }
 
     void lockUi(Boolean lock){
@@ -793,4 +783,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         prevPageBtn.setEnabled(!lock);
         spinner.setEnabled(!lock);
     }
+
+
 }

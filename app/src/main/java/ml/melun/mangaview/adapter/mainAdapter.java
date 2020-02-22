@@ -25,14 +25,15 @@ import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Manga;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.Utils.showErrorPopup;
 
-public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mainContext;
     LayoutInflater mInflater, itemInflater;
     LinearLayoutManager update_lm, name_lm, tag_lm, release_lm;
-    mainUpdatedAdapter uadapter;
+    MainUpdatedAdapter uadapter;
     onItemClick mainClickListener;
-    mainTagAdapter nadapter, tadapter, radapter;
+    MainTagAdapter nadapter, tadapter, radapter;
     Boolean dark, loaded = false;
     Preference p;
 
@@ -47,7 +48,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     final static int RANKING = 6;
 
 
-    public mainAdapter(Context main) {
+    public MainAdapter(Context main) {
         super();
         mainContext = main;
         p = new Preference(mainContext);
@@ -65,21 +66,25 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         name_lm.setOrientation(LinearLayoutManager.HORIZONTAL);
         release_lm.setOrientation(LinearLayoutManager.HORIZONTAL);
 
-        uadapter = new mainUpdatedAdapter(main);
-        tadapter = new mainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_genre)), 0);
-        nadapter = new mainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_name)), 1);
-        radapter = new mainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_release)), 2);
+        uadapter = new MainUpdatedAdapter(main);
+        tadapter = new MainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_genre)), 0);
+        nadapter = new MainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_name)), 1);
+        radapter = new MainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_release)), 2);
 
 
         ranking = new ArrayList<>();
         recent = new ArrayList<>();
         favUpdate = new ArrayList<>();
 
+        setHasStableIds(true);
+        fetch();
+    }
 
+    public void fetch(){
         //fetch main page data
+        uadapter.setLoad();
         fetchMain fetch = new fetchMain();
         fetch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        setHasStableIds(true);
     }
 
     @Override
@@ -218,7 +223,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             updatedList = itemView.findViewById(R.id.main_tag);
             updatedList.setLayoutManager(update_lm);
             updatedList.setAdapter(uadapter);
-            uadapter.setClickListener(new mainUpdatedAdapter.onclick() {
+            uadapter.setClickListener(new MainUpdatedAdapter.onclick() {
                 @Override
                 public void onclick(Manga m) {
                     mainClickListener.clickedManga(m);
@@ -282,7 +287,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             tagList = itemView.findViewById(R.id.main_tag);
             tagList.setLayoutManager(tag_lm);
             tagList.setAdapter(tadapter);
-            tadapter.setClickListener(new mainTagAdapter.tagOnclick() {
+            tadapter.setClickListener(new MainTagAdapter.tagOnclick() {
                 @Override
                 public void onClick(int position, String tag) {
                     mainClickListener.clickedTag(tag);
@@ -299,7 +304,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             nameList = itemView.findViewById(R.id.main_tag);
             nameList.setLayoutManager(name_lm);
             nameList.setAdapter(nadapter);
-            nadapter.setClickListener(new mainTagAdapter.tagOnclick() {
+            nadapter.setClickListener(new MainTagAdapter.tagOnclick() {
                 @Override
                 public void onClick(int pos, String tag) {
                     try {
@@ -320,7 +325,7 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             releaseList = itemView.findViewById(R.id.main_tag);
             releaseList.setLayoutManager(release_lm);
             releaseList.setAdapter(radapter);
-            radapter.setClickListener(new mainTagAdapter.tagOnclick() {
+            radapter.setClickListener(new MainTagAdapter.tagOnclick() {
                 @Override
                 public void onClick(int position, String tag) {
                     mainClickListener.clickedRelease(position+1);
@@ -362,8 +367,11 @@ public class mainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         protected void onPostExecute(MainPage main) {
             super.onPostExecute(main);
             //update adapters?
+            if(main.getRecent().size() == 0){
+                // captcha?
+                showErrorPopup(mainContext, 3);
+            }
             uadapter.setData(main.getRecent());
-
             ranking = main.getRanking();
             recent = main.getOnlineRecent();
             favUpdate = main.getFavUpdate();

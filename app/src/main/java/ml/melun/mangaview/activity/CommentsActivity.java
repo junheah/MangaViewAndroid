@@ -25,7 +25,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.adapter.commentsAdapter;
+import ml.melun.mangaview.adapter.CommentsAdapter;
 import ml.melun.mangaview.fragment.CommentsTabFragment;
 import ml.melun.mangaview.mangaview.Comment;
 import ml.melun.mangaview.mangaview.Login;
@@ -51,7 +51,7 @@ public class CommentsActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     ArrayList<Comment> comments, bcomments;
-    public commentsAdapter adapter, badapter;
+    public CommentsAdapter adapter, badapter;
     Context context;
     TabLayout tab;
     int id;
@@ -75,7 +75,7 @@ public class CommentsActivity extends AppCompatActivity {
         if(gsonData.length()>0){
             Gson gson = new Gson();
             comments = gson.fromJson(gsonData,new TypeToken<ArrayList<Comment>>(){}.getType());
-            adapter = new commentsAdapter(context, comments);
+            adapter = new CommentsAdapter(context, comments);
             getSupportActionBar().setTitle("댓글 " + comments.size());
         }else{
             getSupportActionBar().setTitle("댓글 없음");
@@ -85,7 +85,7 @@ public class CommentsActivity extends AppCompatActivity {
         if(gsonData.length()>0){
             Gson gson = new Gson();
             bcomments = gson.fromJson(gsonData,new TypeToken<ArrayList<Comment>>(){}.getType());
-            badapter = new commentsAdapter(context, bcomments);
+            badapter = new CommentsAdapter(context, bcomments);
             //((TextView)toolbar.findViewById(R.id.comments_title)).setText("댓글 ["+comments.size()+"]");
         }
 

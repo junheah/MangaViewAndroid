@@ -8,6 +8,8 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,6 +48,7 @@ import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity3 extends AppCompatActivity {
     List<String> imgs;
@@ -174,9 +177,10 @@ public class ViewerActivity3 extends AppCompatActivity {
             toolbarTitle.setText(name);
             viewerBookmark = p.getViewerBookmark(id);
 
-            if(intent.getBooleanExtra("recent",false)){
-                Intent resultIntent = new Intent();
-                setResult(RESULT_OK,resultIntent);
+            if(manga.getMode() == 0 || manga.getMode() == 3){
+                result = new Intent();
+                result.putExtra("id", id);
+                setResult(RESULT_OK,result);
             }
             if(manga.getMode() != 0){
                 //load local imgs
@@ -356,10 +360,6 @@ public class ViewerActivity3 extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(res == 1){
-                showErrorPopup(context);
-                return;
-            }
             reloadManga();
             if(manga.getReported()){
                 showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
@@ -374,6 +374,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             imgs = manga.getImgs();
             if(imgs == null || imgs.size()==0) {
                 showErrorPopup(context);
+                return;
             }
             refreshAdapter();
             bookmarkRefresh();
@@ -408,9 +409,11 @@ public class ViewerActivity3 extends AppCompatActivity {
     }
 
     public void updateIntent(){
-        result = new Intent();
-        result.putExtra("id", id);
-        setResult(RESULT_OK, result);
+        if(manga.getMode() == 0 || manga.getMode() == 3) {
+            result = new Intent();
+            result.putExtra("id", id);
+            setResult(RESULT_OK, result);
+        }
         //update intent : not sure if this works TODO: test this
         intent.putExtra("title", new Gson().toJson(title));
         intent.putExtra("manga", new Gson().toJson(manga));
@@ -463,17 +466,9 @@ public class ViewerActivity3 extends AppCompatActivity {
         else {
             prev.setEnabled(true);
             prev.setColorFilter(null);
+            prev.setColorFilter(null);
         }
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            refresh();
-        }else
-            finish();
     }
 
     void lockUi(Boolean lock){
@@ -483,5 +478,12 @@ public class ViewerActivity3 extends AppCompatActivity {
         pageBtn.setEnabled(!lock);
         cut.setEnabled(!lock);
         spinner.setEnabled(!lock);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_CAPTCHA) {
+            refresh();
+        }
     }
 }

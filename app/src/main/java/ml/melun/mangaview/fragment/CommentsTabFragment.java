@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.adapter.commentsAdapter;
+import ml.melun.mangaview.adapter.CommentsAdapter;
 
 public class CommentsTabFragment extends Fragment {
-    commentsAdapter madapter;
+    CommentsAdapter madapter;
     public CommentsTabFragment() {
     }
-    public void setAdapter(commentsAdapter adapter){
+    public void setAdapter(CommentsAdapter adapter){
         madapter = adapter;
     }
     @Override
