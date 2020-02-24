@@ -20,12 +20,13 @@ import java.util.Map;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Manga;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
-import static ml.melun.mangaview.Utils.showErrorPopup;
+import static ml.melun.mangaview.Utils.showCaptchaPopup;
 
 public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mainContext;
@@ -369,7 +370,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             //update adapters?
             if(main.getRecent().size() == 0){
                 // captcha?
-                showErrorPopup(mainContext, 3);
+                Utils.showCaptchaPopup(mainContext, 3);
             }
             uadapter.setData(main.getRecent());
             ranking = main.getRanking();

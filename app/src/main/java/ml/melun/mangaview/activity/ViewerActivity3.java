@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.adapter.CustomSpinnerAdapter;
 import ml.melun.mangaview.adapter.ViewerPagerAdapter;
 import ml.melun.mangaview.interfaces.PageInterface;
@@ -46,7 +47,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
-import static ml.melun.mangaview.Utils.showErrorPopup;
+import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
@@ -373,7 +374,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             lockUi(false);
             imgs = manga.getImgs();
             if(imgs == null || imgs.size()==0) {
-                showErrorPopup(context);
+                showCaptchaPopup(context);
                 return;
             }
             refreshAdapter();
@@ -388,7 +389,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             for(StackTraceElement s : stack){
                 message +=s.toString()+'\n';
             }
-            showErrorPopup(context, e);
+            Utils.showCaptchaPopup(context, e);
         }
     }
 

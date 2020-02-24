@@ -23,6 +23,7 @@ import java.util.List;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.Utils.checkConnection;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class CheckInfo {
@@ -39,10 +40,17 @@ public class CheckInfo {
         sharedPref = context.getSharedPreferences("mangaView",Context.MODE_PRIVATE);
     }
     public void all(Boolean force){
-        update(force);
-        notice(force);
+        if(checkConnection(context)){
+            //only when connected
+            update(force);
+            notice(force);
+        }
     }
     public Boolean update(Boolean force){
+        if(!checkConnection(context)){
+            Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         Long lastUpdateTime = sharedPref.getLong("lastUpdateTime", 0);
         Long updateCycle = sharedPref.getLong("updateCycle",3600000); // def cycle = 1hr
         if(uc.getStatus()== AsyncTask.Status.RUNNING) {
@@ -56,6 +64,10 @@ public class CheckInfo {
         }
     }
     public Boolean notice(Boolean force) {
+        if(!checkConnection(context)){
+            Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         Long lastUpdateTime = sharedPref.getLong("lastNoticeTime", 0);
         Long updateCycle = sharedPref.getLong("noticeCycle",3600000); // def cycle = 1hr
         if (nc.getStatus() == AsyncTask.Status.RUNNING){

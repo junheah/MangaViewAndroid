@@ -1,29 +1,25 @@
 package ml.melun.mangaview.activity;
 
+import android.content.Context;
 import android.content.Intent;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
-import android.view.View;
 import android.webkit.CookieManager;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.TextView;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Login;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.showCaptchaPopup;
+import static ml.melun.mangaview.Utils.showErrorPopup;
 
 public class CaptchaActivity extends AppCompatActivity {
     WebView webView;
@@ -32,8 +28,13 @@ public class CaptchaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Context context = this;
         setContentView(R.layout.activity_captcha);
         String purl = p.getUrl();
+
+        if(purl.contains("http://")){
+            showErrorPopup(context, "ip 주소 혹은 잘못된 주소를 사용중입니다. 자동 URL 설정을 사용하거나, 주소를 다시 입력해 주세요", null, false);
+        }
 
         webView = this.findViewById(R.id.captchaWebView);
         WebSettings settings = webView.getSettings();
@@ -50,15 +51,19 @@ public class CaptchaActivity extends AppCompatActivity {
                 if(count == 0){
                     count--;
                     // read cookies and finish
-                    String cookieStr = cookiem.getCookie(url);
-                    for(String s: cookieStr.split("; ")){
-                        String k = s.substring(0,s.indexOf("="));
-                        String v = s.substring(s.indexOf("=")+1);
-                        httpClient.setCookie(k, v);
+                    try {
+                        String cookieStr = cookiem.getCookie(url);
+                        for (String s : cookieStr.split("; ")) {
+                            String k = s.substring(0, s.indexOf("="));
+                            String v = s.substring(s.indexOf("=") + 1);
+                            httpClient.setCookie(k, v);
+                        }
+                        Intent resultIntent = new Intent();
+                        setResult(RESULT_CAPTCHA, resultIntent);
+                        finish();
+                    }catch (Exception e){
+                        Utils.showErrorPopup(context, "인증 도중 오류가 발생했습니다. 네트워크 연결 상태를 확인해주세요.", e, true);
                     }
-                    Intent resultIntent = new Intent();
-                    setResult(RESULT_CAPTCHA, resultIntent);
-                    finish();
 
                 } else if(url.contains("favicon.ico")){
                     count--;

@@ -34,7 +34,7 @@ public class Preference {
     Boolean stretch;
     Boolean leftRight;
     Login login;
-    final String defUrl = "http://185.141.63.93/";
+    final String defUrl = "https://manamoa.net/";
 //    String session;
     Boolean autoUrl;
 

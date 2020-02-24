@@ -10,11 +10,10 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 
 import androidx.appcompat.app.AlertDialog;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.view.Display;
-import android.webkit.CookieManager;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -43,6 +42,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class Utils {
+
+    private static int captchaCount = 0;
+
     public static Boolean deleteRecursive(File fileOrDirectory) {
         if(!checkWriteable(fileOrDirectory)) return false;
         try {
@@ -158,24 +160,17 @@ public class Utils {
                 .show();
     }
 
-    public static void showErrorPopup(Context context, int code, Exception e, boolean force_close){
+    public static void showErrorPopup(Context context, String message, Exception e, boolean force_close){
         AlertDialog.Builder builder;
         String title = "오류";
-        String content = "정보를 불러오는데 실패하였습니다. CAPTCHA를 재인증 하겠습니까?";
         if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
         else builder = new AlertDialog.Builder(context);
         builder.setTitle(title)
-                .setMessage(content)
-                .setNegativeButton("취소", new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if(force_close) ((Activity)context).finish();
-                    }
-                })
+                .setMessage(message)
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        startCaptchaActivity(context, code);
+                        if(force_close) ((Activity)context).finish();
                     }
                 })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -195,24 +190,79 @@ public class Utils {
         builder.show();
     }
 
+    public static boolean checkConnection(Context context){
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) ((Activity)context).getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close){
+        if(!checkConnection(context)){
+            //no internet
+            //showErrorPopup(context, "네트워크 연결이 없습니다.", e, force_close);
+            Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_LONG).show();
+            if(force_close) ((Activity) context).finish();
+        }else if(captchaCount == 0){
+            startCaptchaActivity(context, code);
+        }else {
+            AlertDialog.Builder builder;
+            String title = "오류";
+            String content = "정보를 불러오는데 실패하였습니다. CAPTCHA를 재인증 하겠습니까?";
+            if (new Preference(context).getDarkTheme())
+                builder = new AlertDialog.Builder(context, R.style.darkDialog);
+            else builder = new AlertDialog.Builder(context);
+            builder.setTitle(title)
+                    .setMessage(content)
+                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (force_close) ((Activity) context).finish();
+                        }
+                    })
+                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startCaptchaActivity(context, code);
+                        }
+                    })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            if (force_close) ((Activity) context).finish();
+                        }
+                    });
+            if (e != null) {
+                builder.setNeutralButton("자세히", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showStackTrace(context, e);
+                    }
+                });
+            }
+            builder.show();
+        }
+        captchaCount++;
+    }
+
     static void startCaptchaActivity(Context context, int code){
         Intent captchaIntent = new Intent(context, CaptchaActivity.class);
         ((Activity)context).startActivityForResult(captchaIntent, code);
     }
 
-    public static void showErrorPopup(Context context, Exception e) {
+    public static void showCaptchaPopup(Context context, Exception e) {
         // viewer call
-        showErrorPopup(context, 0, e, true);
+        showCaptchaPopup(context, 0, e, true);
     }
 
-    public static void showErrorPopup(Context context, int code){
+    public static void showCaptchaPopup(Context context, int code){
         // menu call
-        showErrorPopup(context, code, null, false);
+        showCaptchaPopup(context, code, null, false);
     }
 
-    public static void showErrorPopup(Context context){
+    public static void showCaptchaPopup(Context context){
         // viewer call
-        showErrorPopup(context, 0, null, true);
+        showCaptchaPopup(context, 0, null, true);
     }
 
     private static void showStackTrace(Context context, Exception e){

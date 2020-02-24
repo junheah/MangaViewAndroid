@@ -240,7 +240,13 @@ public class DebugActivity extends AppCompatActivity {
                 }else
                     result = "no ddos guard";
             }catch (Exception e){
-                e.printStackTrace();
+                StringBuilder sbuilder = new StringBuilder();
+                sbuilder.append(e.getMessage()+"\n");
+                for(StackTraceElement s : e.getStackTrace()){
+                    sbuilder.append(s+"\n");
+                }
+                final String error = sbuilder.toString();
+                result = error;
             }
             return null;
         }

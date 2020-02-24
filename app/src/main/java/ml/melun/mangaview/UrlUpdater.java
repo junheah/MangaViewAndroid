@@ -6,6 +6,8 @@ import android.widget.Toast;
 
 import net.jhavar.main.DdosGuardBypass;
 import java.util.HashMap;
+import java.util.Map;
+
 import okhttp3.Response;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
@@ -22,15 +24,24 @@ public class UrlUpdater extends AsyncTask<Void, Void, Integer> {
     }
     protected Integer doInBackground(Void... params) {
         try {
-            Response r = httpClient.get("https://mnmnmnmnm.xyz/", new HashMap<>());
-            if(r.code() == 403) {
-                DdosGuardBypass ddg = new DdosGuardBypass("https://mnmnmnmnm.xyz/");
-                ddg.bypass();
-                String raw = ddg.get("https://mnmnmnmnm.xyz/");
-                result = raw.split("주소는 ")[1].split(" ")[0];
+            Map<String, String> headers = new HashMap<>();
+            headers.put("User-Agent", "Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+            Response r = httpClient.get("http://mnmnmnmnm.xyz/", headers);
+//            if(r.code() == 403) {
+//                DdosGuardBypass ddg = new DdosGuardBypass("https://mnmnmnmnm.xyz/");
+//                ddg.bypass();
+//                String raw = ddg.get("https://mnmnmnmnm.xyz/");
+//                result = raw.split("주소는 ")[1].split(" ")[0];
+//                return 0;
+//            }else
+//                return 1;
+            if(r.code() == 302){
+                result = r.header("Location");
                 return 0;
             }else
                 return 1;
+
+
         }catch (Exception e){
             e.printStackTrace();
             return 1;

@@ -51,7 +51,6 @@ public class CustomHttpClient {
         Response response = null;
         try {
             Request.Builder builder = new Request.Builder()
-                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
                     .url(url)
                     .get();
 
@@ -91,6 +90,7 @@ public class CustomHttpClient {
 
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cookie);
+        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
 
         return get(p.getUrl()+url, headers);
     }

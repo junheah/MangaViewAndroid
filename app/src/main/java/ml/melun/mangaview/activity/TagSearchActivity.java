@@ -29,7 +29,7 @@ import ml.melun.mangaview.mangaview.UpdatedList;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
-import static ml.melun.mangaview.Utils.showErrorPopup;
+import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
 public class TagSearchActivity extends AppCompatActivity {
@@ -136,7 +136,7 @@ public class TagSearchActivity extends AppCompatActivity {
         protected void onPostExecute(Integer res){
             super.onPostExecute(res);
             if(res != 0){
-                showErrorPopup(context);
+                showCaptchaPopup(context);
             }
             if(adapter.getItemCount()==0) {
                 adapter.addData(search.getResult());
@@ -189,7 +189,7 @@ public class TagSearchActivity extends AppCompatActivity {
             super.onPostExecute(res);
             if(updated.getResult().size() == 0 && uadapter.getItemCount() == 0){
                 //error
-                showErrorPopup(context);
+                showCaptchaPopup(context);
             }
             if(uadapter.getItemCount()==0) {
                 uadapter.addData(updated.getResult());
