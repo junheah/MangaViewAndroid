@@ -25,4 +25,7 @@
     <color name="comment">#6a989d</color>
 
     <color name="favorite">#FF9CCF</color>
+
+
+    <color name="header_darker">#e1d3ef</color>
 </resources>

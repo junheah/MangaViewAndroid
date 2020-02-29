@@ -208,7 +208,7 @@ public class Title extends MTitle {
     }
 
     public boolean hasCounter(){
-        return bc>0 && rc>0 && cc>0 && bmc>0;
+        return !(bc==0 && rc==0 && cc==0 && bmc==0);
     }
 
     public MTitle minimize(){

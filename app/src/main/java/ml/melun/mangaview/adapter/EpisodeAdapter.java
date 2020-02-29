@@ -39,8 +39,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     Boolean bookmarked = false;
     TypedValue outValue;
     private int bookmark = -1;
-    //header is in index 0
-    Title header;
+    //title is in index 0
+    Title title;
     TagAdapter ta;
     LinearLayoutManager lm;
     Boolean dark;
@@ -53,7 +53,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = data;
-        this.header = title;
+        this.title = title;
         this.mode = mode;
         outValue = new TypedValue();
         dark = p.getDarkTheme();
@@ -99,17 +99,17 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if(position==0){
             HeaderHolder h = (HeaderHolder) holder;
-            String title = header.getName();
-            String thumb = header.getThumb();
-            int release = header.getRelease();
-            h.h_title.setText(title);
-            h.h_author.setText(header.getAuthor());
+            String titles = this.title.getName();
+            String thumb = this.title.getThumb();
+            int release = this.title.getRelease();
+            h.h_title.setText(titles);
+            h.h_author.setText(this.title.getAuthor());
             if(release>-1) h.h_release.setText(releases[release]);
             else h.h_release.setText("");
-            if(favorite) h.h_star.setImageResource(R.drawable.ic_favorite);
-            else h.h_star.setImageResource(R.drawable.ic_favorite_border);
-            if(bookmarked) h.h_bookmark.setImageResource(R.drawable.ic_bookmark);
-            else h.h_bookmark.setImageResource(R.drawable.ic_bookmark_border);
+            if(favorite) h.h_star_icon.setImageResource(R.drawable.ic_favorite);
+            else h.h_star_icon.setImageResource(R.drawable.ic_favorite_border);
+            if(bookmarked) h.h_bookmark_icon.setImageResource(R.drawable.ic_bookmark);
+            else h.h_bookmark_icon.setImageResource(R.drawable.ic_bookmark_border);
 
             if(!save) Glide.with(mainContext)
                     .load(thumb)
@@ -122,12 +122,26 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             if(mode == 0){
                 h.h_download.setVisibility(View.VISIBLE);
+                if(login)
+                    h.h_bookmark.setVisibility(View.VISIBLE);
+                else
+                    h.h_bookmark.setVisibility(View.GONE);
+
+                //set ext-info text
+                h.h_recommend_c.setText(String.valueOf(title.getRecommend_c()));
+                h.h_battery_c.setText(String.valueOf(title.getBattery_s()));
+                h.h_comment_c.setText(String.valueOf(title.getComment_c()));
+                h.h_bookmark_c.setText(String.valueOf(title.getBookmark_c()));
+
             }else{
+                //offline manga
                 h.h_download.setVisibility(View.GONE);
+                h.h_bookmark.setVisibility(View.GONE);
+                h.h_battery.setVisibility(View.GONE);
+                h.h_recommend.setVisibility(View.GONE);
+                h.h_comment.setVisibility(View.GONE);
             }
-            if(login){
-                h.h_bookmark.setVisibility(View.VISIBLE);
-            }else h.h_bookmark.setVisibility(View.GONE);
+
         }else {
             ViewHolder h = (ViewHolder) holder;
             int Dposition = position-1;
@@ -177,20 +191,37 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public class HeaderHolder extends RecyclerView.ViewHolder{
         TextView h_title, h_author, h_release;
         ImageView h_thumb;
-        ImageView h_star;
-        ImageView h_bookmark;
+        ImageView h_star_icon;
+        ImageView h_bookmark_icon;
+
         Button h_download;
         RecyclerView h_tags;
+        View h_bookmark, h_star, h_recommend, h_comment, h_battery;
+
+        TextView h_bookmark_c, h_recommend_c, h_comment_c, h_battery_c;
         HeaderHolder(View itemView) {
             super(itemView);
             h_title = itemView.findViewById(R.id.HeaderTitle);
             h_thumb = itemView.findViewById(R.id.HeaderThumb);
-            h_star = itemView.findViewById(R.id.FavoriteButton);
+            h_star_icon = itemView.findViewById(R.id.favoriteIcon);
             h_download = itemView.findViewById(R.id.HeaderDownload);
             h_tags = itemView.findViewById(R.id.tagsContainer);
             h_author = itemView.findViewById(R.id.headerAuthor);
             h_release = itemView.findViewById(R.id.HeaderRelease);
+            h_bookmark_icon = itemView.findViewById(R.id.bookmarkIcon);
+
+            h_star = itemView.findViewById(R.id.HeaderFavorite);
             h_bookmark = itemView.findViewById(R.id.HeaderBookmark);
+            h_comment = itemView.findViewById(R.id.HeaderComment);
+            h_recommend = itemView.findViewById(R.id.HeaderRecommend);
+            h_battery = itemView.findViewById(R.id.HeaderBattery);
+
+            h_bookmark_c = itemView.findViewById(R.id.bookmarkText);
+            h_comment_c = itemView.findViewById(R.id.commentText);
+            h_recommend_c = itemView.findViewById(R.id.recommendText);
+            h_battery_c = itemView.findViewById(R.id.batteryText);
+
+
             h_bookmark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

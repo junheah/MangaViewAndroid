@@ -198,8 +198,6 @@ public class Preference {
     public void addRecent(Title tmp){
         if(tmp.getId()>0) {
             MTitle title = tmp.minimize();
-            System.out.println(new Gson().toJson(tmp));
-            System.out.println(new Gson().toJson(title));
             int position = getIndexOf(title);
             if (position > -1) {
                 recent.add(0, title);
@@ -284,7 +282,6 @@ public class Preference {
     private void writeRecent(){
         Gson gson = new Gson();
         prefsEditor.putString("recent", gson.toJson(recent));
-        System.out.println("ppp"+gson.toJson(recent));
         prefsEditor.commit();
     }
 

@@ -240,7 +240,11 @@ public class Utils {
                     }
                 });
             }
-            builder.show();
+            try {
+                builder.show();
+            }catch (Exception e2){
+                e2.printStackTrace();
+            }
         }
         captchaCount++;
     }
