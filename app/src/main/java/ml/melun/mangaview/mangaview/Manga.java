@@ -29,6 +29,7 @@ import okhttp3.Response;
      */
 
 public class Manga {
+
     public Manga(int i, String n, String d) {
         id = i;
         name = n;

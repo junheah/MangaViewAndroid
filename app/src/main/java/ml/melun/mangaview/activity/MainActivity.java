@@ -59,6 +59,7 @@ import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.MainAdapter;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -699,7 +700,7 @@ public class MainActivity extends AppCompatActivity
                                 titles.add(title);
                             }catch (Exception e){
                                 e.printStackTrace();
-                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1, 0));
                             }
                         }else if(data.exists()){
                             try {
@@ -708,10 +709,10 @@ public class MainActivity extends AppCompatActivity
                                 titles.add(title);
                             }catch (Exception e){
                                 e.printStackTrace();
-                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1, 0));
                             }
 
-                        } else titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                        } else titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1, 0));
                     }
                 }
                 //add titles to adapter
@@ -842,9 +843,9 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-            List<Title> recents = p.getRecent();
+            List<MTitle> recents = p.getRecent();
             sum += recents.size();
-            List<Title> favorites = p.getFavorite();
+            List<MTitle> favorites = p.getFavorite();
             sum += favorites.size();
             JSONObject bookmarks = p.getBookmarkObject();
             sum += bookmarks.length();
@@ -887,9 +888,9 @@ public class MainActivity extends AppCompatActivity
             return 0;
         }
 
-        void removeDups(List<Title> titles){
+        void removeDups(List<MTitle> titles){
             for(int i=0; i<titles.size(); i++){
-                Title target = titles.get(i);
+                MTitle target = titles.get(i);
                 for(int j =0 ; j<titles.size(); j++){
                     if(j!=i && titles.get(j).getId() == target.getId()){
                         titles.remove(i);
@@ -900,11 +901,11 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        void titleList(List<Title> titles){
+        void titleList(List<MTitle> titles){
             for(int i = 0; i<titles.size(); i++){
                 current++;
                 publishProgress();
-                Title target = titles.get(i);
+                MTitle target = titles.get(i);
                 if(target.getId() <= 0){
                     int newId = findId(target);
                     if(newId<0){
@@ -918,10 +919,10 @@ public class MainActivity extends AppCompatActivity
         }
 
         int findId(String title){
-            return findId(new Title(title,"","",new ArrayList<>(),-1,-1));
+            return findId(new MTitle(title,-1,"", "",new ArrayList<>(),-1));
         }
 
-        int findId(Title title){
+        int findId(MTitle title){
             String name = title.getName();
             Search s = new Search(name,0);
             while(!s.isLast()){

@@ -13,13 +13,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import ml.melun.mangaview.mangaview.Login;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Title;
 
 public class Preference {
     SharedPreferences sharedPref;
     //ArrayList<Title> recent;
-    List<Title> recent;
-    List<Title> favorite;
+    List<MTitle> recent;
+    List<MTitle> favorite;
     SharedPreferences.Editor prefsEditor;
     JSONObject pagebookmark;
     JSONObject bookmark;
@@ -47,9 +48,9 @@ public class Preference {
         prefsEditor = sharedPref.edit();
         try {
             Gson gson = new Gson();
-            recent = gson.fromJson(sharedPref.getString("recent", ""),new TypeToken<ArrayList<Title>>(){}.getType());
+            recent = gson.fromJson(sharedPref.getString("recent", ""),new TypeToken<ArrayList<MTitle>>(){}.getType());
             if(recent==null) recent = new ArrayList<>();
-            favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<Title>>(){}.getType());
+            favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<MTitle>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
             homeDir = sharedPref.getString("homeDir","/sdcard/MangaView/saved");
             volumeControl = sharedPref.getBoolean("volumeControl",false);
@@ -184,32 +185,57 @@ public class Preference {
         writeRecent();
     }
 
-    public void addRecent(Title tmp){
-        //FUCK YOU JAVA FOR NOT USING POINTERS
+    public void addRecent(MTitle tmp){
         if(tmp.getId()>0) {
-            Title title = tmp.clone();
+            int position = getIndexOf(tmp);
+            if (position > -1) {
+                recent.add(0, tmp);
+                recent.remove(position + 1);
+            } else recent.add(0, tmp);
+            writeRecent();
+        }
+    }
+    public void addRecent(Title tmp){
+        if(tmp.getId()>0) {
+            MTitle title = tmp.minimize();
+            System.out.println(new Gson().toJson(tmp));
+            System.out.println(new Gson().toJson(title));
             int position = getIndexOf(title);
             if (position > -1) {
-                recent.add(0, recent.get(position));
+                recent.add(0, title);
                 recent.remove(position + 1);
             } else recent.add(0, title);
             writeRecent();
         }
     }
 
-    public void updateRecentData(Title title){
-        recent.set(0, title.clone());
+
+    public void updateRecentData(MTitle title){
+        MTitle tmp = title.clone();
+        recent.set(0, tmp);
         writeRecent();
-        int index = findFavorite(title);
+        int index = findFavorite(tmp);
         if(index>-1){
-            favorite.set(index,title.clone());
+            favorite.set(index,tmp);
+            Gson gson = new Gson();
+            prefsEditor.putString("favorite", gson.toJson(favorite));
+            prefsEditor.commit();
+        }
+    }
+    public void updateRecentData(Title title){
+        MTitle tmp = title.minimize();
+        recent.set(0, tmp);
+        writeRecent();
+        int index = findFavorite(tmp);
+        if(index>-1){
+            favorite.set(index, tmp);
             Gson gson = new Gson();
             prefsEditor.putString("favorite", gson.toJson(favorite));
             prefsEditor.commit();
         }
     }
 
-    private int getIndexOf(Title title){
+    private int getIndexOf(MTitle title){
         if(title.getId()>0) {
             return recent.indexOf(title);
         }
@@ -227,7 +253,7 @@ public class Preference {
             writeBookmark();
         }
     }
-    public int getBookmark(Title title){
+    public int getBookmark(MTitle title){
         //return recent.mget(0).getBookmark();
         int titleId = title.getId();
         if(titleId>0) {
@@ -258,6 +284,7 @@ public class Preference {
     private void writeRecent(){
         Gson gson = new Gson();
         prefsEditor.putString("recent", gson.toJson(recent));
+        System.out.println("ppp"+gson.toJson(recent));
         prefsEditor.commit();
     }
 
@@ -316,25 +343,26 @@ public class Preference {
             return false;
         }
     }
-    public int findFavorite(Title title){
+    public int findFavorite(MTitle title){
         if(title.getId()>0){
             return favorite.indexOf(title);
         }
         return -1;
     }
 
-    public List<Title> getFavorite(){
+    public List<MTitle> getFavorite(){
         return favorite;
     }
-    public void setFavorites(List<Title> fav){
-        this.favorite = fav;
+
+    public void setFavorites(List<MTitle> fav){
+        this.favorite = (List<MTitle>)(List<?>)fav;
         Gson gson = new Gson();
         prefsEditor.putString("favorite", gson.toJson(favorite));
         prefsEditor.commit();
     }
 
-    public void setRecents(List<Title> rec){
-        this.recent = rec;
+    public void setRecents(List<MTitle> rec){
+        this.recent = (List<MTitle>)(List<?>)rec;
         writeRecent();
     }
 
@@ -343,7 +371,7 @@ public class Preference {
         writeBookmark();
     }
 
-    public List<Title> getRecent(){
+    public List<MTitle> getRecent(){
         return recent;
     }
 
@@ -372,14 +400,14 @@ public class Preference {
 //    }
 
     //for debug
-    public void removeEpsFromData(){
-        for(Title t:recent){t.removeEps();}
-        for(Title t:favorite){t.removeEps();}
-        writeRecent();
-        Gson gson = new Gson();
-        prefsEditor.putString("favorite", gson.toJson(favorite));
-        prefsEditor.commit();
-    }
+//    public void removeEpsFromData(){
+//        for(Title t:recent){t.removeEps();}
+//        for(Title t:favorite){t.removeEps();}
+//        writeRecent();
+//        Gson gson = new Gson();
+//        prefsEditor.putString("favorite", gson.toJson(favorite));
+//        prefsEditor.commit();
+//    }
 
     public void setLogin(Login login){
         this.login = login;
@@ -391,10 +419,10 @@ public class Preference {
     }
 
     public Boolean check(){
-        for(Title t: recent){
+        for(MTitle t: recent){
             if(t.getId()<=0) return false;
         }
-        for(Title t: favorite){
+        for(MTitle t: favorite){
             if(t.getId()<=0) return false;
         }
         Iterator<String> keys = bookmark.keys();

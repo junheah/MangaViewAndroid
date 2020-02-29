@@ -17,6 +17,7 @@ import java.util.List;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.p;
@@ -65,14 +66,22 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         View view = mInflater.inflate(R.layout.item_title, parent, false);
         return new ViewHolder(view);
     }
-    public void addData(List<Title> t){
+    public void addData(List<?> t){
         int oSize = mData.size();
-        for(Title d:t){
-            d.setBookmark(p.getBookmark(d));
+        for(Object d:t){
+            if(d instanceof Title){
+                ((Title) d).setBookmark(p.getBookmark((Title)d));
+                mData.add((Title)d);
+            } else if(d instanceof MTitle){
+                Title d2 = new Title((MTitle)d);
+                d2.setBookmark(p.getBookmark((MTitle) d));
+                mData.add(d2);
+            }
         }
-        mData.addAll(t);
         notifyItemRangeInserted(oSize,t.size());
     }
+
+
     public void moveItemToTop(int from){
         mData.add(0, mData.get(from));
         mData.remove(from+1);
@@ -94,12 +103,29 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         String author = data.getAuthor();
         String tags ="";
         int bookmark = data.getBookmark();
-        for(String s:data.getTags()){
-            tags+=s+" ";
+        if(data.getTags().size()>0) {
+            holder.tagContainer.setVisibility(View.VISIBLE);
+            for (String s : data.getTags()) {
+                tags += s + " ";
+            }
+            holder.tags.setText(tags);
+        }else{
+            holder.tagContainer.setVisibility(View.GONE);
         }
         holder.name.setText(title);
         holder.author.setText(author);
-        holder.tags.setText(tags);
+
+        if(data.hasCounter()){
+            holder.counterContainer.setVisibility(View.VISIBLE);
+            holder.recommend_c.setText(String.valueOf(data.getRecommend_c()));
+            holder.battery_c.setText(String.valueOf(data.getBattery_s()));
+            holder.comment_c.setText(String.valueOf(data.getComment_c()));
+            holder.bookmark_c.setText(String.valueOf(data.getBookmark_c()));
+        }else{
+            //no counter
+            holder.counterContainer.setVisibility(View.GONE);
+        }
+
         if(thumb.length()>1 && !save) Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
         if(save) holder.thumb.setVisibility(View.GONE);
@@ -118,8 +144,12 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         ImageView thumb;
         TextView author;
         TextView tags;
+        TextView recommend_c, battery_c, comment_c, bookmark_c;
         Button resume;
         CardView card;
+
+        View tagContainer;
+        View counterContainer;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -129,6 +159,13 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             tags = itemView.findViewById(R.id.TitleTag);
             card = itemView.findViewById(R.id.titleCard);
             resume = itemView.findViewById(R.id.epsButton);
+            recommend_c = itemView.findViewById(R.id.TitleRecommend_c);
+            battery_c = itemView.findViewById(R.id.TitleBattery_c);
+            comment_c = itemView.findViewById(R.id.TitleComment_c);
+            bookmark_c = itemView.findViewById(R.id.TitleBookmark_c);
+
+            tagContainer = itemView.findViewById(R.id.TitleTagContainer);
+            counterContainer = itemView.findViewById(R.id.TitleCounterContainer);
 
 
             if(dark){

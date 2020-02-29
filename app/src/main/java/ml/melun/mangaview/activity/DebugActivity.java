@@ -58,20 +58,21 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
         Button migrate = this.findViewById(R.id.debug_migrate);
-        migrate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Preference p = new Preference(context);
-                List<Title> titles = p.getRecent();
-                StringBuilder b = new StringBuilder();
-                for(Title t : titles){
-                    if(t.getBookmark()>0) p.setBookmark(t,t.getBookmark());
-                    b.append("제목: "+t.getName() +" | 북마크: "+t.getBookmark() +'\n');
-                }
-                b.append("북마크 이전이 완료되었습니다.");
-                output.setText(b.toString());
-            }
-        });
+        migrate.setEnabled(false);
+//        migrate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Preference p = new Preference(context);
+//                List<Title> titles = p.getRecent();
+//                StringBuilder b = new StringBuilder();
+//                for(Title t : titles){
+//                    if(t.getBookmark()>0) p.setBookmark(t,t.getBookmark());
+//                    b.append("제목: "+t.getName() +" | 북마크: "+t.getBookmark() +'\n');
+//                }
+//                b.append("북마크 이전이 완료되었습니다.");
+//                output.setText(b.toString());
+//            }
+//        });
         Button clear = this.findViewById(R.id.debug_clear);
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,13 +117,14 @@ public class DebugActivity extends AppCompatActivity {
         });
 
         Button removeEps = this.findViewById(R.id.debug_removeEps);
-        removeEps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Preference(context).removeEpsFromData();
-                output.setText("작업 완료.");
-            }
-        });
+        removeEps.setEnabled(false);
+//        removeEps.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new Preference(context).removeEpsFromData();
+//                output.setText("작업 완료.");
+//            }
+//        });
 
         this.findViewById(R.id.debug_loginTest).setOnClickListener(new View.OnClickListener() {
             @Override
