@@ -10,6 +10,7 @@ public class MTitle{
     String author;
     List<String> tags;
     int release;
+    public static final String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
     public MTitle(){
 
     }

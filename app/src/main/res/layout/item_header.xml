@@ -83,7 +83,7 @@
                 android:foreground="?android:attr/selectableItemBackground"
                 android:padding="6dp"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/star_off" />
+                app:srcCompat="@drawable/ic_favorite_border" />
 
             <ImageView
                 android:id="@+id/HeaderBookmark"
@@ -95,7 +95,7 @@
                 android:padding="6dp"
                 android:scaleType="centerCrop"
                 android:textColor="@android:color/white"
-                app:srcCompat="@drawable/bookmark_off" />
+                app:srcCompat="@drawable/ic_bookmark_border" />
 
             <Button
                 android:id="@+id/HeaderDownload"

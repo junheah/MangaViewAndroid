@@ -26,6 +26,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.mangaview.MTitle.releases;
 
 
 public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -34,7 +35,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
-    String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
     Boolean favorite = false;
     Boolean bookmarked = false;
     TypedValue outValue;
@@ -106,10 +106,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h.h_author.setText(header.getAuthor());
             if(release>-1) h.h_release.setText(releases[release]);
             else h.h_release.setText("");
-            if(favorite) h.h_star.setImageResource(R.drawable.star_on);
-            else h.h_star.setImageResource(R.drawable.star_off);
-            if(bookmarked) h.h_bookmark.setImageResource(R.drawable.bookmark_on);
-            else h.h_bookmark.setImageResource(R.drawable.bookmark_off);
+            if(favorite) h.h_star.setImageResource(R.drawable.ic_favorite);
+            else h.h_star.setImageResource(R.drawable.ic_favorite_border);
+            if(bookmarked) h.h_bookmark.setImageResource(R.drawable.ic_bookmark);
+            else h.h_bookmark.setImageResource(R.drawable.ic_bookmark_border);
 
             if(!save) Glide.with(mainContext)
                     .load(thumb)
