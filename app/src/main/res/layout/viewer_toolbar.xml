@@ -39,7 +39,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/moreBtn"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/stat_notify_chat" />
+        app:srcCompat="@drawable/ic_comments" />
 
     <ImageButton
         android:id="@+id/moreBtn"
