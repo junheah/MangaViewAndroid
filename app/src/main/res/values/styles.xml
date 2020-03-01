@@ -23,6 +23,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppThemeBlackNoTitle" parent="AppThemeDark">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:itemBackground">@android:color/black</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
     <style name="AppThemeDark" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimary</item>

@@ -39,6 +39,10 @@ public class Preference {
 //    String session;
     Boolean autoUrl;
 
+    public SharedPreferences getSharedPref(){
+        return this.sharedPref;
+    }
+
     //Offline manga has id of -1
     public Preference(Context context){
         init(context);

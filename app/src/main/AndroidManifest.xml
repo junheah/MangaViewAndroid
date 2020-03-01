@@ -16,6 +16,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -37,6 +39,7 @@
             android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -94,7 +97,12 @@
         <activity
             android:name=".activity.CaptchaActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".activity.FirstTimeActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/AppThemeBlackNoTitle"/>
     </application>
 
 </manifest>

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -23,6 +24,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import com.google.android.material.navigation.NavigationView;
@@ -77,6 +80,7 @@ import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -87,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     FloatingActionButton advSearchBtn;
     TextView noresult;
     private EditText searchBox;
-    public Context context = this;
+    private Context context = this;
     ProgressDialog pd;
     Search search;
     TitleAdapter searchAdapter, recentAdapter, favoriteAdapter, offlineAdapter;
@@ -104,6 +108,7 @@ public class MainActivity extends AppCompatActivity
     NotificationManager notificationManager;
     Toolbar toolbar;
     MainAdapter mainadapter;
+    private static final int FIRST_TIME_ACTIVITY = 9;
 
 
     @Override
@@ -111,16 +116,22 @@ public class MainActivity extends AppCompatActivity
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+
+        if(!p.getSharedPref().getBoolean("eula",false)){
+            startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
+        }else {
+            activityInit();
+        }
 
 //        //captcha test
 //        Intent captchaIntent = new Intent(context, CaptchaActivity.class);
 //        startActivity(captchaIntent);
 
-
+    }
+    private void activityInit(){
+        setContentView(R.layout.activity_main);
         //check prefs
         if(!p.check()){
             //popup to fix preferences
@@ -588,6 +599,13 @@ public class MainActivity extends AppCompatActivity
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == FIRST_TIME_ACTIVITY){
+            if(resultCode == RESULT_EULA_AGREE) {
+                activityInit();
+            }else
+                finish();
+            return;
+        }
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case 1:
