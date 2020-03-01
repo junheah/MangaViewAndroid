@@ -66,25 +66,90 @@
                     android:textColor="@android:color/darker_gray"
                     android:textSize="12sp"
                     app:layout_constraintHeight_min="15sp"
-                    app:layout_constraintBottom_toTopOf="@+id/TitleTag"
+                    app:layout_constraintBottom_toTopOf="@+id/TitleCounterContainer"
                     app:layout_constraintEnd_toStartOf="@+id/epsButton"
                     app:layout_constraintStart_toEndOf="@+id/Thumb"
                     app:layout_constraintTop_toBottomOf="@+id/Title"/>
 
-                <TextView
-                    android:id="@+id/TitleTag"
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/TitleCounterContainer"
                     android:layout_width="0dp"
-                    android:layout_height="15sp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
-                    android:singleLine="true"
-                    android:text="태그1 태그2 태그3"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="11sp"
+                    app:layout_constraintBottom_toTopOf="@+id/TitleTagContainer"
+                    app:layout_constraintEnd_toStartOf="@+id/epsButton"
+                    app:layout_constraintStart_toEndOf="@+id/Thumb">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/ic_thumb" />
+                    <TextView
+                        android:id="@+id/TitleRecommend_c"
+                        android:textSize="11sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="추천" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/ic_smile" />
+                    <TextView
+                        android:id="@+id/TitleBattery_c"
+                        android:textSize="11sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="인기" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/ic_comment" />
+                    <TextView
+                        android:id="@+id/TitleComment_c"
+                        android:textSize="11sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="댓글" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/ic_bookmark" />
+                    <TextView
+                        android:id="@+id/TitleBookmark_c"
+                        android:textSize="11sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="북마크" />
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/TitleTagContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/epsButton"
-                    app:layout_constraintStart_toEndOf="@+id/Thumb"/>
+                    app:layout_constraintStart_toEndOf="@+id/Thumb">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/ic_tag" />
+                    <TextView
+                        android:id="@+id/TitleTag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text="태그1 태그2 태그3"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="11sp"/>
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <Button
                     android:id="@+id/epsButton"

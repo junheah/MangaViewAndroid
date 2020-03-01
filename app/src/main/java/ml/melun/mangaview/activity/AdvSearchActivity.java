@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.Arrays;
@@ -26,7 +27,9 @@ public class AdvSearchActivity extends AppCompatActivity {
     RecyclerView tr, rr, nr;
     LinearLayoutManager tm, rm, nm;
     Spinner searchMethod;
+    Spinner sortMethod;
     Button search;
+    EditText input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,9 @@ public class AdvSearchActivity extends AppCompatActivity {
         context = this;
 
         searchMethod = this.findViewById(R.id.searchMethod);
+        sortMethod = this.findViewById(R.id.searchSort);
         search = this.findViewById(R.id.advSearch);
+        input = this.findViewById(R.id.searchInput);
 
         if(p.getDarkTheme()) searchMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
 
@@ -93,7 +98,7 @@ public class AdvSearchActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String query = "search_type="+(searchMethod.getSelectedItemPosition()+1)+"&0=&_1="+na.getSelectedIndex()+"&_2="+ra.getSelectedIndex()+"&_3="+ta.getSelectedValues();
+                String query = "search_type="+(searchMethod.getSelectedItemPosition()+1)+"&_0="+input.getText()+"&_1="+na.getSelectedIndex()+"&_2="+ra.getSelectedIndex()+"&_3="+ta.getSelectedValues()+"&_4="+sortMethod.getSelectedItemPosition();
                 Intent searchActivity = new Intent(context, TagSearchActivity.class);
                 searchActivity.putExtra("query", query);
                 searchActivity.putExtra("mode", 6);

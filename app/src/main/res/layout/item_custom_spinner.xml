@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:scaleType="center"
-        android:layout_width="wrap_content"
+        android:scaleType="centerInside"
+        android:layout_width="27dp"
         android:layout_height="match_parent"
-        app:srcCompat="@drawable/ic_list_24px" />
+        app:srcCompat="@drawable/ic_list" />
 </RelativeLayout>

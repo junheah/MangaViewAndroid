@@ -17,7 +17,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="2dp"
         android:minHeight="60dp"
-        android:text="contentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontentcontent"
+        android:text="content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/comment_icon"
@@ -33,7 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:foreground="@drawable/button_bg"
-        app:srcCompat="@drawable/ic_launcher_background" />
+        app:srcCompat="@mipmap/ic_launcher" />
 
     <TextView
         android:id="@+id/comment_time"

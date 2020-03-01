@@ -62,6 +62,7 @@ public class CustomHttpClient {
             response = this.client.newCall(request).execute();
         }catch (Exception e){
             e.printStackTrace();
+            return null;
         }
         return response;
     }

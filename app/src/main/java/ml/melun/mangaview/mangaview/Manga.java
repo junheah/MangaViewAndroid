@@ -29,6 +29,7 @@ import okhttp3.Response;
      */
 
 public class Manga {
+
     public Manga(int i, String n, String d) {
         id = i;
         name = n;
@@ -48,6 +49,7 @@ public class Manga {
     }
 
     public void setImgs(List<String> imgs){
+        this.reported = false;
         this.imgs = imgs;
     }
 
@@ -60,6 +62,7 @@ public class Manga {
         fetch(client, true);
     }
     public void fetch(CustomHttpClient client, Boolean doLogin) {
+        mode = 0;
         imgs = new ArrayList<>();
         imgs1 = new ArrayList<>();
         eps = new ArrayList<>();
@@ -315,9 +318,9 @@ public class Manga {
     Title title;
     String date;
     int seed;
-    int mode = 0;
+    int mode;
     Listener listener;
-    Boolean reported = false;
+    Boolean reported;
 
     public interface Listener{
         void setMessage(String msg);

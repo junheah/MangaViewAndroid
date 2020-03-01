@@ -9,45 +9,35 @@ import org.jsoup.nodes.Element;
 import okhttp3.Response;
 
 
-public class Title {
+public class Title extends MTitle {
 
-    public Title(String n, String t, String a, List<String> tg, int r) {
-        name = n;
-        thumb = t;
-        author = a;
-        tags = tg;
-        release = r;
-        id = -1;
-    }
+    public static final int BATTERY_EMPTY = 0;
+    public static final int BATTERY_ONE_QUARTER = 1;
+    public static final int BATTERY_HALF = 2;
+    public static final int BATTERY_THREE_QUARTER = 3;
+    public static final int BATTERY_FULL = 4;
 
     public Title(String n, String t, String a, List<String> tg, int r, int id) {
-        name = n;
-        thumb = t;
-        author = a;
-        tags = tg;
-        release = r;
+        super(n, id, t, a, tg, r);
+    }
+
+    public Title(String n, String t, String a, List<String> tg, int r, int id, int rc, int bc, int cc, int bmc) {
+        super(n, id, t, a, tg, r);
         this.id = id;
+        this.rc = rc;
+        this.bc = bc;
+        this.cc = cc;
+        this.bmc = bmc;
     }
 
-    public int getId() {
-        return id;
+    public Title(MTitle title){
+        super(title.getName(), title.getId(), title.getThumb(), title.getAuthor(), title.getTags(), title.getRelease());
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return ((Title)obj).getId() == this.id;
-    }
 
-    public String getName() {
-        return name;
-    }
-    public String getThumb() {
-        return thumb;
-    }
     public List<Manga> getEps(){
         return eps;
     }
-    public int getRelease() { return release; }
 
     public Boolean getBookmarked() {
         if(bookmarked==null) return false;
@@ -90,6 +80,51 @@ public class Title {
             }catch (Exception e){
 
             }
+
+            //fetch recommend buttons
+            Element btns = items.selectFirst("div.btns");
+            try{
+                //rc
+                rc = Integer.parseInt(btns.selectFirst("i.fa.fa-thumbs-up").ownText().replaceAll(",",""));
+            }catch (Exception e){
+                rc = -1;
+                //e.printStackTrace();
+            }
+
+            try {
+                //bc
+                String battery = btns.selectFirst("div.recommend.red").getAllElements().last().className();
+                if(battery.contains("battery-empty")){
+                    this.bc = BATTERY_EMPTY;
+                }else if(battery.contains("battery-quarter")){
+                    this.bc = BATTERY_ONE_QUARTER;
+                }else if(battery.contains("battery-half")) {
+                    this.bc = BATTERY_HALF;
+                }else if(battery.contains("battery-three-quarters")){
+                    this.bc = BATTERY_THREE_QUARTER;
+                }else if(battery.contains("battery-full")){
+                    this.bc = BATTERY_FULL;
+                }
+            }catch (Exception e){
+                this.bc = -1;
+                //e.printStackTrace();
+            }
+
+            //cc
+            try{
+                cc = Integer.parseInt(btns.selectFirst("i.fa.fa-comment").ownText().replaceAll(",",""));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            //bmc
+            try{
+                bmc = Integer.parseInt(btns.selectFirst("i.fa.fa-bookmark").ownText().replaceAll(",",""));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+
             Element bookmark = items.selectFirst("div.favorit");
             bookmarked = bookmark.attr("class").contains("active");
             bookmarkLink = bookmark.attr("onclick").split("='")[1].split("'")[0];
@@ -106,34 +141,11 @@ public class Title {
     }
 
 
-    public String getAuthor(){
-        if(author==null) return "";
-        return author;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    public void setThumb(String thumb) {
-        this.thumb = thumb;
-    }
     public int getBookmark(){
         return bookmark;
     }
     public int getEpsCount(){ return eps.size();}
-    public List<String> getTags(){
-        if(tags==null) return new ArrayList<>();
-        return tags;
-    }
+
     public Boolean isNew() throws Exception{
         if(eps!=null){
             return eps.get(0).getName().split(" ")[0].contains("NEW");
@@ -159,19 +171,57 @@ public class Title {
         return new Title(name, thumb, author, tags, release, id);
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getBattery_c() {
+        return bc;
     }
 
-    private String name;
-    private int id;
-    private String thumb;
-    private List<Manga> eps;
-    int bookmark;
-    String author;
-    List<String> tags;
-    int release;
-    Boolean bookmarked;
-    String bookmarkLink;
+    public void setBattery_c(int battery_c) {
+        this.bc = battery_c;
+    }
+
+    public int getRecommend_c() {
+        return rc;
+    }
+
+    public void setRecommend_c(int recommend_c) {
+        this.rc = recommend_c;
+    }
+
+    public int getComment_c() {
+        return cc;
+    }
+
+    public void setComment_c(int comment_c) {
+        this.cc = comment_c;
+    }
+
+    public int getBookmark_c() {
+        return bmc;
+    }
+
+    public void setBookmark_c(int bookmark_c) {
+        this.bmc = bookmark_c;
+    }
+
+    public String getBattery_s(){
+        return (bc *25)+"%";
+    }
+
+    public boolean hasCounter(){
+        return !(bc==0 && rc==0 && cc==0 && bmc==0);
+    }
+
+    public MTitle minimize(){
+        return new MTitle(name, id, thumb, author, tags, release);
+    }
+
+    private List<Manga> eps = null;
+    int bookmark =0;
+    Boolean bookmarked = false;
+    String bookmarkLink = "";
+    int bc = 0;
+    int rc = 0;
+    int cc = 0;
+    int bmc = 0;
 }
 

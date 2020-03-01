@@ -24,6 +24,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.showPopup;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -302,6 +303,14 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 p.setLeftRight(isChecked);
+            }
+        });
+
+        this.findViewById(R.id.setting_dataManage).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopup(context, "알림", "준비중인 기능입니다.");
+                // TODO implement this
             }
         });
 

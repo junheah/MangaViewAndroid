@@ -87,8 +87,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-
-
     <!--<ImageButton-->
         <!--android:id="@+id/refreshButton"-->
         <!--android:layout_width="wrap_content"-->
@@ -139,6 +137,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_menu_open_24px" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

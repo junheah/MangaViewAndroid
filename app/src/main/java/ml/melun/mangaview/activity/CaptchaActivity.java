@@ -12,6 +12,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Login;
@@ -24,6 +27,7 @@ import static ml.melun.mangaview.Utils.showErrorPopup;
 public class CaptchaActivity extends AppCompatActivity {
     WebView webView;
     public static final int RESULT_CAPTCHA = 15;
+    String domain = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,13 @@ public class CaptchaActivity extends AppCompatActivity {
         Context context = this;
         setContentView(R.layout.activity_captcha);
         String purl = p.getUrl();
+
+        try {
+            URL u = new URL(purl);
+            domain = u.getHost();
+        }catch (MalformedURLException e){
+            showErrorPopup(context, "URL 형식이 올바르지 않습니다.", e, true);
+        }
 
         if(purl.contains("http://")){
             showErrorPopup(context, "ip 주소 혹은 잘못된 주소를 사용중입니다. 자동 URL 설정을 사용하거나, 주소를 다시 입력해 주세요", null, false);
@@ -68,7 +79,7 @@ public class CaptchaActivity extends AppCompatActivity {
                 } else if(url.contains("favicon.ico")){
                     count--;
                     super.onLoadResource(view, url);
-                } else if(url.contains(purl)) {
+                } else if(url.toLowerCase().contains(domain.toLowerCase())) {
                     if(count == 1) count--;
                     super.onLoadResource(view, url);
                 }

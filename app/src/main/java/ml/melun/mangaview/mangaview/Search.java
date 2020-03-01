@@ -9,6 +9,12 @@ import java.util.List;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.mangaview.Title.BATTERY_EMPTY;
+import static ml.melun.mangaview.mangaview.Title.BATTERY_FULL;
+import static ml.melun.mangaview.mangaview.Title.BATTERY_HALF;
+import static ml.melun.mangaview.mangaview.Title.BATTERY_ONE_QUARTER;
+import static ml.melun.mangaview.mangaview.Title.BATTERY_THREE_QUARTER;
+
 public class Search {
     /* mode
     * 0 : 제목
@@ -69,7 +75,7 @@ public class Search {
                         searchUrl = "/bbs/search.php?stx=";
                         break;
                     case 1:
-                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=4&stx=";
+                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=5&stx=";
                         break;
                     case 2:
                         searchUrl = "/bbs/page.php?hid=manga_list&sfl=3&stx=";
@@ -118,7 +124,54 @@ public class Search {
                     }catch (Exception e){
                         //e.printStackTrace();
                     }
-                    result.add(new Title(ntmp, ttmp, atmp, tags, release, Integer.parseInt(idtmp)));
+
+
+
+                    int recommend_c=-1, battery_c=-1, comment_c=-1, bookmark_c=-1;
+                    //fetch recommend buttons
+                    try{
+                        //rc
+                        recommend_c = Integer.parseInt(item.selectFirst("i.fa.fa-thumbs-up").ownText().replaceAll(",",""));
+                    }catch (Exception e){
+                        recommend_c = -1;
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        //bc
+                        String battery = item.selectFirst("i.fa.fa-smile-o").getAllElements().last().className();
+                        if(battery.contains("battery-empty")){
+                            battery_c = BATTERY_EMPTY;
+                        }else if(battery.contains("battery-quarter")){
+                            battery_c = BATTERY_ONE_QUARTER;
+                        }else if(battery.contains("battery-half")) {
+                            battery_c = BATTERY_HALF;
+                        }else if(battery.contains("battery-three-quarters")){
+                            battery_c = BATTERY_THREE_QUARTER;
+                        }else if(battery.contains("battery-full")){
+                            battery_c = BATTERY_FULL;
+                        }
+                    }catch (Exception e){
+                        battery_c = -1;
+                        e.printStackTrace();
+                    }
+
+                    //cc
+                    try{
+                        comment_c = Integer.parseInt(item.selectFirst("i.fa.fa-comment").ownText().replaceAll(",",""));
+                    }catch (Exception e){
+
+                    }
+
+                    //bmc
+                    try{
+                        bookmark_c = Integer.parseInt(item.selectFirst("i.fa.fa-bookmark").ownText().replaceAll(",",""));
+                    }catch (Exception e){
+
+                    }
+
+
+                    result.add(new Title(ntmp, ttmp, atmp, tags, release, Integer.parseInt(idtmp), recommend_c, battery_c, comment_c, bookmark_c));
                 }
                 if (items.size() < 30) last = true;
                 response.close();

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -23,6 +24,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import com.google.android.material.navigation.NavigationView;
@@ -59,6 +62,7 @@ import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.MainAdapter;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -76,6 +80,7 @@ import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -86,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     FloatingActionButton advSearchBtn;
     TextView noresult;
     private EditText searchBox;
-    public Context context = this;
+    private Context context = this;
     ProgressDialog pd;
     Search search;
     TitleAdapter searchAdapter, recentAdapter, favoriteAdapter, offlineAdapter;
@@ -103,6 +108,7 @@ public class MainActivity extends AppCompatActivity
     NotificationManager notificationManager;
     Toolbar toolbar;
     MainAdapter mainadapter;
+    private static final int FIRST_TIME_ACTIVITY = 9;
 
 
     @Override
@@ -110,16 +116,22 @@ public class MainActivity extends AppCompatActivity
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+
+        if(!p.getSharedPref().getBoolean("eula",false)){
+            startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
+        }else {
+            activityInit();
+        }
 
 //        //captcha test
 //        Intent captchaIntent = new Intent(context, CaptchaActivity.class);
 //        startActivity(captchaIntent);
 
-
+    }
+    private void activityInit(){
+        setContentView(R.layout.activity_main);
         //check prefs
         if(!p.check()){
             //popup to fix preferences
@@ -587,6 +599,13 @@ public class MainActivity extends AppCompatActivity
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == FIRST_TIME_ACTIVITY){
+            if(resultCode == RESULT_EULA_AGREE) {
+                activityInit();
+            }else
+                finish();
+            return;
+        }
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case 1:
@@ -699,7 +718,7 @@ public class MainActivity extends AppCompatActivity
                                 titles.add(title);
                             }catch (Exception e){
                                 e.printStackTrace();
-                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1, 0));
                             }
                         }else if(data.exists()){
                             try {
@@ -708,10 +727,10 @@ public class MainActivity extends AppCompatActivity
                                 titles.add(title);
                             }catch (Exception e){
                                 e.printStackTrace();
-                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                                titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1, 0));
                             }
 
-                        } else titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1));
+                        } else titles.add(new Title(f.getName(),"","",new ArrayList<String>(),-1, 0));
                     }
                 }
                 //add titles to adapter
@@ -842,9 +861,9 @@ public class MainActivity extends AppCompatActivity
             }
 
 
-            List<Title> recents = p.getRecent();
+            List<MTitle> recents = p.getRecent();
             sum += recents.size();
-            List<Title> favorites = p.getFavorite();
+            List<MTitle> favorites = p.getFavorite();
             sum += favorites.size();
             JSONObject bookmarks = p.getBookmarkObject();
             sum += bookmarks.length();
@@ -887,9 +906,9 @@ public class MainActivity extends AppCompatActivity
             return 0;
         }
 
-        void removeDups(List<Title> titles){
+        void removeDups(List<MTitle> titles){
             for(int i=0; i<titles.size(); i++){
-                Title target = titles.get(i);
+                MTitle target = titles.get(i);
                 for(int j =0 ; j<titles.size(); j++){
                     if(j!=i && titles.get(j).getId() == target.getId()){
                         titles.remove(i);
@@ -900,11 +919,11 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        void titleList(List<Title> titles){
+        void titleList(List<MTitle> titles){
             for(int i = 0; i<titles.size(); i++){
                 current++;
                 publishProgress();
-                Title target = titles.get(i);
+                MTitle target = titles.get(i);
                 if(target.getId() <= 0){
                     int newId = findId(target);
                     if(newId<0){
@@ -918,10 +937,10 @@ public class MainActivity extends AppCompatActivity
         }
 
         int findId(String title){
-            return findId(new Title(title,"","",new ArrayList<>(),-1,-1));
+            return findId(new MTitle(title,-1,"", "",new ArrayList<>(),-1));
         }
 
-        int findId(Title title){
+        int findId(MTitle title){
             String name = title.getName();
             Search s = new Search(name,0);
             while(!s.isLast()){

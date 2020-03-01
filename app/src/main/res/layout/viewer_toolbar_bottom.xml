@@ -15,7 +15,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:paddingVertical="8dp"
         android:paddingHorizontal="3dp"
-        android:src="@android:drawable/ic_media_next"
+        app:srcCompat="@drawable/ic_arrow_right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -43,7 +43,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:paddingVertical="8dp"
         android:paddingHorizontal="3dp"
-        android:src="@android:drawable/ic_media_previous"
+        app:srcCompat="@drawable/ic_arrow_left"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/toolbar_spinner"
         app:layout_constraintTop_toTopOf="parent" />
