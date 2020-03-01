@@ -64,6 +64,12 @@
                 android:layout_height="wrap_content"
                 android:text="ddg bypass 테스트" />
 
+            <Button
+                android:id="@+id/debug_eula"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="eula 테스트" />
+
             <TextView
                 android:id="@+id/debug_out"
                 android:layout_width="match_parent"
