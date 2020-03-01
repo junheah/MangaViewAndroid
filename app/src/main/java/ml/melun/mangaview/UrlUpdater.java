@@ -26,7 +26,7 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
         Toast.makeText(c, "자동 URL 설정중...", Toast.LENGTH_SHORT).show();
     }
     protected Boolean doInBackground(Void... params) {
-        return directIpFetch() || ipFetch() || fetch();
+        return ipFetch() || fetch();
     }
 
     protected boolean directIpFetch(){

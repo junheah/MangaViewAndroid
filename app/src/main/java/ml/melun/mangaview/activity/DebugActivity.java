@@ -116,6 +116,13 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
+        this.findViewById(R.id.debug_eula).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, FirstTimeActivity.class));
+            }
+        });
+
         Button removeEps = this.findViewById(R.id.debug_removeEps);
         removeEps.setEnabled(false);
 //        removeEps.setOnClickListener(new View.OnClickListener() {
