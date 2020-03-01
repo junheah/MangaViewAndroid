@@ -20,6 +20,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
+            <EditText
+                android:layout_margin="12dp"
+                android:id="@+id/searchInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text=""
+                android:hint="검색어"/>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,8 +81,26 @@
                 android:paddingEnd="8dp"
                 android:paddingTop="12dp"
                 android:paddingStart="8dp"
-                android:text="검색 방법"
+                android:text="정렬"
                 android:textSize="16dp" />
+
+            <Spinner
+                android:id="@+id/searchSort"
+                android:entries="@array/searchSortMethod"
+                android:layout_margin="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="12dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="12dp"
+            android:paddingStart="8dp"
+            android:text="검색 방법"
+            android:textSize="16dp" />
 
             <Spinner
                 android:id="@+id/searchMethod"
@@ -80,6 +108,9 @@
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+
+
             <Button
                 android:id="@+id/advSearch"
                 android:layout_width="match_parent"

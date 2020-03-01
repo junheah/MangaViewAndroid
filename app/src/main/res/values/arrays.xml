@@ -88,4 +88,12 @@
         <item>학원</item>
         <item>호러</item>
     </string-array>
+
+    <string-array name="searchSortMethod">
+        <item>최신순</item>
+        <item>추천수</item>
+        <item>인기수</item>
+        <item>덧글수</item>
+        <item>북마크수</item>
+    </string-array>
 </resources>

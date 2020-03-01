@@ -77,7 +77,7 @@ public class Downloader extends Service {
         if(titles==null) titles = new ArrayList<>();
         if(selected==null) selected = new ArrayList<>();
         homeDir = new File(getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir","/sdcard/MangaView/saved"));
-        baseUrl = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "http://188.214.128.5");
+        baseUrl = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "https://manamoa.net/");
         if(dt==null) dt = new downloadTitle();
         //android O bullshit
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -75,7 +75,7 @@ public class Search {
                         searchUrl = "/bbs/search.php?stx=";
                         break;
                     case 1:
-                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=4&stx=";
+                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=5&stx=";
                         break;
                     case 2:
                         searchUrl = "/bbs/page.php?hid=manga_list&sfl=3&stx=";
