@@ -415,9 +415,6 @@ public class ViewerActivity extends AppCompatActivity {
             if (pd.isShowing()) {
                 pd.dismiss();
             }
-            if(manga.getReported()){
-                showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
-            }
         }
     }
 

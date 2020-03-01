@@ -362,9 +362,6 @@ public class ViewerActivity3 extends AppCompatActivity {
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
             reloadManga();
-            if(manga.getReported()){
-                showPopup(context,"이미지 로드 실패", "문제가 접수된 게시물 입니다. 이미지가 제대로 보이지 않을 수 있습니다.");
-            }
             if(pd.isShowing()) pd.dismiss();
         }
     }
