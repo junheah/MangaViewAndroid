@@ -43,7 +43,10 @@ public class AdvSearchActivity extends AppCompatActivity {
         search = this.findViewById(R.id.advSearch);
         input = this.findViewById(R.id.searchInput);
 
-        if(p.getDarkTheme()) searchMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        if(p.getDarkTheme()) {
+            searchMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+            sortMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        }
 
         nr = this.findViewById(R.id.search_name);
         rr = this.findViewById(R.id.search_release);
