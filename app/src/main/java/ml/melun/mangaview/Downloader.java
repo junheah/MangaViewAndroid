@@ -40,6 +40,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.mangaview.Decoder;
+import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -49,7 +50,7 @@ import static ml.melun.mangaview.Utils.filterFolder;
 public class Downloader extends Service {
     File homeDir;
     String baseUrl;
-    ArrayList<Title> titles;
+    ArrayList<DownloadTitle> titles;
     ArrayList<JSONArray> selected;
     float progress = 0;
     int maxProgress=1000;
@@ -111,7 +112,7 @@ public class Downloader extends Service {
                     startNotification();
                     if (dt == null) dt = new downloadTitle();
                     try {
-                        Title target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+                        DownloadTitle target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<DownloadTitle>() {
                         }.getType());
                         JSONArray selection = new JSONArray(intent.getStringExtra("selected"));
                         queueTitle(target, selection);
@@ -145,7 +146,7 @@ public class Downloader extends Service {
         return null;
     }
 
-    public void queueTitle(Title title, JSONArray selection){
+    public void queueTitle(DownloadTitle title, JSONArray selection){
         titles.add(title);
         selected.add(selection);
         updateNotification("");
@@ -245,13 +246,13 @@ public class Downloader extends Service {
                     progress = 0;
 
                     //mget item from queue
-                    Title title = titles.get(0);
+                    DownloadTitle title = titles.get(0);
                     JSONArray selectedEps = selected.get(0);
 
                     notiTitle = title.getName();
                     updateNotification("준비중");
 
-                    if (title.getEps() == null) title.fetchEps(httpClient);
+                    //if (title.getEps() == null) title.fetchEps(httpClient);
                     List<Manga> mangas = title.getEps();
 
                     float stepSize = maxProgress / selectedEps.length();

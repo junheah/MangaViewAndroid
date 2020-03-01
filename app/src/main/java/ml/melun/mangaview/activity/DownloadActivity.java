@@ -21,6 +21,7 @@ import org.json.JSONArray;
 import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.SelectEpisodeAdapter;
+import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.p;
@@ -115,7 +116,7 @@ public class DownloadActivity extends AppCompatActivity {
                         //check if download service is up and running
                         Intent downloader = new Intent(getApplicationContext(),Downloader.class);
                         downloader.setAction(Downloader.ACTION_QUEUE);
-                        downloader.putExtra("title", new Gson().toJson(title));
+                        downloader.putExtra("title", new Gson().toJson(new DownloadTitle(title)));
                         downloader.putExtra("selected", selected.toString());
 
                         if (Build.VERSION.SDK_INT >= 26) {
