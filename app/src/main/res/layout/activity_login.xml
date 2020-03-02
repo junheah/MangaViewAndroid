@@ -80,7 +80,8 @@
                 android:background="@drawable/button_bg"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:text="MangaView 좋아요를 북마크로 내보내기"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:visibility="gone"/>
         </LinearLayout>
     </ScrollView>
 

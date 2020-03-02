@@ -3,6 +3,7 @@ package ml.melun.mangaview.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +30,7 @@ import ml.melun.mangaview.mangaview.Login;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.mangaview.Bookmark.importBookmark;
 
 /**
  * A login screen that offers login via email/password.
@@ -104,12 +106,47 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
-            ((Button)this.findViewById(R.id.bookmark_list_button)).setOnClickListener(new OnClickListener() {
+            this.findViewById(R.id.bookmark_list_button).setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent i = new Intent(context, TagSearchActivity.class);
                     i.putExtra("mode",7);
                     startActivity(i);
+                }
+            });
+
+            this.findViewById(R.id.bookmark_import_button).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AsyncTask<Void, Void, Integer>(){
+                        ProgressDialog pd;
+                        @Override
+                        protected void onPreExecute() {
+                            super.onPreExecute();
+                            if(p.getDarkTheme()) pd = new ProgressDialog(context, R.style.darkDialog);
+                            else pd = new ProgressDialog(context);
+                            pd.setMessage("불러오는중");
+                            pd.setCancelable(false);
+                            pd.show();
+                        }
+
+                        @Override
+                        protected void onPostExecute(Integer integer) {
+                            super.onPostExecute(integer);
+                            if (pd.isShowing()) {
+                                pd.dismiss();
+                            }
+                            if(integer == 0)
+                                Toast.makeText(context, "작업을 성공적으로 완료했습니다.", Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(context, "작업을 실패했습니다.", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        protected Integer doInBackground(Void... voids) {
+                            return importBookmark(p, httpClient);
+                        }
+                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
         }

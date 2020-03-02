@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.Preference;
 import okhttp3.Response;
 
 public class Bookmark {
@@ -72,5 +73,26 @@ public class Bookmark {
 
     public List<MTitle> getResult(){
         return this.result;
+    }
+
+    public static int importBookmark(Preference p, CustomHttpClient client){
+        try {
+            Bookmark b = new Bookmark();
+            List<MTitle> bookmarks = new ArrayList<>();
+            while (!b.isLast()) {
+                if (b.fetch(client) == 0)
+                    bookmarks.addAll(b.getResult());
+                else
+                    return 1;
+            }
+
+            for (MTitle t : bookmarks) {
+                if (p.findFavorite(t) < 0)
+                    p.toggleFavorite(t, 0);
+            }
+        }catch (Exception e){
+            return 1;
+        }
+        return 0;
     }
 }

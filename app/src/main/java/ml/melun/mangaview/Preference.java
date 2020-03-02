@@ -329,9 +329,12 @@ public class Preference {
     }
 
     public Boolean toggleFavorite(Title tmp, int position){
-        int index = findFavorite(tmp);
+            return toggleFavorite(tmp.minimize(), position);
+    }
+
+    public Boolean toggleFavorite(MTitle title, int position){
+        int index = findFavorite(title);
         if(index==-1){
-            Title title = tmp.clone();
             favorite.add(position,title);
             Gson gson = new Gson();
             prefsEditor.putString("favorite", gson.toJson(favorite));
