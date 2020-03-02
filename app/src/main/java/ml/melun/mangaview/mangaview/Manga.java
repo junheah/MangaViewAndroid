@@ -85,7 +85,6 @@ public class Manga {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 //StringBuffer buffer = new StringBuffer();
                 String line = "";
-                long basetime = System.currentTimeMillis();
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
                     //save as raw html for jsoup
@@ -151,10 +150,6 @@ public class Manga {
                     //if(imgs.size()>0 && eps.size()>0) break;
                 }
 
-                long tmpTime = System.currentTimeMillis();
-                System.out.println("pppppp  " + (tmpTime-basetime));
-                basetime = tmpTime;
-
                 //jsoup parsing
                 Document doc = Jsoup.parse(sb.toString());
 
@@ -209,10 +204,6 @@ public class Manga {
                     level = Integer.parseInt(c.selectFirst("span.lv-icon").text());
                     bcomments.add(new Comment(user, timestamp, icon, content,indent, likes, level));
                 }
-
-                tmpTime = System.currentTimeMillis();
-                System.out.println("pppppp  " + (tmpTime-basetime));
-                basetime = tmpTime;
 
             } catch (Exception e) {
                 e.printStackTrace();

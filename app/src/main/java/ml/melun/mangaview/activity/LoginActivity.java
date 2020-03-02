@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.AsyncTask;
 
 import android.os.Build;
@@ -51,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private View accountPanel;
     private Button logoutBtn;
     Context context;
 
@@ -62,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Set up the login form.
         context = this;
+        accountPanel = this.findViewById(R.id.account_panel);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -89,17 +93,28 @@ public class LoginActivity extends AppCompatActivity {
 
         if(p.getLogin() != null && p.getLogin().isValid()){
             mLoginFormView.setVisibility(View.GONE);
-            logoutBtn.setVisibility(View.VISIBLE);
+
+            accountPanel.setVisibility(View.VISIBLE);
+            logoutBtn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    p.setLogin(null);
+                    mLoginFormView.setVisibility(View.VISIBLE);
+                    accountPanel.setVisibility(View.GONE);
+                }
+            });
+
+            ((Button)this.findViewById(R.id.bookmark_list_button)).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(context, TagSearchActivity.class);
+                    i.putExtra("mode",7);
+                    startActivity(i);
+                }
+            });
         }
 
-        logoutBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                p.setLogin(null);
-                mLoginFormView.setVisibility(View.VISIBLE);
-                logoutBtn.setVisibility(View.GONE);
-            }
-        });
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item){

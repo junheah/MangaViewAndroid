@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -297,13 +298,16 @@ public class EpisodeActivity extends AppCompatActivity {
 
             @Override
             public void onBookmarkClick() {
-                new AsyncTask<Void,Void, Void>(){
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        title.toggleBookmark(httpClient);
-                        return null;
-                    }
-                }.execute();
+                if(mode == 0 && p.getLogin() != null && p.getLogin().isValid()) {
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            title.toggleBookmark(httpClient);
+                            return null;
+                        }
+                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }else
+                    Toast.makeText(context, "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
             }
 
             @Override

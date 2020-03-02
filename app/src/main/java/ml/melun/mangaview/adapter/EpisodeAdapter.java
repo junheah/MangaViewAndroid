@@ -122,10 +122,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             if(mode == 0){
                 h.h_download.setVisibility(View.VISIBLE);
-                if(login)
-                    h.h_bookmark.setVisibility(View.VISIBLE);
-                else
-                    h.h_bookmark.setVisibility(View.GONE);
 
                 //set ext-info text
                 h.h_recommend_c.setText(String.valueOf(title.getRecommend_c()));
@@ -227,8 +223,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 public void onClick(View v) {
                     //set bookmark
                     mClickListener.onBookmarkClick();
-                    bookmarked = !bookmarked;
-                    notifyItemChanged(0);
+                    if(login) {
+                        bookmarked = !bookmarked;
+                        notifyItemChanged(0);
+                    }
                 }
             });
             h_star.setOnClickListener(new View.OnClickListener() {
