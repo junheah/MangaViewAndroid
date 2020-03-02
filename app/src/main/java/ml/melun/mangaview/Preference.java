@@ -193,7 +193,7 @@ public class Preference {
         if(tmp.getId()>0) {
             int position = getIndexOf(tmp);
             if (position > -1) {
-                recent.add(0, tmp);
+                recent.add(0, recent.get(position));
                 recent.remove(position + 1);
             } else recent.add(0, tmp);
             writeRecent();
@@ -204,7 +204,7 @@ public class Preference {
             MTitle title = tmp.minimize();
             int position = getIndexOf(title);
             if (position > -1) {
-                recent.add(0, title);
+                recent.add(0, recent.get(position));
                 recent.remove(position + 1);
             } else recent.add(0, title);
             writeRecent();
@@ -224,6 +224,7 @@ public class Preference {
             prefsEditor.commit();
         }
     }
+
     public void updateRecentData(Title title){
         MTitle tmp = title.minimize();
         recent.set(0, tmp);
@@ -344,6 +345,7 @@ public class Preference {
             return false;
         }
     }
+
     public int findFavorite(MTitle title){
         if(title.getId()>0){
             return favorite.indexOf(title);

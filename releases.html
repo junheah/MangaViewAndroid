@@ -24,6 +24,7 @@
         var releaselink = "";
         var page=0;
         var last=false;
+        var totalDownloadCount = 0;
         function GetReleases() {
             if(!last){
                 ++page;
@@ -41,6 +42,7 @@
                         for (var i2 = 0; i2 < release.assets.length; i2++) {
                             downloadCount += release.assets[i2].download_count;
                         }
+                        totalDownloadCount += downloadCount;
                         var updatedAt = moment(asset.updated_at);
                         previousUpdatedAt = updatedAt;
                         $(".table-downloads tbody")
@@ -72,6 +74,7 @@
                     $("table-downloads").fadeIn();
                     if(last) document.getElementById("more").style.display = "none";
                     else document.getElementById("more").disabled = false;
+                    console.log(totalDownloadCount);
                 });
             }
         }
