@@ -31,6 +31,7 @@ public class CaptchaActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         super.onCreate(savedInstanceState);
         Context context = this;
         setContentView(R.layout.activity_captcha);
@@ -106,5 +107,11 @@ public class CaptchaActivity extends AppCompatActivity {
         webView.clearHistory();
         webView.clearCache(true);
         webView.destroy();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        this.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }

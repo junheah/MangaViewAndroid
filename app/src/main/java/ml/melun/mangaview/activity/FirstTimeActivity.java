@@ -23,6 +23,8 @@ public class FirstTimeActivity extends AppCompatActivity {
         setResult(RESULT_EULA_DISAGREE);
         this.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_first_time);
+
+        p.getSharedPref().edit().putBoolean("eula", false).commit();
         this.findViewById(R.id.eulaAgreeBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

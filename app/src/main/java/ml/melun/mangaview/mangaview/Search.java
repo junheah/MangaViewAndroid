@@ -107,25 +107,22 @@ public class Search {
                     String idtmp = manga_subject.attr("href").split("manga_id=")[1];
                     String ttmp = (item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
                     String atmp = "";
-                    try {
-                        atmp = item.selectFirst("div.author").selectFirst("div").text();
-                    } catch (Exception e) {
-                        //e.printStackTrace();
-                    }
+
+                    Element ae = item.selectFirst("div.author");
+                    if(ae!= null)
+                        atmp = ae.selectFirst("div").text();
+
                     List<String> tags = new ArrayList<>();
-                    try {
-                        tags = item.selectFirst("div.tags").select("a").eachText();
-                    } catch (Exception e) {
-                        //e.printStackTrace();
-                    }
+
+                    Element te = item.selectFirst("div.tags");
+                    if(te != null)
+                        tags = te.select("a").eachText();
+
                     int release = -1;
-                    try{
-                        release = Integer.parseInt(item.selectFirst("div.publish-type").attr("onclick").split("\\(")[1].split("\\)")[0]);
-                    }catch (Exception e){
-                        //e.printStackTrace();
-                    }
 
-
+                    Element re = item.selectFirst("div.publish-type");
+                    if(re != null)
+                        release = Integer.parseInt(re.attr("onclick").split("\\(")[1].split("\\)")[0]);
 
                     int recommend_c=-1, battery_c=-1, comment_c=-1, bookmark_c=-1;
                     //fetch recommend buttons

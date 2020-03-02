@@ -78,16 +78,17 @@ public class Manga {
             cookie.put("last_page",String.valueOf(0));
 
             Response response = client.mget("/bbs/board.php?bo_table=manga&wr_id="+id, doLogin, cookie);
+            StringBuilder sb = new StringBuilder();
             try {
                 InputStream stream = response.body().byteStream();
                 if(listener!=null) listener.setMessage("페이지 읽는중");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
                 //StringBuffer buffer = new StringBuffer();
                 String line = "";
-                String raw = "";
                 while ((line = reader.readLine()) != null) {
+                    sb.append(line);
                     //save as raw html for jsoup
-                    raw += line;
+                    //raw += line;
                     if(line.contains("var img_list =")) {
                         if(listener!=null) listener.setMessage("이미지 리스트 읽는중");
                         String imgStr = line;
@@ -150,7 +151,7 @@ public class Manga {
                 }
 
                 //jsoup parsing
-                Document doc = Jsoup.parse(raw);
+                Document doc = Jsoup.parse(sb.toString());
 
                 //parse title
                 if(title==null){

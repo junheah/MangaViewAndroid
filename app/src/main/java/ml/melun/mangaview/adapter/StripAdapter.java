@@ -84,12 +84,12 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     }
 
     void glideBind(ViewHolder holder, int pos){
-        if(autoCut) {
+        if (autoCut) {
             final int position = pos / 2;
             final int type = pos % 2;
-            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(position) : imgs.get(position);
-            if(error && !useSecond){
-                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+            String image = useSecond && imgs1 != null && imgs1.size() > 0 ? imgs1.get(position) : imgs.get(position);
+            if (error && !useSecond) {
+                image = image.indexOf("img.") > -1 ? image.replace("img.", "s3.") : image.replace("://", "://s3.");
             }
             //set image to holder view
             Glide.with(mainContext)
@@ -98,25 +98,25 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                            bitmap = d.decode(bitmap,width);
+                            bitmap = d.decode(bitmap, width);
                             int width = bitmap.getWidth();
                             int height = bitmap.getHeight();
-                            if(width>height){
-                                if(type==0) {
+                            if (width > height) {
+                                if (type == 0) {
                                     if (reverse)
                                         holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, width / 2, height));
                                     else
                                         holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, width / 2, 0, width / 2, height));
-                                }else{
+                                } else {
                                     if (reverse)
                                         holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, width / 2, 0, width / 2, height));
                                     else
                                         holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, width / 2, height));
                                 }
-                            }else{
-                                if(type==0) {
+                            } else {
+                                if (type == 0) {
                                     holder.frame.setImageBitmap(bitmap);
-                                }else{
+                                } else {
                                     holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap.getWidth(), 1, Bitmap.Config.ARGB_8888));
                                 }
                             }
@@ -131,24 +131,23 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
 
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                            if(imgs.size()>0) {
+                            if (imgs.size() > 0) {
                                 holder.frame.setImageResource(R.drawable.placeholder);
                                 holder.refresh.setVisibility(View.VISIBLE);
-                                if(!error){
+                                if (!error) {
                                     error = true;
-                                    glideBind(holder,pos);
-                                }else{
+                                    glideBind(holder, pos);
+                                } else {
                                     useSecond = true;
-                                    glideBind(holder,pos);
+                                    glideBind(holder, pos);
                                 }
                             }
                         }
                     });
-        }
-        else {
-            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(pos) : imgs.get(pos);
-            if(error && !useSecond){
-                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
+        } else {
+            String image = useSecond && imgs1 != null && imgs1.size() > 0 ? imgs1.get(pos) : imgs.get(pos);
+            if (error && !useSecond) {
+                image = image.indexOf("img.") > -1 ? image.replace("img.", "s3.") : image.replace("://", "://s3.");
             }
             Glide.with(mainContext)
                     .asBitmap()
@@ -175,7 +174,7 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
                                 if (!error) {
                                     error = true;
                                     glideBind(holder, pos);
-                                } else if(!useSecond) {
+                                } else if (!useSecond) {
                                     useSecond = true;
                                     glideBind(holder, pos);
                                 }

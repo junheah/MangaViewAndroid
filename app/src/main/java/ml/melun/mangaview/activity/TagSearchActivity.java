@@ -21,6 +21,7 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirec
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.UpdatedAdapter;
+import ml.melun.mangaview.mangaview.Bookmark;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -43,6 +44,7 @@ public class TagSearchActivity extends AppCompatActivity {
     UpdatedList updated;
     TextView noresult;
     SwipyRefreshLayout swipe;
+    Bookmark bookmark;
 
 
     @Override
@@ -80,12 +82,16 @@ public class TagSearchActivity extends AppCompatActivity {
             case 6:
                 ab.setTitle("검색결과");
                 break;
+            case 7:
+                ab.setTitle("북마크");
+                break;
         }
-        ab.setDisplayHomeAsUpEnabled(true);
 
-        if(mode == 5){
+        ab.setDisplayHomeAsUpEnabled(true);
+        swipe.setRefreshing(true);
+
+        if(mode == 5) {
             uadapter = new UpdatedAdapter(context);
-            swipe.setRefreshing(true);
             updated = new UpdatedList();
             getUpdated gu = new getUpdated();
             gu.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -98,9 +104,24 @@ public class TagSearchActivity extends AppCompatActivity {
                     } else swipe.setRefreshing(false);
                 }
             });
+
+        }else if(mode == 7){
+            adapter = new TitleAdapter(context);
+            bookmark = new Bookmark();
+            getBookmarks gb = new getBookmarks();
+            gb.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh(SwipyRefreshLayoutDirection direction) {
+                    if (!bookmark.isLast()) {
+                        getBookmarks gb = new getBookmarks();
+                        gb.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    } else swipe.setRefreshing(false);
+                }
+            });
+
         }else {
             adapter = new TitleAdapter(context);
-            swipe.setRefreshing(true);
             search = new Search(query,mode);
             searchManga sm = new searchManga();
             sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -122,6 +143,62 @@ public class TagSearchActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private class getBookmarks extends AsyncTask<Void, Void, Integer>{
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            if(integer != 0){
+                showCaptchaPopup(context);
+            }
+            if(adapter.getItemCount()==0) {
+                adapter.addData(bookmark.getResult());
+                searchResult.setAdapter(adapter);
+                adapter.setClickListener(new TitleAdapter.ItemClickListener() {
+                    @Override
+                    public void onResumeClick(int position, int id) {
+                        Intent viewer = viewerIntent(context, new Manga(id,"",""));
+                        viewer.putExtra("online",true);
+                        startActivity(viewer);
+                    }
+
+                    @Override
+                    public void onItemClick(int position) {
+                        // start intent : Episode viewer
+                        Title selected = adapter.getItem(position);
+                        Intent episodeView = episodeIntent(context, selected);
+                        episodeView.putExtra("online", true);
+                        startActivity(episodeView);
+                    }
+
+                    @Override
+                    public void onLongClick(View view, int position) {
+                        popup(view, position, adapter.getItem(position), 0);
+                    }
+                });
+            }else{
+                adapter.addData(bookmark.getResult());
+            }
+
+            if(adapter.getItemCount()>0) {
+                noresult.setVisibility(View.GONE);
+            }else{
+                noresult.setVisibility(View.VISIBLE);
+            }
+            swipe.setRefreshing(false);
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return bookmark.fetch(httpClient);
+        }
     }
 
 
