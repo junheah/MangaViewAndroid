@@ -25,6 +25,8 @@ import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
+import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SELECT;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -120,22 +122,6 @@ public class SettingsActivity extends AppCompatActivity {
                 p.setDarkTheme(isChecked);
             }
         });
-//
-//        s_scroll = this.findViewById(R.id.setting_scroll);
-//        s_scroll_switch = this.findViewById(R.id.setting_scroll_switch);
-//        s_scroll_spinner.setChecked(p.getScrollViewer());
-//        s_scroll.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                s_scroll_switch.toggle();
-//            }
-//        });
-//        s_scroll_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                p.setScrollViewer(isChecked);
-//            }
-//        });
 
         s_viewer = this.findViewById(R.id.setting_viewer);
         s_viewer_spinner = this.findViewById(R.id.setting_viewer_spinner);
@@ -309,8 +295,10 @@ public class SettingsActivity extends AppCompatActivity {
         this.findViewById(R.id.setting_dataManage).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPopup(context, "알림", "준비중인 기능입니다.");
-                // TODO implement this
+                Intent intent = new Intent(context, FolderSelectActivity.class);
+                intent.putExtra("mode", MODE_FILE_SAVE);
+                intent.putExtra("title", "설정 파일 선택");
+                startActivity(intent);
             }
         });
 

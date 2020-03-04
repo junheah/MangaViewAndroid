@@ -58,7 +58,6 @@ public class Preference {
             if(favorite==null) favorite = new ArrayList<>();
             homeDir = sharedPref.getString("homeDir","/sdcard/MangaView/saved");
             volumeControl = sharedPref.getBoolean("volumeControl",false);
-            //pagebookmark = {id:page}
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
             bookmark = new JSONObject(sharedPref.getString("bookmark2", "{}"));
             darkTheme = sharedPref.getBoolean("darkTheme", false);
@@ -70,7 +69,6 @@ public class Preference {
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
-//            session = sharedPref.getString("session", "");
             autoUrl = sharedPref.getBoolean("autoUrl", true);
 //            if(login != null && login.isValid()){
 //                setSession(login.getCookie());

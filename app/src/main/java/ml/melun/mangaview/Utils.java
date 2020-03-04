@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
@@ -25,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Login;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 import okhttp3.FormBody;
@@ -412,57 +415,6 @@ public class Utils {
         return false;
     }
 
-
-//    static public void checkCaptcha(Preference p, Context context, Runnable callback){
-//        String url = p.getUrl();
-//
-//        System.out.println("pppp checkcaptcha create!");
-//        WebView webView = new WebView(context);
-//
-//        WebSettings settings = webView.getSettings();
-//        settings.setJavaScriptEnabled(true);
-//        CookieManager cookiem = CookieManager.getInstance();
-//        cookiem.removeAllCookie();
-//
-//        webView.setWebViewClient(new WebViewClient() {
-//            boolean catchNextRequest = false;
-//
-//            public boolean shouldOverrideUrlLoading(WebView view, String url){
-//                System.out.println("ppp" + url);
-//                String cookies = CookieManager.getInstance().getCookie(url);
-//                if(catchNextRequest){
-//                    String cookieStr = cookiem.getCookie(url);
-//                    for(String s: cookieStr.split(";")){
-//                        if(s.contains("PHPSESSID=")){
-//                            String cookie = s.substring(s.indexOf("=")+1);
-//                            callback.run();
-//                            break;
-//                        }
-//                    }
-//                } else if(url.contains("sign_captcha.php")) {
-//                    catchNextRequest = true;
-//                    view.loadUrl(url);
-//                }else
-//                    view.loadUrl(url);
-//                return false; // then it is not handled by default action
-//            }
-//        });
-//
-//        Map<String, String> headers = new HashMap<>();
-//        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-//
-//        Login login = p.getLogin();
-//
-//        // if logged-in, mget session from login
-//        if(login != null && login.isValid()){
-//            cookiem.setCookie(p.getUrl(), login.getCookie(true));
-//        }else if(p.login.getCookie().length()>0){
-//            // else, use session
-//            cookiem.setCookie(p.getUrl(), "PHPSESSID=" + p.login.getCookie() + "; ");
-//        }
-//        webView.loadUrl(url, headers);
-//    }
-
     public static void hideSpinnerDropDown(Spinner spinner) {
         try {
             Method method = Spinner.class.getDeclaredMethod("onDetachedFromWindow");
@@ -470,6 +422,35 @@ public class Utils {
             method.invoke(spinner);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void writePreferenceToFile(File f){
+        try {
+//            Gson gson = new Gson();
+//            recent = gson.fromJson(sharedPref.getString("recent", ""), new TypeToken<ArrayList<MTitle>>() {
+//            }.getType());
+//            if (recent == null) recent = new ArrayList<>();
+//            favorite = gson.fromJson(sharedPref.getString("favorite", ""), new TypeToken<ArrayList<MTitle>>() {
+//            }.getType());
+//            if (favorite == null) favorite = new ArrayList<>();
+//            homeDir = sharedPref.getString("homeDir", "/sdcard/MangaView/saved");
+//            volumeControl = sharedPref.getBoolean("volumeControl", false);
+//            pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
+//            bookmark = new JSONObject(sharedPref.getString("bookmark2", "{}"));
+//            darkTheme = sharedPref.getBoolean("darkTheme", false);
+//            viewerType = sharedPref.getInt("viewerType", 0);
+//            reverse = sharedPref.getBoolean("pageReverse", false);
+//            dataSave = sharedPref.getBoolean("dataSave", false);
+//            startTab = sharedPref.getInt("startTab", 0);
+//            url = sharedPref.getString("url", defUrl);
+//            stretch = sharedPref.getBoolean("stretch", false);
+//            leftRight = sharedPref.getBoolean("leftRight", false);
+//            login = gson.fromJson(sharedPref.getString("login", "{}"), new TypeToken<Login>() {
+//            }.getType());
+//            autoUrl = sharedPref.getBoolean("autoUrl", true);
+        }catch (Exception e){
+
         }
     }
 }

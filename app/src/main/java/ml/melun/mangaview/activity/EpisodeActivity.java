@@ -181,7 +181,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 episodes =  title.getEps();
                 offlineEpisodes = new ArrayList<>();
                 for(File folder : getOfflineEpisodes()){
-                    //get id from folders
+                    //get id from listContent
                     String name = folder.getName();
                     try {
                         int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)),"",""));
