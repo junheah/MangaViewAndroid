@@ -59,9 +59,12 @@ public class Manga {
     }
 
     public void fetch(CustomHttpClient client){
-        fetch(client, true);
+        fetch(client, true ,null);
     }
-    public void fetch(CustomHttpClient client, Boolean doLogin) {
+    public void fetch(CustomHttpClient client, Map<String,String> cookies){
+        fetch(client, false, cookies);
+    }
+    public void fetch(CustomHttpClient client, Boolean doLogin, Map<String,String> cookies) {
         mode = 0;
         imgs = new ArrayList<>();
         imgs1 = new ArrayList<>();
@@ -73,9 +76,13 @@ public class Manga {
 
         while(imgs.size()==0 && tries < 2) {
             Map<String,String> cookie = new HashMap<>();
-            cookie.put("last_wr_id",String.valueOf(id));
-            cookie.put("last_percent",String.valueOf(1));
-            cookie.put("last_page",String.valueOf(0));
+            if(doLogin) {
+                cookie.put("last_wr_id", String.valueOf(id));
+                cookie.put("last_percent", String.valueOf(1));
+                cookie.put("last_page", String.valueOf(0));
+            }
+            if(cookies != null)
+                cookie.putAll(cookies);
 
             Response response = client.mget("/bbs/board.php?bo_table=manga&wr_id="+id, doLogin, cookie);
             StringBuilder sb = new StringBuilder();
@@ -164,45 +171,50 @@ public class Manga {
                 this.name = doc.selectFirst("div.toon-title").ownText();
 
                 if(listener!=null) listener.setMessage("댓글 읽는중");
-
-                Elements cs = doc.select("section.comment-media").last().select("div.media");
-                for(Element c:cs){
-                    String icon, user, timestamp, content;
-                    int indent, likes, level;
-                    Elements i = c.select("img");
-                    if(!i.isEmpty()) {
-                        icon = i.get(0).attr("src");
-                    }else icon = "";
-                    user = c.selectFirst("span.member").ownText();
-                    timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
-                    content = c.selectFirst("div.media-content").selectFirst("textarea").ownText();
-                    String indentStr = c.attr("style");
-                    if(indentStr.length()>0) {
-                        String indentStrSplit = indentStr.split(":")[1].split("px")[0];
-                        int indentRaw = Integer.parseInt(indentStrSplit);
-                        indent = indentRaw / 64;
-                    }else indent = 0;
-                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
-                    level = Integer.parseInt(c.selectFirst("span.lv-icon").text());
-                    comments.add(new Comment(user, timestamp, icon, content,indent, likes, level));
+                Elements cs = doc.select("section.comment-media");
+                if(cs != null) {
+                    cs = cs.last().select("div.media");
+                    for (Element c : cs) {
+                        String icon, user, timestamp, content;
+                        int indent, likes, level;
+                        Elements i = c.select("img");
+                        if (!i.isEmpty()) {
+                            icon = i.get(0).attr("src");
+                        } else icon = "";
+                        user = c.selectFirst("span.member").ownText();
+                        timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
+                        content = c.selectFirst("div.media-content").selectFirst("textarea").ownText();
+                        String indentStr = c.attr("style");
+                        if (indentStr.length() > 0) {
+                            String indentStrSplit = indentStr.split(":")[1].split("px")[0];
+                            int indentRaw = Integer.parseInt(indentStrSplit);
+                            indent = indentRaw / 64;
+                        } else indent = 0;
+                        likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
+                        level = Integer.parseInt(c.selectFirst("span.lv-icon").text());
+                        comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
+                    }
                 }
 
-                cs = doc.select("section.comment-media.best-comment").last().select("div.media");
-                for(Element c:cs){
-                    String icon, user, timestamp, content;
-                    int indent, likes, level;
-                    Elements i = c.select("img");
-                    if(!i.isEmpty()) {
-                        icon = i.get(0).attr("src");
-                    }else icon = "";
-                    user = c.selectFirst("span.member").ownText();
-                    timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
-                    content = c.selectFirst("div.commtent-content").ownText();
-                    String indentStr = c.attr("style");
-                    indent = 0;
-                    likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
-                    level = Integer.parseInt(c.selectFirst("span.lv-icon").text());
-                    bcomments.add(new Comment(user, timestamp, icon, content,indent, likes, level));
+                cs = doc.select("section.comment-media.best-comment");
+                if(cs != null) {
+                    cs = cs.last().select("div.media");
+                    for (Element c : cs) {
+                        String icon, user, timestamp, content;
+                        int indent, likes, level;
+                        Elements i = c.select("img");
+                        if (!i.isEmpty()) {
+                            icon = i.get(0).attr("src");
+                        } else icon = "";
+                        user = c.selectFirst("span.member").ownText();
+                        timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
+                        content = c.selectFirst("div.commtent-content").ownText();
+                        String indentStr = c.attr("style");
+                        indent = 0;
+                        likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
+                        level = Integer.parseInt(c.selectFirst("span.lv-icon").text());
+                        bcomments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
+                    }
                 }
 
             } catch (Exception e) {

@@ -19,6 +19,8 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -93,7 +95,7 @@ public class NoticesActivity extends AppCompatActivity {
                 if(title == null)
                     list[i] = "";
                 else
-                    list[i] = notices.get(i).getTitle();
+                    list[i] = notices.get(i).getId() + ". " + title;
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
             //populate listview and set click listener
@@ -131,6 +133,7 @@ public class NoticesActivity extends AppCompatActivity {
             }
             return 0;
         }
+
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
@@ -141,8 +144,16 @@ public class NoticesActivity extends AppCompatActivity {
                         if(index>-1) notices.set(index, n);
                         else notices.add(n);
                     }
-
                 }
+                Collections.sort(notices, new Comparator<Notice>() {
+                    @Override
+                    public int compare(Notice n1, Notice n2) {
+                        if(n1.getId() < n2.getId())
+                            return 1;
+                        else
+                            return -1;
+                    }
+                });
             }catch (Exception e){
                 //probably offline
             }

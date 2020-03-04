@@ -29,16 +29,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import ml.melun.mangaview.activity.MainActivity;
+import ml.melun.mangaview.mangaview.Cloudflare;
 import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.Manga;
@@ -71,6 +75,7 @@ public class Downloader extends Service {
     PendingIntent pendingIntent;
     PendingIntent stopIntent;
     Context serviceContext;
+    Map<String, String> cookies;
 
     @Override
     public void onCreate() {
@@ -231,6 +236,7 @@ public class Downloader extends Service {
     private class downloadTitle extends AsyncTask<Void,Void,Integer> {
         protected void onPreExecute() {
             super.onPreExecute();
+            cookies = new HashMap<>();
             running = true;
         }
         protected Integer doInBackground(Void... params) {
@@ -269,16 +275,6 @@ public class Downloader extends Service {
                                 //save thumbnail
                                 String thumb = downloadFile(title.getThumb(), new File(titleDir, "thumb")).getName();
                                 title.setThumb(thumb);
-                                //if first manga, save title data & id list to title.data as JSON
-                                //title.removeEps();
-//                                JSONObject json = new JSONObject();
-//                                json.put("title", new JSONObject(new Gson().toJson(title)));
-//                                JSONArray ids = new JSONArray();
-//                                for (int i = mangas.size() - 1; i >= 0; i--) {
-//                                    //save manga id to JSONArray
-//                                    ids.put(mangas.mget(i).getId());
-//                                }
-//                                json.put("ids", ids);
 
                                 //if old title.data exist, remove file
                                 File old = new File(titleDir,"title.data");
@@ -305,10 +301,26 @@ public class Downloader extends Service {
                             this.cancel(true);
                             return 2;
                         }
-                        Manga target = mangas.get(listIndex);
 
-                        //fetch info of target
-                        target.fetch(httpClient, true);
+                        Manga target = mangas.get(listIndex);
+                        //error
+                        int cf_tries = 3;
+                        while(cf_tries>0){
+                            target.fetch(httpClient, cookies);
+                            if(target.getImgs().size() == 0) {
+                                //update cf cookie
+                                Cloudflare cf = new Cloudflare(baseUrl);
+                                List<HttpCookie> cookiel = cf.getCookies();
+                                if (cookiel != null) {
+                                    for (HttpCookie c : cookiel) {
+                                        cookies.put(c.getName(), c.getValue());
+                                    }
+                                }
+                            }else
+                                break;
+                            cf_tries--;
+                        }
+
                         Decoder d = new Decoder(target.getSeed(), target.getId());
                         List<String> urls = target.getImgs();
                         List<String> urls1 = target.getImgs(true);

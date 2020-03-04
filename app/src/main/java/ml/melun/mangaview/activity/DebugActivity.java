@@ -159,7 +159,7 @@ public class DebugActivity extends AppCompatActivity {
                 //String fetchUrl = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=1639778";
                 String fetchUrl = p.getUrl();
 
-                new AsyncTask<Void,Void,Map<String,String>>(){
+                new AsyncTask<Void,Void,List<HttpCookie>>(){
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
@@ -167,24 +167,24 @@ public class DebugActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    protected Map<String,String> doInBackground(Void... voids) {
+                    protected List<HttpCookie> doInBackground(Void... voids) {
                         Cloudflare cf = new Cloudflare(fetchUrl);
                         return cf.getCookies();
                     }
 
                     @Override
-                    protected void onPostExecute(Map<String, String> res) {
+                    protected void onPostExecute(List<HttpCookie> res) {
                         if(res == null){
                             printLine("cf-scrape fail");
                         }else{
                             printLine("cf-scrape success");
-                            for(Map.Entry<String,String> item : res.entrySet()){
-                                printLine(item.getKey() + " " + item.getValue());
+                            for(HttpCookie item : res){
+                                printLine(item.getName() + " " + item.getValue());
                             }
                         }
                         cfBtn.setEnabled(true);
                     }
-                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }.execute();
 
             }
         });
@@ -274,6 +274,7 @@ public class DebugActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.debug_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -284,7 +285,6 @@ public class DebugActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     private class ddgBypassTest extends AsyncTask<Void, Void, Integer> {
         String result = "";

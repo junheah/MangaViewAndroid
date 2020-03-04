@@ -1,7 +1,7 @@
 package ml.melun.mangaview.mangaview;
 
 /*
-original code: https://github.com/zhkrb/cloudflare-scrape-Android
+original code : https://github.com/zhkrb/cloudflare-scrape-Android/
 
 MIT License
 
@@ -29,6 +29,7 @@ SOFTWARE.
 import android.net.Uri;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.ArrayMap;
 import android.util.Log;
 
 import com.eclipsesource.v8.V8;
@@ -54,32 +55,24 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ml.melun.mangaview.R;
-import okhttp3.FormBody;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-import static ml.melun.mangaview.MainApplication.httpClient;
-
 //TODO SSLSocketFactory setEnabledCipherSuites
 //ECDHE-ECDSA-AES128-GCM-SHA256
 
 public class Cloudflare {
 
     private String mUrl;
+    private String mUser_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
     private int mRetry_count;
     private URL ConnUrl;
-    private Map<String, String> cookies = new HashMap<>();
+    private List<HttpCookie> mCookieList;
+    private CookieManager mCookieManager;
+    private HttpURLConnection mCheckConn;
+    private HttpURLConnection mGetMainConn;
+    private HttpURLConnection mGetRedirectionConn;
 
     private static final int MAX_COUNT = 3;
     private static final int CONN_TIMEOUT = 60000;
-
-    private final Map<String, String> originalHeader = new HashMap<String, String>() {
-        {
-            put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-            put("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3");
-        }
-    };
+    private static final String ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3";
 
     private boolean canVisit = false;
     private boolean hasNewUrl = false;  //when cf return 301 you need to change old url to new url;
@@ -88,12 +81,30 @@ public class Cloudflare {
         mUrl = url;
     }
 
-    public Map<String,String> getCookies(){
+    public Cloudflare(String url, String user_agent) {
+        mUrl = url;
+        mUser_agent = user_agent;
+    }
+
+    public String getUser_agent() {
+        return mUser_agent;
+    }
+
+    public void setUser_agent(String user_agent) {
+        mUser_agent = user_agent;
+    }
+
+    public List<HttpCookie> getCookies(){
+        mCookieManager = new CookieManager();
+        mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL); //接受所有cookies
+        CookieHandler.setDefault(mCookieManager);
+        HttpURLConnection.setFollowRedirects(false);
         while (!canVisit){
             if (mRetry_count>MAX_COUNT){
                 break;
             }
             try {
+
                 int responseCode = checkUrl();
                 if (responseCode==200){
                     canVisit=true;
@@ -101,9 +112,10 @@ public class Cloudflare {
                 }else {
                     getVisiteCookie();
                 }
-            } catch (IOException | RuntimeException | InterruptedException e) {
-                if (cookies!=null){
-                    cookies.clear();
+            } catch (IOException| RuntimeException | InterruptedException e) {
+                if (mCookieList!=null){
+                    mCookieList= new ArrayList<>(mCookieList);
+                    mCookieList.clear();
                 }
                 e.printStackTrace();
             } finally {
@@ -111,50 +123,63 @@ public class Cloudflare {
             }
             mRetry_count++;
         }
-        if(canVisit)
-            return cookies;
-        else
+        if (canVisit){
+            return mCookieList;
+        }else {
             return null;
-
+        }
     }
 
 
+
     private void getVisiteCookie() throws IOException, InterruptedException {
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.putAll(originalHeader);
         ConnUrl = new URL(mUrl);
-        //mGetMainConn.setRequestMethod("GET");
-
-        headers.put("referer", mUrl);
-        setCookies(headers);
-        for(Map.Entry<String, String> item : headers.entrySet())
-            System.out.println("pppp" + item.getKey() +" " + item.getValue());
-        Response r = httpClient.get(mUrl, headers);
-
-        switch (r.code()){
+        mGetMainConn = (HttpURLConnection) ConnUrl.openConnection();
+        mGetMainConn.setRequestMethod("GET");
+        mGetMainConn.setConnectTimeout(CONN_TIMEOUT);
+        mGetMainConn.setReadTimeout(CONN_TIMEOUT);
+        if (!TextUtils.isEmpty(mUser_agent)){
+            mGetMainConn.setRequestProperty("user-agent",mUser_agent);
+        }
+        mGetMainConn.setRequestProperty("accept",ACCEPT);
+        mGetMainConn.setRequestProperty("referer", mUrl);
+        if (mCookieList!=null&&mCookieList.size()>0){
+            mGetMainConn.setRequestProperty("cookie",listToString(mCookieList));
+        }
+        mGetMainConn.setUseCaches(false);
+        mGetMainConn.connect();
+        switch (mGetMainConn.getResponseCode()){
             case HttpURLConnection.HTTP_OK:
                 e("MainUrl","visit website success");
-                updateCookies(r);
-                checkCookie(cookies);
+                mCookieList = mCookieManager.getCookieStore().getCookies();
+                checkCookie(mCookieList);
                 return;
             case HttpURLConnection.HTTP_MOVED_PERM:
             case HttpURLConnection.HTTP_MOVED_TEMP:
-                mUrl = r.header("Location");
-                updateCookies(r);
-                checkCookie(cookies);
+                mUrl = mGetMainConn.getHeaderField("Location");
+                mCookieList = mCookieManager.getCookieStore().getCookies();
+                checkCookie(mCookieList);
                 e("MainUrl","HTTP 301 :"+mUrl);
                 return;
             case HttpURLConnection.HTTP_FORBIDDEN:
                 e("MainUrl","IP block or cookie err");
                 return;
             case HttpURLConnection.HTTP_UNAVAILABLE:
-                updateCookies(r);
-                String str = r.body().string();
-                System.out.println("PPPPPP" +str);
+                InputStream mInputStream = mCheckConn.getErrorStream();
+                BufferedReader mBufferedReader = new BufferedReader(new InputStreamReader(mInputStream));
+                StringBuilder sb = new StringBuilder();
+                String str;
+                while ((str = mBufferedReader.readLine()) != null){
+                    sb.append(str);
+                }
+                mInputStream.close();
+                mBufferedReader.close();
+                mCookieList = mCookieManager.getCookieStore().getCookies();
+                str = sb.toString();
                 getCheckAnswer(str);
                 break;
             default:
-                e("MainUrl","UnCatch Http code: "+r.header("Location"));
+                e("MainUrl","UnCatch Http code: "+mGetMainConn.getHeaderField("Location"));
                 break;
         }
     }
@@ -208,100 +233,109 @@ public class Cloudflare {
     }
 
     private void getRedirectResponse(AnswerBean answerBean) throws IOException {
-        //header
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.putAll(originalHeader);
-        headers.put("referer", mUrl);
-        setCookies(headers);
+        HttpURLConnection.setFollowRedirects(false);
+        mGetRedirectionConn = (HttpURLConnection) new URL(answerBean.getHost()).openConnection();
 
-        Response r;
-        if(answerBean.getMethod() == AnswerBean.GET){
-            r = httpClient.get(answerBean.getHost(), headers);
-        }else{
-            headers.put("Content-Type", "application/x-www-form-urlencoded");
-            FormBody.Builder body = new FormBody.Builder();
-            for(Map.Entry<String, String> entry :answerBean.getFromData().entrySet()){
-                body.add(entry.getKey(), entry.getValue());
-            }
-            r = httpClient.post(answerBean.getHost(), body.build(), headers);
+        mGetRedirectionConn.setRequestMethod(answerBean.getMethod() == AnswerBean.GET ? "GET" : "POST");
+        mGetRedirectionConn.setConnectTimeout(CONN_TIMEOUT);
+        mGetRedirectionConn.setReadTimeout(CONN_TIMEOUT);
+        mGetRedirectionConn.setDoInput(true);
+        mGetRedirectionConn.setDoOutput(true);
+        mGetRedirectionConn.setUseCaches(false);
+        if (!TextUtils.isEmpty(mUser_agent)){
+            mGetRedirectionConn.setRequestProperty("user-agent",mUser_agent);
         }
-
-        switch (r.code()){
+        mGetRedirectionConn.setRequestProperty("accept",ACCEPT);
+        mGetRedirectionConn.setRequestProperty("referer", mUrl);
+        if (mCookieList!=null&&mCookieList.size()>0){
+            mGetRedirectionConn.setRequestProperty("cookie",listToString(mCookieList));
+        }
+        mGetRedirectionConn.setUseCaches(false);
+        if (answerBean.getMethod() == AnswerBean.POST){
+            mGetRedirectionConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        }
+        mGetRedirectionConn.connect();
+        if (answerBean.getMethod() == AnswerBean.POST){
+            StringBuilder stringBuilder = new StringBuilder();
+            for(Map.Entry<String, String> entry :answerBean.getFromData().entrySet()){
+                stringBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length()-1);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(mGetRedirectionConn.getOutputStream(), "UTF-8"));
+            writer.write(stringBuilder.toString());
+            writer.close();
+        }
+        switch (mGetRedirectionConn.getResponseCode()){
             case HttpURLConnection.HTTP_OK:
-                updateCookies(r);
+                mCookieList = mCookieManager.getCookieStore().getCookies();
                 break;
             case HttpURLConnection.HTTP_MOVED_TEMP:
-                updateCookies(r);
-                checkCookie(cookies);
+                mCookieList = mCookieManager.getCookieStore().getCookies();
+                checkCookie(mCookieList);
                 break;
-            default:throw new IOException("getOtherResponse Code: "+ r.code());
+            default:throw new IOException("getOtherResponse Code: "+
+                    mGetRedirectionConn.getResponseCode());
         }
     }
 
-    private void checkCookie(Map<String, String> cookieList) {
+    private void checkCookie(List<HttpCookie> cookieList) {
         if (cookieList == null || cookieList.size() <= 1){
             return;
         }
-        Map<String, String> a = new HashMap<>();
-        Map.Entry<String,String> newestCookie = null;
-        for (Map.Entry<String, String> item : cookieList.entrySet()){
-            if (!item.getKey().equals("_cfduid")){
+        List<HttpCookie> a = new ArrayList<>();
+        HttpCookie newestCookie = null;
+        for (int i =0;i<cookieList.size();i++){
+            if (!cookieList.get(i).getName().equals("_cfduid")){
                 continue;
             }
             if (newestCookie == null){
-                newestCookie = item;
+                newestCookie = cookieList.get(i);
                 continue;
             }
-            a.put(newestCookie.getKey(), newestCookie.getValue());
-            newestCookie = item;
+            a.add(newestCookie);
+            newestCookie = cookieList.get(i);
         }
         if (a.size()>0){
-            for(String k: a.keySet()){
-                cookieList.remove(k);
-            }
+            cookieList.removeAll(a);
         }
     }
 
-    private void setCookies(Map<String, String> header){
-        if (cookies!=null&&cookies.size()>0) {
-            StringBuilder csb = new StringBuilder();
-            for(String k : cookies.keySet()){
-                csb.append(k);
-                csb.append('=');
-                csb.append(cookies.get(k));
-                csb.append("; ");
-            }
-            csb.delete(csb.length()-2, csb.length());
-            header.put("cookie",csb.toString());
-        }
-    }
 
     private int checkUrl()throws IOException {
         URL ConnUrl = new URL(mUrl);
-        Map<String, String> headers = new HashMap<String, String>();
-        headers.putAll(originalHeader);
-        headers.put("referer", mUrl);
-        setCookies(headers);
-        return httpClient.get(mUrl, headers).code();
+        mCheckConn = (HttpURLConnection) ConnUrl.openConnection();
+        mCheckConn.setRequestMethod("GET");
+        mCheckConn.setConnectTimeout(CONN_TIMEOUT);
+        mCheckConn.setReadTimeout(CONN_TIMEOUT);
+        if (!TextUtils.isEmpty(mUser_agent)){
+            mCheckConn.setRequestProperty("user-agent",mUser_agent);
+        }
+        mCheckConn.setRequestProperty("accept",ACCEPT);
+        mCheckConn.setRequestProperty("referer",mUrl);
+        if (mCookieList!=null&&mCookieList.size()>0){
+            mCheckConn.setRequestProperty("cookie",listToString(mCookieList));
+        }
+        mCheckConn.setUseCaches(false);
+        mCheckConn.connect();
+        return mCheckConn.getResponseCode();
     }
 
     private void closeAllConn(){
-//        if (mCheckConn!=null){
-//            mCheckConn.disconnect();
-//        }
-//        if (mGetMainConn!=null){
-//            mGetMainConn.disconnect();
-//        }
-//        if (mGetRedirectionConn!=null){
-//            mGetRedirectionConn.disconnect();
-//        }
+        if (mCheckConn!=null){
+            mCheckConn.disconnect();
+        }
+        if (mGetMainConn!=null){
+            mGetMainConn.disconnect();
+        }
+        if (mGetRedirectionConn!=null){
+            mGetRedirectionConn.disconnect();
+        }
     }
 
-    private void updateCookies(Response r){
-        List<String>cstrs = r.headers("Set-Cookie");
-        for(String c : cstrs){
-            cookies.put(c.split("=")[0], c.substring(c.indexOf("=")+1,c.indexOf(";")));
-        }
+
+    public interface cfCallback{
+        void onSuccess(List<HttpCookie> cookieList, boolean hasNewUrl ,String newUrl);
+        void onFail();
     }
 
     private double get_answer(String str) {  //取值
