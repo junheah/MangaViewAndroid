@@ -26,7 +26,7 @@ public class CustomHttpClient {
     Map<String, String> cookies;
 
     public CustomHttpClient(Preference p){
-        System.out.println("http client init");
+        System.out.println("http client create");
         this.cookies = new HashMap<>();
         this.p = p;
         this.client = getUnsafeOkHttpClient()
@@ -137,7 +137,7 @@ public class CustomHttpClient {
 
     public Response post(String url, RequestBody body){
 //        if(!isloaded){
-//            cloudflareDns.init();
+//            cloudflareDns.create();
 //            isloaded = true;
 //        }
         return post(url, body, new HashMap<>());

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -30,17 +31,26 @@ public class ViewerPageFragment extends Fragment {
     int width;
     Boolean error = false;
     Boolean useSecond = false;
+
     public ViewerPageFragment(){
+
     }
-    public Fragment init(String image, String image1, Decoder decoder, int width, Context context, PageInterface i){
+    public ViewerPageFragment(String image, String image1, Decoder decoder, int width, Context context, PageInterface i){
         this.image = image;
         this.image1 = image1;
         this.decoder = decoder;
         this.width = width;
         this.context = context;
         this.i = i;
-        return this;
     }
+    public static Fragment create(String image, String image1, Decoder decoder, int width, Context context, PageInterface i){
+        return new ViewerPageFragment(image, image1, decoder, width, context, i);
+    }
+
+    public void updatePageFragment(Context context){
+        this.context = context;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -50,13 +60,17 @@ public class ViewerPageFragment extends Fragment {
         //glide
         frame.setImageResource(R.drawable.placeholder);
         refresh.setVisibility(View.VISIBLE);
-        loadImage(frame, refresh);
+
+        if(context != null)
+            loadImage(frame, refresh);
 
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                error = false;
-                loadImage(frame, refresh);
+                if(context != null) {
+                    error = false;
+                    loadImage(frame, refresh);
+                }
             }
         });
         rootView.setOnClickListener(new View.OnClickListener() {

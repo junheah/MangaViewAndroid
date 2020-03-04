@@ -416,7 +416,7 @@ public class Utils {
 //    static public void checkCaptcha(Preference p, Context context, Runnable callback){
 //        String url = p.getUrl();
 //
-//        System.out.println("pppp checkcaptcha init!");
+//        System.out.println("pppp checkcaptcha create!");
 //        WebView webView = new WebView(context);
 //
 //        WebSettings settings = webView.getSettings();

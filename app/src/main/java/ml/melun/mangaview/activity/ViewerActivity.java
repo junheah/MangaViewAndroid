@@ -85,6 +85,14 @@ public class ViewerActivity extends AppCompatActivity {
     boolean captchaChecked = false;
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("manga", new Gson().toJson(manga));
+        outState.putString("title", new Gson().toJson(title));
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
@@ -108,8 +116,17 @@ public class ViewerActivity extends AppCompatActivity {
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             intent = getIntent();
-            title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
-            manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
+            if(savedInstanceState == null) {
+                title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+                }.getType());
+                manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
+                }.getType());
+            }else{
+                title = new Gson().fromJson(savedInstanceState.getString("title"), new TypeToken<Title>() {
+                }.getType());
+                manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
+                }.getType());
+            }
 
             name = manga.getName();
             id = manga.getId();
@@ -361,6 +378,9 @@ public class ViewerActivity extends AppCompatActivity {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
 //    }
 
+
+
+
     private class loadImages extends AsyncTask<Void,String,Integer> {
         @Override
         protected void onProgressUpdate(String... values) {
@@ -465,9 +485,6 @@ public class ViewerActivity extends AppCompatActivity {
         result = new Intent();
         result.putExtra("id", id);
         setResult(RESULT_OK, result);
-        //update intent : not sure if this works TODO: test this
-        intent.putExtra("title", new Gson().toJson(title));
-        intent.putExtra("manga", new Gson().toJson(manga));
     }
 
     public void refreshAdapter(){

@@ -612,11 +612,13 @@ public class MainActivity extends AppCompatActivity
                 case 1:
                     //favorite result
                     Boolean favorite_after = data.getBooleanExtra("favorite",true);
-                    if(!favorite_after && favoriteAdapter != null) favoriteAdapter.remove(selectedPosition);
+                    if(!favorite_after && favoriteAdapter != null && favoriteAdapter.getItemCount()>0)
+                        favoriteAdapter.remove(selectedPosition);
                     break;
                 case 2:
                     //recent result
-                    if(recentAdapter != null)recentAdapter.moveItemToTop(selectedPosition);
+                    if(recentAdapter != null && recentAdapter.getItemCount()>0)
+                        recentAdapter.moveItemToTop(selectedPosition);
                     break;
 
             }
@@ -624,7 +626,8 @@ public class MainActivity extends AppCompatActivity
             switch(requestCode){
                 case 3:
                     //main page
-                    mainadapter.fetch();
+                    if(mainadapter!=null)
+                        mainadapter.fetch();
                     break;
                 case 4:
                     //search

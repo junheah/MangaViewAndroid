@@ -89,6 +89,13 @@ public class ViewerActivity2 extends AppCompatActivity {
     Boolean error = false, useSecond = false;
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("manga", new Gson().toJson(manga));
+        outState.putString("title", new Gson().toJson(title));
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
@@ -155,9 +162,17 @@ public class ViewerActivity2 extends AppCompatActivity {
         width = getScreenSize(getWindowManager().getDefaultDisplay());
 
         intent = getIntent();
-
-        manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
-        title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
+        if(savedInstanceState == null) {
+            title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+            }.getType());
+            manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
+            }.getType());
+        }else{
+            title = new Gson().fromJson(savedInstanceState.getString("title"), new TypeToken<Title>() {
+            }.getType());
+            manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
+            }.getType());
+        }
 
         name = manga.getName();
         id = manga.getId();
@@ -706,9 +721,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         result = new Intent();
         result.putExtra("id", id);
         setResult(RESULT_OK, result);
-        //update intent : not sure if this works TODO: test this
-        intent.putExtra("title", new Gson().toJson(title));
-        intent.putExtra("manga", new Gson().toJson(manga));
     }
 
     public void refresh(){

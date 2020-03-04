@@ -56,7 +56,7 @@ public class FolderSelectActivity extends AppCompatActivity {
         defDir = new File("/sdcard/MangaView/saved/");
         if(!currentDir.exists()){
             p.setHomeDir(defDir.getAbsolutePath());
-            showPopup(context, "알림","설정된 폴더를 찾을 수 없습니다. 기본 폴더로 설정 합니다.");
+            showPopup(context, "알림","설정된 폴더를 찾을 수 없습니다. 기본 폴더로 이동 합니다.");
             currentDir = defDir;
             if(!defDir.exists()) currentDir.mkdirs();
         }
@@ -68,7 +68,7 @@ public class FolderSelectActivity extends AppCompatActivity {
         actionBar.setTitle("폴더 선택기");
         actionBar.setDisplayHomeAsUpEnabled(true);
         path = this.findViewById(R.id.path);
-        //adapter init
+        //adapter create
         folders = refresh();
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, folders );
 
