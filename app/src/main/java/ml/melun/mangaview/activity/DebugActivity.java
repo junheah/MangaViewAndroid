@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -33,7 +35,11 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Cloudflare;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.Utils.readPref;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
+import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SELECT;
+import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FOLDER_SELECT;
 
 public class DebugActivity extends AppCompatActivity {
     TextView output;
@@ -56,7 +62,7 @@ public class DebugActivity extends AppCompatActivity {
         pref.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                output.setText(pref());
+                output.setText(readPref(context));
             }
         });
         Button migrate = this.findViewById(R.id.debug_migrate);
@@ -92,7 +98,7 @@ public class DebugActivity extends AppCompatActivity {
                 editor.setVisibility(View.VISIBLE);
                 save.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.VISIBLE);
-                editor.setText(pref());
+                editor.setText(readPref(context));
                 save.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -196,34 +202,6 @@ public class DebugActivity extends AppCompatActivity {
         });
 
     }
-    String pref(){
-        SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
-        JSONObject data = new JSONObject();
-        try {
-            data.put("recent",new JSONArray(sharedPref.getString("recent", "[]")));
-            data.put("favorite",new JSONArray(sharedPref.getString("favorite", "[]")));
-            data.put("homeDir",sharedPref.getString("homeDir","/sdcard/MangaView/saved"));
-            data.put("darkTheme",sharedPref.getBoolean("darkTheme", false));
-            data.put("volumeControl",sharedPref.getBoolean("volumeControl",false));
-            data.put("bookmark(viewer)",new JSONObject(sharedPref.getString("bookmark", "{}")));
-            data.put("bookmark(episode)",new JSONObject(sharedPref.getString("bookmark2", "{}")));
-            data.put("viewerType", sharedPref.getInt("viewerType",0));
-            data.put("pageReverse",sharedPref.getBoolean("pageReverse",false));
-            data.put("dataSave",sharedPref.getBoolean("dataSave", false));
-            data.put("stretch",sharedPref.getBoolean("stretch", false));
-            data.put("leftRight", sharedPref.getBoolean("leftRight", false));
-            data.put("startTab",sharedPref.getInt("startTab", 0));
-            data.put("url",sharedPref.getString("url", "http://188.214.128.5"));
-            data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
-            data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
-            data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
-            data.put("login",new JSONObject(sharedPref.getString("login","{}")));
-            data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return (filter(data.toString()));
-    }
 
     void writeToPref(Editable edit){
         try {
@@ -251,18 +229,13 @@ public class DebugActivity extends AppCompatActivity {
             editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
             editor.commit();
             // reload preference
-            p = new Preference(this);
+            p.init(this);
         }catch (Exception e){
             showPopup(context,"오류",e.getMessage());
             e.printStackTrace();
         }
     }
-    String filter(String input){
-        // keep newline and filter everything else
-        return input.replace("\\n", "/n")
-                .replace("\\","")
-                .replace("/n", "\\n");
-    }
+
 //    String filter(String input){return input.replaceAll("(?<!\\\\)\\\\(?!\\\\)", "");}
 
     private void printLine(String text){

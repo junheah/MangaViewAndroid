@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 
@@ -20,10 +21,12 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import java.util.Map;
 
 import ml.melun.mangaview.activity.CaptchaActivity;
 import ml.melun.mangaview.activity.EpisodeActivity;
+import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
@@ -44,9 +48,13 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class Utils {
 
     private static int captchaCount = 0;
+
+    public static final String ReservedChars = "|\\?*<\":>+[]/'";
 
     public static Boolean deleteRecursive(File fileOrDirectory) {
         if(!checkWriteable(fileOrDirectory)) return false;
@@ -425,32 +433,89 @@ public class Utils {
         }
     }
 
-    public static void writePreferenceToFile(File f){
+    public static boolean writePreferenceToFile(Context c, File f){
         try {
-//            Gson gson = new Gson();
-//            recent = gson.fromJson(sharedPref.getString("recent", ""), new TypeToken<ArrayList<MTitle>>() {
-//            }.getType());
-//            if (recent == null) recent = new ArrayList<>();
-//            favorite = gson.fromJson(sharedPref.getString("favorite", ""), new TypeToken<ArrayList<MTitle>>() {
-//            }.getType());
-//            if (favorite == null) favorite = new ArrayList<>();
-//            homeDir = sharedPref.getString("homeDir", "/sdcard/MangaView/saved");
-//            volumeControl = sharedPref.getBoolean("volumeControl", false);
-//            pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
-//            bookmark = new JSONObject(sharedPref.getString("bookmark2", "{}"));
-//            darkTheme = sharedPref.getBoolean("darkTheme", false);
-//            viewerType = sharedPref.getInt("viewerType", 0);
-//            reverse = sharedPref.getBoolean("pageReverse", false);
-//            dataSave = sharedPref.getBoolean("dataSave", false);
-//            startTab = sharedPref.getInt("startTab", 0);
-//            url = sharedPref.getString("url", defUrl);
-//            stretch = sharedPref.getBoolean("stretch", false);
-//            leftRight = sharedPref.getBoolean("leftRight", false);
-//            login = gson.fromJson(sharedPref.getString("login", "{}"), new TypeToken<Login>() {
-//            }.getType());
-//            autoUrl = sharedPref.getBoolean("autoUrl", true);
+            FileOutputStream stream = new FileOutputStream(f);
+            stream.write(readPref(c).getBytes());
+            stream.flush();
+            stream.close();
         }catch (Exception e){
-
+            e.printStackTrace();
+            return false;
         }
+        return true;
     }
+
+
+    public static boolean readPreferenceFromFile(Preference p, Context c, File f){
+        try {
+            JSONObject data = new JSONObject(readFileToString(f));
+
+            SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
+
+            editor.putString("recent",data.getJSONArray("recent").toString());
+            editor.putString("favorite",data.getJSONArray("favorite").toString());
+            editor.putString("homeDir",data.getString("homeDir"));
+            editor.putBoolean("darkTheme",data.getBoolean("darkTheme"));
+            editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
+            editor.putString("bookmark",data.getJSONObject("bookmark").toString());
+            editor.putString("bookmark2",data.getJSONObject("bookmark2").toString());
+            editor.putInt("viewerType",data.getInt("viewerType"));
+            editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
+            editor.putBoolean("dataSave",data.getBoolean("dataSave"));
+            editor.putBoolean("stretch",data.getBoolean("stretch"));
+            editor.putInt("startTab",data.getInt("startTab"));
+            editor.putString("url",data.getString("url"));
+            editor.putString("notice",data.getJSONArray("notice").toString());
+            editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
+            editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
+            editor.putBoolean("leftRight", data.getBoolean("leftRight"));
+            editor.putString("login", data.getJSONObject("login").toString());
+            editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
+
+            editor.commit();
+            p.init(c);
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public static String readPref(Context context){
+        SharedPreferences sharedPref = ((Activity)context).getSharedPreferences("mangaView", Context.MODE_PRIVATE);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("recent",new JSONArray(sharedPref.getString("recent", "[]")));
+            data.put("favorite",new JSONArray(sharedPref.getString("favorite", "[]")));
+            data.put("homeDir",sharedPref.getString("homeDir","/sdcard/MangaView/saved"));
+            data.put("darkTheme",sharedPref.getBoolean("darkTheme", false));
+            data.put("volumeControl",sharedPref.getBoolean("volumeControl",false));
+            data.put("bookmark",new JSONObject(sharedPref.getString("bookmark", "{}")));
+            data.put("bookmark2",new JSONObject(sharedPref.getString("bookmark2", "{}")));
+            data.put("viewerType", sharedPref.getInt("viewerType",0));
+            data.put("pageReverse",sharedPref.getBoolean("pageReverse",false));
+            data.put("dataSave",sharedPref.getBoolean("dataSave", false));
+            data.put("stretch",sharedPref.getBoolean("stretch", false));
+            data.put("leftRight", sharedPref.getBoolean("leftRight", false));
+            data.put("startTab",sharedPref.getInt("startTab", 0));
+            data.put("url",sharedPref.getString("url", "http://188.214.128.5"));
+            data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
+            data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
+            data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
+            data.put("login",new JSONObject(sharedPref.getString("login","{}")));
+            data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return (prefFilter(data.toString()));
+    }
+
+    public static String prefFilter(String input){
+        // keep newline and filter everything else
+        return input.replace("\\n", "/n")
+                .replace("\\","")
+                .replace("/n", "\\n");
+    }
+
 }

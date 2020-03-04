@@ -1,9 +1,12 @@
 package ml.melun.mangaview.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,13 +23,18 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.readPreferenceFromFile;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.Utils.writePreferenceToFile;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SELECT;
+import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FOLDER_SELECT;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -38,6 +46,8 @@ public class SettingsActivity extends AppCompatActivity {
     Spinner s_tab_spinner, s_viewer_spinner;
     Switch s_volumeKey_switch, s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch, s_leftRight_switch;
     Boolean dark;
+    public static final String prefExtension = ".mvpref";
+    public static final int RESULT_NEED_RESTART = 7;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
@@ -51,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, FolderSelectActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, MODE_FOLDER_SELECT);
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -76,6 +86,7 @@ public class SettingsActivity extends AppCompatActivity {
                                 p.resetViewerBookmark();
                                 p.resetRecent();
                                 Toast.makeText(context,"초기화 되었습니다.",Toast.LENGTH_LONG).show();
+                                setResult(RESULT_NEED_RESTART);
                                 break;
 
                             case DialogInterface.BUTTON_NEGATIVE:
@@ -120,6 +131,8 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 p.setDarkTheme(isChecked);
+                if(isChecked != dark) setResult(RESULT_NEED_RESTART);
+                else setResult(RESULT_CANCELED);
             }
         });
 
@@ -164,12 +177,7 @@ public class SettingsActivity extends AppCompatActivity {
                 s_dataSave_switch.toggle();
             }
         });
-        s_dataSave_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                p.setDataSave(isChecked);
-            }
-        });
+        s_dataSave_switch.setOnCheckedChangeListener((buttonView, isChecked) -> p.setDataSave(isChecked));
 
         s_tab = this.findViewById(R.id.setting_startTab);
         s_tab_spinner = this.findViewById(R.id.setting_startTab_spinner);
@@ -188,77 +196,71 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
 
-        this.findViewById(R.id.setting_license).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent l = new Intent(context,LicenseActivity.class);
-                startActivity(l);
-            }
+        this.findViewById(R.id.setting_license).setOnClickListener(v -> {
+            Intent l = new Intent(context,LicenseActivity.class);
+            startActivity(l);
         });
 
 
-        this.findViewById(R.id.setting_url).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final LinearLayout layout = new LinearLayout(context);
-                layout.setOrientation(LinearLayout.VERTICAL);
-                final LinearLayout switch_layout = new LinearLayout(context);
-                switch_layout.setOrientation(LinearLayout.HORIZONTAL);
-                switch_layout.setGravity(Gravity.RIGHT);
-                switch_layout.setPadding(0,0,10,0);
-                final EditText input = new EditText(context);
-                final TextView toggle_lbl = new TextView(context);
-                toggle_lbl.setText("URL 자동 설정");
-                final Switch toggle = new Switch(context);
-                switch_layout.addView(toggle_lbl);
-                switch_layout.addView(toggle);
-                layout.addView(input);
-                layout.addView(switch_layout);
+        this.findViewById(R.id.setting_url).setOnClickListener(v -> {
+            final LinearLayout layout = new LinearLayout(context);
+            layout.setOrientation(LinearLayout.VERTICAL);
+            final LinearLayout switch_layout = new LinearLayout(context);
+            switch_layout.setOrientation(LinearLayout.HORIZONTAL);
+            switch_layout.setGravity(Gravity.RIGHT);
+            switch_layout.setPadding(0,0,10,0);
+            final EditText input = new EditText(context);
+            final TextView toggle_lbl = new TextView(context);
+            toggle_lbl.setText("URL 자동 설정");
+            final Switch toggle = new Switch(context);
+            switch_layout.addView(toggle_lbl);
+            switch_layout.addView(toggle);
+            layout.addView(input);
+            layout.addView(switch_layout);
 
-                toggle.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        if(b){
-                            input.setEnabled(false);
-                            input.setText("...");
-                        }else{
-                            input.setEnabled(true);
-                            input.setText(p.getUrl());
-                        }
+            toggle.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if(b){
+                        input.setEnabled(false);
+                        input.setText("...");
+                    }else{
+                        input.setEnabled(true);
+                        input.setText(p.getUrl());
                     }
-                });
+                }
+            });
 
-                toggle.setChecked(p.getAutoUrl());
+            toggle.setChecked(p.getAutoUrl());
 
-                input.setText(p.getUrl());
-                input.setHint(p.getDefUrl());
-                AlertDialog.Builder builder;
-                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
-                else builder = new AlertDialog.Builder(context);
-                builder.setTitle("URL 설정")
-                        .setView(layout)
-                        .setPositiveButton("설정", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int button) {
-                                if(toggle.isChecked()){
-                                    // 자동 설정
-                                    p.setAutoUrl(true);
-                                    new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                                }else {
-                                    // 수동 설정
-                                    p.setAutoUrl(false);
-                                    if (input.getText().length() > 0)
-                                        p.setUrl(input.getText().toString());
-                                    else p.setUrl(input.getHint().toString());
-                                }
+            input.setText(p.getUrl());
+            input.setHint(p.getDefUrl());
+            AlertDialog.Builder builder;
+            if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+            else builder = new AlertDialog.Builder(context);
+            builder.setTitle("URL 설정")
+                    .setView(layout)
+                    .setPositiveButton("설정", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int button) {
+                            if(toggle.isChecked()){
+                                // 자동 설정
+                                p.setAutoUrl(true);
+                                new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            }else {
+                                // 수동 설정
+                                p.setAutoUrl(false);
+                                if (input.getText().length() > 0)
+                                    p.setUrl(input.getText().toString());
+                                else p.setUrl(input.getHint().toString());
                             }
-                        })
-                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int button) {
-                                //do nothing
-                            }
-                        })
-                        .show();
-            }
+                        }
+                    })
+                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int button) {
+                            //do nothing
+                        }
+                    })
+                    .show();
         });
 
         s_stretch = this.findViewById(R.id.setting_stretch);
@@ -292,17 +294,25 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        this.findViewById(R.id.setting_dataManage).setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.setting_dataExport).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, FolderSelectActivity.class);
                 intent.putExtra("mode", MODE_FILE_SAVE);
-                intent.putExtra("title", "설정 파일 선택");
-                startActivity(intent);
+                intent.putExtra("title", "파일 저장");
+                startActivityForResult(intent, MODE_FILE_SAVE);
             }
         });
 
-
+        this.findViewById(R.id.setting_dataImport).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, FolderSelectActivity.class);
+                intent.putExtra("mode", MODE_FILE_SELECT);
+                intent.putExtra("title", "파일 선택");
+                startActivityForResult(intent, MODE_FILE_SELECT);
+            }
+        });
 
     }
 
@@ -317,14 +327,44 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try{
-            if(requestCode==2){
-                String tmp = data.getData().getPath();
-                String tmp2 = java.net.URLDecoder.decode(tmp, "UTF-8");
-                p.setHomeDir(tmp2);
+        if(data != null) {
+            String path = data.getStringExtra("path");
+            if (path != null) {
+                switch (requestCode) {
+                    case MODE_FILE_SELECT:
+                        if(readPreferenceFromFile(p, context, new File(path))) {
+                            setResult(RESULT_NEED_RESTART);
+                            showPopup(context, "데이터 불러오기", "작업 성공", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                }
+                            }, new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialogInterface) {
+                                    finish();
+                                }
+                            });
+                        }else
+                            Toast.makeText(context, "불러오기 실패", Toast.LENGTH_LONG).show();
+                        break;
+                    case MODE_FOLDER_SELECT:
+                        p.setHomeDir(path);
+                        Toast.makeText(context, "설정 완료!", Toast.LENGTH_LONG).show();
+                        break;
+                    case MODE_FILE_SAVE:
+
+                        if(writePreferenceToFile(context, new File(path)))
+                            Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
+
+                        break;
+                }
             }
-        }catch (Exception e){}
+        }
+
     }
 }

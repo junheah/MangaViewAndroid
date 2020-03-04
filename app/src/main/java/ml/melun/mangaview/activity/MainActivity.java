@@ -81,6 +81,7 @@ import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
+import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -348,7 +349,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent settingIntent = new Intent(context, SettingsActivity.class);
-            startActivity(settingIntent);
+            startActivityForResult(settingIntent, 0);
             return true;
         }else if(id == R.id.action_debug){
             Intent debug = new Intent(context, DebugActivity.class);
@@ -392,7 +393,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(browserIntent);
             }else if(id==R.id.nav_settings){
                 Intent settingIntent = new Intent(context, SettingsActivity.class);
-                startActivity(settingIntent);
+                startActivityForResult(settingIntent, 0);
                 return true;
             }else if(id==R.id.nav_donate){
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://junheah.github.io/donate"));
@@ -634,6 +635,11 @@ public class MainActivity extends AppCompatActivity
                     
                     break;
             }
+        }else if(resultCode == RESULT_NEED_RESTART){
+            System.out.println("ppppppppppppppppppppp");
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
         }
     }
 

@@ -12,7 +12,9 @@ import android.os.Bundle;
 import androidx.appcompat.widget.PopupMenu;
 
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -33,9 +35,11 @@ import java.util.Comparator;
 import ml.melun.mangaview.R;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.ReservedChars;
 import static ml.melun.mangaview.Utils.checkWriteable;
 import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.activity.SettingsActivity.prefExtension;
 
 public class FolderSelectActivity extends AppCompatActivity {
 
@@ -91,13 +95,23 @@ public class FolderSelectActivity extends AppCompatActivity {
         listContent = refresh();
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listContent);
 
-        if(mode != MODE_FILE_SAVE){
-            input.setVisibility(View.GONE);
-        }
 
-        if(mode == MODE_FILE_SAVE) {
-            select.setText("저장");
+        if(mode == MODE_FILE_SAVE || mode == MODE_FILE_SELECT) {
+            if(mode == MODE_FILE_SAVE)
+                select.setText("저장");
+
             select.setEnabled(false);
+            input.setFilters(new InputFilter[] {new InputFilter() {
+                @Override
+                public CharSequence filter(CharSequence source, int s, int e, Spanned spanned, int i2, int i3) {
+                    for (int i = s; i < e; i++) {
+                        if (ReservedChars.indexOf(source.charAt(i))>-1) {
+                            return "";
+                        }
+                    }
+                    return null;
+                }
+            }});
             input.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -114,15 +128,43 @@ public class FolderSelectActivity extends AppCompatActivity {
 
                 @Override
                 public void afterTextChanged(Editable editable) {
+
                 }
             });
+        }else{
+            input.setVisibility(View.GONE);
         }
         select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(checkWriteable(currentDir)) {
-                    p.setHomeDir(currentDir.getAbsolutePath());
-                    Toast.makeText(context, "설정 완료!", Toast.LENGTH_LONG).show();
+                    Intent resultIntent = new Intent();
+                    String path;
+                    if(mode == MODE_FILE_SAVE){
+                        String filename = input.getText().toString();
+                        if(!filename.endsWith(prefExtension)) {
+                            filename += prefExtension;
+                            input.setText(filename);
+                        }
+                        File target = new File(currentDir, filename);
+                        if(target.exists()) {
+                            showPopup(context, "오류", "파일이 이미 존재합니다.");
+                            return;
+                        }
+                        path = target.getAbsolutePath();
+                    }else if(mode == MODE_FILE_SELECT){
+                        File target = new File(currentDir, input.getText().toString());
+                        if(!target.exists()) {
+                            showPopup(context, "오류", "파일이 존재하지 않습니다.");
+                            return;
+                        }
+                        path = target.getAbsolutePath();
+                    }else{
+                        path = currentDir.getAbsolutePath();
+                    }
+
+                    resultIntent.putExtra("path", path);
+                    setResult(0, resultIntent);
                     finish();
                 }else{
                     showPopup(context, "알림","쓰기가 불가능한 위치 입니다. 다른 위치를 선택해 주세요.");
@@ -138,7 +180,11 @@ public class FolderSelectActivity extends AppCompatActivity {
                     // is folder
                     if(listContent.get(position).indexOf('/')>-1) {
                         currentDir = new File(currentDir, listContent.get(position));
+                        if(mode == MODE_FILE_SAVE || mode == MODE_FILE_SELECT)
+                            input.setText("");
                         populate();
+                    }else if(mode == MODE_FILE_SAVE || mode == MODE_FILE_SELECT){
+                        input.setText(listContent.get(position));
                     }
                 }else{
                     //parent
@@ -256,8 +302,9 @@ public class FolderSelectActivity extends AppCompatActivity {
                 if (f.isDirectory()) {
                     tmp.add(f.getName() + '/');
                 }else {
-                    if (mode == MODE_FILE_SELECT) {
-                        tmp.add(f.getName());
+                    if (mode == MODE_FILE_SELECT || mode == MODE_FILE_SAVE) {
+                        if(f.getName().toLowerCase().endsWith(prefExtension))
+                            tmp.add(f.getName());
                     }
                 }
             }
