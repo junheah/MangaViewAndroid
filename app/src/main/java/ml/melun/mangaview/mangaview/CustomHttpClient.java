@@ -32,9 +32,10 @@ public class CustomHttpClient {
         this.client = getUnsafeOkHttpClient()
                 .followRedirects(false)
                 .followSslRedirects(false)
-                .connectTimeout(20, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
                 .build();
+
         //this.cfc = new HashMap<>();
         //this.client = new OkHttpClient.Builder().build();
     }

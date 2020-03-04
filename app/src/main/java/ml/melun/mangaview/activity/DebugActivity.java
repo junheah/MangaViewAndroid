@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.net.HttpCookie;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
@@ -30,7 +31,6 @@ import static ml.melun.mangaview.MainApplication.p;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Cloudflare;
-import ml.melun.mangaview.mangaview.Title;
 import okhttp3.Response;
 
 import static ml.melun.mangaview.Utils.showPopup;
@@ -149,7 +149,9 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
-        this.findViewById(R.id.debug_cf).setOnClickListener(new View.OnClickListener() {
+
+        Button cfBtn = this.findViewById(R.id.debug_cf);
+        cfBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 printLine("cf-scrape start");
@@ -157,38 +159,39 @@ public class DebugActivity extends AppCompatActivity {
                 //String fetchUrl = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=1639778";
                 String fetchUrl = p.getUrl();
 
-                new AsyncTask<Void,String,Void>(){
+                new AsyncTask<Void,Void,Map<String,String>>(){
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
+                        cfBtn.setEnabled(false);
                     }
 
                     @Override
-                    protected void onProgressUpdate(String... values) {
-                        printLine(values[0]);
-                    }
-
-                    @Override
-                    protected Void doInBackground(Void... voids) {
+                    protected Map<String,String> doInBackground(Void... voids) {
                         Cloudflare cf = new Cloudflare(fetchUrl);
-                        cf.setUser_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-                        cf.getCookies(new Cloudflare.cfCallback() {
-                            @Override
-                            public void onSuccess(List<HttpCookie> cookieList, boolean hasNewUrl, String newUrl) {
-                                for(HttpCookie cookie : cookieList){
-                                    publishProgress(cookie.getName() +" " + cookie.getValue());
-                                }
-                            }
+                        return cf.getCookies();
+                    }
 
-                            @Override
-                            public void onFail() {
-
+                    @Override
+                    protected void onPostExecute(Map<String, String> res) {
+                        if(res == null){
+                            printLine("cf-scrape fail");
+                        }else{
+                            printLine("cf-scrape success");
+                            for(Map.Entry<String,String> item : res.entrySet()){
+                                printLine(item.getKey() + " " + item.getValue());
                             }
-                        });
-                        return null;
+                        }
+                        cfBtn.setEnabled(true);
                     }
                 }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+            }
+        });
+        cfBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                return false;
             }
         });
 
