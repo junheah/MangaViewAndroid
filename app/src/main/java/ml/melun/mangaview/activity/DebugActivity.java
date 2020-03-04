@@ -20,6 +20,7 @@ import net.jhavar.main.DdosGuardBypass;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.HttpCookie;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import static ml.melun.mangaview.MainApplication.p;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.mangaview.Cloudflare;
 import ml.melun.mangaview.mangaview.Title;
 import okhttp3.Response;
 
@@ -70,14 +72,14 @@ public class DebugActivity extends AppCompatActivity {
 //                    b.append("제목: "+t.getName() +" | 북마크: "+t.getBookmark() +'\n');
 //                }
 //                b.append("북마크 이전이 완료되었습니다.");
-//                output.setText(b.toString());
+//                printLine(b.toString());
 //            }
 //        });
         Button clear = this.findViewById(R.id.debug_clear);
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                output.setText(" ");
+                output.setText("");
             }
         });
         final EditText editor = this.findViewById(R.id.debug_edit);
@@ -129,7 +131,7 @@ public class DebugActivity extends AppCompatActivity {
 //            @Override
 //            public void onClick(View v) {
 //                new Preference(context).removeEpsFromData();
-//                output.setText("작업 완료.");
+//                printLine("작업 완료.");
 //            }
 //        });
 
@@ -144,6 +146,49 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new ddgBypassTest().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        });
+
+        this.findViewById(R.id.debug_cf).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                printLine("cf-scrape start");
+                //유사하렘 1화
+                //String fetchUrl = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=1639778";
+                String fetchUrl = p.getUrl();
+
+                new AsyncTask<Void,String,Void>(){
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                    }
+
+                    @Override
+                    protected void onProgressUpdate(String... values) {
+                        printLine(values[0]);
+                    }
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        Cloudflare cf = new Cloudflare(fetchUrl);
+                        cf.setUser_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+                        cf.getCookies(new Cloudflare.cfCallback() {
+                            @Override
+                            public void onSuccess(List<HttpCookie> cookieList, boolean hasNewUrl, String newUrl) {
+                                for(HttpCookie cookie : cookieList){
+                                    publishProgress(cookie.getName() +" " + cookie.getValue());
+                                }
+                            }
+
+                            @Override
+                            public void onFail() {
+
+                            }
+                        });
+                        return null;
+                    }
+                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
             }
         });
 
@@ -217,6 +262,10 @@ public class DebugActivity extends AppCompatActivity {
     }
 //    String filter(String input){return input.replaceAll("(?<!\\\\)\\\\(?!\\\\)", "");}
 
+    private void printLine(String text){
+        output.append(System.currentTimeMillis() + " : " +text + "\n");
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.debug_menu, menu);
@@ -260,7 +309,7 @@ public class DebugActivity extends AppCompatActivity {
             return null;
         }
         protected void onPostExecute(Integer r) {
-            output.setText(result);
+            printLine(result);
         }
     }
 

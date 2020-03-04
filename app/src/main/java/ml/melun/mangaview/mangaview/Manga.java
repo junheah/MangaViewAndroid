@@ -309,6 +309,10 @@ public class Manga {
         this.mode = mode;
     }
 
+    public String getUrl(){
+        return "/bbs/board.php?bo_table=manga&wr_id=" + id;
+    }
+
     private int id;
     String name;
     List<Manga> eps;
