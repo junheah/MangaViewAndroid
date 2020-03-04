@@ -18,12 +18,17 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
     String fetchUrl = "http://mnmnmnmnm.xyz/";
     String ipFetchUrl = "http://52.74.159.59";
     String directIp = "http://185.141.63.93";
+    boolean silent = false;
     Context c;
     public UrlUpdater(Context c){
         this.c = c;
     }
+    public UrlUpdater(Context c, boolean silent){
+        this.c = c;
+        this.silent = silent;
+    }
     protected void onPreExecute() {
-        Toast.makeText(c, "자동 URL 설정중...", Toast.LENGTH_SHORT).show();
+        if(!silent) Toast.makeText(c, "자동 URL 설정중...", Toast.LENGTH_SHORT).show();
     }
     protected Boolean doInBackground(Void... params) {
         return ipFetch() || fetch();
@@ -101,9 +106,9 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
     protected void onPostExecute(Boolean r) {
         if(r && result !=null){
             p.setUrl(result);
-            Toast.makeText(c, "자동 URL 설정 완료!", Toast.LENGTH_SHORT).show();
+            if(!silent)Toast.makeText(c, "자동 URL 설정 완료!", Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(c, "자동 URL 설정 실패, 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
+            if(!silent)Toast.makeText(c, "자동 URL 설정 실패, 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
         }
     }
 }
