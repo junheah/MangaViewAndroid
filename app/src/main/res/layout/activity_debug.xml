@@ -70,13 +70,19 @@
                 android:layout_height="wrap_content"
                 android:text="eula 테스트" />
 
+            <Button
+                android:id="@+id/debug_cf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="cf scrape 테스트" />
+
             <TextView
                 android:id="@+id/debug_out"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="true"
                 android:longClickable="true"
-                android:text="output"
+                android:text=""
                 android:textIsSelectable="true" />
             <EditText
                 android:visibility="gone"

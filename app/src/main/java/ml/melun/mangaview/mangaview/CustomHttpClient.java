@@ -35,6 +35,7 @@ public class CustomHttpClient {
                 .connectTimeout(20, TimeUnit.SECONDS)
                 .readTimeout(20, TimeUnit.SECONDS)
                 .build();
+
         //this.cfc = new HashMap<>();
         //this.client = new OkHttpClient.Builder().build();
     }
@@ -78,19 +79,21 @@ public class CustomHttpClient {
         if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
             customCookie.put("PHPSESSID", p.getLogin().cookie);
         }
-        String cookie = "";
+        Map<String,String> cookie = new HashMap<>();
+        cookie.putAll(this.cookies);
+        cookie.putAll(customCookie);
 
-        // local cookies
-        for(String key : this.cookies.keySet()){
-            customCookie.put(key, this.cookies.get(key));
+        StringBuilder cbuilder = new StringBuilder();
+        for(String key : cookie.keySet()){
+            cbuilder.append(key);
+            cbuilder.append('=');
+            cbuilder.append(cookie.get(key));
+            cbuilder.append("; ");
         }
-
-        for(String key : customCookie.keySet()){
-            cookie += key + '=' + customCookie.get(key) + "; ";
-        }
+        cbuilder.delete(cbuilder.length()-2,cbuilder.length());
 
         Map headers = new HashMap<String, String>();
-        headers.put("Cookie", cookie);
+        headers.put("Cookie", cbuilder.toString());
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
 
         return get(p.getUrl()+url, headers);

@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity
         if(!p.getSharedPref().getBoolean("eula",false)){
             startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
         }else {
+            if(p.getAutoUrl())
+                new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             activityInit();
         }
 
@@ -160,8 +162,7 @@ public class MainActivity extends AppCompatActivity
                     .show();
         }
         // url updater
-        if(p.getAutoUrl())
-            new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

@@ -20,15 +20,17 @@ import net.jhavar.main.DdosGuardBypass;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.net.HttpCookie;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.mangaview.Title;
+import ml.melun.mangaview.mangaview.Cloudflare;
 import okhttp3.Response;
 
 import static ml.melun.mangaview.Utils.showPopup;
@@ -70,14 +72,14 @@ public class DebugActivity extends AppCompatActivity {
 //                    b.append("제목: "+t.getName() +" | 북마크: "+t.getBookmark() +'\n');
 //                }
 //                b.append("북마크 이전이 완료되었습니다.");
-//                output.setText(b.toString());
+//                printLine(b.toString());
 //            }
 //        });
         Button clear = this.findViewById(R.id.debug_clear);
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                output.setText(" ");
+                output.setText("");
             }
         });
         final EditText editor = this.findViewById(R.id.debug_edit);
@@ -129,7 +131,7 @@ public class DebugActivity extends AppCompatActivity {
 //            @Override
 //            public void onClick(View v) {
 //                new Preference(context).removeEpsFromData();
-//                output.setText("작업 완료.");
+//                printLine("작업 완료.");
 //            }
 //        });
 
@@ -144,6 +146,52 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new ddgBypassTest().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        });
+
+
+        Button cfBtn = this.findViewById(R.id.debug_cf);
+        cfBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                printLine("cf-scrape start");
+                //유사하렘 1화
+                //String fetchUrl = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=1639778";
+                String fetchUrl = p.getUrl();
+
+                new AsyncTask<Void,Void,List<HttpCookie>>(){
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        cfBtn.setEnabled(false);
+                    }
+
+                    @Override
+                    protected List<HttpCookie> doInBackground(Void... voids) {
+                        Cloudflare cf = new Cloudflare(fetchUrl);
+                        return cf.getCookies();
+                    }
+
+                    @Override
+                    protected void onPostExecute(List<HttpCookie> res) {
+                        if(res == null){
+                            printLine("cf-scrape fail");
+                        }else{
+                            printLine("cf-scrape success");
+                            for(HttpCookie item : res){
+                                printLine(item.getName() + " " + item.getValue());
+                            }
+                        }
+                        cfBtn.setEnabled(true);
+                    }
+                }.execute();
+
+            }
+        });
+        cfBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                return false;
             }
         });
 
@@ -217,11 +265,16 @@ public class DebugActivity extends AppCompatActivity {
     }
 //    String filter(String input){return input.replaceAll("(?<!\\\\)\\\\(?!\\\\)", "");}
 
+    private void printLine(String text){
+        output.append(System.currentTimeMillis() + " : " +text + "\n");
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.debug_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -232,7 +285,6 @@ public class DebugActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     private class ddgBypassTest extends AsyncTask<Void, Void, Integer> {
         String result = "";
@@ -260,7 +312,7 @@ public class DebugActivity extends AppCompatActivity {
             return null;
         }
         protected void onPostExecute(Integer r) {
-            output.setText(result);
+            printLine(result);
         }
     }
 
