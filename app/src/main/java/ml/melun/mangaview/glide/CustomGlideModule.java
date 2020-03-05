@@ -16,7 +16,7 @@ import java.io.InputStream;
 public class CustomGlideModule extends AppGlideModule {
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
-        System.out.println("glide module init");
+        System.out.println("glide module create");
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(httpClient.client));
     }
 }

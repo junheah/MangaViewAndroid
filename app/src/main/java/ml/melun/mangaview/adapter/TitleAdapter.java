@@ -136,7 +136,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mData.size();
+        if(mData != null)
+            return mData.size();
+        return 0;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{

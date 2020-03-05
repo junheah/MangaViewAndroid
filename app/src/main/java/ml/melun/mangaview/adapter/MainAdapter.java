@@ -96,11 +96,11 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        int RECENT = this.RECENT + favUpdate.size();
-        int RANKING = this.RANKING + favUpdate.size() + recent.size();
+        int mRECENT = RECENT + favUpdate.size();
+        int mRANKING = RANKING + favUpdate.size() + recent.size();
         if(position>=0 && position <=4) return position;
-        else if(position == RECENT) return this.RECENT;
-        else if(position == RANKING) return this.RANKING;
+        else if(position == mRECENT) return RECENT;
+        else if(position == mRANKING) return RANKING;
         else return -1;
     }
 
@@ -338,6 +338,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void setMainClickListener(onItemClick main) {
         this.mainClickListener = main;
     }
+
+
 
     public interface onItemClick{
         void clickedManga(Manga m);

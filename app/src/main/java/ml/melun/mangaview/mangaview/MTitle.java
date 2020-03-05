@@ -80,7 +80,6 @@ public class MTitle{
 
     @Override
     public boolean equals(Object obj) {
-        System.out.println("pppp" + ((MTitle)obj).getId()+ " " + this.id);
         return ((MTitle)obj).getId() == this.id;
     }
 }

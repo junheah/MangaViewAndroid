@@ -13,6 +13,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,6 +27,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.preference.PreferenceManager;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import com.google.android.material.navigation.NavigationView;
@@ -37,8 +39,12 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -81,6 +87,7 @@ import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
+import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -348,7 +355,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent settingIntent = new Intent(context, SettingsActivity.class);
-            startActivity(settingIntent);
+            startActivityForResult(settingIntent, 0);
             return true;
         }else if(id == R.id.action_debug){
             Intent debug = new Intent(context, DebugActivity.class);
@@ -387,12 +394,39 @@ public class MainActivity extends AppCompatActivity
                 startActivity(noticesIntent);
                 return true;
             }else if(id==R.id.nav_kakao){
-                Toast.makeText(getApplicationContext(), "오픈톡방에 참가합니다.", Toast.LENGTH_LONG).show();
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
-                startActivity(browserIntent);
+
+                View layout = getLayoutInflater().inflate(R.layout.content_kakao_popup, null);
+                layout.findViewById(R.id.kakao_notice).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_notice))));
+                    }
+                });
+                layout.findViewById(R.id.kakao_chat).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_chat))));
+                    }
+                });
+                layout.findViewById(R.id.kakao_direct).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_direct))));
+                    }
+                });
+
+                AlertDialog.Builder builder;
+                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                else builder = new AlertDialog.Builder(context);
+                builder.setTitle("오픈 카톡 참가")
+                        .setView(layout)
+                        .show();
+
+//                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
+//                startActivity(browserIntent);
             }else if(id==R.id.nav_settings){
                 Intent settingIntent = new Intent(context, SettingsActivity.class);
-                startActivity(settingIntent);
+                startActivityForResult(settingIntent, 0);
                 return true;
             }else if(id==R.id.nav_donate){
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://junheah.github.io/donate"));
@@ -612,11 +646,13 @@ public class MainActivity extends AppCompatActivity
                 case 1:
                     //favorite result
                     Boolean favorite_after = data.getBooleanExtra("favorite",true);
-                    if(!favorite_after && favoriteAdapter != null) favoriteAdapter.remove(selectedPosition);
+                    if(!favorite_after && favoriteAdapter != null && favoriteAdapter.getItemCount()>0)
+                        favoriteAdapter.remove(selectedPosition);
                     break;
                 case 2:
                     //recent result
-                    if(recentAdapter != null)recentAdapter.moveItemToTop(selectedPosition);
+                    if(recentAdapter != null && recentAdapter.getItemCount()>0)
+                        recentAdapter.moveItemToTop(selectedPosition);
                     break;
 
             }
@@ -624,13 +660,19 @@ public class MainActivity extends AppCompatActivity
             switch(requestCode){
                 case 3:
                     //main page
-                    mainadapter.fetch();
+                    if(mainadapter!=null)
+                        mainadapter.fetch();
                     break;
                 case 4:
                     //search
                     
                     break;
             }
+        }else if(resultCode == RESULT_NEED_RESTART){
+            System.out.println("ppppppppppppppppppppp");
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
         }
     }
 

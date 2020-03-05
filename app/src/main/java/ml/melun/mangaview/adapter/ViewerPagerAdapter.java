@@ -1,6 +1,8 @@
 package ml.melun.mangaview.adapter;
 
 import android.content.Context;
+import android.os.Parcelable;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -40,7 +42,7 @@ public class ViewerPagerAdapter extends FragmentStatePagerAdapter
                 s1 = imgs1.get(i);
             }
 
-            fragments.add(new ViewerPageFragment().init(s, s1, new Decoder(m.getSeed(), m.getId()), width, context, new PageInterface() {
+            fragments.add(ViewerPageFragment.create(s, s1, new Decoder(m.getSeed(), m.getId()), width, context, new PageInterface() {
                 @Override
                 public void onPageClick() {
                     itf.onPageClick();
@@ -62,6 +64,12 @@ public class ViewerPagerAdapter extends FragmentStatePagerAdapter
     public int getCount()
     {
         return fragments.size();
+    }
+
+    @Override
+    public Parcelable saveState()
+    {
+        return null;
     }
 
 }

@@ -82,10 +82,18 @@ public class ViewerActivity3 extends AppCompatActivity {
     CustomSpinnerAdapter spinnerAdapter;
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("manga", new Gson().toJson(manga));
+        outState.putString("title", new Gson().toJson(title));
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_viewer3);
         context = this;
         next = this.findViewById(R.id.toolbar_next);
@@ -169,8 +177,17 @@ public class ViewerActivity3 extends AppCompatActivity {
 
         try {
             intent = getIntent();
-            title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
-            manga = new Gson().fromJson(intent.getStringExtra("manga"),new TypeToken<Manga>(){}.getType());
+            if(savedInstanceState == null) {
+                title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+                }.getType());
+                manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
+                }.getType());
+            }else{
+                title = new Gson().fromJson(savedInstanceState.getString("title"), new TypeToken<Title>() {
+                }.getType());
+                manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
+                }.getType());
+            }
 
             name = manga.getName();
             id = manga.getId();
@@ -277,8 +294,6 @@ public class ViewerActivity3 extends AppCompatActivity {
         captchaChecked = false;
         new LoadImages().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
-
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
@@ -407,14 +422,9 @@ public class ViewerActivity3 extends AppCompatActivity {
     }
 
     public void updateIntent(){
-        if(manga.getMode() == 0 || manga.getMode() == 3) {
-            result = new Intent();
-            result.putExtra("id", id);
-            setResult(RESULT_OK, result);
-        }
-        //update intent : not sure if this works TODO: test this
-        intent.putExtra("title", new Gson().toJson(title));
-        intent.putExtra("manga", new Gson().toJson(manga));
+        result = new Intent();
+        result.putExtra("id", id);
+        setResult(RESULT_OK, result);
     }
 
     public void refreshAdapter(){
