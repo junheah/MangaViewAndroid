@@ -260,6 +260,7 @@ public class FolderSelectActivity extends AppCompatActivity {
                 alert.setTitle("새로운 폴더 생성");
                 final EditText input = new EditText(context);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("폴더 이름");
                 alert.setView(input);
                 alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int button) {

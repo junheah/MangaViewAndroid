@@ -316,7 +316,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -336,7 +335,7 @@ public class SettingsActivity extends AppCompatActivity {
                     case MODE_FILE_SELECT:
                         if(readPreferenceFromFile(p, context, new File(path))) {
                             setResult(RESULT_NEED_RESTART);
-                            showPopup(context, "데이터 불러오기", "작업 성공", new DialogInterface.OnClickListener() {
+                            showPopup(context, "데이터 불러오기", "데이터 불러오기를 성공했습니다. 변경사항을 적용하기 위해 앱을 재시작 합니다.", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     finish();

@@ -13,6 +13,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,6 +27,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.preference.PreferenceManager;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import com.google.android.material.navigation.NavigationView;
@@ -37,8 +39,12 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -388,9 +394,36 @@ public class MainActivity extends AppCompatActivity
                 startActivity(noticesIntent);
                 return true;
             }else if(id==R.id.nav_kakao){
-                Toast.makeText(getApplicationContext(), "오픈톡방에 참가합니다.", Toast.LENGTH_LONG).show();
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
-                startActivity(browserIntent);
+
+                View layout = getLayoutInflater().inflate(R.layout.content_kakao_popup, null);
+                layout.findViewById(R.id.kakao_notice).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_notice))));
+                    }
+                });
+                layout.findViewById(R.id.kakao_chat).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_chat))));
+                    }
+                });
+                layout.findViewById(R.id.kakao_direct).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_direct))));
+                    }
+                });
+
+                AlertDialog.Builder builder;
+                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                else builder = new AlertDialog.Builder(context);
+                builder.setTitle("오픈 카톡 참가")
+                        .setView(layout)
+                        .show();
+
+//                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
+//                startActivity(browserIntent);
             }else if(id==R.id.nav_settings){
                 Intent settingIntent = new Intent(context, SettingsActivity.class);
                 startActivityForResult(settingIntent, 0);

@@ -470,7 +470,6 @@ public class Utils {
             editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putString("login", data.getJSONObject("login").toString());
             editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
 
             editor.commit();
@@ -503,7 +502,6 @@ public class Utils {
             data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
-            data.put("login",new JSONObject(sharedPref.getString("login","{}")));
             data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
         }catch(Exception e){
             e.printStackTrace();

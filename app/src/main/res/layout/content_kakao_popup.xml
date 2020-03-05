@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/button_bg"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:id="@+id/kakao_notice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="공지방 (채팅 금지)" />
+
+    <Button
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/button_bg"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:id="@+id/kakao_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="잡담방" />
+
+    <Button
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/button_bg"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:id="@+id/kakao_direct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="1대1 문의" />
+</LinearLayout>
