@@ -9,7 +9,7 @@
 #
 [모든 릴리즈 한번에 보기](https://github.com/junheah/MangaViewAndroid/tree/master/app/release)
 
-버그제보/문의는 [이슈](/issues)를 통해서 해주세요
+버그 제보는 [이슈](https://github.com/junheah/MangaViewAndroid/issues)를 통해서 해주세요
 
 ## License ##
 [MIT License](/LICENSE)
