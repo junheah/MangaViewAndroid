@@ -13,10 +13,16 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 
 import java.io.InputStream;
 
+@GlideModule
 public class CustomGlideModule extends AppGlideModule {
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
         System.out.println("glide module create");
         registry.replace(GlideUrl.class, InputStream.class, new OkHttpUrlLoader.Factory(httpClient.client));
+    }
+
+    @Override
+    public boolean isManifestParsingEnabled() {
+        return false;
     }
 }
