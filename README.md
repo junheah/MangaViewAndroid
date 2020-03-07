@@ -1,7 +1,7 @@
 [![logo](/web/logo_static.svg "MangaView")](https://junheah.github.io/MangaViewAndroid/)
 
 
-# ~~망가쇼미~~ 마나모아 전용 만화뷰어 앱 #
+# 마나모아 전용 뷰어/다운로더 앱 #
 
 
 ### [최신 버전 다운로드 (apk)](https://junheah.github.io/MangaViewAndroid/) ###
