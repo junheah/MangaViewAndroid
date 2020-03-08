@@ -30,8 +30,10 @@ import java.util.Map;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
+import ml.melun.mangaview.CustomJSONObject;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Cloudflare;
 import okhttp3.Response;
 
@@ -206,27 +208,8 @@ public class DebugActivity extends AppCompatActivity {
     void writeToPref(Editable edit){
         try {
             SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
-            JSONObject data = new JSONObject(edit.toString());
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("recent",data.getJSONArray("recent").toString());
-            editor.putString("favorite",data.getJSONArray("favorite").toString());
-            editor.putString("homeDir",data.getString("homeDir"));
-            editor.putBoolean("darkTheme",data.getBoolean("darkTheme"));
-            editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
-            editor.putString("bookmark",data.getJSONObject("bookmark").toString());
-            editor.putString("bookmark2",data.getJSONObject("bookmark2").toString());
-            editor.putInt("viewerType",data.getInt("viewerType"));
-            editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
-            editor.putBoolean("dataSave",data.getBoolean("dataSave"));
-            editor.putBoolean("stretch",data.getBoolean("stretch"));
-            editor.putInt("startTab",data.getInt("startTab"));
-            editor.putString("url",data.getString("url").toString());
-            editor.putString("notice",data.getJSONArray("notice").toString());
-            editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
-            editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
-            editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
-            editor.commit();
+            CustomJSONObject data = new CustomJSONObject(edit.toString());
+            Utils.jsonToPref(this, data);
             // reload preference
             p.init(this);
         }catch (Exception e){

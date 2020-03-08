@@ -446,33 +446,35 @@ public class Utils {
         return true;
     }
 
+    public static void jsonToPref(Context c, CustomJSONObject data){
+        SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
+        editor.putString("recent",data.getJSONArray("recent", new JSONArray()).toString());
+        editor.putString("favorite",data.getJSONArray("favorite", new JSONArray()).toString());
+        editor.putString("homeDir",data.getString("homeDir", "/sdcard/MangaView/saved"));
+        editor.putBoolean("darkTheme",data.getBoolean("darkTheme",false));
+        editor.putInt("prevPageKey", data.getInt("prevPageKey", -1));
+        editor.putInt("nextPageKey", data.getInt("nextPageKey", -1));
+        editor.putString("bookmark",data.getJSONObject("bookmark", new JSONObject()).toString());
+        editor.putString("bookmark2",data.getJSONObject("bookmark2", new JSONObject()).toString());
+        editor.putInt("viewerType",data.getInt("viewerType", 0));
+        editor.putBoolean("pageReverse",data.getBoolean("pageReverse", false));
+        editor.putBoolean("dataSave",data.getBoolean("dataSave", false));
+        editor.putBoolean("stretch",data.getBoolean("stretch", false));
+        editor.putInt("startTab",data.getInt("startTab", 0));
+        editor.putString("url",data.getString("url", "https://manamoa.net/"));
+        editor.putString("notice",data.getJSONArray("notice", new JSONArray()).toString());
+        editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime", 0));
+        editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime", 0));
+        editor.putBoolean("leftRight", data.getBoolean("leftRight", false));
+        editor.putBoolean("autoUrl", data.getBoolean("autoUrl", true));
+        editor.putString("login", data.getJSONObject("login", new JSONObject()).toString());
+        editor.commit();
+    }
 
     public static boolean readPreferenceFromFile(Preference p, Context c, File f){
         try {
-            JSONObject data = new JSONObject(readFileToString(f));
-
-            SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
-
-            editor.putString("recent",data.getJSONArray("recent").toString());
-            editor.putString("favorite",data.getJSONArray("favorite").toString());
-            editor.putString("homeDir",data.getString("homeDir"));
-            editor.putBoolean("darkTheme",data.getBoolean("darkTheme"));
-            editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
-            editor.putString("bookmark",data.getJSONObject("bookmark").toString());
-            editor.putString("bookmark2",data.getJSONObject("bookmark2").toString());
-            editor.putInt("viewerType",data.getInt("viewerType"));
-            editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
-            editor.putBoolean("dataSave",data.getBoolean("dataSave"));
-            editor.putBoolean("stretch",data.getBoolean("stretch"));
-            editor.putInt("startTab",data.getInt("startTab"));
-            editor.putString("url",data.getString("url"));
-            editor.putString("notice",data.getJSONArray("notice").toString());
-            editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
-            editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
-            editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
-
-            editor.commit();
+            CustomJSONObject data = new CustomJSONObject(readFileToString(f));
+            jsonToPref(c, data);
             p.init(c);
         }catch (Exception e){
             e.printStackTrace();
@@ -489,7 +491,6 @@ public class Utils {
             data.put("favorite",new JSONArray(sharedPref.getString("favorite", "[]")));
             data.put("homeDir",sharedPref.getString("homeDir","/sdcard/MangaView/saved"));
             data.put("darkTheme",sharedPref.getBoolean("darkTheme", false));
-            data.put("volumeControl",sharedPref.getBoolean("volumeControl",false));
             data.put("bookmark",new JSONObject(sharedPref.getString("bookmark", "{}")));
             data.put("bookmark2",new JSONObject(sharedPref.getString("bookmark2", "{}")));
             data.put("viewerType", sharedPref.getInt("viewerType",0));
@@ -503,6 +504,8 @@ public class Utils {
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
             data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
+            data.put("prevPageKey", sharedPref.getInt("prevPageKey", -1));
+            data.put("nextPageKey", sharedPref.getInt("nextPageKey", -1));
         }catch(Exception e){
             e.printStackTrace();
         }
