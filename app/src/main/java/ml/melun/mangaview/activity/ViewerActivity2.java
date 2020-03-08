@@ -119,6 +119,12 @@ public class ViewerActivity2 extends AppCompatActivity {
         leftRight = p.getLeftRight();
         spinner = this.findViewById(R.id.toolbar_spinner);
 
+        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         spinnerAdapter = new CustomSpinnerAdapter(context);
         spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
             @Override

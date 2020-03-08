@@ -102,6 +102,13 @@ public class ViewerActivity3 extends AppCompatActivity {
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         cut = this.findViewById(R.id.viewerBtn2);
+        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         cut.setText("자동 분할");
         //TODO: autoCut
         cut.setVisibility(View.GONE);

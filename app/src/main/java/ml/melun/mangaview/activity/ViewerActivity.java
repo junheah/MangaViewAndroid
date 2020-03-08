@@ -111,6 +111,13 @@ public class ViewerActivity extends AppCompatActivity {
         commentBtn = this.findViewById(R.id.commentButton);
         spinner = this.findViewById(R.id.toolbar_spinner);
         width = getScreenSize(getWindowManager().getDefaultDisplay());
+
+        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         //imageZoomHelper = new ImageZoomHelper(this);
         try {
             intent = getIntent();
