@@ -7,6 +7,22 @@
     android:fitsSystemWindows="true"
     tools:context=".activity.ViewerActivity">
 
+
+
+    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/viewerSwipe"
+        app:srl_direction="top">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/strip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            />
+    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/viewerAppbar"
         android:layout_width="match_parent"
@@ -27,20 +43,6 @@
         </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
-
-    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/viewerSwipe"
-        app:srl_direction="top">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/strip"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            />
-    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/viewerAppbarBottom"

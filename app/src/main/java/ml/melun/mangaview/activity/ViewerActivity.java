@@ -335,6 +335,8 @@ public class ViewerActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode,event);
     }
 
+
+
     public void toggleToolbar(){
         //attrs = getWindow().getAttributes();
         if(toolbarshow){

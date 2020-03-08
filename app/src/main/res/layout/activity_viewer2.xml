@@ -6,26 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".activity.ViewerActivity2">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/viewerAppbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:alpha="0.8">
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/viewerToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
-            android:background="?attr/colorPrimary"
-            app:contentInsetStart="0dp"
-            app:contentInsetLeft="0dp"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
-            <include layout="@layout/viewer_toolbar"/>
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+
 
 
 
@@ -99,6 +80,27 @@
         <!--app:layout_constraintStart_toStartOf="parent"-->
         <!--app:layout_constraintTop_toTopOf="parent"-->
         <!--app:srcCompat="@drawable/baseline_refresh_black_48" />-->
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/viewerAppbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:alpha="0.8">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/viewerToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:background="?attr/colorPrimary"
+            app:contentInsetStart="0dp"
+            app:contentInsetLeft="0dp"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+            <include layout="@layout/viewer_toolbar"/>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/viewerAppbarBottom"
