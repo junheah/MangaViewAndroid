@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import androidx.annotation.Nullable;
+
+import com.bumptech.glide.load.Key;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,7 +59,7 @@ import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity2 extends AppCompatActivity {
-    Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, stretch, leftRight;
+    Boolean dark, toolbarshow=true, reverse, touch=true, stretch, leftRight;
     Context context = this;
     String name;
     int id;
@@ -109,7 +111,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
-        volumeControl = p.getVolumeControl();
         reverse = p.getReverse();
         frame = this.findViewById(R.id.viewer_image);
         pageBtn = this.findViewById(R.id.viewerBtn1);
@@ -617,18 +618,20 @@ public class ViewerActivity2 extends AppCompatActivity {
         //getWindow().setAttributes(attrs);
     }
 
+
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
-        if(volumeControl && (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN ||keyCode==KeyEvent.KEYCODE_VOLUME_UP)) {
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (keyCode == p.getNextPageKey() ) {
+            if(event.getAction() == KeyEvent.ACTION_UP)
                 nextPage();
-            } else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            return true;
+        } else if(keyCode == p.getPrevPageKey()) {
+            if(event.getAction() == KeyEvent.ACTION_UP)
                 prevPage();
-            }
             return true;
         }
-        return super.onKeyDown(keyCode,event);
+        return super.dispatchKeyEvent(event);
     }
 
     private class loadImages extends AsyncTask<Void,String,Integer> {

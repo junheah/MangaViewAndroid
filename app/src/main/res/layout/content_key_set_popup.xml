@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="10dp"
+    android:paddingEnd="10dp">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+        <Button
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/button_bg"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/key_prev"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="이전 페이지" />
+        <TextView
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:id="@+id/key_prev_text"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:layout_marginRight="10dp"
+            android:background="@drawable/button_bg"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/key_next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="다음 페이지"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:id="@+id/key_next_text"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</LinearLayout>

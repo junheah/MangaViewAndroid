@@ -61,7 +61,6 @@ public class ViewerActivity3 extends AppCompatActivity {
     TextView toolbarTitle;
     AppBarLayout appbar, appbarBottom;
     Toolbar toolbar;
-    Boolean volumeControl;
     Button cut, pageBtn;
     ImageButton commentBtn;
     int width;
@@ -102,7 +101,6 @@ public class ViewerActivity3 extends AppCompatActivity {
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
-        volumeControl = p.getVolumeControl();
         cut = this.findViewById(R.id.viewerBtn2);
         cut.setText("자동 분할");
         //TODO: autoCut
@@ -295,18 +293,20 @@ public class ViewerActivity3 extends AppCompatActivity {
         new LoadImages().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
-        if(volumeControl && (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN ||keyCode==KeyEvent.KEYCODE_VOLUME_UP)) {
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
-                if(viewerBookmark<pageAdapter.getCount()-1) viewPager.setCurrentItem(viewerBookmark+1);
-            } else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                if(viewerBookmark>0) viewPager.setCurrentItem(viewerBookmark-1);
-            }
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if(keyCode == p.getNextPageKey()){
+            if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark<pageAdapter.getCount()-1)
+                viewPager.setCurrentItem(viewerBookmark+1);
+            return true;
+        }else if(keyCode == p.getPrevPageKey()){
+            if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark>0)
+                viewPager.setCurrentItem(viewerBookmark-1);
             return true;
         }
-        return super.onKeyDown(keyCode,event);
+        return super.dispatchKeyEvent(event);
     }
 
     public void toggleToolbar(){

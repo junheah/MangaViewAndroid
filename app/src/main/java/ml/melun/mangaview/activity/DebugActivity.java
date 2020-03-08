@@ -213,8 +213,8 @@ public class DebugActivity extends AppCompatActivity {
             editor.putString("homeDir",data.getString("homeDir"));
             editor.putBoolean("darkTheme",data.getBoolean("darkTheme"));
             editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
-            editor.putString("bookmark",data.getJSONObject("bookmark(viewer)").toString());
-            editor.putString("bookmark2",data.getJSONObject("bookmark(episode)").toString());
+            editor.putString("bookmark",data.getJSONObject("bookmark").toString());
+            editor.putString("bookmark2",data.getJSONObject("bookmark2").toString());
             editor.putInt("viewerType",data.getInt("viewerType"));
             editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
             editor.putBoolean("dataSave",data.getBoolean("dataSave"));
@@ -225,7 +225,6 @@ public class DebugActivity extends AppCompatActivity {
             editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
             editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
             editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putString("login", data.getJSONObject("login").toString());
             editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
             editor.commit();
             // reload preference

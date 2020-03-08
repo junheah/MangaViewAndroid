@@ -25,7 +25,6 @@ public class Preference {
     JSONObject pagebookmark;
     JSONObject bookmark;
     String homeDir;
-    Boolean volumeControl;
     Boolean darkTheme;
     int viewerType;
     Boolean reverse;
@@ -36,8 +35,9 @@ public class Preference {
     Boolean leftRight;
     Login login;
     final String defUrl = "https://manamoa.net/";
-//    String session;
     Boolean autoUrl;
+
+    int prevPageKey, nextPageKey;
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
@@ -57,7 +57,8 @@ public class Preference {
             favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<MTitle>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
             homeDir = sharedPref.getString("homeDir","/sdcard/MangaView/saved");
-            volumeControl = sharedPref.getBoolean("volumeControl",false);
+            prevPageKey = sharedPref.getInt("prevPageKey", -1);
+            nextPageKey = sharedPref.getInt("nextPageKey", -1);
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
             bookmark = new JSONObject(sharedPref.getString("bookmark2", "{}"));
             darkTheme = sharedPref.getBoolean("darkTheme", false);
@@ -163,15 +164,7 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public Boolean getVolumeControl() {
-        return volumeControl;
-    }
 
-    public void setVolumeControl(Boolean volumeControl) {
-        this.volumeControl = volumeControl;
-        prefsEditor.putBoolean("volumeControl", volumeControl);
-        prefsEditor.commit();
-    }
 
     public String getHomeDir() {
         return homeDir;
@@ -465,6 +458,27 @@ public class Preference {
     public void setAutoUrl(Boolean autoUrl) {
         this.autoUrl = autoUrl;
         prefsEditor.putBoolean("autoUrl", autoUrl);
+        prefsEditor.commit();
+    }
+
+
+    public int getPrevPageKey() {
+        return prevPageKey;
+    }
+
+    public void setPrevPageKey(int prevPageKey) {
+        this.prevPageKey = prevPageKey;
+        prefsEditor.putInt("prevPageKey", prevPageKey);
+        prefsEditor.commit();
+    }
+
+    public int getNextPageKey() {
+        return nextPageKey;
+    }
+
+    public void setNextPageKey(int nextPageKey) {
+        this.nextPageKey = nextPageKey;
+        prefsEditor.putInt("nextPageKey", nextPageKey);
         prefsEditor.commit();
     }
 }

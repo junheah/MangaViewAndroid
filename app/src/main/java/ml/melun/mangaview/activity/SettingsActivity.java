@@ -12,9 +12,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -48,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
     Boolean dark;
     public static final String prefExtension = ".mvpref";
     public static final int RESULT_NEED_RESTART = 7;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
@@ -102,19 +105,111 @@ public class SettingsActivity extends AppCompatActivity {
                         .setNegativeButton("아니오", dialogClickListener).show();
             }
         });
-        s_volumeKey = this.findViewById(R.id.setting_volume);
-        s_volumeKey_switch = this.findViewById(R.id.setting_volume_switch);
-        s_volumeKey_switch.setChecked(p.getVolumeControl());
-        s_volumeKey.setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.setting_key).setOnClickListener(new View.OnClickListener() {
+            int prevKeyCode;
+            int nextKeyCode;
+            InputCallback inputCallback = null;
             @Override
-            public void onClick(View v) {
-                s_volumeKey_switch.toggle();
-            }
-        });
-        s_volumeKey_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                p.setVolumeControl(isChecked);
+            public void onClick(View view) {
+                prevKeyCode = p.getPrevPageKey();
+                nextKeyCode = p.getNextPageKey();
+
+                View v = getLayoutInflater().inflate(R.layout.content_key_set_popup, null);
+                Button pbtn = v.findViewById(R.id.key_prev);
+                Button nbtn = v.findViewById(R.id.key_next);
+                TextView ptext = v.findViewById(R.id.key_prev_text);
+                TextView ntext = v.findViewById(R.id.key_next_text);
+
+                if(prevKeyCode == -1)
+                    ptext.setText("-");
+                else
+                    ptext.setText(KeyEvent.keyCodeToString(prevKeyCode));
+                if(nextKeyCode == -1)
+                    ntext.setText("-");
+                else
+                    ntext.setText(KeyEvent.keyCodeToString(nextKeyCode));
+
+                pbtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(inputCallback == null) {
+                            view.setEnabled(false);
+                            ptext.setText("키를 입력해 주세요");
+                            inputCallback = new InputCallback() {
+                                @Override
+                                public void onKeyEvent(KeyEvent event) {
+                                    prevKeyCode = event.getKeyCode();
+                                    ptext.setText(KeyEvent.keyCodeToString(prevKeyCode));
+                                    view.setEnabled(true);
+                                }
+                            };
+                        }
+                    }
+                });
+                nbtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(inputCallback == null) {
+                            view.setEnabled(false);
+                            ntext.setText("키를 입력해 주세요");
+                            inputCallback = new InputCallback() {
+                                @Override
+                                public void onKeyEvent(KeyEvent event) {
+                                    nextKeyCode = event.getKeyCode();
+                                    ntext.setText(KeyEvent.keyCodeToString(nextKeyCode));
+                                    view.setEnabled(true);
+                                }
+                            };
+                        }
+                    }
+                });
+
+                AlertDialog.Builder builder;
+                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                else builder = new AlertDialog.Builder(context);
+                builder.setTitle("단축키 설정")
+                        .setView(v)
+                        .setOnKeyListener(new DialogInterface.OnKeyListener() {
+                            @Override
+                            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                                if(inputCallback != null){
+                                    if(keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+                                        inputCallback.onKeyEvent(keyEvent);
+                                        inputCallback = null;
+                                    }
+                                    return true;
+                                }
+                                return false;
+                            }
+                        })
+                        .setNeutralButton("초기화", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                p.setPrevPageKey(-1);
+                                p.setNextPageKey(-1);
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                inputCallback = null;
+                            }
+                        })
+                        .setPositiveButton("적용", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                inputCallback = null;
+                                p.setNextPageKey(nextKeyCode);
+                                p.setPrevPageKey(prevKeyCode);
+                            }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                inputCallback = null;
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -365,5 +460,9 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    private interface InputCallback{
+        void onKeyEvent(KeyEvent event);
     }
 }
