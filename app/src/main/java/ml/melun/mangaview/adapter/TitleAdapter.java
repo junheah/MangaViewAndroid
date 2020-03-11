@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,9 +24,10 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.p;
 
-public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> {
+public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> implements Filterable {
 
     private ArrayList<Title> mData;
+    private ArrayList<Title> mDataFiltered;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
@@ -33,6 +36,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     Boolean resume = true;
     Boolean updated = false;
     String path = "";
+    Filter filter;
 
     public TitleAdapter(Context context) {
         init(context);
@@ -48,6 +52,34 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
+        filter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String query = charSequence.toString();
+                if(query.isEmpty()){
+                    mDataFiltered = mData;
+                }else{
+                    if(mDataFiltered == null)
+                        mDataFiltered = new ArrayList<>();
+                    else
+                        mDataFiltered.clear();
+
+                    for(Title t : mData){
+                        if(t.getName().toLowerCase().contains(query.toLowerCase()))
+                            mDataFiltered.add(t);
+                    }
+                }
+                FilterResults res = new FilterResults();
+                res.values = mDataFiltered;
+                return res;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mDataFiltered = (ArrayList<Title>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     @Override
@@ -213,5 +245,14 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         void onItemClick(int position);
         void onLongClick(View view, int position);
         void onResumeClick(int position, int id);
+    }
+
+
+
+    // filter
+
+    @Override
+    public Filter getFilter() {
+        return null;
     }
 }

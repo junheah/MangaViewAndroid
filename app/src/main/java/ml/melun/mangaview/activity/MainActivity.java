@@ -260,8 +260,6 @@ public class MainActivity extends AppCompatActivity
         return 0;
     }
 
-
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -669,7 +667,6 @@ public class MainActivity extends AppCompatActivity
                     break;
             }
         }else if(resultCode == RESULT_NEED_RESTART){
-            System.out.println("ppppppppppppppppppppp");
             Intent intent = getIntent();
             finish();
             startActivity(intent);
