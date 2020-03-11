@@ -67,22 +67,7 @@ public class DebugActivity extends AppCompatActivity {
                 output.setText(readPref(context));
             }
         });
-        Button migrate = this.findViewById(R.id.debug_migrate);
-        migrate.setEnabled(false);
-//        migrate.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Preference p = new Preference(context);
-//                List<Title> titles = p.getRecent();
-//                StringBuilder b = new StringBuilder();
-//                for(Title t : titles){
-//                    if(t.getBookmark()>0) p.setBookmark(t,t.getBookmark());
-//                    b.append("제목: "+t.getName() +" | 북마크: "+t.getBookmark() +'\n');
-//                }
-//                b.append("북마크 이전이 완료되었습니다.");
-//                printLine(b.toString());
-//            }
-//        });
+
         Button clear = this.findViewById(R.id.debug_clear);
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,15 +118,7 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
-        Button removeEps = this.findViewById(R.id.debug_removeEps);
-        removeEps.setEnabled(false);
-//        removeEps.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new Preference(context).removeEpsFromData();
-//                printLine("작업 완료.");
-//            }
-//        });
+
 
         this.findViewById(R.id.debug_loginTest).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,6 +177,13 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public boolean onLongClick(View view) {
                 return false;
+            }
+        });
+
+        this.findViewById(R.id.debug_layoutEditor).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, LayoutEditActivity.class));
             }
         });
 

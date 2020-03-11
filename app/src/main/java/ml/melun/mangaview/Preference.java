@@ -36,7 +36,7 @@ public class Preference {
     Login login;
     final String defUrl = "https://manamoa.net/";
     Boolean autoUrl;
-
+    int pageControlButtonOffset;
     int prevPageKey, nextPageKey;
 
     public SharedPreferences getSharedPref(){
@@ -71,6 +71,7 @@ public class Preference {
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
             autoUrl = sharedPref.getBoolean("autoUrl", true);
+            pageControlButtonOffset = sharedPref.getInt("pageControlButtonOffset", -1);
 //            if(login != null && login.isValid()){
 //                setSession(login.getCookie());
 //            }
@@ -479,6 +480,16 @@ public class Preference {
     public void setNextPageKey(int nextPageKey) {
         this.nextPageKey = nextPageKey;
         prefsEditor.putInt("nextPageKey", nextPageKey);
+        prefsEditor.commit();
+    }
+
+    public int getPageControlButtonOffset() {
+        return pageControlButtonOffset;
+    }
+
+    public void setPageControlButtonOffset(int pageControlButtonOffset) {
+        this.pageControlButtonOffset = pageControlButtonOffset;
+        prefsEditor.putInt("pageControlButtonOffset", pageControlButtonOffset);
         prefsEditor.commit();
     }
 }

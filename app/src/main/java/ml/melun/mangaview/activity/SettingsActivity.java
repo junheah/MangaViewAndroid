@@ -1,6 +1,5 @@
 package ml.melun.mangaview.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,12 +43,14 @@ public class SettingsActivity extends AppCompatActivity {
     //데이터 절약 모드 : 외부 이미지 로드 안함
     //
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_volumeKey, s_getSd, s_dark, s_viewer, s_reverse, s_dataSave, s_tab, s_url, s_stretch;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_dark, s_viewer, s_reverse, s_dataSave, s_tab, s_stretch;
     Spinner s_tab_spinner, s_viewer_spinner;
-    Switch s_volumeKey_switch, s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch, s_leftRight_switch;
+    Switch s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch;
     Boolean dark;
     public static final String prefExtension = ".mvpref";
     public static final int RESULT_NEED_RESTART = 7;
+
+    View.OnClickListener pbtnClear, nbtnClear, pbtnSet, nbtnSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,11 +130,33 @@ public class SettingsActivity extends AppCompatActivity {
                 else
                     ntext.setText(KeyEvent.keyCodeToString(nextKeyCode));
 
-                pbtn.setOnClickListener(new View.OnClickListener() {
+                pbtnClear = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(prevKeyCode == -1)
+                            ptext.setText("-");
+                        else
+                            ptext.setText(KeyEvent.keyCodeToString(prevKeyCode));
+                        inputCallback = null;
+                        view.setOnClickListener(pbtnSet);
+                    }
+                };
+                nbtnClear = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(nextKeyCode == -1)
+                            ntext.setText("-");
+                        else
+                            ntext.setText(KeyEvent.keyCodeToString(nextKeyCode));
+                        inputCallback = null;
+                        view.setOnClickListener(nbtnSet);
+                    }
+                };
+                pbtnSet = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if(inputCallback == null) {
-                            view.setEnabled(false);
+                            view.setOnClickListener(pbtnClear);
                             ptext.setText("키를 입력해 주세요");
                             inputCallback = new InputCallback() {
                                 @Override
@@ -141,16 +164,17 @@ public class SettingsActivity extends AppCompatActivity {
                                     prevKeyCode = event.getKeyCode();
                                     ptext.setText(KeyEvent.keyCodeToString(prevKeyCode));
                                     view.setEnabled(true);
+                                    view.setOnClickListener(pbtnSet);
                                 }
                             };
                         }
                     }
-                });
-                nbtn.setOnClickListener(new View.OnClickListener() {
+                };
+                nbtnSet = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if(inputCallback == null) {
-                            view.setEnabled(false);
+                            view.setOnClickListener(nbtnClear);
                             ntext.setText("키를 입력해 주세요");
                             inputCallback = new InputCallback() {
                                 @Override
@@ -158,11 +182,15 @@ public class SettingsActivity extends AppCompatActivity {
                                     nextKeyCode = event.getKeyCode();
                                     ntext.setText(KeyEvent.keyCodeToString(nextKeyCode));
                                     view.setEnabled(true);
+                                    view.setOnClickListener(nbtnSet);
                                 }
                             };
                         }
                     }
-                });
+                };
+
+                pbtn.setOnClickListener(pbtnSet);
+                nbtn.setOnClickListener(nbtnSet);
 
                 AlertDialog.Builder builder;
                 if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
@@ -187,6 +215,7 @@ public class SettingsActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 p.setPrevPageKey(-1);
                                 p.setNextPageKey(-1);
+                                inputCallback = null;
                             }
                         })
                         .setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -374,18 +403,10 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        s_leftRight_switch = this.findViewById(R.id.setting_leftRight_switch);
-        s_leftRight_switch.setChecked(p.getLeftRight());
-        this.findViewById(R.id.setting_leftRight).setOnClickListener(new View.OnClickListener() {
+        this.findViewById(R.id.setting_buttonLayout).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                s_leftRight_switch.toggle();
-            }
-        });
-        s_leftRight_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                p.setLeftRight(isChecked);
+            public void onClick(View view) {
+                startActivity(new Intent(context, LayoutEditActivity.class));
             }
         });
 

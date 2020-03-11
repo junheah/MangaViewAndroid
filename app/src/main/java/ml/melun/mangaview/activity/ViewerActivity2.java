@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import androidx.annotation.Nullable;
 
-import com.bumptech.glide.load.Key;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +19,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -89,6 +89,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     CustomSpinnerAdapter spinnerAdapter;
     Decoder d;
     Boolean error = false, useSecond = false;
+    int buttonOffset;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -112,6 +113,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         reverse = p.getReverse();
+        buttonOffset = p.getPageControlButtonOffset();
         frame = this.findViewById(R.id.viewer_image);
         pageBtn = this.findViewById(R.id.viewerBtn1);
         toolbar_toggleBtn = this.findViewById(R.id.toolbar_toggleBtn);
@@ -150,14 +152,20 @@ public class ViewerActivity2 extends AppCompatActivity {
         spinner.setAdapter(spinnerAdapter);
 
         if(leftRight){
-            nextPageBtn = this.findViewById(R.id.nextPageBtn2);
-            prevPageBtn = this.findViewById(R.id.prevPageBtn2);
+            // button reverse
+            nextPageBtn = this.findViewById(R.id.leftButton);
+            prevPageBtn = this.findViewById(R.id.rightButton);
         }else{
-            nextPageBtn = this.findViewById(R.id.nextPageBtn);
-            prevPageBtn = this.findViewById(R.id.prevPageBtn);
+            nextPageBtn = this.findViewById(R.id.rightButton);
+            prevPageBtn = this.findViewById(R.id.leftButton);
         }
-        nextPageBtn.setVisibility(View.VISIBLE);
-        prevPageBtn.setVisibility(View.VISIBLE);
+
+        if(p.getPageControlButtonOffset()!= -1){
+            Button left = this.findViewById(R.id.leftButton);
+            ViewGroup.LayoutParams params = left.getLayoutParams();
+            params.width = p.getPageControlButtonOffset();
+            left.setLayoutParams(params);
+        }
 
         touchToggleBtn = this.findViewById(R.id.viewerBtn2);
         touchToggleBtn.setText("입력 제한");

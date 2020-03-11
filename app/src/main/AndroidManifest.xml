@@ -98,11 +98,15 @@
             android:name=".activity.CaptchaActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activity.FirstTimeActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppThemeBlackNoTitle"/>
+            android:theme="@style/AppThemeBlackNoTitle" />
+
+        <activity
+            android:name=".activity.LayoutEditActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="레이아웃 수정"/>
     </application>
 
 </manifest>

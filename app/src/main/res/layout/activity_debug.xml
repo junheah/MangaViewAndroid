@@ -37,16 +37,6 @@
                 android:text="sharedpref 편집" />
 
             <Button
-                android:id="@+id/debug_migrate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="북마크 이전" />
-            <Button
-                android:id="@+id/debug_removeEps"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="저장된 객체들에서 화 목록 지우기" />
-            <Button
                 android:id="@+id/debug_webTest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -75,6 +65,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="cf scrape 테스트" />
+
+            <Button
+                android:id="@+id/debug_layoutEditor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="layout editor 테스트" />
 
             <TextView
                 android:id="@+id/debug_out"

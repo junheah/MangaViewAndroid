@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -377,6 +378,11 @@ public class Utils {
         return width>3000 ? 3000 : width ;
     }
 
+    public static int getScreenWidth(Display display){
+        Point size = new Point();
+        display.getSize(size);
+        return size.x;
+    }
     public static Boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
         try {
             Map<String, String> headers = new HashMap<>();
@@ -517,6 +523,14 @@ public class Utils {
         return input.replace("\\n", "/n")
                 .replace("\\","")
                 .replace("/n", "\\n");
+    }
+
+    public static float dpToPixel(float dp, Context context){
+        return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static float pixelToDp(float px, Context context){
+        return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
 }

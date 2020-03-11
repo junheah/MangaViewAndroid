@@ -23,49 +23,23 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
-        android:id="@+id/nextPageBtn"
-        android:layout_width="match_parent"
+        android:id="@+id/rightButton"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:text="next"
-        android:visibility="gone"
+        android:visibility="visible"
         android:alpha="0"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-    <Button
-        android:id="@+id/prevPageBtn"
-        android:layout_width="100dp"
-        android:layout_height="0dp"
-        android:text="prev"
-        android:visibility="gone"
-        android:alpha="0"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-
-    <Button
-        android:id="@+id/nextPageBtn2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="prev"
-        android:visibility="gone"
-        android:alpha="0"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-
-
-    <Button
-        android:id="@+id/prevPageBtn2"
-        android:layout_width="100dp"
-        android:layout_height="0dp"
-        android:text="next"
-        android:visibility="gone"
-        android:alpha="0"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/leftButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+    <Button
+        android:id="@+id/leftButton"
+        android:layout_width="100dp"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        android:alpha="0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <!--<ImageButton-->

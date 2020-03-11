@@ -257,4 +257,7 @@
     <string name="kakao_chat">https://open.kakao.com/o/gV9pe1ob</string>
     <string name="kakao_direct">https://open.kakao.com/o/sxm0Blfb</string>
 
+    <string name="prev_page">이전 페이지</string>
+    <string name="next_page">다음 페이지</string>
+
 </resources>
