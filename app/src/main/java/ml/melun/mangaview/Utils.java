@@ -11,11 +11,15 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.fragment.app.Fragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -209,14 +213,16 @@ public class Utils {
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
-    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close){
+
+
+    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Fragment fragment){
         if(!checkConnection(context)){
             //no internet
             //showErrorPopup(context, "네트워크 연결이 없습니다.", e, force_close);
             Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_LONG).show();
             if(force_close) ((Activity) context).finish();
         }else if(captchaCount == 0){
-            startCaptchaActivity(context, code);
+            startCaptchaActivity(context, code, fragment);
         }else {
             AlertDialog.Builder builder;
             String title = "오류";
@@ -235,7 +241,7 @@ public class Utils {
                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startCaptchaActivity(context, code);
+                            startCaptchaActivity(context, code, fragment);
                         }
                     })
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -261,9 +267,16 @@ public class Utils {
         captchaCount++;
     }
 
-    static void startCaptchaActivity(Context context, int code){
+    static void startCaptchaActivity(Context context, int code, Fragment fragment){
         Intent captchaIntent = new Intent(context, CaptchaActivity.class);
-        ((Activity)context).startActivityForResult(captchaIntent, code);
+        if(fragment == null)
+            ((Activity)context).startActivityForResult(captchaIntent, code);
+        else
+            fragment.startActivityForResult(captchaIntent, code);
+    }
+
+    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close) {
+        showCaptchaPopup(context,code,e,force_close,null);
     }
 
     public static void showCaptchaPopup(Context context, Exception e) {
@@ -274,6 +287,11 @@ public class Utils {
     public static void showCaptchaPopup(Context context, int code){
         // menu call
         showCaptchaPopup(context, code, null, false);
+    }
+
+    public static void showCaptchaPopup(Context context, int code, Fragment fragment){
+        // menu call
+        showCaptchaPopup(context, code, null, false, fragment);
     }
 
     public static void showCaptchaPopup(Context context){
@@ -531,6 +549,46 @@ public class Utils {
 
     public static float pixelToDp(float px, Context context){
         return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static void openViewer(Context context, Manga manga, int code){
+        Intent viewer = viewerIntent(context,manga);
+        viewer.putExtra("online",true);
+        ((Activity)context).startActivityForResult(viewer, code);
+    }
+
+    public static void popup(Context context, View view, final int position, final Title title, final int m, PopupMenu.OnMenuItemClickListener listener, Preference p) {
+        PopupMenu popup = new PopupMenu(context, view);
+        //Inflating the Popup using xml file
+        //todo: clean this part
+        popup.getMenuInflater().inflate(R.menu.title_options, popup.getMenu());
+        switch (m) {
+            case 1:
+                //최근
+                popup.getMenu().findItem(R.id.del).setVisible(true);
+            case 0:
+                //검색
+                popup.getMenu().findItem(R.id.favAdd).setVisible(true);
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
+                break;
+            case 2:
+                //좋아요
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
+                break;
+            case 3:
+                //저장됨
+                popup.getMenu().findItem(R.id.favAdd).setVisible(true);
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
+                popup.getMenu().findItem(R.id.remove).setVisible(true);
+                break;
+        }
+        //좋아요 추가/제거 중 하나만 남김
+        if (m != 2) {
+            if (p.findFavorite(title) > -1) popup.getMenu().removeItem(R.id.favAdd);
+            else popup.getMenu().removeItem(R.id.favDel);
+        }
+        popup.setOnMenuItemClickListener(listener);
+        popup.show();
     }
 
 }

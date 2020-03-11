@@ -49,7 +49,9 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
         else
             mData = new ArrayList<>();
-        mData.add(new Manga(0,"로드중...",""));
+        Manga loading = new Manga(0,"로드중...","");
+        loading.addThumb("loading");
+        mData.add(loading);
         notifyDataSetChanged();
     }
 
@@ -69,7 +71,13 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         viewHolder h = (viewHolder) holder;
         h.title.setText(mData.get(position).getName());
-        if(!save) Glide.with(context).load(mData.get(position).getThumb()).into(h.thumb);
+        String thumb = mData.get(position).getThumb();
+        if(thumb != null && thumb.equals("loading"))
+            h.thumb.setImageResource(android.R.color.transparent);
+        else if(thumb != null && thumb.equals("reload"))
+            h.thumb.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_refresh));
+        else if(!save)
+            Glide.with(context).load(thumb).into(h.thumb);
     }
 
 
@@ -79,6 +87,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
     public interface onclick{
         void onclick(Manga m);
+        void refresh();
     }
 
     class viewHolder extends RecyclerView.ViewHolder{
@@ -99,7 +108,8 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public void onClick(View v) {
                     if(loaded ){
                         monclick.onclick(mData.get(getAdapterPosition()));
-                    }
+                    }else
+                        monclick.refresh();
                 }
             });
             if(dark){
@@ -115,7 +125,9 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void setData(List<Manga> data){
         mData = data;
         if(mData.size()==0){
-            mData.add(new Manga(0,"결과 없음",""));
+            Manga none = new Manga(0,"결과 없음","");
+            none.addThumb("reload");
+            mData.add(none);
             notifyItemChanged(0);
             loaded = false;
         }else {

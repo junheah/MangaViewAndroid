@@ -229,6 +229,11 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onclick(Manga m) {
                     mainClickListener.clickedManga(m);
                 }
+
+                @Override
+                public void refresh() {
+                    fetch();
+                }
             });
             title.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -339,14 +344,13 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.mainClickListener = main;
     }
 
-
-
     public interface onItemClick{
         void clickedManga(Manga m);
         void clickedTag(String t);
         void clickedName(int t);
         void clickedRelease(int t);
         void clickedMoreUpdated();
+        void captchaCallback();
     }
 
     private class fetchMain extends AsyncTask<Void, Integer, MainPage> {
@@ -372,7 +376,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             //update adapters?
             if(main.getRecent().size() == 0){
                 // captcha?
-                Utils.showCaptchaPopup(mainContext, 3);
+                mainClickListener.captchaCallback();
             }
             uadapter.setData(main.getRecent());
             ranking = main.getRanking();
