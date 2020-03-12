@@ -26,6 +26,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -61,6 +64,10 @@ import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
 import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
+
+
+//TODO: smooth transitioning between fragments
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -76,15 +83,19 @@ public class MainActivity extends AppCompatActivity
     Toolbar toolbar;
     private static final int FIRST_TIME_ACTIVITY = 9;
 
+
+    Fragment[] fragments = new Fragment[5];
     MainMain mainTab;
     MainRecent recentTab;
     MainSaved savedTab;
     MainSearch searchTab;
     MainFavorite favoriteTab;
+
     FrameLayout content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
@@ -101,6 +112,13 @@ public class MainActivity extends AppCompatActivity
 
     private void activityInit(){
         setContentView(R.layout.activity_main);
+        fragments[0] = new MainMain();
+        fragments[1] = new MainSearch();
+        fragments[2] = new MainRecent();
+        fragments[3] = new MainFavorite();
+        fragments[4] = new MainSaved();
+
+
         //check prefs
         if(!p.check()){
             //popup to fix preferences
@@ -183,12 +201,6 @@ public class MainActivity extends AppCompatActivity
 
         content = findViewById(R.id.contentHolder);
 
-        mainTab = new MainMain();
-        recentTab = new MainRecent();
-        savedTab = new MainSaved();
-        searchTab = new MainSearch();
-        favoriteTab = new MainFavorite();
-
         // set initial tab
         startTab = p.getStartTab();
         currentTabId = getTabId(startTab);
@@ -215,6 +227,22 @@ public class MainActivity extends AppCompatActivity
                 return(R.id.nav_download);
         }
         return 0;
+    }
+
+    public int getTabIndex(int i){
+        switch(i){
+            case R.id.nav_main:
+                return 0;
+            case R.id.nav_search:
+                return 1;
+            case R.id.nav_recent:
+                return 2;
+            case R.id.nav_favorite:
+                return 3;
+            case R.id.nav_download:
+                return 4;
+        }
+        return -1;
     }
 
     @Override
@@ -317,20 +345,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     boolean changeFragment(int id){
-        if (id == R.id.nav_main) {
-            // Handle the main action
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, mainTab).commit();
-        }else if (id == R.id.nav_search) {
-            // Handle the search action
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, searchTab).commit();
-        }else if(id==R.id.nav_recent) {
-            // Handle the recent action
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, recentTab).commit();
-        }else if(id==R.id.nav_favorite) {
-            // Handle the favorite action
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, favoriteTab).commit();
-        }else if(id==R.id.nav_download){
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, savedTab).commit();
+        int index = getTabIndex(id);
+        if(index>-1){
+            if(getSupportFragmentManager().getFragments().indexOf(fragments[index])==-1)
+                getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, fragments[index]).commit();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            for(int i=0; i<5; i++){
+                if(i == index)
+                    ft.show(fragments[i]);
+                else
+                    ft.hide(fragments[i]);
+            }
+            ft.commit();
         }else
             return false;   //fragment doesnt exist
         currentTabId = id;
@@ -342,10 +368,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (changeFragment(id)){
-            // fragment exists
-
-        }else{
+        if (!changeFragment(id)){
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update

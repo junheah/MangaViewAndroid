@@ -3,6 +3,8 @@ package ml.melun.mangaview;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
 import org.acra.annotation.AcraDialog;
@@ -33,8 +35,9 @@ public class MainApplication extends Application{
 
     @Override
     public void onCreate() {
-        super.onCreate();
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         p = new Preference(this);
         httpClient = new CustomHttpClient(p);
+        super.onCreate();
     }
 }

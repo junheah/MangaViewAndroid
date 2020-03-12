@@ -48,7 +48,7 @@ public class MainSearch extends Fragment {
     Spinner searchMode;
     TitleAdapter searchAdapter;
     Search search;
-    
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

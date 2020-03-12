@@ -28,6 +28,7 @@ android {
         versionCode code
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
         setProperty("archivesBaseName", "mangaViewer_" + code)
     }
     buildTypes {

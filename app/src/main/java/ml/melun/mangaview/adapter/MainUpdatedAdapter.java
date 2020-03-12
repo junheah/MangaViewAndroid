@@ -50,7 +50,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         else
             mData = new ArrayList<>();
         Manga loading = new Manga(0,"로드중...","");
-        loading.addThumb("loading");
+        loading.addThumb("");
         mData.add(loading);
         notifyDataSetChanged();
     }
@@ -72,11 +72,13 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         viewHolder h = (viewHolder) holder;
         h.title.setText(mData.get(position).getName());
         String thumb = mData.get(position).getThumb();
-        if(thumb != null && thumb.equals("loading"))
+        if(thumb != null && thumb.length()==0)
             h.thumb.setImageResource(android.R.color.transparent);
         else if(thumb != null && thumb.equals("reload"))
             h.thumb.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_refresh));
-        else if(!save)
+        else if(save)
+            h.thumb.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
+        else
             Glide.with(context).load(thumb).into(h.thumb);
     }
 

@@ -98,6 +98,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         View view = mInflater.inflate(R.layout.item_title, parent, false);
         return new ViewHolder(view);
     }
+
     public void addData(List<?> t){
         int oSize = mData.size();
         for(Object d:t){

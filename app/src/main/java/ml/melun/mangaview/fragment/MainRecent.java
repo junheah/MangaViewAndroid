@@ -1,8 +1,11 @@
 package ml.melun.mangaview.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -19,9 +22,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.util.List;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -90,6 +95,21 @@ public class MainRecent extends Fragment {
                 startActivityForResult(episodeView,2);
             }
         });
+
+//        new AsyncTask<Void,Void,Void>(){
+//            List<MTitle> titles;
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                recentAdapter.addData(titles);
+//            }
+//
+//            @Override
+//            protected Void doInBackground(Void... voids) {
+//                titles = p.getRecent();
+//                return null;
+//            }
+//        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         return rootView;
     }
