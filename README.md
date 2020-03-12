@@ -3,7 +3,7 @@
 
 # 마나모아 전용 뷰어/다운로더 앱 #
 
-![GitHub All Releases](https://img.shields.io/github/downloads/junheah/MangaViewAndroid/total?color=db49de&label=%EC%A0%84%EC%B2%B4%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C)
+[![GitHub All Releases](https://img.shields.io/github/downloads/junheah/MangaViewAndroid/total?color=db49de&label=다운로드)](https://junheah.github.io/MangaViewAndroid/)
 ### [최신 버전 다운로드 (apk)](https://junheah.github.io/MangaViewAndroid/) ###
 
 #
