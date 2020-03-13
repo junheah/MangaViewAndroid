@@ -41,7 +41,7 @@ import static ml.melun.mangaview.Utils.popup;
 import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showPopup;
 
-public class MainSaved extends Fragment {
+public class MainSaved extends MainActivityFragment {
     TitleAdapter offlineAdapter;
     RecyclerView savedList;
 

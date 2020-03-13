@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 
@@ -27,7 +28,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,7 +60,6 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
-import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
 import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
     public static int PERMISSION_CODE = 132322;
     int startTab;
-    int currentTabId;
+    int currentTab;
     private Context context = this;
     int selectedPosition=-1;
     MenuItem versionItem;
@@ -81,21 +80,21 @@ public class MainActivity extends AppCompatActivity
     Boolean dark;
     NavigationView navigationView;
     Toolbar toolbar;
+    View progressView;
     private static final int FIRST_TIME_ACTIVITY = 9;
 
-
     Fragment[] fragments = new Fragment[5];
-    MainMain mainTab;
-    MainRecent recentTab;
-    MainSaved savedTab;
-    MainSearch searchTab;
-    MainFavorite favoriteTab;
+    boolean fragmentNeedChange = false;
 
     FrameLayout content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        fragments[0] = new MainMain();
+        fragments[1] = new MainSearch();
+        fragments[2] = new MainRecent();
+        fragments[3] = new MainFavorite();
+        fragments[4] = new MainSaved();
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
@@ -112,13 +111,8 @@ public class MainActivity extends AppCompatActivity
 
     private void activityInit(){
         setContentView(R.layout.activity_main);
-        fragments[0] = new MainMain();
-        fragments[1] = new MainSearch();
-        fragments[2] = new MainRecent();
-        fragments[3] = new MainFavorite();
-        fragments[4] = new MainSaved();
 
-
+        progressView = this.findViewById(R.id.progress_panel);
         //check prefs
         if(!p.check()){
             //popup to fix preferences
@@ -154,6 +148,29 @@ public class MainActivity extends AppCompatActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                if(fragmentNeedChange) {
+                    changeFragment(currentTab);
+                }
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
         toggle.syncState();
 
         //nav_drawer color scheme
@@ -203,11 +220,10 @@ public class MainActivity extends AppCompatActivity
 
         // set initial tab
         startTab = p.getStartTab();
-        currentTabId = getTabId(startTab);
-        changeFragment(getTabId(startTab));
+        currentTab = startTab;
+        changeFragment(startTab);
         getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
         navigationView.getMenu().getItem(startTab).setChecked(true);
-
 
         //check for update, notices
         new CheckInfo(context,httpClient).all(false);
@@ -251,7 +267,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(currentTabId == getTabId(startTab)){
+            if(currentTab == startTab){
 
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
@@ -313,7 +329,7 @@ public class MainActivity extends AppCompatActivity
                         .setNegativeButton("아니오", dialogClickListener)
                         .show();
             }else{
-                changeFragment(getTabId(startTab));
+                changeFragment(startTab);
                 navigationView.getMenu().getItem(startTab).setChecked(true);
                 toolbar.setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
             }
@@ -344,23 +360,19 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    boolean changeFragment(int id){
+    boolean preChangeFragment(int id){
         int index = getTabIndex(id);
         if(index>-1){
-            if(getSupportFragmentManager().getFragments().indexOf(fragments[index])==-1)
-                getSupportFragmentManager().beginTransaction().add(R.id.contentHolder, fragments[index]).commit();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            for(int i=0; i<5; i++){
-                if(i == index)
-                    ft.show(fragments[i]);
-                else
-                    ft.hide(fragments[i]);
-            }
-            ft.commit();
+            currentTab = index;
+            fragmentNeedChange = true;
+            progressView.setVisibility(View.VISIBLE);
+            return true;
         }else
             return false;   //fragment doesnt exist
-        currentTabId = id;
-        return true;
+    }
+
+    void changeFragment(int index){
+        getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, fragments[index]).commit();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -368,7 +380,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (!changeFragment(id)){
+        if (!preChangeFragment(id)){
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update
@@ -444,6 +456,10 @@ public class MainActivity extends AppCompatActivity
             finish();
             startActivity(intent);
         }
+    }
+
+    public void hideProgressPanel(){
+        progressView.setVisibility(View.GONE);
     }
 
     private class DataUpdater extends AsyncTask<Void,Void,Integer>{

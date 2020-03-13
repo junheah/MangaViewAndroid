@@ -39,7 +39,7 @@ import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.Utils.popup;
 
-public class MainSearch extends Fragment {
+public class MainSearch extends MainActivityFragment {
     SwipyRefreshLayout swipe;
     FloatingActionButton advSearchBtn;
     TextView noresult;

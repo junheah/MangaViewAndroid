@@ -6,10 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activity.ViewerActivity2">
 
-
-
-
-
     <ImageView
         android:id="@+id/viewer_image"
         android:layout_width="match_parent"

@@ -26,7 +26,7 @@ import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.Utils.popup;
 
-public class MainFavorite extends Fragment {
+public class MainFavorite extends MainActivityFragment {
     TitleAdapter favoriteAdapter;
     RecyclerView favoriteResult;
     int selectedPosition = -1;

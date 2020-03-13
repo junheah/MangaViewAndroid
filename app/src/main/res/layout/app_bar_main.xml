@@ -28,5 +28,12 @@
 
     </FrameLayout>
 
+    <include
+        android:visibility="gone"
+        android:layout_marginTop="?attr/actionBarSize"
+        layout="@layout/progress_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

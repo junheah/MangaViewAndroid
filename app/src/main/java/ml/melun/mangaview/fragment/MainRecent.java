@@ -39,7 +39,7 @@ import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.Utils.popup;
 import static ml.melun.mangaview.Utils.showPopup;
 
-public class MainRecent extends Fragment {
+public class MainRecent extends MainActivityFragment {
     int selectedPosition = -1;
     RecyclerView recentResult;
     TitleAdapter recentAdapter;
