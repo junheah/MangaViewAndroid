@@ -47,7 +47,6 @@
         android:paddingBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/layout_save"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button

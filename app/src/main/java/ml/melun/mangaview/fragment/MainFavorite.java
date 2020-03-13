@@ -1,6 +1,5 @@
 package ml.melun.mangaview.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,7 +24,7 @@ import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.Utils.popup;
 
-public class MainFavorite extends MainActivityFragment {
+public class MainFavorite extends MainActivityFragment{
     TitleAdapter favoriteAdapter;
     RecyclerView favoriteResult;
     int selectedPosition = -1;
@@ -38,7 +36,7 @@ public class MainFavorite extends MainActivityFragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_favorite , container, false);
         favoriteResult = rootView.findViewById(R.id.favoriteList);
         favoriteAdapter = new TitleAdapter(getContext());
-        favoriteAdapter.addData(p.getFavorite());
+
         favoriteResult.setLayoutManager(new LinearLayoutManager(getContext()));
         favoriteResult.setAdapter(favoriteAdapter);
         favoriteAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
@@ -88,5 +86,10 @@ public class MainFavorite extends MainActivityFragment {
             if(!favorite_after && favoriteAdapter != null && favoriteAdapter.getItemCount()>0)
                 favoriteAdapter.remove(selectedPosition);
         }
+    }
+
+    @Override
+    public void postDrawerJob() {
+        favoriteAdapter.addData(p.getFavorite());
     }
 }

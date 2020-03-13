@@ -1,6 +1,5 @@
 package ml.melun.mangaview.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +25,6 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirec
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.activity.AdvSearchActivity;
-import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
@@ -39,7 +36,7 @@ import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.Utils.popup;
 
-public class MainSearch extends MainActivityFragment {
+public class MainSearch extends MainActivityFragment{
     SwipyRefreshLayout swipe;
     FloatingActionButton advSearchBtn;
     TextView noresult;

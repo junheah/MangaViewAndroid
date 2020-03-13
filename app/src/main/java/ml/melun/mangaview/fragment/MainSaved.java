@@ -1,6 +1,5 @@
 package ml.melun.mangaview.fragment;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -15,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -41,7 +38,7 @@ import static ml.melun.mangaview.Utils.popup;
 import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showPopup;
 
-public class MainSaved extends MainActivityFragment {
+public class MainSaved extends MainActivityFragment{
     TitleAdapter offlineAdapter;
     RecyclerView savedList;
 
@@ -112,6 +109,13 @@ public class MainSaved extends MainActivityFragment {
                 //not used
             }
         });
+
+
+        return rootView;
+    }
+
+    @Override
+    public void postDrawerJob() {
         new AsyncTask<Void, Void, Integer>() {
             List<Title> titles;
 
@@ -170,7 +174,5 @@ public class MainSaved extends MainActivityFragment {
                 return null;
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-        return rootView;
     }
 }

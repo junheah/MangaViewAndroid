@@ -118,7 +118,8 @@ public class CustomHttpClient {
             cbuilder.append(cookie.get(key));
             cbuilder.append("; ");
         }
-        cbuilder.delete(cbuilder.length()-2,cbuilder.length());
+        if(cbuilder.length()>2)
+            cbuilder.delete(cbuilder.length()-2,cbuilder.length());
 
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cbuilder.toString());

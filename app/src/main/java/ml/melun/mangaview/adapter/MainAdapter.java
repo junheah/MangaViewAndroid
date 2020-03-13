@@ -78,14 +78,12 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         favUpdate = new ArrayList<>();
 
         setHasStableIds(true);
-        fetch();
     }
 
     public void fetch(){
         //fetch main page data
         uadapter.setLoad();
-        fetchMain fetch = new fetchMain();
-        fetch.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new fetchMain().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -212,6 +210,10 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ranking.add(new Manga(-1,"결과없음",""));
             notifyItemChanged(RANKING+1);
         }
+
+    }
+
+    public void clearRecyclerPools(){
 
     }
 

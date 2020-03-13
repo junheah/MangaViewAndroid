@@ -1,45 +1,31 @@
 package ml.melun.mangaview.fragment;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
-import java.util.List;
-
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
-import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static android.app.Activity.RESULT_OK;
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.episodeIntent;
-import static ml.melun.mangaview.Utils.filterFolder;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.Utils.popup;
 import static ml.melun.mangaview.Utils.showPopup;
 
-public class MainRecent extends MainActivityFragment {
+public class MainRecent extends MainActivityFragment{
     int selectedPosition = -1;
     RecyclerView recentResult;
     TitleAdapter recentAdapter;
@@ -51,7 +37,7 @@ public class MainRecent extends MainActivityFragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_recent , container, false);
         recentResult = rootView.findViewById(R.id.recentList);
         recentAdapter = new TitleAdapter(getContext());
-        recentAdapter.addData(p.getRecent());
+
         recentResult.setLayoutManager(new LinearLayoutManager(getContext()));
         recentResult.setAdapter(recentAdapter);
         recentAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
@@ -119,5 +105,10 @@ public class MainRecent extends MainActivityFragment {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK && recentAdapter != null && recentAdapter.getItemCount() > 0)
             recentAdapter.moveItemToTop(selectedPosition);
+    }
+
+    @Override
+    public void postDrawerJob() {
+        recentAdapter.addData(p.getRecent());
     }
 }

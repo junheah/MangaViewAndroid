@@ -44,6 +44,7 @@ import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
+import ml.melun.mangaview.fragment.MainActivityFragment;
 import ml.melun.mangaview.fragment.MainFavorite;
 import ml.melun.mangaview.fragment.MainMain;
 import ml.melun.mangaview.fragment.MainRecent;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity
 
     public static int PERMISSION_CODE = 132322;
     int startTab;
-    int currentTab;
+    int currentTab = -1;
     private Context context = this;
     int selectedPosition=-1;
     MenuItem versionItem;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     View progressView;
     private static final int FIRST_TIME_ACTIVITY = 9;
 
-    Fragment[] fragments = new Fragment[5];
+    MainActivityFragment[] fragments = new MainActivityFragment[5];
     boolean fragmentNeedChange = false;
 
     FrameLayout content;
@@ -162,7 +163,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
                 if(fragmentNeedChange) {
-                    changeFragment(currentTab);
+                    fragments[currentTab].drawerClosed();
+                    fragmentNeedChange = false;
                 }
             }
 
@@ -220,8 +222,7 @@ public class MainActivity extends AppCompatActivity
 
         // set initial tab
         startTab = p.getStartTab();
-        currentTab = startTab;
-        changeFragment(startTab);
+        changeFragment(startTab, true);
         getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
         navigationView.getMenu().getItem(startTab).setChecked(true);
 
@@ -360,27 +361,31 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    boolean preChangeFragment(int id){
-        int index = getTabIndex(id);
-        if(index>-1){
+
+    boolean changeFragment(int index, boolean forceUpdate){
+        if(index>-1 && index != currentTab){
             currentTab = index;
             fragmentNeedChange = true;
-            progressView.setVisibility(View.VISIBLE);
+            getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, (Fragment)fragments[index]).commit();
+            if(forceUpdate)
+                fragments[index].drawerClosed();
             return true;
         }else
             return false;   //fragment doesnt exist
     }
-
-    void changeFragment(int index){
-        getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, fragments[index]).commit();
+    boolean changeFragment(int index){
+        return changeFragment(index, false);
     }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (!preChangeFragment(id)){
+        if (changeFragment(getTabIndex(id))) {
+
+        }else{
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update

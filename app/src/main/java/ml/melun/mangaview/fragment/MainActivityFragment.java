@@ -1,12 +1,41 @@
 package ml.melun.mangaview.fragment;
 
-import androidx.fragment.app.Fragment;
-import ml.melun.mangaview.activity.MainActivity;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-public class MainActivityFragment extends Fragment {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+public class MainActivityFragment extends Fragment{
+    boolean loaded = false;
+    boolean force = false;
+
     @Override
-    public void onResume() {
-        super.onResume();
-        ((MainActivity)getActivity()).hideProgressPanel();
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        loaded = true;
+        if(force){
+            postDrawerJob();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        loaded = false;
+    }
+
+    public void drawerClosed() {
+        if(!loaded)
+            force = true;
+        else
+            postDrawerJob();
+    }
+
+    public void postDrawerJob(){
+
     }
 }

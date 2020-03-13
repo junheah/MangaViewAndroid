@@ -1,6 +1,5 @@
 package ml.melun.mangaview.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
-import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.mangaview.Manga;
@@ -23,7 +21,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
-public class MainMain extends MainActivityFragment {
+public class MainMain extends MainActivityFragment{
 
     RecyclerView mainRecycler;
     MainAdapter mainadapter;
@@ -33,6 +31,7 @@ public class MainMain extends MainActivityFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_main , container, false);
+
         fragment = this;
         //main content
         // 최근 추가된 만화
@@ -85,6 +84,7 @@ public class MainMain extends MainActivityFragment {
                 Utils.showCaptchaPopup(getContext(), 3, fragment);
             }
         });
+        mainadapter.fetch();
         return rootView;
     }
 

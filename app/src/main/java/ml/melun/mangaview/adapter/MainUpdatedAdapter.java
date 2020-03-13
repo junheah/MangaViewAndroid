@@ -40,6 +40,18 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         //fetch data with async
         //data initialize
         setHasStableIds(true);
+        //setNull();
+    }
+
+    public void setNull(){
+        if(mData != null){
+            mData.clear();
+            loaded = false;
+        }
+        else
+            mData = new ArrayList<>();
+        mData.add(new Manga(0,"",""));
+        notifyDataSetChanged();
     }
 
     public void setLoad(){
@@ -85,7 +97,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemCount() {
-        return mData.size();
+        return mData == null ? 0 : mData.size();
     }
     public interface onclick{
         void onclick(Manga m);
@@ -108,7 +120,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(loaded ){
+                    if(loaded){
                         monclick.onclick(mData.get(getAdapterPosition()));
                     }else
                         monclick.refresh();
