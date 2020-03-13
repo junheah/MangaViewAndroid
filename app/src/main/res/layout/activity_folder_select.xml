@@ -1,33 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
     tools:context=".activity.FolderSelectActivity">
 
     <TextView
+        android:ellipsize="marquee"
+        android:focusable="true"
         android:id="@+id/path"
-        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
-        android:focusable="true"
+        android:layout_width="0dp"
         android:marqueeRepeatLimit="marquee_forever"
-        android:ellipsize="marquee"
         android:singleLine="true"
+        android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
         android:id="@+id/dirList"
-        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/fileNameInput"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,50 +36,51 @@
     </ListView>
 
     <Button
+        android:background="@drawable/button_bg"
+        android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/dirSelectBtn"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/button_bg"
-        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_width="wrap_content"
         android:text="선택"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/createFolderBtn"
         app:layout_constraintStart_toEndOf="@+id/storageSelectBtn" />
 
     <EditText
-        android:id="@+id/fileNameInput"
-        android:layout_width="match_parent"
-        android:layout_margin="6dp"
-        android:layout_height="wrap_content"
         android:hint="파일명"
+        android:id="@+id/fileNameInput"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:layout_width="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/dirSelectBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
+        android:background="@drawable/button_bg"
+        android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/storageSelectBtn"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
-        android:background="@drawable/button_bg"
-        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_width="wrap_content"
         android:text="저장소 선택"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/createFolderBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:background="@drawable/button_bg"
         android:foreground="?android:attr/selectableItemBackground"
+        android:id="@+id/createFolderBtn"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_width="wrap_content"
         android:text="폴더 생성"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

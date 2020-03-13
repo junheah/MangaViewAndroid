@@ -1,30 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
     tools:context=".activity.LayoutEditActivity">
 
     <Button
-        android:id="@+id/layoutRightButton"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
         android:background="@drawable/button_bg_light"
-        android:text="@string/next_page"
+        android:id="@+id/layoutRightButton"
+        android:layout_height="0dp"
         android:layout_marginBottom="10dp"
+        android:layout_width="0dp"
+        android:text="@string/next_page"
         app:layout_constraintBottom_toTopOf="@+id/layout_reverse"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/layoutLeftButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/layoutLeftButton"
-        android:layout_width="100dp"
-        android:layout_height="0dp"
         android:background="@drawable/button_bg_light"
-        android:text="@string/prev_page"
+        android:id="@+id/layoutLeftButton"
+        android:layout_height="0dp"
         android:layout_marginBottom="10dp"
+        android:layout_width="100dp"
+        android:text="@string/prev_page"
         app:layout_constraintBottom_toTopOf="@+id/layout_reverse"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -32,8 +32,8 @@
     <Button
         android:background="@drawable/button_bg"
         android:id="@+id/layout_reverse"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         android:text="좌우 반전"
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,10 +41,10 @@
 
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
+        android:layout_width="match_parent"
         android:paddingBottom="10dp"
+        android:paddingTop="10dp"
         app:layout_constraintBottom_toTopOf="@+id/layout_save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -52,33 +52,34 @@
     <Button
         android:background="@drawable/button_bg"
         android:id="@+id/layout_reset"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="기본값"
-        android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:text="기본값"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="10dp"
         android:background="@drawable/button_bg"
         android:id="@+id/layout_cancel"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_width="wrap_content"
         android:text="취소"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
-        android:layout_marginBottom="10dp"
         android:background="@drawable/button_bg"
         android:id="@+id/layout_save"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_width="wrap_content"
         android:text="저장"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/layout_cancel"
         app:layout_constraintStart_toEndOf="@+id/layout_reset" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,21 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="200sp"
         android:background="#333333"
+        android:id="@+id/constraintLayout2"
+        android:layout_height="200sp"
+        android:layout_width="match_parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/HeaderThumb"
-            android:layout_width="170dp"
             android:layout_height="match_parent"
+            android:layout_width="170dp"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -24,11 +24,11 @@
 
         <TextView
             android:id="@+id/HeaderTitle"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_width="0dp"
             android:text="TextView"
             android:textColor="@android:color/white"
             android:textSize="20sp"
@@ -37,10 +37,10 @@
             app:layout_constraintStart_toEndOf="@+id/HeaderThumb" />
 
         <TextView
-            android:id="@+id/HeaderRelease"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:background="#8000"
+            android:id="@+id/HeaderRelease"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:padding="4dp"
             android:text="오이"
             android:textAlignment="center"
@@ -49,10 +49,10 @@
             app:layout_constraintTop_toTopOf="@+id/HeaderThumb" />
 
         <TextView
-            android:id="@+id/headerAuthor"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:background="#8000"
+            android:id="@+id/headerAuthor"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
             android:padding="4dp"
             android:text="Author"
             android:textAlignment="center"
@@ -61,14 +61,13 @@
             app:layout_constraintEnd_toEndOf="@+id/HeaderThumb"
             app:layout_constraintStart_toStartOf="parent" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/HeaderBtnContainer"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
         android:background="#282828"
+        android:id="@+id/HeaderBtnContainer"
+        android:layout_height="45dp"
+        android:layout_width="match_parent"
         android:orientation="horizontal"
         android:padding="3dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,145 +76,148 @@
 
         <LinearLayout
             android:id="@+id/HeaderRecommend"
-            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_width="wrap_content"
             android:paddingEnd="6dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
                 android:id="@+id/recommendIcon"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_thumb" />
 
             <TextView
                 android:id="@+id/recommendText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:text="123"
                 android:textColor="@color/thumb" />
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/HeaderBattery"
-            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_width="wrap_content"
             android:paddingEnd="6dp">
 
             <ImageView
-                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingTop="10dp"
+                android:layout_width="wrap_content"
                 android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_smile" />
 
             <TextView
                 android:id="@+id/batteryText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:text="123"
                 android:textColor="@color/smile" />
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/HeaderComment"
-            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_width="wrap_content"
             android:paddingEnd="6dp">
 
             <ImageView
-                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingTop="10dp"
+                android:layout_width="wrap_content"
                 android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_comment" />
 
             <TextView
                 android:id="@+id/commentText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:text="123"
                 android:textColor="@color/comment" />
+
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/HeaderBookmark"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
             android:background="@drawable/button_bg_light"
             android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/HeaderBookmark"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
             android:paddingEnd="6dp">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
                 android:id="@+id/bookmarkIcon"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_bookmark_border" />
 
             <TextView
                 android:id="@+id/bookmarkText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:text="123"
                 android:textColor="@color/bookmark" />
+
         </LinearLayout>
 
         <LinearLayout
-            android:layout_marginStart="3dp"
-            android:id="@+id/HeaderFavorite"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
             android:background="@drawable/button_bg_light"
-            android:foreground="?android:attr/selectableItemBackground">
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/HeaderFavorite"
+            android:layout_height="match_parent"
+            android:layout_marginStart="3dp"
+            android:layout_width="wrap_content">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:layout_marginStart="9dp"
-                android:layout_marginEnd="9dp"
                 android:id="@+id/favoriteIcon"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="9dp"
+                android:layout_marginStart="9dp"
+                android:layout_width="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_favorite_border" />
+
         </LinearLayout>
 
         <Button
-            android:layout_marginStart="3dp"
-            android:id="@+id/HeaderDownload"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
             android:background="@drawable/button_bg_light"
             android:enabled="true"
             android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/HeaderDownload"
+            android:layout_height="match_parent"
+            android:layout_marginStart="3dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:text="다운로드"
             android:textColor="@android:color/white" />
-
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tagsContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
         android:background="@color/selected"
+        android:id="@+id/tagsContainer"
+        android:layout_gravity="left"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/HeaderBtnContainer" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

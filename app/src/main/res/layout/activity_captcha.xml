@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/captchaContainer"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
     tools:context=".activity.CaptchaActivity">
-
 
     <WebView
         android:id="@+id/captchaWebView"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_width="match_parent"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,14 +20,15 @@
     </WebView>
 
     <TextView
-        android:id="@+id/captchaText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingVertical="10dp"
-        android:text="CAPTCHA 인증중.."
         android:background="#000"
-        android:textColor="#fff"
+        android:id="@+id/captchaText"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:text="CAPTCHA 인증중.."
         android:textAlignment="center"
+        android:textColor="#fff"
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,12 +37,12 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:indeterminate="true"
-        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/captchaText" />
+        app:layout_constraintTop_toBottomOf="@+id/captchaText"
+        style="?android:attr/progressBarStyleHorizontal" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
