@@ -35,6 +35,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     Boolean save;
     Boolean resume = true;
     Boolean updated = false;
+    boolean forceThumbnail = false;
     String path = "";
     Filter filter;
 
@@ -43,7 +44,11 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     }
     public TitleAdapter(Context context, Boolean online) {
         init(context);
-        if(!online) save = false;
+        forceThumbnail = !online;
+    }
+
+    public void setForceThumbnail(boolean b){
+        this.forceThumbnail = b;
     }
     void init(Context context){
         p = new Preference(context);
@@ -81,6 +86,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         };
     }
 
+
     @Override
     public long getItemId(int position) {
         return position;
@@ -89,6 +95,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public void removeAll(){
         int originSize = mData.size();
         mData.clear();
+        mDataFiltered.clear();
         notifyItemRangeRemoved(0,originSize);
     }
 
@@ -110,14 +117,27 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                 mData.add(d2);
             }
         }
-        mDataFiltered.addAll(mData);
+        mDataFiltered = mData;
         notifyItemRangeInserted(oSize,t.size());
+    }
+
+    public void setData(List<?> t){
+        clearData();
+        addData(t);
+    }
+
+    public void clearData(){
+        mData.clear();
+        mDataFiltered.clear();
+        notifyDataSetChanged();
     }
 
 
     public void moveItemToTop(int from){
         mData.add(0, mData.get(from));
+        mDataFiltered.add(0, mDataFiltered.get(from));
         mData.remove(from+1);
+        mDataFiltered.remove(from+1);
         for(int i= from; i>0; i--){
             notifyItemMoved(i,i-1);
         }
@@ -125,6 +145,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     public void remove(int pos){
         mData.remove(pos);
+        mDataFiltered.remove(pos);
         notifyItemRemoved(pos);
     }
 
@@ -159,9 +180,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             holder.counterContainer.setVisibility(View.GONE);
         }
 
-        if(thumb.length()>1 && !save) Glide.with(mainContext).load(thumb).into(holder.thumb);
+        if(thumb.length()>1 && (!save || forceThumbnail)) Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
-        if(save) holder.thumb.setVisibility(View.GONE);
+        if(save && !forceThumbnail) holder.thumb.setVisibility(View.GONE);
         if(bookmark>0 && resume) holder.resume.setVisibility(View.VISIBLE);
         else holder.resume.setVisibility(View.GONE);
 
@@ -231,8 +252,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         }
     }
 
-    public void noResume(){
-        resume = false;
+    public void setResume(boolean resume){
+        this.resume = resume;
     }
     public Title getItem(int id) {
         return mDataFiltered.get(id);

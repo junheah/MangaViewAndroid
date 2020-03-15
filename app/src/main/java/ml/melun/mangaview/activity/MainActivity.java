@@ -16,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 
@@ -44,12 +43,9 @@ import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
-import ml.melun.mangaview.fragment.MainActivityFragment;
-import ml.melun.mangaview.fragment.MainFavorite;
 import ml.melun.mangaview.fragment.MainMain;
-import ml.melun.mangaview.fragment.MainRecent;
-import ml.melun.mangaview.fragment.MainSaved;
 import ml.melun.mangaview.fragment.MainSearch;
+import ml.melun.mangaview.fragment.RecyclerFragment;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -84,8 +80,7 @@ public class MainActivity extends AppCompatActivity
     View progressView;
     private static final int FIRST_TIME_ACTIVITY = 9;
 
-    MainActivityFragment[] fragments = new MainActivityFragment[5];
-    boolean fragmentNeedChange = false;
+    Fragment[] fragments = new Fragment[3];
 
     FrameLayout content;
 
@@ -93,9 +88,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         fragments[0] = new MainMain();
         fragments[1] = new MainSearch();
-        fragments[2] = new MainRecent();
-        fragments[3] = new MainFavorite();
-        fragments[4] = new MainSaved();
+        fragments[2] = new RecyclerFragment();
         dark = p.getDarkTheme();
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
@@ -149,30 +142,6 @@ public class MainActivity extends AppCompatActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
-        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
-            }
-
-            @Override
-            public void onDrawerOpened(@NonNull View drawerView) {
-
-            }
-
-            @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-                if(fragmentNeedChange) {
-                    fragments[currentTab].drawerClosed();
-                    fragmentNeedChange = false;
-                }
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
-            }
-        });
         toggle.syncState();
 
         //nav_drawer color scheme
@@ -222,7 +191,7 @@ public class MainActivity extends AppCompatActivity
 
         // set initial tab
         startTab = p.getStartTab();
-        changeFragment(startTab, true);
+        changeFragment(startTab);
         getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
         navigationView.getMenu().getItem(startTab).setChecked(true);
 
@@ -246,7 +215,7 @@ public class MainActivity extends AppCompatActivity
         return 0;
     }
 
-    public int getTabIndex(int i){
+    public int getFragmentIndex(int i){
         switch(i){
             case R.id.nav_main:
                 return 0;
@@ -330,7 +299,7 @@ public class MainActivity extends AppCompatActivity
                         .setNegativeButton("아니오", dialogClickListener)
                         .show();
             }else{
-                changeFragment(startTab, true);
+                changeFragment(startTab);
                 navigationView.getMenu().getItem(startTab).setChecked(true);
                 toolbar.setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
             }
@@ -362,21 +331,21 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    boolean changeFragment(int index, boolean forceUpdate){
+    boolean changeFragment(int index){
+        boolean change = !(currentTab >= 2 && index >= 2);
+        int fragmentI = index>2 ? 2 : index;
         if(index>-1 && index != currentTab){
             currentTab = index;
-            fragmentNeedChange = !forceUpdate;
-            getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, (Fragment)fragments[index]).commit();
-            if(forceUpdate) {
-                fragments[index].drawerClosed();
+            if(index >= 2){
+                ((RecyclerFragment)fragments[2]).changeMode(getTabId(index));
             }
+            if(change) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, (Fragment) fragments[fragmentI]).commit();
+            }
+
             return true;
         }else
-            return false;   //fragment doesnt exist
-    }
-
-    boolean changeFragment(int index){
-        return changeFragment(index, false);
+            return false;   //fragment does not exist
     }
 
 
@@ -385,9 +354,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (changeFragment(getTabIndex(id))) {
-
-        }else{
+        if (!changeFragment(getFragmentIndex(id))) {
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update

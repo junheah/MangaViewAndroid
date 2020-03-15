@@ -21,7 +21,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
-public class MainMain extends MainActivityFragment{
+public class MainMain extends Fragment{
 
     RecyclerView mainRecycler;
     MainAdapter mainadapter;

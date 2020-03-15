@@ -348,6 +348,8 @@ public class ViewerActivity2 extends AppCompatActivity {
         if(viewerBookmark==imgs.size()-1 && (type==-1 || type==1)){
             //end of manga
             //refreshbtn.setVisibility(View.INVISIBLE);
+            // 다음화 로드
+            next.performClick();
         }else if(type==0){
             //is two page, current pos: right
             //dont add page
