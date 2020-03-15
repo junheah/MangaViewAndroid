@@ -52,25 +52,24 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
+        this.mDataFiltered = new ArrayList<>();
         filter = new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
                 String query = charSequence.toString();
-                if(query.isEmpty()){
+                if(query.isEmpty() || query.length() == 0){
                     mDataFiltered = mData;
                 }else{
-                    if(mDataFiltered == null)
-                        mDataFiltered = new ArrayList<>();
-                    else
-                        mDataFiltered.clear();
-
+                    ArrayList<Title> filtered = new ArrayList<>();
                     for(Title t : mData){
                         if(t.getName().toLowerCase().contains(query.toLowerCase()))
-                            mDataFiltered.add(t);
+                            filtered.add(t);
                     }
+                    mDataFiltered = filtered;
                 }
                 FilterResults res = new FilterResults();
                 res.values = mDataFiltered;
+                System.out.println(mData.size() +"  " +mDataFiltered.size());
                 return res;
             }
 
@@ -111,6 +110,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                 mData.add(d2);
             }
         }
+        mDataFiltered.addAll(mData);
         notifyItemRangeInserted(oSize,t.size());
     }
 
@@ -130,7 +130,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Title data = mData.get(position);
+        Title data = mDataFiltered.get(position);
         String title = data.getName();
         String thumb = data.getThumb();
         String author = data.getAuthor();
@@ -169,8 +169,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        if(mData != null)
-            return mData.size();
+        if(mDataFiltered != null)
+            return mDataFiltered.size();
         return 0;
     }
 
@@ -223,7 +223,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             resume.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mData.get(getAdapterPosition())));
+                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mDataFiltered.get(getAdapterPosition())));
                 }
             });
 
@@ -235,7 +235,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         resume = false;
     }
     public Title getItem(int id) {
-        return mData.get(id);
+        return mDataFiltered.get(id);
     }
 
     public void setClickListener(ItemClickListener itemClickListener) {
@@ -254,6 +254,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     @Override
     public Filter getFilter() {
-        return null;
+        return filter;
     }
 }

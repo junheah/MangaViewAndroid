@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity
                         .setNegativeButton("아니오", dialogClickListener)
                         .show();
             }else{
-                changeFragment(startTab);
+                changeFragment(startTab, true);
                 navigationView.getMenu().getItem(startTab).setChecked(true);
                 toolbar.setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
             }
@@ -365,14 +365,16 @@ public class MainActivity extends AppCompatActivity
     boolean changeFragment(int index, boolean forceUpdate){
         if(index>-1 && index != currentTab){
             currentTab = index;
-            fragmentNeedChange = true;
+            fragmentNeedChange = !forceUpdate;
             getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, (Fragment)fragments[index]).commit();
-            if(forceUpdate)
+            if(forceUpdate) {
                 fragments[index].drawerClosed();
+            }
             return true;
         }else
             return false;   //fragment doesnt exist
     }
+
     boolean changeFragment(int index){
         return changeFragment(index, false);
     }

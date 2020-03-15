@@ -19,6 +19,7 @@ public class MainActivityFragment extends Fragment{
         loaded = true;
         if(force){
             postDrawerJob();
+            force = false;
         }
     }
 
@@ -31,8 +32,10 @@ public class MainActivityFragment extends Fragment{
     public void drawerClosed() {
         if(!loaded)
             force = true;
-        else
+        else {
             postDrawerJob();
+            loaded = false;
+        }
     }
 
     public void postDrawerJob(){
