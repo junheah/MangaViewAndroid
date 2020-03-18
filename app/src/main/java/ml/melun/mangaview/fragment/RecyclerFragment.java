@@ -52,6 +52,7 @@ public class RecyclerFragment extends Fragment {
     RecyclerView recyclerView;
     int mode = -1;
     boolean loaded = false;
+    SearchView searchView;
 
 
 
@@ -148,11 +149,22 @@ public class RecyclerFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mode = -1;
+        loaded = false;
+    }
+
     public void changeMode(int id){
         mode = id;
         if(!loaded)
             return;
         recyclerView.scrollToPosition(0);
+        if(searchView != null){
+            searchView.clearFocus();
+            searchView.setQuery("", false);
+        }
         if(id == R.id.nav_recent){
             titleAdapter.setResume(true);
             titleAdapter.setForceThumbnail(false);
@@ -223,9 +235,10 @@ public class RecyclerFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.search_menu, menu);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.filter_search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.filter_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setQueryHint("검색");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
