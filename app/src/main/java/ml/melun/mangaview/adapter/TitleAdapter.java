@@ -38,6 +38,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     boolean forceThumbnail = false;
     String path = "";
     Filter filter;
+    boolean searching = false;
 
     public TitleAdapter(Context context) {
         init(context);
@@ -64,7 +65,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                 String query = charSequence.toString();
                 if(query.isEmpty() || query.length() == 0){
                     mDataFiltered = mData;
+                    searching = false;
                 }else{
+                    searching = true;
                     ArrayList<Title> filtered = new ArrayList<>();
                     for(Title t : mData){
                         if(t.getName().toLowerCase().contains(query.toLowerCase()))
@@ -74,7 +77,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                 }
                 FilterResults res = new FilterResults();
                 res.values = mDataFiltered;
-                System.out.println(mData.size() +"  " +mDataFiltered.size());
                 return res;
             }
 
@@ -134,19 +136,31 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
 
     public void moveItemToTop(int from){
-        mData.add(0, mData.get(from));
-        mDataFiltered.add(0, mDataFiltered.get(from));
-        mData.remove(from+1);
-        mDataFiltered.remove(from+1);
-        for(int i= from; i>0; i--){
-            notifyItemMoved(i,i-1);
+        if(!searching) {
+            mData.add(0, mData.get(from));
+            mData.remove(from + 1);
+            for (int i = from; i > 0; i--) {
+                notifyItemMoved(i, i - 1);
+            }
+        }else{
+            Title t = mDataFiltered.get(from);
+            int index = mData.indexOf(t);
+            mData.add(0, mData.get(index));
+            mData.remove(index + 1);
         }
     }
 
     public void remove(int pos){
-        mData.remove(pos);
-        mDataFiltered.remove(pos);
-        notifyItemRemoved(pos);
+        if(!searching) {
+            mData.remove(pos);
+            notifyItemRemoved(pos);
+        }else{
+            Title t = mDataFiltered.get(pos);
+            int index = mData.indexOf(t);
+            mData.remove(index);
+            mDataFiltered.remove(pos);
+            notifyItemRemoved(pos);
+        }
     }
 
     @Override

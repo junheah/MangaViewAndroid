@@ -53,6 +53,15 @@ public class RecyclerFragment extends Fragment {
     int mode = -1;
     boolean loaded = false;
 
+
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt("mode", mode);
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +116,10 @@ public class RecyclerFragment extends Fragment {
                 }
             }
         });
-        if(mode>-1 && !loaded) {
+        if(savedInstanceState != null){
+            mode = savedInstanceState.getInt("mode");
+        }
+        if(mode > -1) {
             loaded = true;
             changeMode(mode);
         }
@@ -115,28 +127,23 @@ public class RecyclerFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mode = -1;
-        loaded = false;
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK){
-            switch (requestCode){
-                case 1:
-                    //favorite result
-                    Boolean favorite_after = data.getBooleanExtra("favorite",true);
-                    if(!favorite_after && titleAdapter != null && titleAdapter.getItemCount()>0)
-                        titleAdapter.remove(selectedPosition);
-                    break;
-                case 2:
-                    //recent result
-                    if(titleAdapter != null && titleAdapter.getItemCount()>0)
-                        titleAdapter.moveItemToTop(selectedPosition);
-                    break;
+            if(titleAdapter != null && titleAdapter.getItemCount() > 0 && selectedPosition > -1) {
+                switch (requestCode) {
+                    case 1:
+                        //favorite result
+                        Boolean favorite_after = data.getBooleanExtra("favorite", true);
+                        if (!favorite_after && titleAdapter != null && titleAdapter.getItemCount() > 0)
+                            titleAdapter.remove(selectedPosition);
+                        break;
+                    case 2:
+                        //recent result
+                        if (titleAdapter != null && titleAdapter.getItemCount() > 0)
+                            titleAdapter.moveItemToTop(selectedPosition);
+                        break;
 
+                }
             }
         }
     }

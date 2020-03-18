@@ -70,8 +70,7 @@ public class MainActivity extends AppCompatActivity
     public static int PERMISSION_CODE = 132322;
     int startTab;
     int currentTab = -1;
-    private Context context = this;
-    int selectedPosition=-1;
+    private Context context;
     MenuItem versionItem;
     String homeDirStr;
     Boolean dark;
@@ -85,6 +84,12 @@ public class MainActivity extends AppCompatActivity
     FrameLayout content;
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("currentTab", currentTab);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         fragments[0] = new MainMain();
         fragments[1] = new MainSearch();
@@ -93,24 +98,25 @@ public class MainActivity extends AppCompatActivity
         if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
+        context = this;
+
 
         if(!p.getSharedPref().getBoolean("eula",false)){
             startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
         }else {
             if(p.getAutoUrl())
                 new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            activityInit();
+            activityInit(savedInstanceState);
         }
     }
 
-    private void activityInit(){
+    private void activityInit(Bundle savedInstanceState){
         setContentView(R.layout.activity_main);
-
         progressView = this.findViewById(R.id.progress_panel);
         //check prefs
         if(!p.check()){
             //popup to fix preferences
-            System.out.println("needs fix");
+            System.out.println("preference needs fix");
 
             AlertDialog.Builder builder;
             if (p.getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
@@ -191,9 +197,16 @@ public class MainActivity extends AppCompatActivity
 
         // set initial tab
         startTab = p.getStartTab();
-        changeFragment(startTab);
-        getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
-        navigationView.getMenu().getItem(startTab).setChecked(true);
+        if(savedInstanceState != null)
+            changeFragment(savedInstanceState.getInt("currentTab"));
+        else
+            changeFragment(startTab);
+
+        getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(currentTab)).getTitle());
+        navigationView.getMenu().getItem(currentTab).setChecked(true);
+
+        // savedInstanceState
+
 
         //check for update, notices
         new CheckInfo(context,httpClient).all(false);
@@ -330,7 +343,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
     boolean changeFragment(int index){
         boolean change = !(currentTab >= 2 && index >= 2);
         int fragmentI = index>2 ? 2 : index;
@@ -420,7 +432,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == FIRST_TIME_ACTIVITY){
             if(resultCode == RESULT_EULA_AGREE) {
-                activityInit();
+                activityInit(null);
             }else
                 finish();
             return;
