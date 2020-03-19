@@ -89,7 +89,6 @@ public class ViewerActivity2 extends AppCompatActivity {
     CustomSpinnerAdapter spinnerAdapter;
     Decoder d;
     Boolean error = false, useSecond = false;
-    int buttonOffset;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -113,7 +112,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         reverse = p.getReverse();
-        buttonOffset = p.getPageControlButtonOffset();
         frame = this.findViewById(R.id.viewer_image);
         pageBtn = this.findViewById(R.id.viewerBtn1);
         toolbar_toggleBtn = this.findViewById(R.id.toolbar_toggleBtn);
@@ -160,12 +158,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             prevPageBtn = this.findViewById(R.id.leftButton);
         }
 
-        if(p.getPageControlButtonOffset()!= -1){
-            Button left = this.findViewById(R.id.leftButton);
-            ViewGroup.LayoutParams params = left.getLayoutParams();
-            params.width = p.getPageControlButtonOffset();
-            left.setLayoutParams(params);
-        }
+        refreshPageControlButton();
 
         touchToggleBtn = this.findViewById(R.id.viewerBtn2);
         touchToggleBtn.setText("입력 제한");
@@ -341,6 +334,15 @@ public class ViewerActivity2 extends AppCompatActivity {
             }
         });
 
+    }
+
+    void refreshPageControlButton(){
+        if(p.getPageControlButtonOffset()!= -1){
+            Button left = this.findViewById(R.id.leftButton);
+            ViewGroup.LayoutParams params = left.getLayoutParams();
+            params.width = (int)(p.getPageControlButtonOffset() * Utils.getScreenWidth(getWindowManager().getDefaultDisplay()));
+            left.setLayoutParams(params);
+        }
     }
 
     void nextPage(){
@@ -799,6 +801,12 @@ public class ViewerActivity2 extends AppCompatActivity {
         if (resultCode == RESULT_CAPTCHA) {
             refresh();
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        refreshPageControlButton();
     }
 
     void lockUi(Boolean lock){
