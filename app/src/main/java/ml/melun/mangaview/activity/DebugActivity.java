@@ -30,8 +30,10 @@ import java.util.Map;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
+import ml.melun.mangaview.CustomJSONObject;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Cloudflare;
 import okhttp3.Response;
 
@@ -65,22 +67,7 @@ public class DebugActivity extends AppCompatActivity {
                 output.setText(readPref(context));
             }
         });
-        Button migrate = this.findViewById(R.id.debug_migrate);
-        migrate.setEnabled(false);
-//        migrate.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Preference p = new Preference(context);
-//                List<Title> titles = p.getRecent();
-//                StringBuilder b = new StringBuilder();
-//                for(Title t : titles){
-//                    if(t.getBookmark()>0) p.setBookmark(t,t.getBookmark());
-//                    b.append("제목: "+t.getName() +" | 북마크: "+t.getBookmark() +'\n');
-//                }
-//                b.append("북마크 이전이 완료되었습니다.");
-//                printLine(b.toString());
-//            }
-//        });
+
         Button clear = this.findViewById(R.id.debug_clear);
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,15 +118,7 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
-        Button removeEps = this.findViewById(R.id.debug_removeEps);
-        removeEps.setEnabled(false);
-//        removeEps.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new Preference(context).removeEpsFromData();
-//                printLine("작업 완료.");
-//            }
-//        });
+
 
         this.findViewById(R.id.debug_loginTest).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,33 +180,20 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
+        this.findViewById(R.id.debug_layoutEditor).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, LayoutEditActivity.class));
+            }
+        });
+
     }
 
     void writeToPref(Editable edit){
         try {
             SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
-            JSONObject data = new JSONObject(edit.toString());
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("recent",data.getJSONArray("recent").toString());
-            editor.putString("favorite",data.getJSONArray("favorite").toString());
-            editor.putString("homeDir",data.getString("homeDir"));
-            editor.putBoolean("darkTheme",data.getBoolean("darkTheme"));
-            editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
-            editor.putString("bookmark",data.getJSONObject("bookmark(viewer)").toString());
-            editor.putString("bookmark2",data.getJSONObject("bookmark(episode)").toString());
-            editor.putInt("viewerType",data.getInt("viewerType"));
-            editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
-            editor.putBoolean("dataSave",data.getBoolean("dataSave"));
-            editor.putBoolean("stretch",data.getBoolean("stretch"));
-            editor.putInt("startTab",data.getInt("startTab"));
-            editor.putString("url",data.getString("url").toString());
-            editor.putString("notice",data.getJSONArray("notice").toString());
-            editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
-            editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
-            editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putString("login", data.getJSONObject("login").toString());
-            editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
-            editor.commit();
+            CustomJSONObject data = new CustomJSONObject(edit.toString());
+            Utils.jsonToPref(this, data);
             // reload preference
             p.init(this);
         }catch (Exception e){

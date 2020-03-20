@@ -56,12 +56,11 @@ public class ViewerActivity3 extends AppCompatActivity {
     Manga manga;
     Context context;
     ViewPager viewPager;
-    Boolean dark;
+    boolean dark;
     ImageButton next, prev;
     TextView toolbarTitle;
     AppBarLayout appbar, appbarBottom;
     Toolbar toolbar;
-    Boolean volumeControl;
     Button cut, pageBtn;
     ImageButton commentBtn;
     int width;
@@ -76,7 +75,7 @@ public class ViewerActivity3 extends AppCompatActivity {
     int index;
     Intent result;
     List<Manga> eps;
-    Boolean toolbarshow = true;
+    boolean toolbarshow = true;
     ViewPager.OnPageChangeListener listener;
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
@@ -102,8 +101,14 @@ public class ViewerActivity3 extends AppCompatActivity {
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
-        volumeControl = p.getVolumeControl();
         cut = this.findViewById(R.id.viewerBtn2);
+        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         cut.setText("자동 분할");
         //TODO: autoCut
         cut.setVisibility(View.GONE);
@@ -295,18 +300,20 @@ public class ViewerActivity3 extends AppCompatActivity {
         new LoadImages().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
-        if(volumeControl && (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN ||keyCode==KeyEvent.KEYCODE_VOLUME_UP)) {
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
-                if(viewerBookmark<pageAdapter.getCount()-1) viewPager.setCurrentItem(viewerBookmark+1);
-            } else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                if(viewerBookmark>0) viewPager.setCurrentItem(viewerBookmark-1);
-            }
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if(keyCode == p.getNextPageKey()){
+            if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark<pageAdapter.getCount()-1)
+                viewPager.setCurrentItem(viewerBookmark+1);
+            return true;
+        }else if(keyCode == p.getPrevPageKey()){
+            if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark>0)
+                viewPager.setCurrentItem(viewerBookmark-1);
             return true;
         }
-        return super.onKeyDown(keyCode,event);
+        return super.dispatchKeyEvent(event);
     }
 
     public void toggleToolbar(){
@@ -479,7 +486,7 @@ public class ViewerActivity3 extends AppCompatActivity {
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
     }
 
-    void lockUi(Boolean lock){
+    void lockUi(boolean lock){
         commentBtn.setEnabled(!lock);
         next.setEnabled(!lock);
         prev.setEnabled(!lock);

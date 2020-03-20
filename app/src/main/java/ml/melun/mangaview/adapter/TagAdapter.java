@@ -20,7 +20,7 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     List<String> tags;
     LayoutInflater mInflater;
     private tagOnclick mClickListener;
-    Boolean dark;
+    boolean dark;
 
     public TagAdapter(Context m, List<String> t) {
         mcontext = m;

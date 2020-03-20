@@ -24,10 +24,11 @@ android {
         applicationId "ml.melun.mangaview"
         minSdkVersion 18
         targetSdkVersion 27
-        versionName "2.9-" + code
+        versionName "3.0-" + code
         versionCode code
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
         setProperty("archivesBaseName", "mangaViewer_" + code)
     }
     buildTypes {
@@ -55,14 +56,18 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
     }
-    implementation "com.github.bumptech.glide:okhttp3-integration:4.11.0"
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.github.bumptech.glide:annotations:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.11.0'
     implementation('com.github.bumptech.glide:recyclerview-integration:4.11.0') {
         // Excludes the support library because it's already included by Glide.
         transitive = false
     }
+
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+
     implementation 'androidx.fragment:fragment:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.vectordrawable:vectordrawable:1.0.0'
@@ -75,8 +80,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.omadahealth:swipy:1.2.3@aar'
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+//    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.2'
     implementation 'com.eclipsesource.j2v8:j2v8:6.0.0@aar'
+    implementation 'org.apache.commons:commons-text:1.7'
 }

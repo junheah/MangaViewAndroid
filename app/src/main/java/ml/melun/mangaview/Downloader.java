@@ -59,7 +59,7 @@ public class Downloader extends Service {
     float progress = 0;
     int maxProgress=1000;
     String notiTitle="";
-    public static Boolean running = false;
+    public static boolean running = false;
     NotificationCompat.Builder notification;
     public static final String ACTION_START = "ml.melun.mangaview.action.START";
     public static final String ACTION_STOP = "ml.melun.mangaview.action.STOP";
@@ -76,6 +76,7 @@ public class Downloader extends Service {
     PendingIntent stopIntent;
     Context serviceContext;
     Map<String, String> cookies;
+    int failures = 0;
 
     @Override
     public void onCreate() {
@@ -175,7 +176,7 @@ public class Downloader extends Service {
         }
     }
 
-    Boolean updateDownloading = false;
+    boolean updateDownloading = false;
 
     private class Download extends AsyncTask<String,Void,Integer> {
         File downloaded;
@@ -188,8 +189,11 @@ public class Downloader extends Service {
             NotificationCompat.Builder noti = new NotificationCompat.Builder(serviceContext, channeld)
                     .setContentIntent(intentP)
                     .setContentTitle("업데이트 다운로드중")
-                    .setSmallIcon(R.drawable.ic_logo)
                     .setOngoing(true);
+            if (Build.VERSION.SDK_INT >= 26)
+                noti.setSmallIcon(R.drawable.ic_logo);
+            else
+                noti.setSmallIcon(R.drawable.notification_logo);
             notificationManager.notify(nid+3, noti.build());
         }
 
@@ -211,8 +215,11 @@ public class Downloader extends Service {
                     .setContentIntent(installP)
                     .setContentTitle("업데이트 다운로드 완료")
                     .setContentText("지금 설치하려면 터치")
-                    .setSmallIcon(R.drawable.ic_logo)
                     .setOngoing(false);
+            if (Build.VERSION.SDK_INT >= 26)
+                noti.setSmallIcon(R.drawable.ic_logo);
+            else
+                noti.setSmallIcon(R.drawable.notification_logo);
             notificationManager.notify(nid+3, noti.build());
             updateDownloading = false;
             if(!running) stopSelf();
@@ -336,8 +343,9 @@ public class Downloader extends Service {
                         //create download flag
                         File downloadFlag = new File(dir,"downloading");
                         downloadFlag.createNewFile();
-                        Boolean error = false;
-                        Boolean useSecond = false;
+                        boolean error = false;
+                        boolean useSecond = false;
+                        //download images
                         for (int i = 0; i < urls.size(); i++) {
                             int tries = 0;
                             while(tries < 5){
@@ -369,6 +377,10 @@ public class Downloader extends Service {
                             progress += imgStepSize;
                             updateNotification((selectedEps.length() - queueIndex) + "/" + selectedEps.length());
                         }
+                        // check for download failures
+                        if(dir.listFiles().length  == 0 || dir.listFiles().length < urls.size())
+                            failures++;
+
                         downloadFlag.delete();
                     }
                     titles.remove(0);
@@ -418,7 +430,7 @@ public class Downloader extends Service {
         }
     }
 
-    Boolean downloadImage(String urlStr, File outputFile, Decoder d){
+    boolean downloadImage(String urlStr, File outputFile, Decoder d){
         try {
             URL url = new URL(urlStr);
             if(url.getProtocol().toLowerCase().equals("https")) {
@@ -507,6 +519,7 @@ public class Downloader extends Service {
         }
         return outputFile;
     }
+
     public int getIndex(List<Manga> eps, int id){
         for(int i=0; i<eps.size(); i++){
             if(eps.get(i).getId()==id){
@@ -519,8 +532,11 @@ public class Downloader extends Service {
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
                 .setContentTitle("다운로드를 시작합니다")
-                .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(true);
+        if (Build.VERSION.SDK_INT >= 26)
+            notification.setSmallIcon(R.drawable.ic_logo);
+        else
+            notification.setSmallIcon(R.drawable.notification_logo);
         startForeground(nid, notification.build());
     }
     private void updateNotification(String text) {
@@ -531,8 +547,12 @@ public class Downloader extends Service {
                 .setContentText(text)
                 .addAction(R.drawable.blank, "중지", stopIntent)
                 .setProgress(maxProgress, (int) progress, !(progress > 0))
-                .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(true);
+        if (Build.VERSION.SDK_INT >= 26)
+            notification.setSmallIcon(R.drawable.ic_logo);
+        else
+            notification.setSmallIcon(R.drawable.notification_logo);
+        ;
         notificationManager.notify(nid, notification.build());
     }
 
@@ -540,8 +560,11 @@ public class Downloader extends Service {
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
                 .setContentTitle("다운로드 완료")
-                .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(false);
+        if (Build.VERSION.SDK_INT >= 26)
+            notification.setSmallIcon(R.drawable.ic_logo);
+        else
+            notification.setSmallIcon(R.drawable.notification_logo);
         notificationManager.notify(nid, notification.build());
 }
 
@@ -549,8 +572,15 @@ public class Downloader extends Service {
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
                 .setContentTitle("모든 다운로드가 완료되었습니다.")
-                .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(false);
+        if (Build.VERSION.SDK_INT >= 26)
+            notification.setSmallIcon(R.drawable.ic_logo);
+        else
+            notification.setSmallIcon(R.drawable.notification_logo);
+        if(failures>0) {
+            notification.setContentText("누락: " + failures);
+            failures = 0;
+        }
         notificationManager.notify(nid+1, notification.build());
     }
     private void stopNotification(String why){
@@ -558,8 +588,11 @@ public class Downloader extends Service {
                 .setContentIntent(pendingIntent)
                 .setContentText(why)
                 .setContentTitle("다운로드가 취소되었습니다.")
-                .setSmallIcon(R.drawable.ic_logo)
                 .setOngoing(false);
+        if (Build.VERSION.SDK_INT >= 26)
+            notification.setSmallIcon(R.drawable.ic_logo);
+        else
+            notification.setSmallIcon(R.drawable.notification_logo);
         notificationManager.notify(nid + 2, notification.build());
     }
 

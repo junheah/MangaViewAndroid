@@ -1,55 +1,56 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
     tools:context=".activity.DownloadActivity">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dl_eplist"
-        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_width="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/dl_buttonContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintTop_toTopOf="parent"></androidx.recyclerview.widget.RecyclerView>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/dl_buttonContainer"
-        android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_width="match_parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:layout_weight="1"
-            android:id="@+id/dl_btn"
             android:background="@drawable/button_bg"
             android:foreground="?android:attr/selectableItemBackground"
-            android:layout_width="wrap_content"
+            android:id="@+id/dl_btn"
             android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:text="선택 다운로드"
             app:layout_constraintStart_toStartOf="parent" />
+
         <Button
             android:background="@drawable/button_bg"
             android:foreground="?android:attr/selectableItemBackground"
-            android:layout_weight="1"
             android:id="@+id/dl_mode_btn"
-            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:text="단일 선택 모드"
             app:layout_constraintEnd_toEndOf="parent" />
+
         <Button
             android:background="@drawable/button_bg"
             android:foreground="?android:attr/selectableItemBackground"
-            android:layout_weight="1"
             android:id="@+id/dl_all_btn"
-            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:text="모두 다운로드"
             app:layout_constraintEnd_toEndOf="parent" />
 
-
     </androidx.appcompat.widget.LinearLayoutCompat>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

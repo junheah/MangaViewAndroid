@@ -1,9 +1,12 @@
 package ml.melun.mangaview.mangaview;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,6 +97,7 @@ public class Search {
 
                 Response response = client.mget(searchUrl + query + "&page=" + page);
                 Document search = Jsoup.parse(response.body().string());
+                search.outputSettings().charset(Charset.forName("UTF-8"));
                 Elements items = search.select("div.post-row");
                 if(response.code()>=400){
                     //has error
@@ -103,7 +107,7 @@ public class Search {
 
                 for (Element item : items) {
                     Element manga_subject = item.selectFirst("div.manga-subject").selectFirst("a");
-                    String ntmp = (manga_subject.ownText());
+                    String ntmp = manga_subject.text();
                     String idtmp = manga_subject.attr("href").split("manga_id=")[1];
                     String ttmp = (item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
                     String atmp = "";
@@ -166,7 +170,6 @@ public class Search {
                     }catch (Exception e){
 
                     }
-
 
                     result.add(new Title(ntmp, ttmp, atmp, tags, release, Integer.parseInt(idtmp), recommend_c, battery_c, comment_c, bookmark_c));
                 }

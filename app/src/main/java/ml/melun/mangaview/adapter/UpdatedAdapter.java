@@ -26,8 +26,8 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     Context context;
     ArrayList<Manga> mData;
     onclickListener olisten;
-    Boolean save;
-    Boolean dark;
+    boolean save;
+    boolean dark;
     private LayoutInflater mInflater;
 
     public UpdatedAdapter(Context main) {

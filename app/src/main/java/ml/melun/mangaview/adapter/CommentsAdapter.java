@@ -23,8 +23,8 @@ public class CommentsAdapter extends BaseAdapter {
     Context context;
     ArrayList<Comment> data;
     LayoutInflater inflater;
-    Boolean dark;
-    Boolean save;
+    boolean dark;
+    boolean save;
     public CommentsAdapter(Context context, ArrayList<Comment> data) {
         super();
         this.dark = p.getDarkTheme();

@@ -29,8 +29,8 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     private LayoutInflater mInflater;
     private Context mainContext;
     private StripAdapter.ItemClickListener mClickListener;
-    Boolean autoCut = false;
-    Boolean reverse;
+    boolean autoCut = false;
+    boolean reverse;
     Boolean error = false;
     int __seed;
     Decoder d;

@@ -11,10 +11,15 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.fragment.app.Fragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -56,7 +61,7 @@ public class Utils {
 
     public static final String ReservedChars = "|\\?*<\":>+[]/'";
 
-    public static Boolean deleteRecursive(File fileOrDirectory) {
+    public static boolean deleteRecursive(File fileOrDirectory) {
         if(!checkWriteable(fileOrDirectory)) return false;
         try {
             if (fileOrDirectory.isDirectory())
@@ -208,14 +213,16 @@ public class Utils {
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
-    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close){
+
+
+    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Fragment fragment){
         if(!checkConnection(context)){
             //no internet
             //showErrorPopup(context, "네트워크 연결이 없습니다.", e, force_close);
             Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_LONG).show();
             if(force_close) ((Activity) context).finish();
         }else if(captchaCount == 0){
-            startCaptchaActivity(context, code);
+            startCaptchaActivity(context, code, fragment);
         }else {
             AlertDialog.Builder builder;
             String title = "오류";
@@ -234,7 +241,7 @@ public class Utils {
                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startCaptchaActivity(context, code);
+                            startCaptchaActivity(context, code, fragment);
                         }
                     })
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -260,9 +267,16 @@ public class Utils {
         captchaCount++;
     }
 
-    static void startCaptchaActivity(Context context, int code){
+    static void startCaptchaActivity(Context context, int code, Fragment fragment){
         Intent captchaIntent = new Intent(context, CaptchaActivity.class);
-        ((Activity)context).startActivityForResult(captchaIntent, code);
+        if(fragment == null)
+            ((Activity)context).startActivityForResult(captchaIntent, code);
+        else
+            fragment.startActivityForResult(captchaIntent, code);
+    }
+
+    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close) {
+        showCaptchaPopup(context,code,e,force_close,null);
     }
 
     public static void showCaptchaPopup(Context context, Exception e) {
@@ -273,6 +287,11 @@ public class Utils {
     public static void showCaptchaPopup(Context context, int code){
         // menu call
         showCaptchaPopup(context, code, null, false);
+    }
+
+    public static void showCaptchaPopup(Context context, int code, Fragment fragment){
+        // menu call
+        showCaptchaPopup(context, code, null, false, fragment);
     }
 
     public static void showCaptchaPopup(Context context){
@@ -377,7 +396,12 @@ public class Utils {
         return width>3000 ? 3000 : width ;
     }
 
-    public static Boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
+    public static int getScreenWidth(Display display){
+        Point size = new Point();
+        display.getSize(size);
+        return size.x;
+    }
+    public static boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("Cookie", login.getCookie(true));
@@ -446,33 +470,36 @@ public class Utils {
         return true;
     }
 
+    public static void jsonToPref(Context c, CustomJSONObject data){
+        SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
+        editor.putString("recent",data.getJSONArray("recent", new JSONArray()).toString());
+        editor.putString("favorite",data.getJSONArray("favorite", new JSONArray()).toString());
+        editor.putString("homeDir",data.getString("homeDir", "/sdcard/MangaView/saved"));
+        editor.putBoolean("darkTheme",data.getBoolean("darkTheme",false));
+        editor.putInt("prevPageKey", data.getInt("prevPageKey", -1));
+        editor.putInt("nextPageKey", data.getInt("nextPageKey", -1));
+        editor.putString("bookmark",data.getJSONObject("bookmark", new JSONObject()).toString());
+        editor.putString("bookmark2",data.getJSONObject("bookmark2", new JSONObject()).toString());
+        editor.putInt("viewerType",data.getInt("viewerType", 0));
+        editor.putBoolean("pageReverse",data.getBoolean("pageReverse", false));
+        editor.putBoolean("dataSave",data.getBoolean("dataSave", false));
+        editor.putBoolean("stretch",data.getBoolean("stretch", false));
+        editor.putInt("startTab",data.getInt("startTab", 0));
+        editor.putString("url",data.getString("url", "https://manamoa.net/"));
+        editor.putString("notice",data.getJSONArray("notice", new JSONArray()).toString());
+        editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime", 0));
+        editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime", 0));
+        editor.putBoolean("leftRight", data.getBoolean("leftRight", false));
+        editor.putBoolean("autoUrl", data.getBoolean("autoUrl", true));
+        editor.putString("login", data.getJSONObject("login", new JSONObject()).toString());
+        editor.putFloat("pageControlButtonOffset", (float)data.getDouble("pageControlButtonOffset", -1));
+        editor.commit();
+    }
 
     public static boolean readPreferenceFromFile(Preference p, Context c, File f){
         try {
-            JSONObject data = new JSONObject(readFileToString(f));
-
-            SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
-
-            editor.putString("recent",data.getJSONArray("recent").toString());
-            editor.putString("favorite",data.getJSONArray("favorite").toString());
-            editor.putString("homeDir",data.getString("homeDir"));
-            editor.putBoolean("darkTheme",data.getBoolean("darkTheme"));
-            editor.putBoolean("volumeControl",data.getBoolean("volumeControl"));
-            editor.putString("bookmark",data.getJSONObject("bookmark").toString());
-            editor.putString("bookmark2",data.getJSONObject("bookmark2").toString());
-            editor.putInt("viewerType",data.getInt("viewerType"));
-            editor.putBoolean("pageReverse",data.getBoolean("pageReverse"));
-            editor.putBoolean("dataSave",data.getBoolean("dataSave"));
-            editor.putBoolean("stretch",data.getBoolean("stretch"));
-            editor.putInt("startTab",data.getInt("startTab"));
-            editor.putString("url",data.getString("url"));
-            editor.putString("notice",data.getJSONArray("notice").toString());
-            editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime"));
-            editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime"));
-            editor.putBoolean("leftRight", data.getBoolean("leftRight"));
-            editor.putBoolean("autoUrl", data.getBoolean("autoUrl"));
-
-            editor.commit();
+            CustomJSONObject data = new CustomJSONObject(readFileToString(f));
+            jsonToPref(c, data);
             p.init(c);
         }catch (Exception e){
             e.printStackTrace();
@@ -489,7 +516,6 @@ public class Utils {
             data.put("favorite",new JSONArray(sharedPref.getString("favorite", "[]")));
             data.put("homeDir",sharedPref.getString("homeDir","/sdcard/MangaView/saved"));
             data.put("darkTheme",sharedPref.getBoolean("darkTheme", false));
-            data.put("volumeControl",sharedPref.getBoolean("volumeControl",false));
             data.put("bookmark",new JSONObject(sharedPref.getString("bookmark", "{}")));
             data.put("bookmark2",new JSONObject(sharedPref.getString("bookmark2", "{}")));
             data.put("viewerType", sharedPref.getInt("viewerType",0));
@@ -503,6 +529,9 @@ public class Utils {
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));
             data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
+            data.put("prevPageKey", sharedPref.getInt("prevPageKey", -1));
+            data.put("nextPageKey", sharedPref.getInt("nextPageKey", -1));
+            data.put("pageControlButtonOffset", sharedPref.getFloat("pageControlButtonOffset", -1));
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -514,6 +543,54 @@ public class Utils {
         return input.replace("\\n", "/n")
                 .replace("\\","")
                 .replace("/n", "\\n");
+    }
+
+    public static float dpToPixel(float dp, Context context){
+        return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static float pixelToDp(float px, Context context){
+        return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static void openViewer(Context context, Manga manga, int code){
+        Intent viewer = viewerIntent(context,manga);
+        viewer.putExtra("online",true);
+        ((Activity)context).startActivityForResult(viewer, code);
+    }
+
+    public static void popup(Context context, View view, final int position, final Title title, final int m, PopupMenu.OnMenuItemClickListener listener, Preference p) {
+        PopupMenu popup = new PopupMenu(context, view);
+        //Inflating the Popup using xml file
+        //todo: clean this part
+        popup.getMenuInflater().inflate(R.menu.title_options, popup.getMenu());
+        switch (m) {
+            case 1:
+                //최근
+                popup.getMenu().findItem(R.id.del).setVisible(true);
+            case 0:
+                //검색
+                popup.getMenu().findItem(R.id.favAdd).setVisible(true);
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
+                break;
+            case 2:
+                //좋아요
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
+                break;
+            case 3:
+                //저장됨
+                popup.getMenu().findItem(R.id.favAdd).setVisible(true);
+                popup.getMenu().findItem(R.id.favDel).setVisible(true);
+                popup.getMenu().findItem(R.id.remove).setVisible(true);
+                break;
+        }
+        //좋아요 추가/제거 중 하나만 남김
+        if (m != 2) {
+            if (p.findFavorite(title) > -1) popup.getMenu().removeItem(R.id.favAdd);
+            else popup.getMenu().removeItem(R.id.favDel);
+        }
+        popup.setOnMenuItemClickListener(listener);
+        popup.show();
     }
 
 }

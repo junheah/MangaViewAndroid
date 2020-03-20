@@ -1,44 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+
     <androidx.cardview.widget.CardView
+        android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/updatedCard"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="3dp"
-        android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:foreground="?android:attr/selectableItemBackground">
+        android:layout_marginTop="3dp"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="3dp">
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_width="match_parent"
             android:minHeight="88sp">
 
             <ImageView
                 android:id="@+id/Thumb"
-                android:layout_width="80dp"
                 android:layout_height="0dp"
+                android:layout_width="80dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                />
-
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/Title"
-                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_width="0dp"
                 android:text="TextView"
                 android:textSize="15sp"
                 app:layout_constraintEnd_toStartOf="@+id/epsButton"
@@ -46,16 +45,16 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:gravity="bottom|right"
                 android:id="@+id/date"
-                android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_margin="8sp"
-                android:gravity="bottom|right"
+                android:layout_width="0dp"
                 android:maxLines="1"
+                android:minHeight="16sp"
                 android:text="date"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="13sp"
-                android:minHeight="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/epsButton"
                 app:layout_constraintHeight_min="16sp"
@@ -63,20 +62,22 @@
                 app:layout_constraintTop_toBottomOf="@+id/Title" />
 
             <Button
+                android:background="@android:color/darker_gray"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:id="@+id/epsButton"
-                android:visibility="visible"
-                android:textColor="@android:color/white"
-                android:layout_width="40dp"
                 android:layout_height="0dp"
+                android:layout_width="40dp"
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
                 android:text="전\n편\n보\n기"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:background="@android:color/darker_gray"
+                android:textColor="@android:color/white"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.cardview.widget.CardView>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

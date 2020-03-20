@@ -35,18 +35,18 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
-    Boolean favorite = false;
-    Boolean bookmarked = false;
+    boolean favorite = false;
+    boolean bookmarked = false;
     TypedValue outValue;
     private int bookmark = -1;
     //title is in index 0
     Title title;
     TagAdapter ta;
     LinearLayoutManager lm;
-    Boolean dark;
-    Boolean save;
+    boolean dark;
+    boolean save;
     int mode = 0;
-    Boolean login;
+    boolean login;
 
     // data is passed into the constructor
     public EpisodeAdapter(Context context, List<Manga> data, Title title, int mode) {
@@ -255,7 +255,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    public void setFavorite(Boolean b){
+    public void setFavorite(boolean b){
         if(favorite!=b) {
             favorite = b;
             notifyItemChanged(0);

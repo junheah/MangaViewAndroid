@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,12 +19,14 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -57,7 +60,7 @@ import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity2 extends AppCompatActivity {
-    Boolean dark, volumeControl, toolbarshow=true, reverse, touch=true, stretch, leftRight;
+    Boolean dark, toolbarshow=true, reverse, touch=true, stretch, leftRight;
     Context context = this;
     String name;
     int id;
@@ -86,7 +89,9 @@ public class ViewerActivity2 extends AppCompatActivity {
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     Decoder d;
-    Boolean error = false, useSecond = false;
+    boolean error = false, useSecond = false;
+    boolean nextEpisodeVisible = false;
+    View nextEpisode;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -109,7 +114,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
-        volumeControl = p.getVolumeControl();
         reverse = p.getReverse();
         frame = this.findViewById(R.id.viewer_image);
         pageBtn = this.findViewById(R.id.viewerBtn1);
@@ -117,7 +121,16 @@ public class ViewerActivity2 extends AppCompatActivity {
         pageBtn.setText("-/-");
         leftRight = p.getLeftRight();
         spinner = this.findViewById(R.id.toolbar_spinner);
+        nextEpisode = this.findViewById(R.id.viewerNextEpisode);
 
+        nextEpisode.setVisibility(View.GONE);
+
+        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         spinnerAdapter = new CustomSpinnerAdapter(context);
         spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
             @Override
@@ -143,14 +156,15 @@ public class ViewerActivity2 extends AppCompatActivity {
         spinner.setAdapter(spinnerAdapter);
 
         if(leftRight){
-            nextPageBtn = this.findViewById(R.id.nextPageBtn2);
-            prevPageBtn = this.findViewById(R.id.prevPageBtn2);
+            // button reverse
+            nextPageBtn = this.findViewById(R.id.leftButton);
+            prevPageBtn = this.findViewById(R.id.rightButton);
         }else{
-            nextPageBtn = this.findViewById(R.id.nextPageBtn);
-            prevPageBtn = this.findViewById(R.id.prevPageBtn);
+            nextPageBtn = this.findViewById(R.id.rightButton);
+            prevPageBtn = this.findViewById(R.id.leftButton);
         }
-        nextPageBtn.setVisibility(View.VISIBLE);
-        prevPageBtn.setVisibility(View.VISIBLE);
+
+        refreshPageControlButton();
 
         touchToggleBtn = this.findViewById(R.id.viewerBtn2);
         touchToggleBtn.setText("입력 제한");
@@ -281,7 +295,8 @@ public class ViewerActivity2 extends AppCompatActivity {
                         refresh();
                     else
                         reloadManga();
-                }
+                }else
+                    Toast.makeText(context, "마지막화 입니다", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -328,11 +343,27 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     }
 
+    void refreshPageControlButton(){
+        if(p.getPageControlButtonOffset()!= -1){
+            Button left = this.findViewById(R.id.leftButton);
+            ViewGroup.LayoutParams params = left.getLayoutParams();
+            params.width = (int)(p.getPageControlButtonOffset() * Utils.getScreenWidth(getWindowManager().getDefaultDisplay()));
+            left.setLayoutParams(params);
+        }
+    }
+
+
     void nextPage(){
         //refreshbtn.setVisibility(View.VISIBLE);
         if(viewerBookmark==imgs.size()-1 && (type==-1 || type==1)){
             //end of manga
             //refreshbtn.setVisibility(View.INVISIBLE);
+            // 다음화 로드
+            if(nextEpisodeVisible) {
+                next.performClick();
+            }
+            toggleNextEpisode();
+
         }else if(type==0){
             //is two page, current pos: right
             //dont add page
@@ -414,7 +445,9 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void prevPage(){
         //refreshbtn.setVisibility(View.VISIBLE);
-        if(viewerBookmark==0 && (type==-1 || type==0)){
+        if(nextEpisodeVisible){
+            toggleNextEpisode();
+        }else if(viewerBookmark==0 && (type==-1 || type==0)){
             //start of manga
             //refreshbtn.setVisibility(View.INVISIBLE);
         } else if(type==1){
@@ -598,6 +631,16 @@ public class ViewerActivity2 extends AppCompatActivity {
             toggleToolbar();
     }
 
+    void toggleNextEpisode(){
+        if(nextEpisodeVisible) {
+            nextEpisodeVisible = false;
+            nextEpisode.setVisibility(View.GONE);
+        }else{
+            nextEpisodeVisible = true;
+            nextEpisode.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void toggleToolbar(){
         //attrs = getWindow().getAttributes();
         if(toolbarshow){
@@ -617,18 +660,20 @@ public class ViewerActivity2 extends AppCompatActivity {
         //getWindow().setAttributes(attrs);
     }
 
+
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
-        if(volumeControl && (keyCode==KeyEvent.KEYCODE_VOLUME_DOWN ||keyCode==KeyEvent.KEYCODE_VOLUME_UP)) {
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ) {
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (keyCode == p.getNextPageKey() ) {
+            if(event.getAction() == KeyEvent.ACTION_UP)
                 nextPage();
-            } else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            return true;
+        } else if(keyCode == p.getPrevPageKey()) {
+            if(event.getAction() == KeyEvent.ACTION_UP)
                 prevPage();
-            }
             return true;
         }
-        return super.onKeyDown(keyCode,event);
+        return super.dispatchKeyEvent(event);
     }
 
     private class loadImages extends AsyncTask<Void,String,Integer> {
@@ -780,6 +825,12 @@ public class ViewerActivity2 extends AppCompatActivity {
         if (resultCode == RESULT_CAPTCHA) {
             refresh();
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        refreshPageControlButton();
     }
 
     void lockUi(Boolean lock){

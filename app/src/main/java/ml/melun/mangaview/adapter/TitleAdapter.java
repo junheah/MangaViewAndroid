@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,24 +24,32 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.p;
 
-public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> {
+public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> implements Filterable {
 
     private ArrayList<Title> mData;
+    private ArrayList<Title> mDataFiltered;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
-    Boolean dark = false;
-    Boolean save;
-    Boolean resume = true;
-    Boolean updated = false;
+    boolean dark = false;
+    boolean save;
+    boolean resume = true;
+    boolean updated = false;
+    boolean forceThumbnail = false;
     String path = "";
+    Filter filter;
+    boolean searching = false;
 
     public TitleAdapter(Context context) {
         init(context);
     }
-    public TitleAdapter(Context context, Boolean online) {
+    public TitleAdapter(Context context, boolean online) {
         init(context);
-        if(!online) save = false;
+        forceThumbnail = !online;
+    }
+
+    public void setForceThumbnail(boolean b){
+        this.forceThumbnail = b;
     }
     void init(Context context){
         p = new Preference(context);
@@ -48,7 +58,36 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.mData = new ArrayList<>();
+        this.mDataFiltered = new ArrayList<>();
+        filter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String query = charSequence.toString();
+                if(query.isEmpty() || query.length() == 0){
+                    mDataFiltered = mData;
+                    searching = false;
+                }else{
+                    searching = true;
+                    ArrayList<Title> filtered = new ArrayList<>();
+                    for(Title t : mData){
+                        if(t.getName().toLowerCase().contains(query.toLowerCase()) || t.getAuthor().toLowerCase().contains(query.toLowerCase()))
+                            filtered.add(t);
+                    }
+                    mDataFiltered = filtered;
+                }
+                FilterResults res = new FilterResults();
+                res.values = mDataFiltered;
+                return res;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mDataFiltered = (ArrayList<Title>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
     }
+
 
     @Override
     public long getItemId(int position) {
@@ -58,6 +97,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public void removeAll(){
         int originSize = mData.size();
         mData.clear();
+        mDataFiltered.clear();
         notifyItemRangeRemoved(0,originSize);
     }
 
@@ -66,6 +106,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         View view = mInflater.inflate(R.layout.item_title, parent, false);
         return new ViewHolder(view);
     }
+
     public void addData(List<?> t){
         int oSize = mData.size();
         for(Object d:t){
@@ -78,26 +119,53 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                 mData.add(d2);
             }
         }
+        mDataFiltered = mData;
         notifyItemRangeInserted(oSize,t.size());
+    }
+
+    public void setData(List<?> t){
+        clearData();
+        addData(t);
+    }
+
+    public void clearData(){
+        mData.clear();
+        mDataFiltered.clear();
+        notifyDataSetChanged();
     }
 
 
     public void moveItemToTop(int from){
-        mData.add(0, mData.get(from));
-        mData.remove(from+1);
-        for(int i= from; i>0; i--){
-            notifyItemMoved(i,i-1);
+        if(!searching) {
+            mData.add(0, mData.get(from));
+            mData.remove(from + 1);
+            for (int i = from; i > 0; i--) {
+                notifyItemMoved(i, i - 1);
+            }
+        }else{
+            Title t = mDataFiltered.get(from);
+            int index = mData.indexOf(t);
+            mData.add(0, mData.get(index));
+            mData.remove(index + 1);
         }
     }
 
     public void remove(int pos){
-        mData.remove(pos);
-        notifyItemRemoved(pos);
+        if(!searching) {
+            mData.remove(pos);
+            notifyItemRemoved(pos);
+        }else{
+            Title t = mDataFiltered.get(pos);
+            int index = mData.indexOf(t);
+            mData.remove(index);
+            mDataFiltered.remove(pos);
+            notifyItemRemoved(pos);
+        }
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Title data = mData.get(position);
+        Title data = mDataFiltered.get(position);
         String title = data.getName();
         String thumb = data.getThumb();
         String author = data.getAuthor();
@@ -126,9 +194,9 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             holder.counterContainer.setVisibility(View.GONE);
         }
 
-        if(thumb.length()>1 && !save) Glide.with(mainContext).load(thumb).into(holder.thumb);
+        if(thumb.length()>1 && (!save || forceThumbnail)) Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
-        if(save) holder.thumb.setVisibility(View.GONE);
+        if(save && !forceThumbnail) holder.thumb.setVisibility(View.GONE);
         if(bookmark>0 && resume) holder.resume.setVisibility(View.VISIBLE);
         else holder.resume.setVisibility(View.GONE);
 
@@ -136,8 +204,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        if(mData != null)
-            return mData.size();
+        if(mDataFiltered != null)
+            return mDataFiltered.size();
         return 0;
     }
 
@@ -190,7 +258,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             resume.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mData.get(getAdapterPosition())));
+                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mDataFiltered.get(getAdapterPosition())));
                 }
             });
 
@@ -198,11 +266,11 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         }
     }
 
-    public void noResume(){
-        resume = false;
+    public void setResume(boolean resume){
+        this.resume = resume;
     }
     public Title getItem(int id) {
-        return mData.get(id);
+        return mDataFiltered.get(id);
     }
 
     public void setClickListener(ItemClickListener itemClickListener) {
@@ -213,5 +281,14 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         void onItemClick(int position);
         void onLongClick(View view, int position);
         void onResumeClick(int position, int id);
+    }
+
+
+
+    // filter
+
+    @Override
+    public Filter getFilter() {
+        return filter;
     }
 }

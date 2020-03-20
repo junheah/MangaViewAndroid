@@ -28,7 +28,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     private Context mainContext;
     boolean favorite = false;
     TypedValue outValue;
-    Boolean[] selected;
+    boolean[] selected;
     ItemClickListener mClickListener;
     boolean dark;
     boolean single = true;
@@ -40,7 +40,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         mainContext = context;
         this.data = list;
         outValue = new TypedValue();
-        selected = new Boolean[list.size()];
+        selected = new boolean[list.size()];
         Arrays.fill(selected,Boolean.FALSE);
         dark = p.getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
@@ -161,7 +161,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
-    public JSONArray getSelected(Boolean all){
+    public JSONArray getSelected(boolean all){
         JSONArray tmp = new JSONArray();
         for(int i=0; i<selected.length;i++){
             if(selected[i]) tmp.put(i);

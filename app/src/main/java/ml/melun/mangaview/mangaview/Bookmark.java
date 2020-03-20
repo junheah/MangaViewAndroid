@@ -47,7 +47,6 @@ public class Bookmark {
                     tags = telement.select("a").eachText();
                 }
 
-                System.out.println("pppp" + ntmp);
 
                 result.add(new MTitle(ntmp, id, ttmp, atmp, tags, rtmp));
                 r.close();

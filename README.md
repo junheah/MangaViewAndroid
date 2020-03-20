@@ -1,4 +1,3 @@
-[![logo](/web/logo_static.svg "MangaView")](https://junheah.github.io/MangaViewAndroid/)
 
 
 # 마나모아 전용 뷰어/다운로더 앱 #

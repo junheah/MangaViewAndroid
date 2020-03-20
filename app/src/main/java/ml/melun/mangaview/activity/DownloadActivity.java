@@ -30,7 +30,7 @@ public class DownloadActivity extends AppCompatActivity {
     Title title;
     SelectEpisodeAdapter adapter;
     RecyclerView eplist;
-    Boolean dark;
+    boolean dark;
     JSONArray selected;
     boolean singleSelect = true;
 
