@@ -171,7 +171,6 @@ public class Search {
 
                     }
 
-                    System.out.println(ntmp);
                     result.add(new Title(ntmp, ttmp, atmp, tags, release, Integer.parseInt(idtmp), recommend_c, battery_c, comment_c, bookmark_c));
                 }
                 if (items.size() < 30) last = true;

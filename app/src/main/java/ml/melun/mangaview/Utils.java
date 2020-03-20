@@ -492,6 +492,7 @@ public class Utils {
         editor.putBoolean("leftRight", data.getBoolean("leftRight", false));
         editor.putBoolean("autoUrl", data.getBoolean("autoUrl", true));
         editor.putString("login", data.getJSONObject("login", new JSONObject()).toString());
+        editor.putFloat("pageControlButtonOffset", (float)data.getDouble("pageControlButtonOffset", -1));
         editor.commit();
     }
 
@@ -530,6 +531,7 @@ public class Utils {
             data.put("autoUrl", sharedPref.getBoolean("autoUrl", true));
             data.put("prevPageKey", sharedPref.getInt("prevPageKey", -1));
             data.put("nextPageKey", sharedPref.getInt("nextPageKey", -1));
+            data.put("pageControlButtonOffset", sharedPref.getFloat("pageControlButtonOffset", -1));
         }catch(Exception e){
             e.printStackTrace();
         }
