@@ -56,7 +56,7 @@ public class ViewerActivity3 extends AppCompatActivity {
     Manga manga;
     Context context;
     ViewPager viewPager;
-    Boolean dark;
+    boolean dark;
     ImageButton next, prev;
     TextView toolbarTitle;
     AppBarLayout appbar, appbarBottom;
@@ -75,7 +75,7 @@ public class ViewerActivity3 extends AppCompatActivity {
     int index;
     Intent result;
     List<Manga> eps;
-    Boolean toolbarshow = true;
+    boolean toolbarshow = true;
     ViewPager.OnPageChangeListener listener;
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
@@ -486,7 +486,7 @@ public class ViewerActivity3 extends AppCompatActivity {
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
     }
 
-    void lockUi(Boolean lock){
+    void lockUi(boolean lock){
         commentBtn.setEnabled(!lock);
         next.setEnabled(!lock);
         prev.setEnabled(!lock);

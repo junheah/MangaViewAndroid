@@ -71,9 +71,9 @@ public class ViewerActivity extends AppCompatActivity {
     List<Manga> eps;
     int index = -1;
     Title title;
-    Boolean autoCut = false;
+    boolean autoCut = false;
     List<String> imgs;
-    Boolean dark;
+    boolean dark;
     Intent result;
     SwipyRefreshLayout swipe;
     ImageButton commentBtn;
@@ -562,7 +562,7 @@ public class ViewerActivity extends AppCompatActivity {
         return super.onMenuOpened(featureId, menu);
     }
 
-    void lockUi(Boolean lock){
+    void lockUi(boolean lock){
         commentBtn.setEnabled(!lock);
         next.setEnabled(!lock);
         prev.setEnabled(!lock);

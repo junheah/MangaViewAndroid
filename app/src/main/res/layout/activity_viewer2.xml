@@ -39,29 +39,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--<ImageButton-->
 
-    <!--android:id="@+id/refreshButton"-->
-
-    <!--android:layout_width="wrap_content"-->
-
-    <!--android:layout_height="wrap_content"-->
-
-    <!--android:layout_marginEnd="8dp"-->
-
-    <!--android:layout_marginTop="100dp"-->
-
-    <!--android:background="?android:attr/selectableItemBackground"-->
-
-    <!--android:padding="5dp"-->
-
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-
-    <!--app:srcCompat="@drawable/baseline_refresh_black_48" />-->
+    <TextView
+        android:id="@+id/viewerNextEpisode"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:background="#000"
+        android:gravity="center"
+        android:lineSpacingExtra="5dp"
+        android:text="다음 페이지를 눌러서\n다음 화 로드하기"
+        android:textAlignment="center"
+        android:textColor="#FFF"
+        android:textSize="20sp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:alpha="0.8"

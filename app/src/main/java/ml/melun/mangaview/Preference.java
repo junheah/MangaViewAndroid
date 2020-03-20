@@ -25,17 +25,17 @@ public class Preference {
     JSONObject pagebookmark;
     JSONObject bookmark;
     String homeDir;
-    Boolean darkTheme;
+    boolean darkTheme;
     int viewerType;
-    Boolean reverse;
-    Boolean dataSave;
+    boolean reverse;
+    boolean dataSave;
     int startTab;
     String url;
-    Boolean stretch;
-    Boolean leftRight;
+    boolean stretch;
+    boolean leftRight;
     Login login;
     final String defUrl = "https://manamoa.net/";
-    Boolean autoUrl;
+    boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
 
@@ -84,11 +84,11 @@ public class Preference {
         return defUrl;
     }
 
-    public Boolean getLeftRight() {
+    public boolean getLeftRight() {
         return leftRight;
     }
 
-    public void setLeftRight(Boolean leftRight) {
+    public void setLeftRight(boolean leftRight) {
         this.leftRight = leftRight;
         prefsEditor.putBoolean("leftRight", leftRight);
         prefsEditor.commit();
@@ -104,11 +104,11 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public Boolean getStretch() {
+    public boolean getStretch() {
         return stretch;
     }
 
-    public void setStretch(Boolean stretch) {
+    public void setStretch(boolean stretch) {
         this.stretch = stretch;
         prefsEditor.putBoolean("stretch", stretch);
         prefsEditor.commit();
@@ -134,32 +134,32 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public Boolean getDataSave() {
+    public boolean getDataSave() {
         return dataSave;
     }
 
-    public void setDataSave(Boolean dataSave) {
+    public void setDataSave(boolean dataSave) {
         this.dataSave = dataSave;
         prefsEditor.putBoolean("dataSave", dataSave);
         prefsEditor.commit();
     }
 
-    public Boolean getReverse() {
+    public boolean getReverse() {
         return reverse;
     }
 
-    public void setReverse(Boolean reverse) {
+    public void setReverse(boolean reverse) {
         this.reverse = reverse;
         prefsEditor.putBoolean("pageReverse", reverse);
         prefsEditor.commit();
     }
 
 
-    public Boolean getDarkTheme() {
+    public boolean getDarkTheme() {
         return darkTheme;
     }
 
-    public void setDarkTheme(Boolean darkTheme) {
+    public void setDarkTheme(boolean darkTheme) {
         this.darkTheme = darkTheme;
         prefsEditor.putBoolean("darkTheme", darkTheme);
         prefsEditor.commit();
@@ -320,11 +320,11 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public Boolean toggleFavorite(Title tmp, int position){
+    public boolean toggleFavorite(Title tmp, int position){
             return toggleFavorite(tmp.minimize(), position);
     }
 
-    public Boolean toggleFavorite(MTitle title, int position){
+    public boolean toggleFavorite(MTitle title, int position){
         int index = findFavorite(title);
         if(index==-1){
             favorite.add(position,title);
@@ -373,11 +373,11 @@ public class Preference {
         return recent;
     }
 
-    public Boolean isViewed(int id){
+    public boolean isViewed(int id){
         return pagebookmark.has(id+"");
     }
 
-//    public Boolean match(String s1, String s2){
+//    public boolean match(String s1, String s2){
 //        return filterString(s1).matches(filterString(s2));
 //    }
 //    private String filterString(String input){
@@ -416,7 +416,7 @@ public class Preference {
         prefsEditor.commit();
     }
 
-    public Boolean check(){
+    public boolean check(){
         for(MTitle t: recent){
             if(t.getId()<=0) return false;
         }
@@ -452,11 +452,11 @@ public class Preference {
 //        prefsEditor.commit();
 //    }
 
-    public Boolean getAutoUrl() {
+    public boolean getAutoUrl() {
         return autoUrl;
     }
 
-    public void setAutoUrl(Boolean autoUrl) {
+    public void setAutoUrl(boolean autoUrl) {
         this.autoUrl = autoUrl;
         prefsEditor.putBoolean("autoUrl", autoUrl);
         prefsEditor.commit();

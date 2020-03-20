@@ -26,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -88,7 +89,9 @@ public class ViewerActivity2 extends AppCompatActivity {
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     Decoder d;
-    Boolean error = false, useSecond = false;
+    boolean error = false, useSecond = false;
+    boolean nextEpisodeVisible = false;
+    View nextEpisode;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -118,6 +121,9 @@ public class ViewerActivity2 extends AppCompatActivity {
         pageBtn.setText("-/-");
         leftRight = p.getLeftRight();
         spinner = this.findViewById(R.id.toolbar_spinner);
+        nextEpisode = this.findViewById(R.id.viewerNextEpisode);
+
+        nextEpisode.setVisibility(View.GONE);
 
         this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,7 +295,8 @@ public class ViewerActivity2 extends AppCompatActivity {
                         refresh();
                     else
                         reloadManga();
-                }
+                }else
+                    Toast.makeText(context, "마지막화 입니다", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -345,13 +352,18 @@ public class ViewerActivity2 extends AppCompatActivity {
         }
     }
 
+
     void nextPage(){
         //refreshbtn.setVisibility(View.VISIBLE);
         if(viewerBookmark==imgs.size()-1 && (type==-1 || type==1)){
             //end of manga
             //refreshbtn.setVisibility(View.INVISIBLE);
             // 다음화 로드
-            next.performClick();
+            if(nextEpisodeVisible) {
+                next.performClick();
+            }
+            toggleNextEpisode();
+
         }else if(type==0){
             //is two page, current pos: right
             //dont add page
@@ -433,7 +445,9 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void prevPage(){
         //refreshbtn.setVisibility(View.VISIBLE);
-        if(viewerBookmark==0 && (type==-1 || type==0)){
+        if(nextEpisodeVisible){
+            toggleNextEpisode();
+        }else if(viewerBookmark==0 && (type==-1 || type==0)){
             //start of manga
             //refreshbtn.setVisibility(View.INVISIBLE);
         } else if(type==1){
@@ -615,6 +629,16 @@ public class ViewerActivity2 extends AppCompatActivity {
             toggleToolbar();
         else if(lastPage && !toolbarshow)
             toggleToolbar();
+    }
+
+    void toggleNextEpisode(){
+        if(nextEpisodeVisible) {
+            nextEpisodeVisible = false;
+            nextEpisode.setVisibility(View.GONE);
+        }else{
+            nextEpisodeVisible = true;
+            nextEpisode.setVisibility(View.VISIBLE);
+        }
     }
 
     public void toggleToolbar(){

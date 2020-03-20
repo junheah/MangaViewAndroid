@@ -31,10 +31,10 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private Context mainContext;
-    Boolean dark = false;
-    Boolean save;
-    Boolean resume = true;
-    Boolean updated = false;
+    boolean dark = false;
+    boolean save;
+    boolean resume = true;
+    boolean updated = false;
     boolean forceThumbnail = false;
     String path = "";
     Filter filter;
@@ -43,7 +43,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public TitleAdapter(Context context) {
         init(context);
     }
-    public TitleAdapter(Context context, Boolean online) {
+    public TitleAdapter(Context context, boolean online) {
         init(context);
         forceThumbnail = !online;
     }
@@ -70,7 +70,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                     searching = true;
                     ArrayList<Title> filtered = new ArrayList<>();
                     for(Title t : mData){
-                        if(t.getName().toLowerCase().contains(query.toLowerCase()))
+                        if(t.getName().toLowerCase().contains(query.toLowerCase()) || t.getAuthor().toLowerCase().contains(query.toLowerCase()))
                             filtered.add(t);
                     }
                     mDataFiltered = filtered;

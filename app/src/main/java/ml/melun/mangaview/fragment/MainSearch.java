@@ -36,6 +36,7 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.Utils.popup;
+import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class MainSearch extends Fragment {
     SwipyRefreshLayout swipe;
@@ -46,6 +47,7 @@ public class MainSearch extends Fragment {
     Spinner searchMode;
     TitleAdapter searchAdapter;
     Search search;
+    Fragment fragment;
 
     @Nullable
     @Override
@@ -60,6 +62,7 @@ public class MainSearch extends Fragment {
         searchMode = rootView.findViewById(R.id.searchMode);
         advSearchBtn = rootView.findViewById(R.id.advSearchBtn);
         swipe = rootView.findViewById(R.id.searchSwipe);
+        fragment = this;
         if(p.getDarkTheme()) searchMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
 
         advSearchBtn.setOnClickListener(new View.OnClickListener() {
@@ -74,16 +77,7 @@ public class MainSearch extends Fragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if(event.getAction()==KeyEvent.ACTION_DOWN && keyCode ==KeyEvent.KEYCODE_ENTER){
-                    String query = searchBox.getText().toString();
-                    if(query.length()>0) {
-                        swipe.setRefreshing(true);
-                        if(searchAdapter != null) searchAdapter.removeAll();
-                        else searchAdapter = new TitleAdapter(getContext());
-                        search = new Search(query,searchMode.getSelectedItemPosition());
-
-                        SearchManga sm = new SearchManga();
-                        sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    }
+                    searchSubmit();
                     return true;
                 }
                 return false;
@@ -105,6 +99,24 @@ public class MainSearch extends Fragment {
         return rootView;
     }
 
+    void searchSubmit(){
+        String query = searchBox.getText().toString();
+        if(query.length()>0) {
+            swipe.setRefreshing(true);
+            if(searchAdapter != null) searchAdapter.removeAll();
+            else searchAdapter = new TitleAdapter(getContext());
+            search = new Search(query,searchMode.getSelectedItemPosition());
+            new SearchManga().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_CAPTCHA && searchAdapter!=null && search != null)
+            searchSubmit();
+    }
 
     private class SearchManga extends AsyncTask<String,String,Integer>{
         protected void onPreExecute(){
@@ -118,7 +130,7 @@ public class MainSearch extends Fragment {
             super.onPostExecute(res);
             if(res != 0){
                 // error
-                Utils.showCaptchaPopup(getContext(), 4);
+                Utils.showCaptchaPopup(getContext(), 4, fragment);
             }
 
             if(searchAdapter.getItemCount()==0) {

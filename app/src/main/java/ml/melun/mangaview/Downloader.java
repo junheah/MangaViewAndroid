@@ -59,7 +59,7 @@ public class Downloader extends Service {
     float progress = 0;
     int maxProgress=1000;
     String notiTitle="";
-    public static Boolean running = false;
+    public static boolean running = false;
     NotificationCompat.Builder notification;
     public static final String ACTION_START = "ml.melun.mangaview.action.START";
     public static final String ACTION_STOP = "ml.melun.mangaview.action.STOP";
@@ -176,7 +176,7 @@ public class Downloader extends Service {
         }
     }
 
-    Boolean updateDownloading = false;
+    boolean updateDownloading = false;
 
     private class Download extends AsyncTask<String,Void,Integer> {
         File downloaded;
@@ -343,8 +343,8 @@ public class Downloader extends Service {
                         //create download flag
                         File downloadFlag = new File(dir,"downloading");
                         downloadFlag.createNewFile();
-                        Boolean error = false;
-                        Boolean useSecond = false;
+                        boolean error = false;
+                        boolean useSecond = false;
                         //download images
                         for (int i = 0; i < urls.size(); i++) {
                             int tries = 0;
@@ -430,7 +430,7 @@ public class Downloader extends Service {
         }
     }
 
-    Boolean downloadImage(String urlStr, File outputFile, Decoder d){
+    boolean downloadImage(String urlStr, File outputFile, Decoder d){
         try {
             URL url = new URL(urlStr);
             if(url.getProtocol().toLowerCase().equals("https")) {

@@ -27,9 +27,9 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     List<Manga> mData;
     Context context;
     LayoutInflater mInflater;
-    Boolean loaded = false;
+    boolean loaded = false;
     onclick monclick;
-    Boolean dark, save;
+    boolean dark, save;
 
     public MainUpdatedAdapter(Context c) {
         context = c;

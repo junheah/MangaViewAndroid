@@ -61,7 +61,7 @@ public class Utils {
 
     public static final String ReservedChars = "|\\?*<\":>+[]/'";
 
-    public static Boolean deleteRecursive(File fileOrDirectory) {
+    public static boolean deleteRecursive(File fileOrDirectory) {
         if(!checkWriteable(fileOrDirectory)) return false;
         try {
             if (fileOrDirectory.isDirectory())
@@ -401,7 +401,7 @@ public class Utils {
         display.getSize(size);
         return size.x;
     }
-    public static Boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
+    public static boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("Cookie", login.getCookie(true));

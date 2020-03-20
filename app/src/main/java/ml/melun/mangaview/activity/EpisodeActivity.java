@@ -48,15 +48,15 @@ public class EpisodeActivity extends AppCompatActivity {
     EpisodeAdapter episodeAdapter;
     Context context = this;
     RecyclerView episodeList;
-    Boolean favoriteResult = false;
-    Boolean recentResult = false;
+    boolean favoriteResult = false;
+    boolean recentResult = false;
     int position;
     int bookmarkId = -1;
     int bookmarkIndex = -1;
     FloatingActionButton upBtn;
-    Boolean upBtnVisible = false;
+    boolean upBtnVisible = false;
     List<Manga> episodes;
-    Boolean dark, online=true;
+    boolean dark, online=true;
     Intent viewer;
     ActionBar actionBar;
     String homeDir;
@@ -77,7 +77,7 @@ public class EpisodeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode== RESULT_OK && requestCode==0){
+        if(resultCode== RESULT_OK){
             int newid = data.getIntExtra("id", -1);
             if(newid>0 && newid!=bookmarkId){
                 bookmarkId = newid;

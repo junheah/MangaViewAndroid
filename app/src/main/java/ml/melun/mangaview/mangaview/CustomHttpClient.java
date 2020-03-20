@@ -48,7 +48,7 @@ public class CustomHttpClient {
                     .cipherSuites(cipherSuites.toArray(new CipherSuite[0]))
                     .build();
 
-            this.client = new OkHttpClient.Builder()
+            this.client = getUnsafeOkHttpClient()
                     .connectionSpecs(Arrays.asList(legacyTls, ConnectionSpec.CLEARTEXT))
                     .followRedirects(false)
                     .followSslRedirects(false)

@@ -5,6 +5,8 @@ import java.util.List;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
+import org.jsoup.select.Elements;
 
 import okhttp3.Response;
 
@@ -57,14 +59,20 @@ public class Title extends MTitle {
             //Response response = client.mget("/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"));
             Response response = client.mget("/bbs/page.php?hid=manga_detail&manga_id="+id);
             Document items = Jsoup.parse(response.body().string());
+            StringBuilder nameBuilder = new StringBuilder();
             for(Element e:items.select("div.slot")) {
+                nameBuilder.setLength(0);
+                for(Element child : e.selectFirst("div.title").getAllElements()){
+                    if(!child.tag().toString().contains("span"))
+                        nameBuilder.append(child.ownText());
+                }
                 eps.add(new Manga(Integer.parseInt(e.attr("data-wrid"))
-                        ,e.selectFirst("div.title").ownText()
+                        ,nameBuilder.toString()
                         ,e.selectFirst("div.addedAt").ownText().split(" ")[0]));
             }
             thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
 
-            name = items.selectFirst("div.manga-subject").selectFirst("div.title").ownText();
+            name = items.selectFirst("div.manga-subject").selectFirst("div.title").text();
             try {
                 author = items.selectFirst("a.author").ownText();
             }catch (Exception e){

@@ -64,7 +64,7 @@ public class Manga {
     public void fetch(CustomHttpClient client, Map<String,String> cookies){
         fetch(client, false, cookies);
     }
-    public void fetch(CustomHttpClient client, Boolean doLogin, Map<String,String> cookies) {
+    public void fetch(CustomHttpClient client, boolean doLogin, Map<String,String> cookies) {
         mode = 0;
         imgs = new ArrayList<>();
         imgs1 = new ArrayList<>();
@@ -239,7 +239,7 @@ public class Manga {
     public List<String> getImgs(){
         return getImgs(false);
     }
-    public List<String> getImgs(Boolean second){
+    public List<String> getImgs(boolean second){
         if(mode == 0) {
             if (second)
                 return imgs1;
@@ -311,7 +311,7 @@ public class Manga {
         this.listener = listener;
     }
 
-    public Boolean getReported() {
+    public boolean getReported() {
         return reported;
     }
 
@@ -337,7 +337,7 @@ public class Manga {
     int seed;
     int mode;
     Listener listener;
-    Boolean reported;
+    boolean reported;
 
     public interface Listener{
         void setMessage(String msg);

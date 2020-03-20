@@ -35,7 +35,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     MainUpdatedAdapter uadapter;
     onItemClick mainClickListener;
     MainTagAdapter nadapter, tadapter, radapter;
-    Boolean dark, loaded = false;
+    boolean dark, loaded = false;
     Preference p;
 
     List<Manga> ranking, recent, favUpdate;

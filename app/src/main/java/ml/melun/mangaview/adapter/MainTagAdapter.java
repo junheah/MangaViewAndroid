@@ -23,12 +23,12 @@ public class MainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     Context mcontext;
     List<String> tags;
-    Boolean[] selected;
+    boolean[] selected;
     LayoutInflater mInflater;
     private tagOnclick mClickListener;
     int type;
-    Boolean dark;
-    Boolean singleSelect = false;
+    boolean dark;
+    boolean singleSelect = false;
     int selection = -1;
 
     public MainTagAdapter(Context m, List<String> t , int type) {
@@ -37,7 +37,7 @@ public class MainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.type = type;
         this.mInflater = LayoutInflater.from(m);
         dark = p.getDarkTheme();
-        selected = new Boolean[t.size()];
+        selected = new boolean[t.size()];
         Arrays.fill(selected,Boolean.FALSE);
         setHasStableIds(true);
     }
@@ -46,7 +46,7 @@ public class MainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public long getItemId(int position) {
         return position;
     }
-    public void setSingleSelect(Boolean b){
+    public void setSingleSelect(boolean b){
         singleSelect = b;
     }
 
