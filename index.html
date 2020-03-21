@@ -57,6 +57,10 @@
             setTimeout(function (){
                 $("div.title").fadeIn('slow');
                 GetLatestReleaseInfo();
+                var shield = document.createElement('img'); 
+                shield.src = 'https://img.shields.io/github/downloads/junheah/MangaViewAndroid/total?color=db49de&label=%EC%A0%84%EC%B2%B4%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C&style=for-the-badge'; 
+                document.getElementById('shield').appendChild(img); 
+
             }, 800);
         }
         </script>
@@ -68,8 +72,8 @@
             <div class="title" style="display:none; width:auto">
                 <h1> Manga View Android </h1>
                 <p> 마나모아 안드로이드 뷰어 </p>
-                <img style="margin-top: 10;" alt="GitHub All Releases" src="https://img.shields.io/github/downloads/junheah/MangaViewAndroid/total?color=db49de&label=%EC%A0%84%EC%B2%B4%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C&style=for-the-badge">
-            </div>
+                <div id="shield" style="margin-top: 10;">
+                </div>
             <br>
             <div class="button-container" style="display:none;width:auto;">
                 <button class="download" onclick="location.href = downloadlink;">
