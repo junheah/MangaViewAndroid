@@ -31,6 +31,8 @@ public class FirstTimeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 p.getSharedPref().edit().putBoolean("eula", true).commit();
+                // not a migrator
+                p.getSharedPref().edit().putBoolean("manamoa", false).commit();
                 setResult(RESULT_EULA_AGREE);
                 finish();
             }

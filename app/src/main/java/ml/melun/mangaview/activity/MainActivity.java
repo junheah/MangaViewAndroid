@@ -57,6 +57,10 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
+import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_ACTIVITY;
+import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_FAIL;
+import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_RESET;
+import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_SUCCESS;
 import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
 
@@ -102,6 +106,10 @@ public class MainActivity extends AppCompatActivity
 
         if(!p.getSharedPref().getBoolean("eula",false)){
             startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
+        }else if(p.getSharedPref().getBoolean("manamoa",true)){
+            //migrator from manamoa
+            startActivityForResult(new Intent(context, MigrationActivity.class), MIGRATION_ACTIVITY);
+
         }else {
             activityInit(savedInstanceState);
         }
@@ -109,6 +117,9 @@ public class MainActivity extends AppCompatActivity
 
     private void activityInit(Bundle savedInstanceState){
         setContentView(R.layout.activity_main);
+
+
+
         progressView = this.findViewById(R.id.progress_panel);
         //check prefs
         if(!p.check()){
@@ -433,6 +444,15 @@ public class MainActivity extends AppCompatActivity
             }else
                 finish();
             return;
+        }else if(requestCode == MIGRATION_ACTIVITY){
+            if(resultCode == MIGRATION_SUCCESS || resultCode == MIGRATION_RESET){
+                p.getSharedPref().edit().putBoolean("manamoa", false).commit();
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+            }else{
+                finish();
+            }
         }
         if(resultCode == RESULT_NEED_RESTART){
             Intent intent = getIntent();

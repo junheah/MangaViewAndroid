@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,14 @@ public class Preference {
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
+    }
+
+    public void reset(){
+        setUrl(defUrl);
+        resetFavorites();
+        resetRecent();
+        resetBookmark();
+        resetViewerBookmark();
     }
 
     //Offline manga has id of -1
@@ -274,6 +283,13 @@ public class Preference {
     public void resetRecent(){
         recent = new ArrayList<>();
         writeRecent();
+    }
+
+    public void resetFavorites(){
+        favorite = new ArrayList<>();
+        prefsEditor.putString("favorite", new Gson().toJson(favorite));
+        prefsEditor.commit();
+
     }
 
     private void writeRecent(){

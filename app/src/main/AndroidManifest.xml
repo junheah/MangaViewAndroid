@@ -53,7 +53,7 @@
         <activity
             android:name=".activity.DownloadActivity"
             android:configChanges="orientation|screenSize"
-            android:label="다운로드"/>
+            android:label="다운로드" />
         <activity
             android:name=".activity.SettingsActivity"
             android:configChanges="orientation|screenSize"
@@ -103,11 +103,15 @@
             android:name=".activity.FirstTimeActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppThemeBlackNoTitle" />
-
         <activity
             android:name=".activity.LayoutEditActivity"
             android:configChanges="orientation|screenSize"
-            android:label="레이아웃 수정"/>
+            android:label="레이아웃 수정" />
+
+        <activity
+            android:name=".activity.MigrationActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="기록 업데이트"/>
     </application>
 
 </manifest>
