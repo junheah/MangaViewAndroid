@@ -205,7 +205,7 @@ public class RecyclerFragment extends Fragment {
                                         titles.add(title);
                                     } catch (Exception e) {
                                         e.printStackTrace();
-                                        titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), -1, 0));
+                                        titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
                                     }
                                 } else if (data.exists()) {
                                     try {
@@ -216,11 +216,11 @@ public class RecyclerFragment extends Fragment {
                                         titles.add(title);
                                     } catch (Exception e) {
                                         e.printStackTrace();
-                                        titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), -1, 0));
+                                        titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
                                     }
 
                                 } else
-                                    titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), -1, 0));
+                                    titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
                             }
                         }
                         //add titles to adapter

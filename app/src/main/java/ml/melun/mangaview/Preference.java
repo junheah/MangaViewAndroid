@@ -34,7 +34,7 @@ public class Preference {
     boolean stretch;
     boolean leftRight;
     Login login;
-    final String defUrl = "https://manamoa.net/";
+    final String defUrl = "https://newtoki73.net/";
     boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;

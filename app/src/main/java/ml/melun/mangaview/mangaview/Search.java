@@ -69,112 +69,69 @@ public class Search {
         result = new ArrayList<>();
         if(!last) {
             try {
-                //검색결과 페이지당 30개
+                //검색결과 페이지당 210개
                 //stx=쿼리, page=0~
-                page++;
                 String searchUrl = "";
                 switch(mode){
+                    //todo add more modes
                     case 0:
-                        searchUrl = "/bbs/search.php?stx=";
+                        searchUrl = "/comic?stx=";
                         break;
                     case 1:
-                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=5&stx=";
+                        searchUrl = "/comic?artist=";
                         break;
                     case 2:
-                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=3&stx=";
+                        searchUrl = "/comic?tag=";
                         break;
                     case 3:
-                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=1&stx=";
+                        searchUrl = "/comic?jaum=";
                         break;
                     case 4:
-                        searchUrl = "/bbs/page.php?hid=manga_list&sfl=2&stx=";
-                        break;
-                    case 6:
-                        searchUrl = "/bbs/page.php?hid=manga_list&";
+                        searchUrl = "/comic?publish=";
                         break;
                 }
 
 
-                Response response = client.mget(searchUrl + query + "&page=" + page);
-                Document search = Jsoup.parse(response.body().string());
-                search.outputSettings().charset(Charset.forName("UTF-8"));
-                Elements items = search.select("div.post-row");
+                Response response = client.mget(searchUrl + query + "&page=" + page++);
+                Document d = Jsoup.parse(response.body().string());
+                d.outputSettings().charset(Charset.forName("UTF-8"));
+
+                Elements titles = d.select("div.list-item");
+
                 if(response.code()>=400){
                     //has error
                     return 1;
-                } else if (items.size() < 1)
+                } else if (titles.size() < 1)
                     last = true;
 
-                for (Element item : items) {
-                    Element manga_subject = item.selectFirst("div.manga-subject").selectFirst("a");
-                    String ntmp = manga_subject.text();
-                    String idtmp = manga_subject.attr("href").split("manga_id=")[1];
-                    String ttmp = (item.selectFirst("div.img-wrap-back").attr("style").split("\\(")[1].split("\\)")[0]);
-                    String atmp = "";
+                String title;
+                String thumb;
+                String author;
+                String release;
+                int id;
 
-                    Element ae = item.selectFirst("div.author");
-                    if(ae!= null)
-                        atmp = ae.selectFirst("div").text();
+                for(Element e : titles) {
+                    Element infos = e.selectFirst("div.img-item");
+                    Element infos2 = infos.selectFirst("div.in-lable");
 
-                    List<String> tags = new ArrayList<>();
+                    id = Integer.parseInt(infos2.attr("rel"));
+                    title = infos2.selectFirst("span").ownText();
+                    thumb = infos.selectFirst("img").attr("src");
 
-                    Element te = item.selectFirst("div.tags");
-                    if(te != null)
-                        tags = te.select("a").eachText();
+                    Element ae = e.selectFirst("div.list-artist");
+                    if(ae != null) author = ae.selectFirst("a").ownText();
+                    else author = "";
 
-                    int release = -1;
+                    Element re = e.selectFirst("div.list-publish");
+                    if(re!=null) release = re.selectFirst("a").ownText();
+                    else release = "";
 
-                    Element re = item.selectFirst("div.publish-type");
-                    if(re != null)
-                        release = Integer.parseInt(re.attr("onclick").split("\\(")[1].split("\\)")[0]);
-
-                    int recommend_c=-1, battery_c=-1, comment_c=-1, bookmark_c=-1;
-                    //fetch recommend buttons
-                    try{
-                        //rc
-                        recommend_c = Integer.parseInt(item.selectFirst("i.fa.fa-thumbs-up").ownText().replaceAll(",",""));
-                    }catch (Exception e){
-                        recommend_c = -1;
-                        e.printStackTrace();
-                    }
-
-                    try {
-                        //bc
-                        String battery = item.selectFirst("i.fa.fa-smile-o").getAllElements().last().className();
-                        if(battery.contains("battery-empty")){
-                            battery_c = BATTERY_EMPTY;
-                        }else if(battery.contains("battery-quarter")){
-                            battery_c = BATTERY_ONE_QUARTER;
-                        }else if(battery.contains("battery-half")) {
-                            battery_c = BATTERY_HALF;
-                        }else if(battery.contains("battery-three-quarters")){
-                            battery_c = BATTERY_THREE_QUARTER;
-                        }else if(battery.contains("battery-full")){
-                            battery_c = BATTERY_FULL;
-                        }
-                    }catch (Exception e){
-                        battery_c = -1;
-                        e.printStackTrace();
-                    }
-
-                    //cc
-                    try{
-                        comment_c = Integer.parseInt(item.selectFirst("i.fa.fa-comment").ownText().replaceAll(",",""));
-                    }catch (Exception e){
-
-                    }
-
-                    //bmc
-                    try{
-                        bookmark_c = Integer.parseInt(item.selectFirst("i.fa.fa-bookmark").ownText().replaceAll(",",""));
-                    }catch (Exception e){
-
-                    }
-
-                    result.add(new Title(ntmp, ttmp, atmp, tags, release, Integer.parseInt(idtmp), recommend_c, battery_c, comment_c, bookmark_c));
+                    result.add(new Title(title,thumb,author,null,release,id));
                 }
-                if (items.size() < 30) last = true;
                 response.close();
+                if (result.size() < 210)
+                    last = true;
+
 
                 if(result.size()==0)
                     page--;
@@ -196,6 +153,6 @@ public class Search {
     private String query;
     Boolean last = false;
     int mode;
-    int page = -1;
+    int page = 1;
     private ArrayList<Title> result;
 }

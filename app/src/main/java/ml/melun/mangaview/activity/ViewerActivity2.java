@@ -71,7 +71,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
     int viewerBookmark = -1;
-    List<String> imgs, imgs1;
+    List<String> imgs;
     List<Integer> types;
     ProgressDialog pd;
     List<Manga> eps;
@@ -89,7 +89,6 @@ public class ViewerActivity2 extends AppCompatActivity {
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     Decoder d;
-    boolean error = false, useSecond = false;
     boolean nextEpisodeVisible = false;
     View nextEpisode;
 
@@ -381,10 +380,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark++;
             try {
-                String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-                if(error && !useSecond){
-                    image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-                }
+                String image = imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -418,15 +414,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 if(imgs.size()>0) {
-                                    if(!error && !useSecond) {
-                                        error= true;
-                                    }else if(!useSecond && error){
-                                        useSecond = true;
-                                        error= false;
-                                    }else{
-                                        error = false;
-                                        useSecond = false;
-                                    }
                                     viewerBookmark--;
                                     nextPage();
                                 }
@@ -464,10 +451,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark--;
             try {
-                String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-                if(error && !useSecond){
-                    image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-                }
+                String image = imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -500,15 +484,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 if(imgs.size()>0) {
-                                    if(!error && !useSecond) {
-                                        error = true;
-                                    }else if(!useSecond && error){
-                                        error = false;
-                                        useSecond = true;
-                                    }else{
-                                        error = false;
-                                        useSecond = false;
-                                    }
                                     viewerBookmark++;
                                     prevPage();
                                 }
@@ -530,11 +505,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         frame.setImageResource(R.drawable.placeholder);
         //refreshbtn.setVisibility(View.VISIBLE);
         try {
-            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-            if(error && !useSecond){
-                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-
-            }
+            String image = imgs.get(viewerBookmark);
             //placeholder
             //frame.setImageResource(R.drawable.placeholder);
             Glide.with(context)
@@ -568,15 +539,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
                             if(imgs.size()>0) {
-                                if(!error && !useSecond) {
-                                    error = true;
-                                }else if(!useSecond && error){
-                                    useSecond = true;
-                                    error = false;
-                                }else{
-                                    error = false;
-                                    useSecond = false;
-                                }
                                 refreshImage();
                             }
                         }
@@ -588,10 +550,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void preload(){
         if(viewerBookmark<imgs.size()-1) {
-            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark+1) : imgs.get(viewerBookmark+1);
-            if(error && !useSecond){
-                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-            }
+            String image = imgs.get(viewerBookmark+1);
             Glide.with(context)
                     .asBitmap()
                     .load(image)
@@ -599,15 +558,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                             if (imgs.size() > 0) {
-                                if(!error && !useSecond){
-                                    error = true;
-                                }else if(!useSecond){
-                                    error = false;
-                                    useSecond = true;
-                                }else{
-                                    error = false;
-                                    useSecond = false;
-                                }
                                 preload();
                             }
                             return false;
@@ -735,7 +685,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         try{
             lockUi(false);
             imgs = manga.getImgs();
-            imgs1 = manga.getImgs(true);
             if(imgs == null || imgs.size()==0) {
                 showCaptchaPopup(context);
                 return;

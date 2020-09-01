@@ -42,7 +42,6 @@ import java.util.List;
 import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.fragment.MainMain;
 import ml.melun.mangaview.fragment.MainSearch;
 import ml.melun.mangaview.fragment.RecyclerFragment;
@@ -104,8 +103,6 @@ public class MainActivity extends AppCompatActivity
         if(!p.getSharedPref().getBoolean("eula",false)){
             startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
         }else {
-            if(p.getAutoUrl())
-                new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             activityInit(savedInstanceState);
         }
     }
@@ -551,7 +548,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         int findId(String title){
-            return findId(new MTitle(title,-1,"", "",new ArrayList<>(),-1));
+            return findId(new MTitle(title,-1,"", "",new ArrayList<>(),""));
         }
 
         int findId(MTitle title){

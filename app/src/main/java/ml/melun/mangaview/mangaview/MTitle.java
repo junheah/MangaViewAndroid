@@ -9,12 +9,12 @@ public class MTitle{
     String thumb;
     String author;
     List<String> tags;
-    int release;
-    public static final String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
+    String release;
+    //public static final String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
     public MTitle(){
 
     }
-    public MTitle(String name, int id, String thumb, String author, List<String> tags, int release) {
+    public MTitle(String name, int id, String thumb, String author, List<String> tags, String release) {
         this.name = name;
         this.id = id;
         this.thumb = thumb;
@@ -45,7 +45,7 @@ public class MTitle{
         return tags;
     }
 
-    public int getRelease() {
+    public String getRelease() {
         return release;
     }
 
@@ -69,7 +69,7 @@ public class MTitle{
         this.tags = tags;
     }
 
-    public void setRelease(int release) {
+    public void setRelease(String release) {
         this.release = release;
     }
 

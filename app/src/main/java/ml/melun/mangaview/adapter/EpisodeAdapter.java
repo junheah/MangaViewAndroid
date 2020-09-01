@@ -26,7 +26,6 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.mangaview.MTitle.releases;
 
 
 public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -101,10 +100,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             HeaderHolder h = (HeaderHolder) holder;
             String titles = this.title.getName();
             String thumb = this.title.getThumb();
-            int release = this.title.getRelease();
+            String release = this.title.getRelease();
             h.h_title.setText(titles);
             h.h_author.setText(this.title.getAuthor());
-            if(release>-1) h.h_release.setText(releases[release]);
+            if(release != null || release.length()>0) h.h_release.setText(release);
             else h.h_release.setText("");
             if(favorite) h.h_star_icon.setImageResource(R.drawable.ic_favorite);
             else h.h_star_icon.setImageResource(R.drawable.ic_favorite_border);

@@ -372,7 +372,7 @@ public class ViewerActivity extends AppCompatActivity {
             cut.setBackgroundResource(R.drawable.button_bg_on);
             //viewerBookmark *= 2;
         }
-        stripAdapter = new StripAdapter(context,imgs,manga.getImgs(true), autoCut, seed, id, width);
+        stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
             public void onItemClick() {
@@ -457,7 +457,7 @@ public class ViewerActivity extends AppCompatActivity {
                 showCaptchaPopup(context);
                 return;
             }
-            stripAdapter = new StripAdapter(context, imgs, manga.getImgs(true), autoCut, manga.getSeed(), id, width);
+            stripAdapter = new StripAdapter(context, imgs, autoCut, manga.getSeed(), id, width);
 
             refreshAdapter();
             bookmarkRefresh();

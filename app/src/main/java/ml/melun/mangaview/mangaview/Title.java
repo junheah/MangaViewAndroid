@@ -12,6 +12,14 @@ import okhttp3.Response;
 
 
 public class Title extends MTitle {
+    private List<Manga> eps = null;
+    int bookmark = 0;
+    Boolean bookmarked = false;
+    String bookmarkLink = "";
+    int bc = 0;
+    int rc = 0;
+    int cc = 0;
+    int bmc = 0;
 
     public static final int BATTERY_EMPTY = 0;
     public static final int BATTERY_ONE_QUARTER = 1;
@@ -19,11 +27,11 @@ public class Title extends MTitle {
     public static final int BATTERY_THREE_QUARTER = 3;
     public static final int BATTERY_FULL = 4;
 
-    public Title(String n, String t, String a, List<String> tg, int r, int id) {
+    public Title(String n, String t, String a, List<String> tg, String r, int id) {
         super(n, id, t, a, tg, r);
     }
 
-    public Title(String n, String t, String a, List<String> tg, int r, int id, int rc, int bc, int cc, int bmc) {
+    public Title(String n, String t, String a, List<String> tg, String r, int id, int rc, int bc, int cc, int bmc) {
         super(n, id, t, a, tg, r);
         this.id = id;
         this.rc = rc;
@@ -47,97 +55,42 @@ public class Title extends MTitle {
     }
 
     public void fetchEps(CustomHttpClient client) {
-        //fetch episodes
         try {
-//            if(id<0){
-//                this.id = getIdWithName(client, this.name);
-//                if(this.id<0) return;
-//            }
+            Response r = client.mget("/comic/" + id);
+            Document d = Jsoup.parse(r.body().string());
+            Element header = d.selectFirst("div.view-title");
 
-            eps = new ArrayList<>();
-            //now uses id, not name
-            //Response response = client.mget("/bbs/page.php?hid=manga_detail&manga_name="+ URLEncoder.encode(name,"UTF-8"));
-            Response response = client.mget("/bbs/page.php?hid=manga_detail&manga_id="+id);
-            Document items = Jsoup.parse(response.body().string());
-            StringBuilder nameBuilder = new StringBuilder();
-            for(Element e:items.select("div.slot")) {
-                nameBuilder.setLength(0);
-                for(Element child : e.selectFirst("div.title").getAllElements()){
-                    if(!child.tag().toString().contains("span"))
-                        nameBuilder.append(child.ownText());
-                }
-                eps.add(new Manga(Integer.parseInt(e.attr("data-wrid"))
-                        ,nameBuilder.toString()
-                        ,e.selectFirst("div.addedAt").ownText().split(" ")[0]));
-            }
-            thumb = items.selectFirst("div.manga-thumbnail").attr("style").split("\\(")[1].split("\\)")[0];
+            //thumb
+            thumb = header.selectFirst("div.view-img").selectFirst("img").attr("src");
 
-            name = items.selectFirst("div.manga-subject").selectFirst("div.title").text();
-            try {
-                author = items.selectFirst("a.author").ownText();
-            }catch (Exception e){
-                //noauthor
-            }
+            Elements infos = header.select("div.view-content");
+            //title
+            name = infos.get(1).selectFirst("b").ownText();
+            //author
+            author = infos.get(2).selectFirst("a").ownText();
+            //tags
             tags = new ArrayList<>();
-            for(Element e:items.selectFirst("div.manga-tags").select("a.tag")){
-                tags.add(e.ownText());
+            for(Element t: infos.get(3).select("a"))
+                tags.add(t.ownText());
+            //release
+            release = infos.get(4).selectFirst("a").ownText();
+
+            //eps
+            String title, date;
+            int id;
+            eps = new ArrayList<>();
+            for(Element e : d.selectFirst("ul.list-body").select("li.list-item")) {
+                Element titlee = e.selectFirst("a.item-subject");
+                id = Integer.parseInt(titlee.attr("href").split("comic/")[1].split("\\?")[0]);
+                title = titlee.ownText();
+
+                Elements infoe = e.selectFirst("div.item-details").select("span");
+                date = infoe.get(0).ownText();
+                //has view-count, thumb-count and other extra info, implement later
+
+                eps.add(new Manga(id, title, date));
             }
-            try{
-                String releaseRaw =  items.selectFirst("div.manga-thumbnail").selectFirst("a.publish_type").attr("href");
-                release = Integer.parseInt(releaseRaw.substring(releaseRaw.lastIndexOf('=') + 1));
-            }catch (Exception e){
-
-            }
-
-            //fetch recommend buttons
-            Element btns = items.selectFirst("div.btns");
-            try{
-                //rc
-                rc = Integer.parseInt(btns.selectFirst("i.fa.fa-thumbs-up").ownText().replaceAll(",",""));
-            }catch (Exception e){
-                rc = -1;
-                //e.printStackTrace();
-            }
-
-            try {
-                //bc
-                String battery = btns.selectFirst("div.recommend.red").getAllElements().last().className();
-                if(battery.contains("battery-empty")){
-                    this.bc = BATTERY_EMPTY;
-                }else if(battery.contains("battery-quarter")){
-                    this.bc = BATTERY_ONE_QUARTER;
-                }else if(battery.contains("battery-half")) {
-                    this.bc = BATTERY_HALF;
-                }else if(battery.contains("battery-three-quarters")){
-                    this.bc = BATTERY_THREE_QUARTER;
-                }else if(battery.contains("battery-full")){
-                    this.bc = BATTERY_FULL;
-                }
-            }catch (Exception e){
-                this.bc = -1;
-                //e.printStackTrace();
-            }
-
-            //cc
-            try{
-                cc = Integer.parseInt(btns.selectFirst("i.fa.fa-comment").ownText().replaceAll(",",""));
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-            //bmc
-            try{
-                bmc = Integer.parseInt(btns.selectFirst("i.fa.fa-bookmark").ownText().replaceAll(",",""));
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-
-            Element bookmark = items.selectFirst("div.favorit");
-            bookmarked = bookmark.attr("class").contains("active");
-            bookmarkLink = bookmark.attr("onclick").split("='")[1].split("'")[0];
-
-            response.close();
+            r.close();
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -223,13 +176,6 @@ public class Title extends MTitle {
         return new MTitle(name, id, thumb, author, tags, release);
     }
 
-    private List<Manga> eps = null;
-    int bookmark =0;
-    Boolean bookmarked = false;
-    String bookmarkLink = "";
-    int bc = 0;
-    int rc = 0;
-    int cc = 0;
-    int bmc = 0;
+
 }
 

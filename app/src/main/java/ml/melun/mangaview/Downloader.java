@@ -330,7 +330,6 @@ public class Downloader extends Service {
 
                         Decoder d = new Decoder(target.getSeed(), target.getId());
                         List<String> urls = target.getImgs();
-                        List<String> urls1 = target.getImgs(true);
 
                         //set stepsize
                         float imgStepSize = stepSize / urls.size();
@@ -343,34 +342,17 @@ public class Downloader extends Service {
                         //create download flag
                         File downloadFlag = new File(dir,"downloading");
                         downloadFlag.createNewFile();
-                        boolean error = false;
-                        boolean useSecond = false;
                         //download images
                         for (int i = 0; i < urls.size(); i++) {
                             int tries = 0;
                             while(tries < 5){
                                 // retry for 5 cycles
                                 if (isCancelled()) return 0;
-                                String url = useSecond && urls1.size()>0 ? urls1.get(i) : urls.get(i);
-                                if(error && !useSecond){
-                                    url = url.indexOf("img.") > -1 ? url.replace("img.","s3.") : url.replace("://", "://s3.");
-                                }
+                                String url = urls.get(i);
+
                                 if(!downloadImage(url, new File(dir, new DecimalFormat("0000").format(i)), d)) {
                                     //change image server name and retry
-                                    if (!error && !useSecond) {
-                                        error = true;
-                                    } else if (error && !useSecond) {
-                                        error = false;
-                                        useSecond = true;
-                                    } else if (!error && useSecond) {
-                                        error = true;
-                                        useSecond = true;
-                                    } else if (error && useSecond) {
-                                        error = false;
-                                        useSecond = false;
-                                        // one cycle = one try
-                                        tries++;
-                                    }
+                                    tries++;
                                 }else //else : success
                                     break;
                             }
