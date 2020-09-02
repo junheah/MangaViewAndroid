@@ -55,6 +55,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
+import static ml.melun.mangaview.Utils.isInteger;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -700,7 +701,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     }
 
     public void bookmarkRefresh(){
-        if(id>0) {
+        if(id>0 && !isInteger(title.getRelease())) {
             viewerBookmark = p.getViewerBookmark(id);
             if(manga.getMode() == 0 || manga.getMode() == 3) {
                 // if manga is online or has title.gson

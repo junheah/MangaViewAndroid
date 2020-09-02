@@ -176,6 +176,40 @@ public class Utils {
                 .show();
     }
 
+    public static void showYesNoPopup(Context context, String title, String content,
+                                      DialogInterface.OnClickListener posClickListener,
+                                      DialogInterface.OnClickListener negClickListener,
+                                      DialogInterface.OnCancelListener cancelListener){
+
+        AlertDialog.Builder builder;
+        if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setMessage(content)
+                .setPositiveButton("예", posClickListener)
+                .setNegativeButton("아니오", negClickListener)
+                .setOnCancelListener(cancelListener)
+                .show();
+    }
+
+    public static void showYesNoNeutralPopup(Context context, String title, String content, String neutral,
+                                             DialogInterface.OnClickListener posClickListener,
+                                             DialogInterface.OnClickListener negClickListener,
+                                             DialogInterface.OnClickListener neuClickListener,
+                                             DialogInterface.OnCancelListener cancelListener){
+
+        AlertDialog.Builder builder;
+        if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setMessage(content)
+                .setPositiveButton("예", posClickListener)
+                .setNegativeButton("아니오", negClickListener)
+                .setNeutralButton(neutral, neuClickListener)
+                .setOnCancelListener(cancelListener)
+                .show();
+    }
+
     public static void showErrorPopup(Context context, String message, Exception e, boolean force_close){
         AlertDialog.Builder builder;
         String title = "오류";
@@ -591,6 +625,18 @@ public class Utils {
         }
         popup.setOnMenuItemClickListener(listener);
         popup.show();
+    }
+
+    public static boolean isInteger(String s) {
+        if(s.isEmpty()) return false;
+        for(int i = 0; i < s.length(); i++) {
+            if(i == 0 && s.charAt(i) == '-') {
+                if(s.length() == 1) return false;
+                else continue;
+            }
+            if(Character.digit(s.charAt(i),10) < 0) return false;
+        }
+        return true;
     }
 
 }

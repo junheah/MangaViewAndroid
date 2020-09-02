@@ -108,10 +108,6 @@
             android:configChanges="orientation|screenSize"
             android:label="레이아웃 수정" />
 
-        <activity
-            android:name=".activity.MigrationActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="기록 업데이트"/>
     </application>
 
 </manifest>

@@ -38,6 +38,7 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
+import static ml.melun.mangaview.Utils.isInteger;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
@@ -177,7 +178,9 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }else if(data.exists()){
                 mode = 3;
-                p.addRecent(title);
+                // migrated
+                if(!isInteger(title.getRelease())) p.addRecent(title);
+
                 episodes =  title.getEps();
                 offlineEpisodes = new ArrayList<>();
                 for(File folder : getOfflineEpisodes()){

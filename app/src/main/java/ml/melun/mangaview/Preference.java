@@ -17,6 +17,8 @@ import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.Utils.isInteger;
+
 public class Preference {
     SharedPreferences sharedPref;
     //ArrayList<Title> recent;
@@ -35,7 +37,7 @@ public class Preference {
     boolean stretch;
     boolean leftRight;
     Login login;
-    final String defUrl = "https://newtoki73.net/";
+    final String defUrl = "https://manatoki73.net/";
     boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
@@ -433,21 +435,13 @@ public class Preference {
     }
 
     public boolean check(){
+        //returns false if needs update
         for(MTitle t: recent){
-            if(t.getId()<=0) return false;
+            if(isInteger(t.getRelease())) return false;
         }
         for(MTitle t: favorite){
-            if(t.getId()<=0) return false;
+            if(isInteger(t.getRelease())) return false;
         }
-        Iterator<String> keys = bookmark.keys();
-        try {
-            while (keys.hasNext()) {
-                Integer.parseInt(keys.next());
-            }
-        }catch (Exception e){
-            return false;
-        }
-
         return true;
     }
     public Login getLogin(){

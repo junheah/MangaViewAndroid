@@ -31,16 +31,20 @@ import androidx.fragment.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.fragment.MainMain;
 import ml.melun.mangaview.fragment.MainSearch;
@@ -56,11 +60,11 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.Utils.showYesNoNeutralPopup;
+import static ml.melun.mangaview.Utils.showYesNoPopup;
+import static ml.melun.mangaview.Utils.writePreferenceToFile;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
-import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_ACTIVITY;
-import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_FAIL;
-import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_RESET;
-import static ml.melun.mangaview.activity.MigrationActivity.MIGRATION_SUCCESS;
+import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
 
@@ -104,15 +108,85 @@ public class MainActivity extends AppCompatActivity
         context = this;
 
 
-        if(!p.getSharedPref().getBoolean("eula",false)){
+        //check prefs
+       if(!p.getSharedPref().getBoolean("eula",false)){
             startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
-        }else if(p.getSharedPref().getBoolean("manamoa",true)){
-            //migrator from manamoa
-            startActivityForResult(new Intent(context, MigrationActivity.class), MIGRATION_ACTIVITY);
+       }else if(!p.check()) {
+           //popup to fix preferences
+           System.out.println("preference needs update");
+           showYesNoNeutralPopup(context, "기록 업데이트 필요",
+                   "저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?" +
+                           "\n(데이터 일부가 유실될 수 있습니다. 꼭 백업을 하고 진행해 주세요)",
+                   "데이터 백업",
+                   new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialogInterface, int i) {
+                            //proceed
+                           final EditText editText = new EditText(context);
+                           editText.setHint(p.getDefUrl());
 
-        }else {
+                           AlertDialog.Builder builder;
+                           if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+                           else builder = new AlertDialog.Builder(context);
+                           builder.setTitle("기록 업데이트")
+                                   .setView(editText)
+                                   .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요")
+                                   .setPositiveButton("계속", new DialogInterface.OnClickListener() {
+                                       @Override
+                                       public void onClick(DialogInterface dialogInterface, int i) {
+                                           String url = editText.getText().toString();
+                                           if(url == null || url.length()<1)
+                                               url = p.getDefUrl();
+                                           new Migrator(savedInstanceState, url).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                       }
+                                   })
+                                   .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                       @Override
+                                       public void onClick(DialogInterface dialogInterface, int i) {
+                                           finish();
+                                       }
+                                   })
+                                   .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                       @Override
+                                       public void onCancel(DialogInterface dialogInterface) {
+                                           finish();
+                                       }
+                                   })
+                                   .show();
+                       }
+                   }, new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialogInterface, int i) {
+                           showPopup(context, "알림", "앱의 데이터를 초기화 하거나 데이터 업데이트를 진행하지 않으면 사용이 불가합니다.", new DialogInterface.OnClickListener() {
+                               @Override
+                               public void onClick(DialogInterface dialogInterface, int i) {
+                                   finish();
+                               }
+                           }, new DialogInterface.OnCancelListener() {
+                               @Override
+                               public void onCancel(DialogInterface dialogInterface) {
+                                   finish();
+                               }
+                           });
+                       }
+                   }, new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialogInterface, int i) {
+                           //backup
+                           Intent intent = new Intent(context, FolderSelectActivity.class);
+                           intent.putExtra("mode", MODE_FILE_SAVE);
+                           intent.putExtra("title", "백업");
+                           startActivityForResult(intent, MODE_FILE_SAVE);
+                       }
+                   }, new DialogInterface.OnCancelListener() {
+                       @Override
+                       public void onCancel(DialogInterface dialogInterface) {
+                           finish();
+                       }
+                   });
+       }else {
             activityInit(savedInstanceState);
-        }
+       }
     }
 
     private void activityInit(Bundle savedInstanceState){
@@ -121,33 +195,7 @@ public class MainActivity extends AppCompatActivity
 
 
         progressView = this.findViewById(R.id.progress_panel);
-        //check prefs
-        if(!p.check()){
-            //popup to fix preferences
-            System.out.println("preference needs fix");
 
-            AlertDialog.Builder builder;
-            if (p.getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
-            else builder = new AlertDialog.Builder(context);
-            builder.setTitle("기록 업데이트 필요")
-                    .setCancelable(false)
-                    .setMessage("저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?")
-                    .setPositiveButton("네", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //update data
-                            new DataUpdater().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        }
-                    })
-                    .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //reset pref
-                            showPopup(context,"알림","예기치 못한 오류가 발생할 수 있습니다. 앱의 데이터를 초기화 하거나 데이터 업데이트를 진행 해 주세요.");
-                        }
-                    })
-                    .show();
-        }
         // url updater
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -444,15 +492,18 @@ public class MainActivity extends AppCompatActivity
             }else
                 finish();
             return;
-        }else if(requestCode == MIGRATION_ACTIVITY){
-            if(resultCode == MIGRATION_SUCCESS || resultCode == MIGRATION_RESET){
-                p.getSharedPref().edit().putBoolean("manamoa", false).commit();
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
-            }else{
-                finish();
+        }else if(requestCode == MODE_FILE_SAVE){
+            String path = null;
+            if(data!=null)
+                path = data.getStringExtra("path");
+            if(path != null){
+                if(writePreferenceToFile(context, new File(path))) {
+                    Toast.makeText(context, "백업 완료!", Toast.LENGTH_LONG).show();
+                }
             }
+            Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
+            finish();
+            startActivity(getIntent());
         }
         if(resultCode == RESULT_NEED_RESTART){
             Intent intent = getIntent();
@@ -464,30 +515,42 @@ public class MainActivity extends AppCompatActivity
     public void hideProgressPanel(){
         progressView.setVisibility(View.GONE);
     }
+    private class Migrator extends AsyncTask<Void, Void, Integer>{
 
-    private class DataUpdater extends AsyncTask<Void,Void,Integer>{
         ProgressDialog pd;
         int sum = 0;
         int current = 0;
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            pd.setMessage(current +" / " + sum+"\n 앱을 종료하지 말아주세요.");
+        List<MTitle> newFavorites, newRecents;
+        List<String> failed;
+        Bundle bundle;
+
+        public Migrator(Bundle bundle, String url){
+            this.bundle = bundle;
+            p.setUrl(url);
         }
+
         @Override
         protected void onPreExecute() {
-            if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
+            if(p.getDarkTheme()) pd = new ProgressDialog(context, R.style.darkDialog);
             else pd = new ProgressDialog(context);
             pd.setMessage("시작중");
             pd.setCancelable(false);
             pd.show();
         }
 
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            pd.setMessage(current +" / " + sum+"\n 앱을 종료하지 말아주세요.");
+        }
+
         @Override
         protected Integer doInBackground(Void... voids) {
 
+            //test
             Search a = new Search("아이",0);
             a.fetch(httpClient);
-            if(a.getResult().size()<=0){
+            if(a.getResult().size()<1){
                 return 1;
             }
 
@@ -496,43 +559,51 @@ public class MainActivity extends AppCompatActivity
             sum += recents.size();
             List<MTitle> favorites = p.getFavorite();
             sum += favorites.size();
-            JSONObject bookmarks = p.getBookmarkObject();
-            sum += bookmarks.length();
             //recent data
 
             //test only favorites
-            titleList(favorites);
             removeDups(favorites);
-
-            titleList(recents);
             removeDups(recents);
 
+            newRecents = new ArrayList<>();
+            newFavorites = new ArrayList<>();
+            failed = new ArrayList<>();
 
-            Iterator<String> keys = bookmarks.keys();
-            JSONObject newBookMark = new JSONObject();
-            while(keys.hasNext()){
+            for(int i=0; i<recents.size(); i++){
                 try {
                     current++;
                     publishProgress();
-                    String key = keys.next();
-                    try {
-                        Integer.parseInt(key);
-                        newBookMark.put(key, bookmarks.get(key));
-                    } catch (Exception e) {
-                        //is not number
-                        int id = findId(key);
-                        if (id > 0) {
-                            newBookMark.put(String.valueOf(id), bookmarks.get(key));
-                        }
-                    }
+                    MTitle newTitle = findTitle(recents.get(i));
+                    if(newTitle !=null)
+                        newRecents.add(newTitle);
+                    else
+                        failed.add(recents.get(i).getName());
                 }catch (Exception e){
                     e.printStackTrace();
+                    failed.add(recents.get(i).getName());
+                }
+            }
+            for(int i=0; i<favorites.size(); i++){
+                try {
+                    current++;
+                    publishProgress();
+                    MTitle newTitle = findTitle(favorites.get(i));
+                    if(newTitle !=null)
+                        newFavorites.add(newTitle);
+                    else
+                        failed.add(favorites.get(i).getName());
+                }catch (Exception e){
+                    e.printStackTrace();
+                    failed.add(favorites.get(i).getName());
                 }
             }
 
-            p.setFavorites(favorites);
-            p.setRecents(recents);
-            p.setBookmarks(newBookMark);
+            p.setFavorites(newFavorites);
+            p.setRecents(newRecents);
+
+            //remove bookmarks
+            p.resetViewerBookmark();
+            p.resetBookmark();
 
             return 0;
         }
@@ -550,39 +621,22 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        void titleList(List<MTitle> titles){
-            for(int i = 0; i<titles.size(); i++){
-                current++;
-                publishProgress();
-                MTitle target = titles.get(i);
-                if(target.getId() <= 0){
-                    int newId = findId(target);
-                    if(newId<0){
-                        titles.remove(i);
-                        i--;
-                    }else{
-                        target.setId(newId);
-                    }
-                }
-            }
+        MTitle findTitle(String title){
+            return findTitle(new MTitle(title,-1,"", "",new ArrayList<>(),""));
         }
 
-        int findId(String title){
-            return findId(new MTitle(title,-1,"", "",new ArrayList<>(),""));
-        }
-
-        int findId(MTitle title){
+        MTitle findTitle(MTitle title){
             String name = title.getName();
             Search s = new Search(name,0);
             while(!s.isLast()){
                 s.fetch(httpClient);
                 for(Title t : s.getResult()){
                     if(t.getName().equals(name)){
-                        return t.getId();
+                        return t.minimize();
                     }
                 }
             }
-            return -1;
+            return null;
         }
 
         @Override
@@ -591,8 +645,48 @@ public class MainActivity extends AppCompatActivity
                 pd.dismiss();
             }
 
-            if(resCode == 0) showPopup(context,"알림","데이터 업데이트 완료");
-            else if(resCode == 1) showPopup(context,"연결 오류","연결을 확인하고 다시 시도해 주세요.");
+            if(resCode == 0){
+                StringBuilder builder = new StringBuilder();
+                for(String t : failed){
+                    builder.append("\n"+t);
+                }
+                builder.deleteCharAt(0);
+
+                final EditText editText = new EditText(context);
+                editText.setText(builder.toString());
+
+                AlertDialog.Builder abuilder;
+                if (new Preference(context).getDarkTheme()) abuilder = new AlertDialog.Builder(context, R.style.darkDialog);
+                else abuilder = new AlertDialog.Builder(context);
+                abuilder.setTitle("알림")
+                        .setView(editText)
+                        .setMessage("기록 업데이트 완료.\n실패한 항목: " + failed.size() + "개")
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                activityInit(bundle);
+                            }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                activityInit(bundle);
+                            }
+                        })
+                        .show();
+            }
+            else if(resCode == 1)
+                showPopup(context, "연결 오류", "연결을 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                }, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        finish();
+                    }
+                });
         }
 
         @Override
@@ -600,6 +694,7 @@ public class MainActivity extends AppCompatActivity
             if(pd.isShowing()){
                 pd.dismiss();
             }
+            finish();
         }
     }
 }

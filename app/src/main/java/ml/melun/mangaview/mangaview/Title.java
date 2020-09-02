@@ -61,35 +61,50 @@ public class Title extends MTitle {
             Element header = d.selectFirst("div.view-title");
 
             //thumb
-            thumb = header.selectFirst("div.view-img").selectFirst("img").attr("src");
+            try {
+                thumb = header.selectFirst("div.view-img").selectFirst("img").attr("src");
+            }catch (Exception e){}
 
             Elements infos = header.select("div.view-content");
             //title
-            name = infos.get(1).selectFirst("b").ownText();
-            //author
-            author = infos.get(2).selectFirst("a").ownText();
-            //tags
+            try {
+                name = infos.get(1).selectFirst("b").ownText();
+            }catch (Exception e){}
             tags = new ArrayList<>();
-            for(Element t: infos.get(3).select("a"))
-                tags.add(t.ownText());
-            //release
-            release = infos.get(4).selectFirst("a").ownText();
+
+            for(int i=1; i<infos.size(); i++){
+                Element e = infos.get(i);
+                try {
+                    String type = e.selectFirst("strong").ownText();
+                    if(type.equals("작가")){
+                        author = e.selectFirst("a").ownText();
+                    }else if(type.equals("분류")){
+                        for(Element t: e.select("a"))
+                            tags.add(t.ownText());
+                    }else if(type.equals("발행구분")) {
+                        release = e.selectFirst("a").ownText();
+                    }
+
+                }catch (Exception e2){continue;}
+            }
 
             //eps
             String title, date;
             int id;
             eps = new ArrayList<>();
-            for(Element e : d.selectFirst("ul.list-body").select("li.list-item")) {
-                Element titlee = e.selectFirst("a.item-subject");
-                id = Integer.parseInt(titlee.attr("href").split("comic/")[1].split("\\?")[0]);
-                title = titlee.ownText();
+            try{
+                for(Element e : d.selectFirst("ul.list-body").select("li.list-item")) {
+                    Element titlee = e.selectFirst("a.item-subject");
+                    id = Integer.parseInt(titlee.attr("href").split("comic/")[1].split("\\?")[0]);
+                    title = titlee.ownText();
 
-                Elements infoe = e.selectFirst("div.item-details").select("span");
-                date = infoe.get(0).ownText();
-                //has view-count, thumb-count and other extra info, implement later
+                    Elements infoe = e.selectFirst("div.item-details").select("span");
+                    date = infoe.get(0).ownText();
+                    //has view-count, thumb-count and other extra info, implement later
 
-                eps.add(new Manga(id, title, date));
-            }
+                    eps.add(new Manga(id, title, date));
+                }
+            }catch (Exception e){}
             r.close();
         }catch(Exception e) {
             e.printStackTrace();
