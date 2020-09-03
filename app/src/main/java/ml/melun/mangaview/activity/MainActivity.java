@@ -3,6 +3,8 @@ package ml.melun.mangaview.activity;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,6 +33,7 @@ import androidx.fragment.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -548,7 +551,7 @@ public class MainActivity extends AppCompatActivity
         protected Integer doInBackground(Void... voids) {
 
             //test
-            Search a = new Search("아이",0);
+            Search a = new Search("이",0);
             a.fetch(httpClient);
             if(a.getResult().size()<1){
                 return 1;
@@ -647,20 +650,31 @@ public class MainActivity extends AppCompatActivity
 
             if(resCode == 0){
                 StringBuilder builder = new StringBuilder();
+                builder.append("기록 업데이트 완료.\n실패한 항목: ");
+                builder.append(failed.size());
+                builder.append("개\n");
                 for(String t : failed){
                     builder.append("\n"+t);
                 }
-                builder.deleteCharAt(0);
 
-                final EditText editText = new EditText(context);
-                editText.setText(builder.toString());
+                final Button copyBtn = new Button(context);
+                copyBtn.setText("결과 복사");
+                copyBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("result", builder.toString());
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(context, "클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
                 AlertDialog.Builder abuilder;
                 if (new Preference(context).getDarkTheme()) abuilder = new AlertDialog.Builder(context, R.style.darkDialog);
                 else abuilder = new AlertDialog.Builder(context);
                 abuilder.setTitle("알림")
-                        .setView(editText)
-                        .setMessage("기록 업데이트 완료.\n실패한 항목: " + failed.size() + "개")
+                        .setView(copyBtn)
+                        .setMessage(builder.toString())
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {

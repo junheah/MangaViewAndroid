@@ -19,6 +19,7 @@ import static ml.melun.mangaview.mangaview.Title.BATTERY_ONE_QUARTER;
 import static ml.melun.mangaview.mangaview.Title.BATTERY_THREE_QUARTER;
 
 public class Search {
+    static final String baseUrl = "/comic";
     /* mode
     * 0 : 제목
     * 1 : 작가
@@ -75,24 +76,24 @@ public class Search {
                 switch(mode){
                     //todo add more modes
                     case 0:
-                        searchUrl = "/comic?stx=";
+                        searchUrl = "?stx=";
                         break;
                     case 1:
-                        searchUrl = "/comic?artist=";
+                        searchUrl = "?artist=";
                         break;
                     case 2:
-                        searchUrl = "/comic?tag=";
+                        searchUrl = "?tag=";
                         break;
                     case 3:
-                        searchUrl = "/comic?jaum=";
+                        searchUrl = "?jaum=";
                         break;
                     case 4:
-                        searchUrl = "/comic?publish=";
+                        searchUrl = "?publish=";
                         break;
                 }
 
 
-                Response response = client.mget(searchUrl + query + "&page=" + page++);
+                Response response = client.mget(baseUrl + "/p" + page++ + searchUrl + query);
                 Document d = Jsoup.parse(response.body().string());
                 d.outputSettings().charset(Charset.forName("UTF-8"));
 

@@ -211,11 +211,13 @@ public class ViewerActivity extends AppCompatActivity {
                         //bookmark handler
                         if (firstVisible == 0) p.removeViewerBookmark(id);
                         if (firstVisible != viewerBookmark) {
-                            p.setViewerBookmark(id, firstVisible);
+                            if(!isInteger(title.getRelease()))
+                                p.setViewerBookmark(id, firstVisible);
                             viewerBookmark = firstVisible;
                         }
                         if (lastVisible >= imgs.size() - 1) {
-                            p.removeViewerBookmark(id);
+                            if(!isInteger(title.getRelease()))
+                                p.removeViewerBookmark(id);
                         }
 
                         if ((!strip.canScrollVertically(1)) && !toolbarshow) {
@@ -338,9 +340,11 @@ public class ViewerActivity extends AppCompatActivity {
                     if (viewerBookmark > 0) strip.scrollToPosition(--viewerBookmark);
                 }
             }
-            if(viewerBookmark>0&&viewerBookmark<stripAdapter.getItemCount()-1) {
-                p.setViewerBookmark(id, viewerBookmark);
-            }else p.removeViewerBookmark(id);
+            if(!isInteger(title.getRelease())) {
+                if (viewerBookmark > 0 && viewerBookmark < stripAdapter.getItemCount() - 1) {
+                    p.setViewerBookmark(id, viewerBookmark);
+                } else p.removeViewerBookmark(id);
+            }
             if(toolbarshow) toggleToolbar();
             return true;
         }
@@ -436,6 +440,8 @@ public class ViewerActivity extends AppCompatActivity {
                 cookie.put("last_page",String.valueOf(0));
             }
             manga.fetch(httpClient);
+            if(title == null)
+                title = manga.getTitle();
             return 0;
         }
 

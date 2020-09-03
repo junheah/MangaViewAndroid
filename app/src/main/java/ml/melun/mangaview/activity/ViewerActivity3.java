@@ -157,9 +157,11 @@ public class ViewerActivity3 extends AppCompatActivity {
                 if(viewerBookmark != position) {
                     viewerBookmark = position;
                     pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
-                    if (position == imgs.size() - 1 || position == 0) {
-                        p.removeViewerBookmark(id);
-                    } else p.setViewerBookmark(id, viewerBookmark);
+                    if(!isInteger(title.getRelease())) {
+                        if (position == imgs.size() - 1 || position == 0) {
+                            p.removeViewerBookmark(id);
+                        } else p.setViewerBookmark(id, viewerBookmark);
+                    }
 
                     boolean lastPage = viewerBookmark == imgs.size() - 1;
                     boolean firstPage = viewerBookmark == 0;
@@ -199,7 +201,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             id = manga.getId();
 
             toolbarTitle.setText(name);
-            viewerBookmark = p.getViewerBookmark(id);
+            if(!isInteger(title.getRelease())) viewerBookmark = p.getViewerBookmark(id);
 
             if(manga.getMode() == 0 || manga.getMode() == 3){
                 result = new Intent();
@@ -378,6 +380,8 @@ public class ViewerActivity3 extends AppCompatActivity {
                 cookie.put("last_page",String.valueOf(0));
             }
             manga.fetch(httpClient);
+            if(title == null)
+                title = manga.getTitle();
             return 0;
         }
 
