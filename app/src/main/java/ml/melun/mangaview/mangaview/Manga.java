@@ -233,7 +233,7 @@ public class Manga {
     Title title;
     String date;
     int seed;
-    int mode = 0;
+    int mode;
     Listener listener;
 
     public interface Listener{

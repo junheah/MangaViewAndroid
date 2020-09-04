@@ -50,6 +50,7 @@ import java.util.List;
 
 import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
+import ml.melun.mangaview.Migrator;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.fragment.MainMain;
@@ -64,6 +65,11 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static ml.melun.mangaview.Downloader.BROADCAST_STOP;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Migrator.MIGRATE_FAIL;
+import static ml.melun.mangaview.Migrator.MIGRATE_PROGRESS;
+import static ml.melun.mangaview.Migrator.MIGRATE_START;
+import static ml.melun.mangaview.Migrator.MIGRATE_STOP;
+import static ml.melun.mangaview.Migrator.MIGRATE_SUCCESS;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.showYesNoNeutralPopup;
@@ -91,6 +97,7 @@ public class MainActivity extends AppCompatActivity
     Toolbar toolbar;
     View progressView;
     private static final int FIRST_TIME_ACTIVITY = 9;
+    ProgressDialog mpd;
 
     Fragment[] fragments = new Fragment[3];
 
@@ -115,8 +122,49 @@ public class MainActivity extends AppCompatActivity
 
 
         //check prefs
-       if(!p.getSharedPref().getBoolean("eula",false)){
-            startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
+       if(!p.getSharedPref().getBoolean("eula",false)) {
+           startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
+
+       }else if(Migrator.running){
+           if(mpd == null) {
+               if (p.getDarkTheme()) mpd = new ProgressDialog(context, R.style.darkDialog);
+               else mpd = new ProgressDialog(context);
+           }
+           mpd.setMessage("기록 업데이트중..");
+           mpd.setCancelable(false);
+           mpd.show();
+
+           BroadcastReceiver migratorStatusReceiver = new BroadcastReceiver() {
+               @Override
+               public void onReceive(Context context, Intent intent) {
+                   switch(intent.getAction()){
+                       case MIGRATE_PROGRESS:
+                           mpd.setMessage(intent.getStringExtra("msg"));
+                           break;
+                       case MIGRATE_START:
+                           break;
+                       case MIGRATE_STOP:
+                           mpd.dismiss();
+                           break;
+                       case MIGRATE_FAIL:
+                           mpd.dismiss();
+                           migratorEndPopup(savedInstanceState, 1, intent.getStringExtra("msg"));
+                           break;
+                       case MIGRATE_SUCCESS:
+                           mpd.dismiss();
+                           migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
+                           break;
+                   }
+               }
+           };
+           IntentFilter infil = new IntentFilter();
+           infil.addAction(MIGRATE_PROGRESS);
+           infil.addAction(MIGRATE_START);
+           infil.addAction(MIGRATE_STOP);
+           infil.addAction(MIGRATE_FAIL);
+           infil.addAction(MIGRATE_SUCCESS);
+           registerReceiver(migratorStatusReceiver, infil);
+
        }else if(!p.check()) {
            //popup to fix preferences
            System.out.println("preference needs update");
@@ -136,14 +184,27 @@ public class MainActivity extends AppCompatActivity
                            else builder = new AlertDialog.Builder(context);
                            builder.setTitle("기록 업데이트")
                                    .setView(editText)
-                                   .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요")
+                                   .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요.")
                                    .setPositiveButton("계속", new DialogInterface.OnClickListener() {
                                        @Override
                                        public void onClick(DialogInterface dialogInterface, int i) {
                                            String url = editText.getText().toString();
                                            if(url == null || url.length()<1)
                                                url = p.getDefUrl();
-                                           new Migrator(savedInstanceState, url).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+                                           Intent intent = new Intent(getApplicationContext(),Migrator.class);
+                                           intent.setAction(MIGRATE_START);
+                                           intent.putExtra("url", url);
+                                           if (Build.VERSION.SDK_INT >= 26) {
+                                               startForegroundService(intent);
+                                           }else{
+                                               startService(intent);
+                                           }
+                                           //queue title to service
+                                           Toast.makeText(getApplication(),"작업을 시작합니다.", Toast.LENGTH_LONG).show();
+                                           //restart activity
+                                           finish();
+                                           startActivity(getIntent());
                                        }
                                    })
                                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -197,9 +258,6 @@ public class MainActivity extends AppCompatActivity
 
     private void activityInit(Bundle savedInstanceState){
         setContentView(R.layout.activity_main);
-
-
-
         progressView = this.findViewById(R.id.progress_panel);
 
         // url updater
@@ -522,208 +580,66 @@ public class MainActivity extends AppCompatActivity
     public void hideProgressPanel(){
         progressView.setVisibility(View.GONE);
     }
-    private class Migrator extends AsyncTask<Void, Void, Integer>{
-
-        ProgressDialog pd;
-        int sum = 0;
-        int current = 0;
-        List<MTitle> newFavorites, newRecents;
-        List<String> failed;
-        Bundle bundle;
-
-        public Migrator(Bundle bundle, String url){
-            this.bundle = bundle;
-            p.setUrl(url);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if(p.getDarkTheme()) pd = new ProgressDialog(context, R.style.darkDialog);
-            else pd = new ProgressDialog(context);
-            pd.setMessage("시작중");
-            pd.setCancelable(false);
-            pd.show();
-        }
 
 
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            pd.setMessage(current +" / " + sum+"\n 앱을 종료하지 말아주세요.");
-        }
-
-        @Override
-        protected Integer doInBackground(Void... voids) {
-
-            //test
-            Search a = new Search("이",0);
-            a.fetch(httpClient);
-            if(a.getResult().size()<1){
-                return 1;
-            }
-
-
-            List<MTitle> recents = p.getRecent();
-            sum += recents.size();
-            List<MTitle> favorites = p.getFavorite();
-            sum += favorites.size();
-            //recent data
-
-            //test only favorites
-            removeDups(favorites);
-            removeDups(recents);
-
-            newRecents = new ArrayList<>();
-            newFavorites = new ArrayList<>();
-            failed = new ArrayList<>();
-
-            for(int i=0; i<recents.size(); i++){
-                try {
-                    current++;
-                    publishProgress();
-                    MTitle newTitle = findTitle(recents.get(i));
-                    if(newTitle !=null)
-                        newRecents.add(newTitle);
-                    else
-                        failed.add(recents.get(i).getName());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    failed.add(recents.get(i).getName());
+    private void migratorEndPopup(Bundle bundle, int resCode, String msg){
+        if(resCode==0) {
+            final ScrollView scrollView = new ScrollView(context);
+            final LinearLayout linearLayout = new LinearLayout(context);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            final TextView textView = new TextView(context);
+            textView.setText(msg);
+            final Button copyBtn = new Button(context);
+            copyBtn.setText("결과 복사");
+            copyBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("result", msg);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(context, "클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
                 }
-            }
-            for(int i=0; i<favorites.size(); i++){
-                try {
-                    current++;
-                    publishProgress();
-                    MTitle newTitle = findTitle(favorites.get(i));
-                    if(newTitle !=null)
-                        newFavorites.add(newTitle);
-                    else
-                        failed.add(favorites.get(i).getName());
-                }catch (Exception e){
-                    e.printStackTrace();
-                    failed.add(favorites.get(i).getName());
+            });
+            final Button btn = new Button(context);
+            btn.setText("닫기");
+            linearLayout.addView(textView);
+            linearLayout.addView(copyBtn);
+            linearLayout.addView(btn);
+            scrollView.addView(linearLayout);
+
+            AlertDialog.Builder abuilder;
+            if (new Preference(context).getDarkTheme())
+                abuilder = new AlertDialog.Builder(context, R.style.darkDialog);
+            else abuilder = new AlertDialog.Builder(context);
+            AlertDialog dialog = abuilder.setTitle("결과")
+                    .setView(scrollView)
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            activityInit(bundle);
+                        }
+                    })
+                    .create();
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                    activityInit(bundle);
                 }
-            }
-
-            p.setFavorites(newFavorites);
-            p.setRecents(newRecents);
-
-            //remove bookmarks
-            p.resetViewerBookmark();
-            p.resetBookmark();
-
-            return 0;
+            });
+            dialog.show();
         }
-
-        void removeDups(List<MTitle> titles){
-            for(int i=0; i<titles.size(); i++){
-                MTitle target = titles.get(i);
-                for(int j =0 ; j<titles.size(); j++){
-                    if(j!=i && titles.get(j).getId() == target.getId()){
-                        titles.remove(i);
-                        i--;
-                        break;
-                    }
+        else if(resCode == 1)
+            showPopup(context, "연결 오류", "연결을 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
                 }
-            }
-        }
-
-        MTitle findTitle(String title){
-            return findTitle(new MTitle(title,-1,"", "",new ArrayList<>(),""));
-        }
-
-        MTitle findTitle(MTitle title){
-            String name = title.getName();
-            Search s = new Search(name,0);
-            while(!s.isLast()){
-                s.fetch(httpClient);
-                for(Title t : s.getResult()){
-                    if(t.getName().equals(name)){
-                        return t.minimize();
-                    }
+            }, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                    finish();
                 }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Integer resCode) {
-            if(pd.isShowing()){
-                pd.dismiss();
-            }
-
-            if(resCode == 0){
-                StringBuilder builder = new StringBuilder();
-                builder.append("기록 업데이트 완료.\n실패한 항목: ");
-                builder.append(failed.size());
-                builder.append("개\n");
-                for(String t : failed){
-                    builder.append("\n"+t);
-                }
-                final ScrollView scrollView = new ScrollView(context);
-                final LinearLayout linearLayout = new LinearLayout(context);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                final TextView textView = new TextView(context);
-                textView.setText(builder.toString());
-                final Button copyBtn = new Button(context);
-                copyBtn.setText("결과 복사");
-                copyBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("result", builder.toString());
-                        clipboard.setPrimaryClip(clip);
-                        Toast.makeText(context, "클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                final Button btn = new Button(context);
-                btn.setText("닫기");
-                linearLayout.addView(textView);
-                linearLayout.addView(copyBtn);
-                linearLayout.addView(btn);
-                scrollView.addView(linearLayout);
-
-                AlertDialog.Builder abuilder;
-                if (new Preference(context).getDarkTheme()) abuilder = new AlertDialog.Builder(context, R.style.darkDialog);
-                else abuilder = new AlertDialog.Builder(context);
-                AlertDialog dialog = abuilder.setTitle("결과")
-                        .setView(scrollView)
-                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialogInterface) {
-                                activityInit(bundle);
-                            }
-                        })
-                        .create();
-                btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                        activityInit(bundle);
-                    }
-                });
-                dialog.show();
-            }
-            else if(resCode == 1)
-                showPopup(context, "연결 오류", "연결을 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                }, new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        finish();
-                    }
-                });
-        }
-
-        @Override
-        protected void onCancelled() {
-            if(pd.isShowing()){
-                pd.dismiss();
-            }
-            finish();
-        }
+            });
     }
 }
