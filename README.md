@@ -1,5 +1,5 @@
 [![logo](/web/logo_static.svg "MangaView")](https://junheah.github.io/MangaViewAndroid/)
-# 마나모아 전용 뷰어/다운로더 앱 #
+# 마나토끼 전용 뷰어/다운로더 앱 #
 
 [![GitHub All Releases](https://img.shields.io/github/downloads/junheah/MangaViewAndroid/total?color=db49de&label=다운로드)](https://junheah.github.io/MangaViewAndroid/)
 ### [최신 버전 다운로드 (apk)](https://junheah.github.io/MangaViewAndroid/) ###
