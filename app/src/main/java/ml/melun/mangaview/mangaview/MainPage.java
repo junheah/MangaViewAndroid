@@ -22,7 +22,14 @@ public class MainPage {
 
         try{
             Response r = client.mget("");
-            Document d = Jsoup.parse(r.body().string());
+            String body = r.body().string();
+            if(body.contains("Connect Error: Connection timed out")){
+                //adblock : try again
+                r.close();
+                fetch(client);
+                return;
+            }
+            Document d = Jsoup.parse(body);
             r.close();
 
             //recent

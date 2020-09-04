@@ -71,7 +71,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Button pageBtn, nextPageBtn, prevPageBtn, touchToggleBtn;
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
-    int viewerBookmark = -1;
+    int viewerBookmark = 0;
     List<String> imgs;
     List<Integer> types;
     ProgressDialog pd;
@@ -188,12 +188,13 @@ public class ViewerActivity2 extends AppCompatActivity {
             }.getType());
         }
 
+        if(title == null)
+            title = manga.getTitle();
+
         name = manga.getName();
         id = manga.getId();
 
         toolbarTitle.setText(name);
-        if(!isInteger(title.getRelease()))
-            viewerBookmark = p.getViewerBookmark(id);
 
 //        refreshbtn.setOnClickListener(new View.OnClickListener() {
 //            @Override

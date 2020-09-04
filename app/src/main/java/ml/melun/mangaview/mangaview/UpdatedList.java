@@ -24,7 +24,14 @@ public class UpdatedList {
         if(!last) {
             try {
                 Response response= client.mget(url + page++);
-                Document document = Jsoup.parse(response.body().string());
+                String body = response.body().string();
+                if(body.contains("Connect Error: Connection timed out")){
+                    //adblock : try again
+                    response.close();
+                    fetch(client);
+                    return;
+                }
+                Document document = Jsoup.parse(body);
                 Elements items = document.select("div.post-row");
                 if (items == null || items.size() < 50) last = true;
                 for(Element item : items){

@@ -70,7 +70,7 @@ public class ViewerActivity3 extends AppCompatActivity {
     String name;
     boolean captchaChecked = false;
     int id;
-    int viewerBookmark;
+    int viewerBookmark = 0;
     int seed;
     ViewerPagerAdapter pageAdapter;
     int index;
@@ -196,6 +196,9 @@ public class ViewerActivity3 extends AppCompatActivity {
                 manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }
+
+            if(title == null)
+                title = manga.getTitle();
 
             name = manga.getName();
             id = manga.getId();

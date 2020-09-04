@@ -65,7 +65,7 @@ public class ViewerActivity extends AppCompatActivity {
     boolean toolbarshow = true;
     TextView toolbarTitle;
     AppBarLayout appbar, appbarBottom;
-    int viewerBookmark;
+    int viewerBookmark = 0;
     LinearLayoutManager manager;
     ImageButton next, prev;
     Button cut, pageBtn;

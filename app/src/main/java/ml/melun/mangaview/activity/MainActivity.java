@@ -36,6 +36,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -502,9 +505,9 @@ public class MainActivity extends AppCompatActivity
             if(path != null){
                 if(writePreferenceToFile(context, new File(path))) {
                     Toast.makeText(context, "백업 완료!", Toast.LENGTH_LONG).show();
-                }
-            }
-            Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
+                }else Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
+            }else Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
+
             finish();
             startActivity(getIntent());
         }
@@ -656,7 +659,11 @@ public class MainActivity extends AppCompatActivity
                 for(String t : failed){
                     builder.append("\n"+t);
                 }
-
+                final ScrollView scrollView = new ScrollView(context);
+                final LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                final TextView textView = new TextView(context);
+                textView.setText(builder.toString());
                 final Button copyBtn = new Button(context);
                 copyBtn.setText("결과 복사");
                 copyBtn.setOnClickListener(new View.OnClickListener() {
@@ -668,26 +675,33 @@ public class MainActivity extends AppCompatActivity
                         Toast.makeText(context, "클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
+                final Button btn = new Button(context);
+                btn.setText("닫기");
+                linearLayout.addView(textView);
+                linearLayout.addView(copyBtn);
+                linearLayout.addView(btn);
+                scrollView.addView(linearLayout);
 
                 AlertDialog.Builder abuilder;
                 if (new Preference(context).getDarkTheme()) abuilder = new AlertDialog.Builder(context, R.style.darkDialog);
                 else abuilder = new AlertDialog.Builder(context);
-                abuilder.setTitle("알림")
-                        .setView(copyBtn)
-                        .setMessage(builder.toString())
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                activityInit(bundle);
-                            }
-                        })
+                AlertDialog dialog = abuilder.setTitle("결과")
+                        .setView(scrollView)
                         .setOnCancelListener(new DialogInterface.OnCancelListener() {
                             @Override
                             public void onCancel(DialogInterface dialogInterface) {
                                 activityInit(bundle);
                             }
                         })
-                        .show();
+                        .create();
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                        activityInit(bundle);
+                    }
+                });
+                dialog.show();
             }
             else if(resCode == 1)
                 showPopup(context, "연결 오류", "연결을 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {

@@ -74,7 +74,14 @@ public class Manga {
         while(imgs.size()==0 && tries < 2) {
             Response r = client.mget("/comic/" + String.valueOf(id));
             try {
-                Document d = Jsoup.parse(r.body().string());
+                String body = r.body().string();
+                if(body.contains("Connect Error: Connection timed out")){
+                    //adblock : try again
+                    r.close();
+                    tries = 0;
+                    continue;
+                }
+                Document d = Jsoup.parse(body);
 
                 //name
                 name = d.selectFirst("div.toon-title").ownText();
@@ -98,7 +105,6 @@ public class Manga {
                 //imgs
                 for(Element e : d.selectFirst("div.view-padding").select("p")) {
                     imgs.add(e.selectFirst("img").attr("data-original"));
-                    System.out.println("pppp"+e.selectFirst("img").attr("data-original"));
                 }
 
                 r.close();

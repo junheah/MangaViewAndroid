@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,8 +94,15 @@ public class Search {
                 }
 
 
-                Response response = client.mget(baseUrl + "/p" + page++ + searchUrl + query);
-                Document d = Jsoup.parse(response.body().string());
+                Response response = client.mget(baseUrl + "/p" + page++ + searchUrl + URLEncoder.encode(query,"UTF-8"));
+                String body = response.body().string();
+                if(body.contains("Connect Error: Connection timed out")){
+                    //adblock : try again
+                    response.close();
+                    page--;
+                    return fetch(client);
+                }
+                Document d = Jsoup.parse(body);
                 d.outputSettings().charset(Charset.forName("UTF-8"));
 
                 Elements titles = d.select("div.list-item");

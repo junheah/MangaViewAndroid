@@ -57,7 +57,14 @@ public class Title extends MTitle {
     public void fetchEps(CustomHttpClient client) {
         try {
             Response r = client.mget("/comic/" + id);
-            Document d = Jsoup.parse(r.body().string());
+            String body = r.body().string();
+            if(body.contains("Connect Error: Connection timed out")){
+                //adblock : try again
+                r.close();
+                fetchEps(client);
+                return;
+            }
+            Document d = Jsoup.parse(body);
             Element header = d.selectFirst("div.view-title");
 
             //thumb
