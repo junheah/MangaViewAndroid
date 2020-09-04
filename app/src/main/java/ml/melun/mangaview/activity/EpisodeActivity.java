@@ -107,7 +107,8 @@ public class EpisodeActivity extends AppCompatActivity {
         upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
         title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
         online = intent.getBooleanExtra("online", true);
-        bookmarkId = p.getBookmark(title);
+        if(title.useBookmark())
+            bookmarkId = p.getBookmark(title);
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
@@ -177,7 +178,14 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }else if(data.exists()){
                 mode = 3;
-                p.addRecent(title);
+
+                if(!title.useBookmark()){
+                    // is migrated
+                   mode = 4;
+                }else{
+                    p.addRecent(title);
+                }
+
                 episodes =  title.getEps();
                 offlineEpisodes = new ArrayList<>();
                 for(File folder : getOfflineEpisodes()){
@@ -383,6 +391,8 @@ public class EpisodeActivity extends AppCompatActivity {
     }
 
     public void openViewer(Manga manga, int code){
+        manga.setMode(mode);
+        System.out.println("pppppppp " +manga.getMode());
         Intent viewer = null;
         switch (p.getViewerType()){
             case 0:

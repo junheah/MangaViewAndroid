@@ -5,41 +5,64 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import okhttp3.Response;
 
 public class UpdatedList {
-    public void UpdatedList(){
-        //
-    }
+    Boolean last = false;
+    ArrayList<Manga> result;
+    int page = 1;
+
     public void fetch(CustomHttpClient client){
+        //50 items per page
         result = new ArrayList<>();
-        String url = "/bbs/board.php?bo_table=manga&page=";
+        String url = "/thema/comic/widget/miso-post-comic-update/widget.rows.php?thema=comic&wname=miso-post-comic-update&wid=comic_update&page=";
         if(!last) {
             try {
-                page++;
-                Response response= client.mget(url+page);
-                Document document = Jsoup.parse(response.body().string());
-                Elements items = document.select("div.media.post-list");
-                if (items.size() < 50) last = true;
+                Response response= client.mget(url + page++);
+                String body = response.body().string();
+                if(body.contains("Connect Error: Connection timed out")){
+                    //adblock : try again
+                    response.close();
+                    fetch(client);
+                    return;
+                }
+                Document document = Jsoup.parse(body);
+                Elements items = document.select("div.post-row");
+                if (items == null || items.size() < 50) last = true;
                 for(Element item : items){
                     try {
-                        String ttmp = item.selectFirst("div.img-item").selectFirst("img").attr("src");
-                        String ntmp = item.selectFirst("div.post-subject").selectFirst("a").ownText().replace('\n', ' ');
-                        String idStr = item.selectFirst("div.post-info").selectFirst("a").attr("href").split("manga_id=")[1];
-                        int id = Integer.parseInt(idStr);
+                        String img = item.selectFirst("img").attr("src");
+                        String name = item.selectFirst("div.post-subject").selectFirst("a").ownText();
+                        int id = Integer.parseInt(item
+                                .selectFirst("div.pull-left")
+                                .selectFirst("a")
+                                .attr("href")
+                                .split("wr_id=")[1]);
 
-                        String idRaw = item.selectFirst("div.post-image").selectFirst("a.ellipsis").attr("href");
-                        int itmp = Integer.parseInt(idRaw.substring(idRaw.lastIndexOf("=") + 1));
+                        Elements rightInfo = item.selectFirst("div.pull-right").select("p");
 
-                        String dtmp = item.selectFirst("div.post-info").selectFirst("span").ownText();
+                        int tid = Integer.parseInt(rightInfo
+                                .get(0)
+                                .selectFirst("a")
+                                .attr("href")
+                                .split("wr_id=")[1]);
 
-                        Manga tmp = new Manga(itmp, ntmp, dtmp);
-                        tmp.setTitle(new Title("", "", "", new ArrayList<String>(), -1, id));
-                        tmp.addThumb(ttmp);
+                        String date = rightInfo.get(1).selectFirst("span").ownText();
+
+                        List<String> tags = Arrays.asList(item.selectFirst("div.post-text").ownText().split(","));
+
+                        Manga tmp = new Manga(id, name, date);
+                        tmp.setMode(0);
+                        tmp.setTitle(new Title(name, img, "", new ArrayList<String>(), "", tid));
+                        tmp.addThumb(img);
                         result.add(tmp);
                     }catch(Exception e){
+                        e.printStackTrace();
                         continue;
                     }
                 }
@@ -56,7 +79,5 @@ public class UpdatedList {
     }
     public boolean isLast(){return last;}
 
-    Boolean last = false;
-    ArrayList<Manga> result;
-    int page = 0;
+
 }

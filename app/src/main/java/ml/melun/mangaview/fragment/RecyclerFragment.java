@@ -177,57 +177,60 @@ public class RecyclerFragment extends Fragment {
             titleAdapter.setResume(false);
             titleAdapter.setForceThumbnail(true);
             titleAdapter.clearData();
-            new AsyncTask<Void, Void, Integer>() {
-                List<Title> titles;
-                @Override
-                protected void onPostExecute(Integer integer) {
-                    super.onPostExecute(integer);
-                    titleAdapter.addData(titles);
-                }
-                @Override
-                protected Integer doInBackground(Void... voids) {
-                    titles = new ArrayList<>();
-                    List<Title> savedTitles = new ArrayList<>();
-                    File homeDir = new File(p.getHomeDir());
-                    if (homeDir.exists()) {
-                        File[] files = homeDir.listFiles();
-                        for (File f : files) {
-                            if (f.isDirectory()) {
-                                File oldData = new File(f, "title.data");
-                                File data = new File(f, "title.gson");
-                                if (oldData.exists()) {
-                                    try {
-                                        JSONObject json = new JSONObject(readFileToString(oldData));
-                                        Title title = new Gson().fromJson(json.getJSONObject("title").toString(), new TypeToken<Title>() {
-                                        }.getType());
-                                        if (title.getThumb().length() > 0)
-                                            title.setThumb(new File(f.getAbsolutePath(), title.getThumb()).getAbsolutePath());
-                                        titles.add(title);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), -1, 0));
-                                    }
-                                } else if (data.exists()) {
-                                    try {
-                                        Title title = new Gson().fromJson(readFileToString(data), new TypeToken<Title>() {
-                                        }.getType());
-                                        if (title.getThumb().length() > 0)
-                                            title.setThumb(f.getAbsolutePath() + '/' + title.getThumb());
-                                        titles.add(title);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), -1, 0));
-                                    }
+            new OfflineReader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+    }
 
-                                } else
-                                    titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), -1, 0));
+
+    public class OfflineReader extends AsyncTask<Void,Void,Integer>{
+        List<Title> titles;
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
+            titleAdapter.addData(titles);
+        }
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            titles = new ArrayList<>();
+            List<Title> savedTitles = new ArrayList<>();
+            File homeDir = new File(p.getHomeDir());
+            if (homeDir.exists()) {
+                File[] files = homeDir.listFiles();
+                for (File f : files) {
+                    if (f.isDirectory()) {
+                        File oldData = new File(f, "title.data");
+                        File data = new File(f, "title.gson");
+                        if (oldData.exists()) {
+                            try {
+                                JSONObject json = new JSONObject(readFileToString(oldData));
+                                Title title = new Gson().fromJson(json.getJSONObject("title").toString(), new TypeToken<Title>() {
+                                }.getType());
+                                if (title.getThumb().length() > 0)
+                                    title.setThumb(new File(f.getAbsolutePath(), title.getThumb()).getAbsolutePath());
+                                titles.add(title);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
                             }
-                        }
-                        //add titles to adapter
+                        } else if (data.exists()) {
+                            try {
+                                Title title = new Gson().fromJson(readFileToString(data), new TypeToken<Title>() {
+                                }.getType());
+                                if (title.getThumb().length() > 0)
+                                    title.setThumb(f.getAbsolutePath() + '/' + title.getThumb());
+                                titles.add(title);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
+                            }
+
+                        } else
+                            titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
                     }
-                    return null;
                 }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                //add titles to adapter
+            }
+            return null;
         }
     }
 

@@ -22,28 +22,24 @@
     </string-array>
     <string-array name="tag_name">
         <item>ㄱ</item>
-        <item>ㄲ</item>
         <item>ㄴ</item>
         <item>ㄷ</item>
-        <item>ㄸ</item>
         <item>ㄹ</item>
         <item>ㅁ</item>
         <item>ㅂ</item>
-        <item>ㅃ</item>
         <item>ㅅ</item>
-        <item>ㅆ</item>
         <item>ㅇ</item>
         <item>ㅈ</item>
-        <item>ㅉ</item>
         <item>ㅊ</item>
         <item>ㅋ</item>
         <item>ㅌ</item>
         <item>ㅍ</item>
         <item>ㅎ</item>
-        <item>A-Z</item>
         <item>0-9</item>
+        <item>A-Z</item>
     </string-array>
     <string-array name="tag_release">
+        <item>미분류</item>
         <item>주간</item>
         <item>격주</item>
         <item>월간</item>
@@ -67,9 +63,10 @@
         <item>러브코미디</item>
         <item>로맨스</item>
         <item>먹방</item>
-        <item>미스테리</item>
+        <item>미스터리</item>
         <item>백합</item>
         <item>붕탁</item>
+        <item>성인</item>
         <item>순정</item>
         <item>스릴러</item>
         <item>스포츠</item>
@@ -77,14 +74,13 @@
         <item>애니화</item>
         <item>액션</item>
         <item>역사</item>
-        <item>요리</item>
         <item>음악</item>
         <item>이세계</item>
         <item>일상</item>
+        <item>일상+치유</item>
         <item>전생</item>
         <item>추리</item>
         <item>판타지</item>
-        <item>하렘</item>
         <item>학원</item>
         <item>호러</item>
     </string-array>

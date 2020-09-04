@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.p;
 
@@ -25,13 +24,15 @@ public class FirstTimeActivity extends AppCompatActivity {
         setResult(RESULT_EULA_DISAGREE);
         this.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         setContentView(R.layout.activity_first_time);
-        new UrlUpdater(this, true).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//        new UrlUpdater(this, true).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         p.getSharedPref().edit().putBoolean("eula", false).commit();
         this.findViewById(R.id.eulaAgreeBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 p.getSharedPref().edit().putBoolean("eula", true).commit();
+                // not a migrator
+                p.getSharedPref().edit().putBoolean("manamoa", false).commit();
                 setResult(RESULT_EULA_AGREE);
                 finish();
             }

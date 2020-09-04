@@ -316,7 +316,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(int pos, String tag) {
                     try {
-                        mainClickListener.clickedName(pos);
+                        mainClickListener.clickedName(tag);
                     }catch (Exception e){
 
                     }
@@ -336,7 +336,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             radapter.setClickListener(new MainTagAdapter.tagOnclick() {
                 @Override
                 public void onClick(int position, String tag) {
-                    mainClickListener.clickedRelease(position+1);
+                    mainClickListener.clickedRelease(tag);
                 }
             });
         }
@@ -349,8 +349,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public interface onItemClick{
         void clickedManga(Manga m);
         void clickedTag(String t);
-        void clickedName(int t);
-        void clickedRelease(int t);
+        void clickedName(String t);
+        void clickedRelease(String t);
         void clickedMoreUpdated();
         void captchaCallback();
     }

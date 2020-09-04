@@ -24,8 +24,9 @@ import okhttp3.Response;
     mode:
     0 = online
     1 = offline - old
-    2 = offline - old (title.data)
-    3 = offline - new (title.gson)
+    2 = offline - old(moa) (title.data)
+    3 = offline - latest(toki) (title.gson)
+    4 = offline - new(moa) (title.gson)
      */
 
 public class Manga {
@@ -49,7 +50,6 @@ public class Manga {
     }
 
     public void setImgs(List<String> imgs){
-        this.reported = false;
         this.imgs = imgs;
     }
 
@@ -67,161 +67,61 @@ public class Manga {
     public void fetch(CustomHttpClient client, boolean doLogin, Map<String,String> cookies) {
         mode = 0;
         imgs = new ArrayList<>();
-        imgs1 = new ArrayList<>();
         eps = new ArrayList<>();
         comments = new ArrayList<>();
         bcomments = new ArrayList<>();
-        cdn_domains = new ArrayList<>();
         int tries = 0;
 
         while(imgs.size()==0 && tries < 2) {
-            Map<String,String> cookie = new HashMap<>();
-            if(doLogin) {
-                cookie.put("last_wr_id", String.valueOf(id));
-                cookie.put("last_percent", String.valueOf(1));
-                cookie.put("last_page", String.valueOf(0));
-            }
-            if(cookies != null)
-                cookie.putAll(cookies);
-
-            Response response = client.mget("/bbs/board.php?bo_table=manga&wr_id="+id, doLogin, cookie);
-            StringBuilder sb = new StringBuilder();
+            Response r = client.mget("/comic/" + String.valueOf(id));
             try {
-                InputStream stream = response.body().byteStream();
-                if(listener!=null) listener.setMessage("페이지 읽는중");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                //StringBuffer buffer = new StringBuffer();
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                    //save as raw html for jsoup
-                    //raw += line;
-                    if(line.contains("var img_list =")) {
-                        if(listener!=null) listener.setMessage("이미지 리스트 읽는중");
-                        String imgStr = line;
-                        if(imgStr!=null) {
-                            String[] imgStrs = imgStr.split("\"");
-                            //remove backslash
-                            for (int i = 1; i < imgStrs.length; i += 2) {
-                                String imgUrl = imgStrs[i].replace("\\","");
-                                String cdn = cdn_domains.get((id + 4 * ((i-1)/2)) % cdn_domains.size());
-                                imgUrl = imgUrl.replace("cdntigermask.xyz", cdn);
-                                imgUrl = imgUrl.replace("cdnmadmax.xyz", cdn);
-                                imgUrl = imgUrl.replace("filecdn.xyz", cdn);
-                                imgUrl += "?quick";
-                                imgs.add(imgUrl);
-                            }
-                        }
-                    }else if(line.contains("var img_list1 =")) {
-                        if(listener!=null) listener.setMessage("이미지 리스트 (보조) 읽는중");
-                        String imgStr = line;
-                        if(imgStr!=null) {
-                            String[] imgStrs = imgStr.split("\"");
-                            //remove backslash
-                            for (int i = 1; i < imgStrs.length; i += 2) {
-                                String imgUrl = imgStrs[i].replace("\\","");
-                                String cdn = cdn_domains.get((id + 4 * ((i-1)/2)) % cdn_domains.size());
-                                imgUrl = imgUrl.replace("cdntigermask.xyz", cdn);
-                                imgUrl = imgUrl.replace("cdnmadmax.xyz", cdn);
-                                imgUrl = imgUrl.replace("filecdn.xyz", cdn);
-                                imgs1.add(imgUrl);
-                            }
-                        }
-                    }else if(line.contains("var only_chapter =")){
-                        if(listener!=null) listener.setMessage("화 목록 읽는중");
-                        String epsStr = line;
-                        String[] epsStrs = epsStr.split("\"");
-                        //remove backslash
-                        for (int i = 3; i < epsStrs.length; i += 4) {
-                            eps.add(new Manga(Integer.parseInt(epsStrs[i]),epsStrs[i-2],""));
-                        }
-                    }else if(line.contains("var view_cnt =")){
-                        String seedt = line.substring(0,line.length()-1);
-                        seed = Integer.parseInt(seedt.split(" ")[3]);
-                    }else if(line.contains("var manga404 = ")){
-                        reported = Boolean.parseBoolean(line.split("=")[1].split(";")[0].split(" ")[1]);
-                    }else if(line.contains("var link =")){
-                        String idStr = line.substring(line.indexOf("manga_id=")+9, line.indexOf("&"));
-                        String titleName = URLDecoder.decode(line.substring(line.indexOf("manga_name=")+11,line.length()-2),"UTF-8");
-                        title = new Title(titleName,"","",new ArrayList<String>(), -1, Integer.parseInt(idStr));
-                    }else if(line.contains("var cdn_domains = ")){
-                        if(listener!=null) listener.setMessage("cdn 목록 읽는중");
-                        String[] cdnStrs = line.split("\"");
-                        for(int i=1; i < cdnStrs.length; i += 2){
-                            if(cdnStrs[i] != null && cdnStrs[i].length()>0)
-                                cdn_domains.add(cdnStrs[i]);
-                        }
+                String body = r.body().string();
+                r.close();
+                if(body.contains("Connect Error: Connection timed out")){
+                    //adblock : try again
+                    r.close();
+                    tries = 0;
+                    continue;
+                }
+                Document d = Jsoup.parse(body);
 
-                    }
+                //name
+                name = d.selectFirst("div.toon-title").ownText();
 
-                    //if(imgs.size()>0 && eps.size()>0) break;
+                //temp title
+                Element navbar = d.selectFirst("div.toon-nav");
+                int tid = Integer.parseInt(navbar.select("a")
+                        .get(3)
+                        .attr("href")
+                        .split("comic/")[1]
+                        .split("\\?")[0]);
+                System.out.println(tid);
+
+                if(title == null) title = new Title(name, "", "", null, "", tid );
+
+                //eps
+                for(Element e :navbar.selectFirst("select").select("option")){
+                    eps.add(new Manga(Integer.parseInt(e.attr("value")),e.ownText(),""));
                 }
 
-                //jsoup parsing
-                Document doc = Jsoup.parse(sb.toString());
-
-                //parse title
-                if(title==null){
-                    String href = doc.selectFirst("div.comic-navbar").select("a").get(3).attr("href");
-                    String idStr = href.substring(href.indexOf("manga_id=")+11);
-                    title = new Title("","","",new ArrayList<String>(), -1, Integer.parseInt(idStr));
+                //imgs
+                for(Element e : d.selectFirst("div.view-padding").select("img")) {
+                    String img = e.attr("data-original");
+                    if(img != null && !img.isEmpty() && !img.contains("blank"))
+                        imgs.add(img);
                 }
 
-                //parse name
-                this.name = doc.selectFirst("div.toon-title").ownText();
+                //comments
+                //Element commentE = d.selectFirst("viewcomment");
 
-                if(listener!=null) listener.setMessage("댓글 읽는중");
-                Elements cs = doc.select("section.comment-media");
-                if(cs != null) {
-                    cs = cs.last().select("div.media");
-                    for (Element c : cs) {
-                        String icon, user, timestamp, content;
-                        int indent, likes, level;
-                        Elements i = c.select("img");
-                        if (!i.isEmpty()) {
-                            icon = i.get(0).attr("src");
-                        } else icon = "";
-                        user = c.selectFirst("span.member").ownText();
-                        timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
-                        content = c.selectFirst("div.media-content").selectFirst("textarea").ownText();
-                        String indentStr = c.attr("style");
-                        if (indentStr.length() > 0) {
-                            String indentStrSplit = indentStr.split(":")[1].split("px")[0];
-                            int indentRaw = Integer.parseInt(indentStrSplit);
-                            indent = indentRaw / 64;
-                        } else indent = 0;
-                        likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
-                        level = Integer.parseInt(c.selectFirst("span.lv-icon").text());
-                        comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
-                    }
-                }
+                //todo: comments
 
-                cs = doc.select("section.comment-media.best-comment");
-                if(cs != null) {
-                    cs = cs.last().select("div.media");
-                    for (Element c : cs) {
-                        String icon, user, timestamp, content;
-                        int indent, likes, level;
-                        Elements i = c.select("img");
-                        if (!i.isEmpty()) {
-                            icon = i.get(0).attr("src");
-                        } else icon = "";
-                        user = c.selectFirst("span.member").ownText();
-                        timestamp = c.selectFirst("span.media-info").selectFirst("span").text();
-                        content = c.selectFirst("div.commtent-content").ownText();
-                        String indentStr = c.attr("style");
-                        indent = 0;
-                        likes = Integer.parseInt(c.selectFirst("a.cmt-good").selectFirst("span").text());
-                        level = Integer.parseInt(c.selectFirst("span.lv-icon").text());
-                        bcomments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
-                    }
-                }
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if(response!=null){
-                response.close();
+            if(r!=null){
+                r.close();
             }
             tries++;
         }
@@ -237,12 +137,7 @@ public class Manga {
     }
 
     public List<String> getImgs(){
-        return getImgs(false);
-    }
-    public List<String> getImgs(boolean second){
         if(mode == 0) {
-            if (second)
-                return imgs1;
             return imgs;
         }else{
             if(imgs == null) {
@@ -252,9 +147,8 @@ public class Manga {
                 switch (mode) {
                     case 1:
                     case 2:
-                        offimgs = offlinePath.listFiles();
-                        break;
                     case 3:
+                    case 4:
                         offimgs = offlinePath.listFiles();
                         break;
                 }
@@ -311,10 +205,6 @@ public class Manga {
         this.listener = listener;
     }
 
-    public boolean getReported() {
-        return reported;
-    }
-
     public int getMode(){return mode;}
 
     public void setMode(int mode){
@@ -322,13 +212,21 @@ public class Manga {
     }
 
     public String getUrl(){
-        return "/bbs/board.php?bo_table=manga&wr_id=" + id;
+        return "/manga/" + id;
+    }
+
+    public boolean useBookmark(){
+        return id>0&&(mode==0||mode==3);
+    }
+
+    public boolean isOnline(){
+        return id>0&&mode==0;
     }
 
     private int id;
     String name;
     List<Manga> eps;
-    List<String> imgs, imgs1, cdn_domains;
+    List<String> imgs;
     List<Comment> comments, bcomments;
     File offlinePath;
     String thumb;
@@ -337,7 +235,6 @@ public class Manga {
     int seed;
     int mode;
     Listener listener;
-    boolean reported;
 
     public interface Listener{
         void setMessage(String msg);

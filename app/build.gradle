@@ -24,7 +24,7 @@ android {
         applicationId "ml.melun.mangaview"
         minSdkVersion 18
         targetSdkVersion 27
-        versionName "3.0-" + code
+        versionName "4.0-" + code
         versionCode code
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true

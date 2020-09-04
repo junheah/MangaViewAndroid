@@ -20,7 +20,39 @@ public class MainPage {
         favUpdate = new ArrayList<>();
         onlineRecent = new ArrayList<>();
 
+        try{
+            Response r = client.mget("");
+            String body = r.body().string();
+            if(body.contains("Connect Error: Connection timed out")){
+                //adblock : try again
+                r.close();
+                fetch(client);
+                return;
+            }
+            Document d = Jsoup.parse(body);
+            r.close();
 
+            //recent
+            int id;
+            String name;
+            String thumb;
+            Manga mtmp;
+            Element infos;
+            for(Element e : d.selectFirst("div.main-box").select("div.post-row")){
+                id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
+                infos = e.selectFirst("div.img-item");
+                thumb = infos.selectFirst("img").attr("src");
+                name = infos.selectFirst("b").ownText();
+
+                mtmp = new Manga(id, name, "");
+                mtmp.addThumb(thumb);
+                recent.add(mtmp);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+/*
         try{
             Response response = client.mget("");
             Document doc = Jsoup.parse(response.body().string());
@@ -55,6 +87,7 @@ public class MainPage {
         }catch (Exception e){
             e.printStackTrace();
         }
+*/
     }
 
     void rankingWidgetLiParser(Elements input, List output){

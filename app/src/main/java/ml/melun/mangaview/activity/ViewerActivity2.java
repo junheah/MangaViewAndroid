@@ -56,7 +56,6 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
-import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity2 extends AppCompatActivity {
@@ -70,8 +69,8 @@ public class ViewerActivity2 extends AppCompatActivity {
     Button pageBtn, nextPageBtn, prevPageBtn, touchToggleBtn;
     AppBarLayout appbar, appbarBottom;
     TextView toolbarTitle;
-    int viewerBookmark = -1;
-    List<String> imgs, imgs1;
+    int viewerBookmark = 0;
+    List<String> imgs;
     List<Integer> types;
     ProgressDialog pd;
     List<Manga> eps;
@@ -89,7 +88,6 @@ public class ViewerActivity2 extends AppCompatActivity {
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     Decoder d;
-    boolean error = false, useSecond = false;
     boolean nextEpisodeVisible = false;
     View nextEpisode;
 
@@ -143,7 +141,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     name = manga.getName();
                     spinner.setSelection(position, true);
                     hideSpinnerDropDown(spinner);
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -192,7 +190,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         id = manga.getId();
 
         toolbarTitle.setText(name);
-        viewerBookmark = p.getViewerBookmark(id);
 
 //        refreshbtn.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -206,7 +203,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             Intent resultIntent = new Intent();
             setResult(RESULT_OK,resultIntent);
         }
-        if(manga.getMode() != 0) {
+        if(!manga.isOnline()) {
             reloadManga();
             commentBtn.setVisibility(View.GONE);
         }else{
@@ -291,7 +288,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -309,7 +306,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -381,10 +378,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark++;
             try {
-                String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-                if(error && !useSecond){
-                    image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-                }
+                String image = imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -418,15 +412,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 if(imgs.size()>0) {
-                                    if(!error && !useSecond) {
-                                        error= true;
-                                    }else if(!useSecond && error){
-                                        useSecond = true;
-                                        error= false;
-                                    }else{
-                                        error = false;
-                                        useSecond = false;
-                                    }
                                     viewerBookmark--;
                                     nextPage();
                                 }
@@ -438,8 +423,10 @@ public class ViewerActivity2 extends AppCompatActivity {
                 viewerBookmark--;
             }
         }
-        p.setViewerBookmark(id,viewerBookmark);
-        if(imgs.size()-1==viewerBookmark) p.removeViewerBookmark(id);
+        if(manga.useBookmark()) {
+            p.setViewerBookmark(id, viewerBookmark);
+            if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(id);
+        }
         updatePageIndex();
     }
 
@@ -464,10 +451,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark--;
             try {
-                String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-                if(error && !useSecond){
-                    image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-                }
+                String image = imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -500,26 +484,20 @@ public class ViewerActivity2 extends AppCompatActivity {
                             @Override
                             public void onLoadFailed(@Nullable Drawable errorDrawable) {
                                 if(imgs.size()>0) {
-                                    if(!error && !useSecond) {
-                                        error = true;
-                                    }else if(!useSecond && error){
-                                        error = false;
-                                        useSecond = true;
-                                    }else{
-                                        error = false;
-                                        useSecond = false;
-                                    }
                                     viewerBookmark++;
                                     prevPage();
                                 }
                             }
                         });
             }catch (Exception e){
+                e.printStackTrace();
                 viewerBookmark++;
             }
         }
-        p.setViewerBookmark(id,viewerBookmark);
-        if(0==viewerBookmark) p.removeViewerBookmark(id);
+        if(manga.useBookmark()) {
+            p.setViewerBookmark(id, viewerBookmark);
+            if (0 == viewerBookmark) p.removeViewerBookmark(id);
+        }
         updatePageIndex();
 
     }
@@ -530,11 +508,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         frame.setImageResource(R.drawable.placeholder);
         //refreshbtn.setVisibility(View.VISIBLE);
         try {
-            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark) : imgs.get(viewerBookmark);
-            if(error && !useSecond){
-                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-
-            }
+            String image = imgs.get(viewerBookmark);
             //placeholder
             //frame.setImageResource(R.drawable.placeholder);
             Glide.with(context)
@@ -568,15 +542,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
                             if(imgs.size()>0) {
-                                if(!error && !useSecond) {
-                                    error = true;
-                                }else if(!useSecond && error){
-                                    useSecond = true;
-                                    error = false;
-                                }else{
-                                    error = false;
-                                    useSecond = false;
-                                }
                                 refreshImage();
                             }
                         }
@@ -588,10 +553,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void preload(){
         if(viewerBookmark<imgs.size()-1) {
-            String image = useSecond && imgs1!=null && imgs1.size()>0 ? imgs1.get(viewerBookmark+1) : imgs.get(viewerBookmark+1);
-            if(error && !useSecond){
-                image = image.indexOf("img.") > -1 ? image.replace("img.","s3.") : image.replace("://", "://s3.");
-            }
+            String image = imgs.get(viewerBookmark+1);
             Glide.with(context)
                     .asBitmap()
                     .load(image)
@@ -599,15 +561,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                             if (imgs.size() > 0) {
-                                if(!error && !useSecond){
-                                    error = true;
-                                }else if(!useSecond){
-                                    error = false;
-                                    useSecond = true;
-                                }else{
-                                    error = false;
-                                    useSecond = false;
-                                }
                                 preload();
                             }
                             return false;
@@ -717,6 +670,8 @@ public class ViewerActivity2 extends AppCompatActivity {
                 cookie.put("last_page",String.valueOf(0));
             }
             manga.fetch(httpClient);
+            if(title == null)
+                title = manga.getTitle();
             return 0;
         }
 
@@ -735,7 +690,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         try{
             lockUi(false);
             imgs = manga.getImgs();
-            imgs1 = manga.getImgs(true);
             if(imgs == null || imgs.size()==0) {
                 showCaptchaPopup(context);
                 return;
@@ -751,14 +705,11 @@ public class ViewerActivity2 extends AppCompatActivity {
     }
 
     public void bookmarkRefresh(){
-        if(id>0) {
+        if(manga.useBookmark()) {
             viewerBookmark = p.getViewerBookmark(id);
-            if(manga.getMode() == 0 || manga.getMode() == 3) {
-                // if manga is online or has title.gson
-                if (title == null) title = manga.getTitle();
-                p.addRecent(title);
-                if (id > 0) p.setBookmark(title, id);
-            }
+            // if manga is online or has title.gson
+            p.addRecent(title);
+            p.setBookmark(title, id);
         }
     }
 

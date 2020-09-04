@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.List;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Title;
+
+import static ml.melun.mangaview.mangaview.Title.isInteger;
 
 public class Preference {
     SharedPreferences sharedPref;
@@ -34,13 +37,21 @@ public class Preference {
     boolean stretch;
     boolean leftRight;
     Login login;
-    final String defUrl = "https://manamoa.net/";
+    final String defUrl = "https://manatoki73.net/";
     boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
+    }
+
+    public void reset(){
+        setUrl(defUrl);
+        resetFavorites();
+        resetRecent();
+        resetBookmark();
+        resetViewerBookmark();
     }
 
     //Offline manga has id of -1
@@ -276,6 +287,13 @@ public class Preference {
         writeRecent();
     }
 
+    public void resetFavorites(){
+        favorite = new ArrayList<>();
+        prefsEditor.putString("favorite", new Gson().toJson(favorite));
+        prefsEditor.commit();
+
+    }
+
     private void writeRecent(){
         Gson gson = new Gson();
         prefsEditor.putString("recent", gson.toJson(recent));
@@ -417,21 +435,13 @@ public class Preference {
     }
 
     public boolean check(){
+        //returns false if needs update
         for(MTitle t: recent){
-            if(t.getId()<=0) return false;
+            if(isInteger(t.getRelease())) return false;
         }
         for(MTitle t: favorite){
-            if(t.getId()<=0) return false;
+            if(isInteger(t.getRelease())) return false;
         }
-        Iterator<String> keys = bookmark.keys();
-        try {
-            while (keys.hasNext()) {
-                Integer.parseInt(keys.next());
-            }
-        }catch (Exception e){
-            return false;
-        }
-
         return true;
     }
     public Login getLogin(){

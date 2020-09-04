@@ -31,6 +31,9 @@
         <service
             android:name=".Downloader"
             android:enabled="true" />
+        <service
+            android:name=".Migrator"
+            android:enabled="true" />
 
         <activity
             android:name=".activity.MainActivity"
@@ -53,7 +56,7 @@
         <activity
             android:name=".activity.DownloadActivity"
             android:configChanges="orientation|screenSize"
-            android:label="다운로드"/>
+            android:label="다운로드" />
         <activity
             android:name=".activity.SettingsActivity"
             android:configChanges="orientation|screenSize"
@@ -103,11 +106,11 @@
             android:name=".activity.FirstTimeActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppThemeBlackNoTitle" />
-
         <activity
             android:name=".activity.LayoutEditActivity"
             android:configChanges="orientation|screenSize"
-            android:label="레이아웃 수정"/>
+            android:label="레이아웃 수정" />
+
     </application>
 
 </manifest>

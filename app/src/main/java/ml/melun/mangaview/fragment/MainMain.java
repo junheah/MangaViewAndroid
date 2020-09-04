@@ -57,17 +57,17 @@ public class MainMain extends Fragment{
             }
 
             @Override
-            public void clickedName(int t) {
+            public void clickedName(String t) {
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
-                i.putExtra("query",t+"");
+                i.putExtra("query",t);
                 i.putExtra("mode",3);
                 startActivity(i);
             }
 
             @Override
-            public void clickedRelease(int t) {
+            public void clickedRelease(String t) {
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
-                i.putExtra("query",t+"");
+                i.putExtra("query",t);
                 i.putExtra("mode",4);
                 startActivity(i);
             }

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -68,8 +69,9 @@ public class MainSearch extends Fragment {
         advSearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent advSearch = new Intent(getContext(), AdvSearchActivity.class);
-                startActivity(advSearch);
+                Toast.makeText(getContext(), "고급검색 기능 사용 불가", Toast.LENGTH_LONG).show();
+//                Intent advSearch = new Intent(getContext(), AdvSearchActivity.class);
+//                startActivity(advSearch);
             }
         });
 
