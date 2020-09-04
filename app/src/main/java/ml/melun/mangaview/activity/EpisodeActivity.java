@@ -38,7 +38,6 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
-import static ml.melun.mangaview.Utils.isInteger;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
@@ -108,7 +107,8 @@ public class EpisodeActivity extends AppCompatActivity {
         upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
         title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
         online = intent.getBooleanExtra("online", true);
-        bookmarkId = p.getBookmark(title);
+        if(title.useBookmark())
+            bookmarkId = p.getBookmark(title);
         position = intent.getIntExtra("position",0);
         favoriteResult = intent.getBooleanExtra("favorite",false);
         recentResult = intent.getBooleanExtra("recent",false);
@@ -178,8 +178,13 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }else if(data.exists()){
                 mode = 3;
-                // migrated
-                if(!isInteger(title.getRelease())) p.addRecent(title);
+
+                if(!title.useBookmark()){
+                    // is migrated
+                   mode = 4;
+                }else{
+                    p.addRecent(title);
+                }
 
                 episodes =  title.getEps();
                 offlineEpisodes = new ArrayList<>();
@@ -386,6 +391,8 @@ public class EpisodeActivity extends AppCompatActivity {
     }
 
     public void openViewer(Manga manga, int code){
+        manga.setMode(mode);
+        System.out.println("pppppppp " +manga.getMode());
         Intent viewer = null;
         switch (p.getViewerType()){
             case 0:

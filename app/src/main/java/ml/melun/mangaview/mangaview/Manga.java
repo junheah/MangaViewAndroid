@@ -24,8 +24,9 @@ import okhttp3.Response;
     mode:
     0 = online
     1 = offline - old
-    2 = offline - old (title.data)
-    3 = offline - new (title.gson)
+    2 = offline - old(moa) (title.data)
+    3 = offline - latest(toki) (title.gson)
+    4 = offline - new(moa) (title.gson)
      */
 
 public class Manga {
@@ -75,6 +76,7 @@ public class Manga {
             Response r = client.mget("/comic/" + String.valueOf(id));
             try {
                 String body = r.body().string();
+                r.close();
                 if(body.contains("Connect Error: Connection timed out")){
                     //adblock : try again
                     r.close();
@@ -88,12 +90,12 @@ public class Manga {
 
                 //temp title
                 Element navbar = d.selectFirst("div.toon-nav");
-                System.out.println("pppp" + navbar.select("a").get(3));
                 int tid = Integer.parseInt(navbar.select("a")
                         .get(3)
                         .attr("href")
                         .split("comic/")[1]
                         .split("\\?")[0]);
+                System.out.println(tid);
 
                 if(title == null) title = new Title(name, "", "", null, "", tid );
 
@@ -103,11 +105,18 @@ public class Manga {
                 }
 
                 //imgs
-                for(Element e : d.selectFirst("div.view-padding").select("p")) {
-                    imgs.add(e.selectFirst("img").attr("data-original"));
+                for(Element e : d.selectFirst("div.view-padding").select("img")) {
+                    String img = e.attr("data-original");
+                    if(img != null && !img.isEmpty() && !img.contains("blank"))
+                        imgs.add(img);
                 }
 
-                r.close();
+                //comments
+                //Element commentE = d.selectFirst("viewcomment");
+
+                //todo: comments
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -138,9 +147,8 @@ public class Manga {
                 switch (mode) {
                     case 1:
                     case 2:
-                        offimgs = offlinePath.listFiles();
-                        break;
                     case 3:
+                    case 4:
                         offimgs = offlinePath.listFiles();
                         break;
                 }
@@ -207,6 +215,14 @@ public class Manga {
         return "/manga/" + id;
     }
 
+    public boolean useBookmark(){
+        return id>0&&(mode==0||mode==3);
+    }
+
+    public boolean isOnline(){
+        return id>0&&mode==0;
+    }
+
     private int id;
     String name;
     List<Manga> eps;
@@ -217,7 +233,7 @@ public class Manga {
     Title title;
     String date;
     int seed;
-    int mode;
+    int mode = 0;
     Listener listener;
 
     public interface Listener{

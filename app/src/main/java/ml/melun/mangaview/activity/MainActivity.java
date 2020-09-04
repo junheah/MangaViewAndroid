@@ -476,7 +476,8 @@ public class MainActivity extends AppCompatActivity
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://junheah.github.io/donate"));
                 startActivity(browserIntent);
             }else if(id==R.id.nav_account){
-                startActivity(new Intent(context, LoginActivity.class));
+                Toast.makeText(context,"사용 불가", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(context, LoginActivity.class));
                 return true;
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

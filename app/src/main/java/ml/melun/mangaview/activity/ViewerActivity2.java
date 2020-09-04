@@ -55,9 +55,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
-import static ml.melun.mangaview.Utils.isInteger;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
-import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity2 extends AppCompatActivity {
@@ -143,7 +141,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     name = manga.getName();
                     spinner.setSelection(position, true);
                     hideSpinnerDropDown(spinner);
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -188,9 +186,6 @@ public class ViewerActivity2 extends AppCompatActivity {
             }.getType());
         }
 
-        if(title == null)
-            title = manga.getTitle();
-
         name = manga.getName();
         id = manga.getId();
 
@@ -208,7 +203,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             Intent resultIntent = new Intent();
             setResult(RESULT_OK,resultIntent);
         }
-        if(manga.getMode() != 0) {
+        if(!manga.isOnline()) {
             reloadManga();
             commentBtn.setVisibility(View.GONE);
         }else{
@@ -293,7 +288,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -311,7 +306,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -428,7 +423,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                 viewerBookmark--;
             }
         }
-        if(!isInteger(title.getRelease())) {
+        if(manga.useBookmark()) {
             p.setViewerBookmark(id, viewerBookmark);
             if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(id);
         }
@@ -495,10 +490,11 @@ public class ViewerActivity2 extends AppCompatActivity {
                             }
                         });
             }catch (Exception e){
+                e.printStackTrace();
                 viewerBookmark++;
             }
         }
-        if(!isInteger(title.getRelease())) {
+        if(manga.useBookmark()) {
             p.setViewerBookmark(id, viewerBookmark);
             if (0 == viewerBookmark) p.removeViewerBookmark(id);
         }
@@ -709,14 +705,11 @@ public class ViewerActivity2 extends AppCompatActivity {
     }
 
     public void bookmarkRefresh(){
-        if(id>0 && !isInteger(title.getRelease())) {
+        if(manga.useBookmark()) {
             viewerBookmark = p.getViewerBookmark(id);
-            if(manga.getMode() == 0 || manga.getMode() == 3) {
-                // if manga is online or has title.gson
-                if (title == null) title = manga.getTitle();
-                p.addRecent(title);
-                if (id > 0) p.setBookmark(title, id);
-            }
+            // if manga is online or has title.gson
+            p.addRecent(title);
+            p.setBookmark(title, id);
         }
     }
 

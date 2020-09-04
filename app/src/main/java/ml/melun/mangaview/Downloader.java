@@ -118,8 +118,7 @@ public class Downloader extends Service {
                     startNotification();
                     if (dt == null) dt = new downloadTitle();
                     try {
-                        DownloadTitle target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<DownloadTitle>() {
-                        }.getType());
+                        DownloadTitle target = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<DownloadTitle>() {}.getType());
                         JSONArray selection = new JSONArray(intent.getStringExtra("selected"));
                         queueTitle(target, selection);
                     } catch (Exception e) {
@@ -267,6 +266,7 @@ public class Downloader extends Service {
 
                     //if (title.getEps() == null) title.fetchEps(httpClient);
                     List<Manga> mangas = title.getEps();
+                    //todo: minimize eps object(remove 'mode')
 
                     float stepSize = maxProgress / selectedEps.length();
                     for (int queueIndex = selectedEps.length()-1; queueIndex >= 0; queueIndex--) {

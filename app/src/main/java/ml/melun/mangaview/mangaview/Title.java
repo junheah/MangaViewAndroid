@@ -97,6 +97,7 @@ public class Title extends MTitle {
 
             //eps
             String title, date;
+            Manga tmp;
             int id;
             eps = new ArrayList<>();
             try{
@@ -108,8 +109,9 @@ public class Title extends MTitle {
                     Elements infoe = e.selectFirst("div.item-details").select("span");
                     date = infoe.get(0).ownText();
                     //has view-count, thumb-count and other extra info, implement later
-
-                    eps.add(new Manga(id, title, date));
+                    tmp = new Manga(id, title, date);
+                    tmp.setMode(0);
+                    eps.add(tmp);
                 }
             }catch (Exception e){}
             r.close();
@@ -197,6 +199,21 @@ public class Title extends MTitle {
         return new MTitle(name, id, thumb, author, tags, release);
     }
 
+    public static boolean isInteger(String s) {
+        if(s.isEmpty()) return false;
+        for(int i = 0; i < s.length(); i++) {
+            if(i == 0 && s.charAt(i) == '-') {
+                if(s.length() == 1) return false;
+                else continue;
+            }
+            if(Character.digit(s.charAt(i),10) < 0) return false;
+        }
+        return true;
+    }
+
+    public boolean useBookmark(){
+        return !isInteger(release);
+    }
 
 }
 

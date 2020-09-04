@@ -48,9 +48,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
-import static ml.melun.mangaview.Utils.isInteger;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
-import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity extends AppCompatActivity {
@@ -160,7 +158,7 @@ public class ViewerActivity extends AppCompatActivity {
                         name = manga.getName();
                         spinner.setSelection(position, true);
                         hideSpinnerDropDown(spinner);
-                        if(manga.getMode() == 0)
+                        if(manga.isOnline())
                             refresh();
                         else
                             reloadManga();
@@ -172,7 +170,7 @@ public class ViewerActivity extends AppCompatActivity {
             });
             spinner.setAdapter(spinnerAdapter);
 
-            if(manga.getMode() != 0){
+            if(!manga.isOnline()){
                 // is offline
                 //load local imgs
 
@@ -211,12 +209,12 @@ public class ViewerActivity extends AppCompatActivity {
                         //bookmark handler
                         if (firstVisible == 0) p.removeViewerBookmark(id);
                         if (firstVisible != viewerBookmark) {
-                            if(!isInteger(title.getRelease()))
+                            if(manga.useBookmark())
                                 p.setViewerBookmark(id, firstVisible);
                             viewerBookmark = firstVisible;
                         }
                         if (lastVisible >= imgs.size() - 1) {
-                            if(!isInteger(title.getRelease()))
+                            if(manga.useBookmark())
                                 p.removeViewerBookmark(id);
                         }
 
@@ -248,7 +246,7 @@ public class ViewerActivity extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -264,7 +262,7 @@ public class ViewerActivity extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -340,7 +338,7 @@ public class ViewerActivity extends AppCompatActivity {
                     if (viewerBookmark > 0) strip.scrollToPosition(--viewerBookmark);
                 }
             }
-            if(!isInteger(title.getRelease())) {
+            if(manga.useBookmark()) {
                 if (viewerBookmark > 0 && viewerBookmark < stripAdapter.getItemCount() - 1) {
                     p.setViewerBookmark(id, viewerBookmark);
                 } else p.removeViewerBookmark(id);
@@ -483,14 +481,14 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     public void bookmarkRefresh(){
-        if(id>0 && !isInteger(title.getRelease())) {
+        if(manga.useBookmark()) {
             viewerBookmark = p.getViewerBookmark(id);
             if (viewerBookmark != -1) {
                 strip.scrollToPosition(viewerBookmark);
             }
             if (!autoCut) strip.scrollToPosition(viewerBookmark);
             else strip.scrollToPosition(viewerBookmark * 2);
-            if (manga.getMode() == 0 || manga.getMode() == 3) {
+            if (manga.useBookmark()) {
                 // if manga is online or has title.gson
                 if (title == null) title = manga.getTitle();
                 p.addRecent(title);

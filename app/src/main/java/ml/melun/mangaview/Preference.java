@@ -17,7 +17,7 @@ import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Title;
 
-import static ml.melun.mangaview.Utils.isInteger;
+import static ml.melun.mangaview.mangaview.Title.isInteger;
 
 public class Preference {
     SharedPreferences sharedPref;

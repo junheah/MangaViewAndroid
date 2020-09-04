@@ -47,9 +47,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
-import static ml.melun.mangaview.Utils.isInteger;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
-import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity3 extends AppCompatActivity {
@@ -133,7 +131,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                     name = manga.getName();
                     spinner.setSelection(position, true);
                     hideSpinnerDropDown(spinner);
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -157,7 +155,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                 if(viewerBookmark != position) {
                     viewerBookmark = position;
                     pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
-                    if(!isInteger(title.getRelease())) {
+                    if(manga.useBookmark()) {
                         if (position == imgs.size() - 1 || position == 0) {
                             p.removeViewerBookmark(id);
                         } else p.setViewerBookmark(id, viewerBookmark);
@@ -204,14 +202,14 @@ public class ViewerActivity3 extends AppCompatActivity {
             id = manga.getId();
 
             toolbarTitle.setText(name);
-            if(!isInteger(title.getRelease())) viewerBookmark = p.getViewerBookmark(id);
+            if(manga.useBookmark()) viewerBookmark = p.getViewerBookmark(id);
 
-            if(manga.getMode() == 0 || manga.getMode() == 3){
+            if(manga.useBookmark()){
                 result = new Intent();
                 result.putExtra("id", id);
                 setResult(RESULT_OK,result);
             }
-            if(manga.getMode() != 0){
+            if(!manga.isOnline()){
                 //load local imgs
                 commentBtn.setVisibility(View.GONE);
                 reloadManga();
@@ -276,7 +274,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -292,7 +290,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.getMode() == 0)
+                    if(manga.isOnline())
                         refresh();
                     else
                         reloadManga();
@@ -421,18 +419,11 @@ public class ViewerActivity3 extends AppCompatActivity {
     }
 
     public void bookmarkRefresh(){
-        if(id>0 && !isInteger(title.getRelease())) {
-            viewerBookmark = p.getViewerBookmark(id);
-            if (viewerBookmark != -1) {
-                viewerBookmark = p.getViewerBookmark(manga.getId());
-                viewPager.setCurrentItem(viewerBookmark, false);
-            }
-            if (manga.getMode() == 0 || manga.getMode() == 3) {
-                // if manga is online or has title.gson
-                if (title == null) title = manga.getTitle();
-                p.addRecent(title);
-                if (id > 0) p.setBookmark(title, id);
-            }
+        if(manga.useBookmark()) {
+            viewerBookmark = p.getViewerBookmark(manga.getId());
+            viewPager.setCurrentItem(viewerBookmark, false);
+            p.addRecent(title);
+            p.setBookmark(title, id);
         }
     }
 

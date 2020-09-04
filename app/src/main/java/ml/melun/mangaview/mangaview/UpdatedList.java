@@ -57,6 +57,7 @@ public class UpdatedList {
                         List<String> tags = Arrays.asList(item.selectFirst("div.post-text").ownText().split(","));
 
                         Manga tmp = new Manga(id, name, date);
+                        tmp.setMode(0);
                         tmp.setTitle(new Title(name, img, "", new ArrayList<String>(), "", tid));
                         tmp.addThumb(img);
                         result.add(tmp);
