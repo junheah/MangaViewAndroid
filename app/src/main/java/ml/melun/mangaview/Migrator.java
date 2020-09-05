@@ -38,6 +38,7 @@ import java.util.List;
 import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.MTitle;
+import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -52,16 +53,17 @@ public class Migrator extends Service {
     public static final String channeld = "MangaViewMG";
     Context serviceContext;
     PendingIntent pendingIntent;
-    PendingIntent stopIntent;
     MigrationWorker mw;
     public static boolean running = false;
     String url = "";
+    Intent resultIntent;
 
     public static final String MIGRATE_STOP = "ml.melun.mangaview.migrator.STOP";
     public static final String MIGRATE_START = "ml.melun.mangaview.migrator.START";
     public static final String MIGRATE_SUCCESS = "ml.melun.mangaview.migrator.SUCCESS";
     public static final String MIGRATE_FAIL = "ml.melun.mangaview.migrator.FAIL";
     public static final String MIGRATE_PROGRESS = "ml.melun.mangaview.migrator.PROGRESS";
+    public static final String MIGRATE_RESULT = "ml.melun.mangaview.migrator.RESULT";
 
     @Override
     public void onCreate() {
@@ -81,9 +83,7 @@ public class Migrator extends Service {
         }
         Intent notificationIntent = new Intent(this, MainActivity.class);
         pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        Intent previousIntent = new Intent(this, Migrator.class);
-        previousIntent.setAction(MIGRATE_STOP);
-        stopIntent = PendingIntent.getService(this, 0, previousIntent, 0);
+        resultIntent = new Intent(this, MainActivity.class);
         serviceContext = this;
         startNotification();
     }
@@ -94,13 +94,17 @@ public class Migrator extends Service {
         if(intent!=null){
             switch (intent.getAction()) {
                 case MIGRATE_START:
-                    url = intent.getStringExtra("url");
                     startNotification();
                     if (mw == null) mw = new MigrationWorker();
                     mw.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     break;
                 case MIGRATE_STOP:
                     //
+                    break;
+                case MIGRATE_PROGRESS:
+                    if(mw != null){
+                        mw.onProgressUpdate("...");
+                    }
                     break;
             }
         }
@@ -111,8 +115,8 @@ public class Migrator extends Service {
     @Override
     public void onDestroy() {
         running = false;
-        super.onDestroy();
         endNotification();
+        super.onDestroy();
     }
 
     @Nullable
@@ -124,7 +128,8 @@ public class Migrator extends Service {
     private void startNotification() {
         notification = new NotificationCompat.Builder(this, channeld)
                 .setContentIntent(pendingIntent)
-                .setContentTitle("백그라운드에서 기록 업데이트중..\n진행률을 확인하려면 터치")
+                .setContentTitle("기록 업데이트중..")
+                .setContentText("진행률을 확인하려면 터치")
                 .setOngoing(true);
         if (Build.VERSION.SDK_INT >= 26)
             notification.setSmallIcon(R.drawable.ic_logo);
@@ -135,9 +140,11 @@ public class Migrator extends Service {
 
 
     private void endNotification(){
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(serviceContext, 0, resultIntent, 0);
         notification = new NotificationCompat.Builder(this, channeld)
-                .setContentIntent(pendingIntent)
-                .setContentTitle("기록 업데이트 완료.")
+                .setContentIntent(resultPendingIntent)
+                .setContentTitle("기록 업데이트 완료")
+                .setContentText("결과를 확인하려면 터치")
                 .setOngoing(false);
         if (Build.VERSION.SDK_INT >= 26)
             notification.setSmallIcon(R.drawable.ic_logo);
@@ -158,7 +165,7 @@ public class Migrator extends Service {
         sendBroadcast(intent);
     }
 
-    private class MigrationWorker extends AsyncTask<Void, Void, Integer> {
+    private class MigrationWorker extends AsyncTask<Void, String, Integer> {
 
         int sum = 0;
         int current = 0;
@@ -173,20 +180,18 @@ public class Migrator extends Service {
 
 
         @Override
-        protected void onProgressUpdate(Void... values) {
-            sendBroadcast(MIGRATE_PROGRESS, current +" / " + sum+"\n앱을 종료하지 말아주세요.");
+        protected void onProgressUpdate(String... values) {
+            String msg = current +" / " + sum+"\n앱을 종료하지 말아주세요.\n";
+            if(values !=null && values.length>0) msg += values[0];
+            sendBroadcast(MIGRATE_PROGRESS, msg);
         }
 
         @Override
         protected Integer doInBackground(Void... voids) {
-
-            //test
-            Search a = new Search("이",0);
-            a.fetch(httpClient);
-            if(a.getResult().size()<1){
+            // check domain
+            MainPage mp = new MainPage(httpClient);
+            if(mp.getRecent().size()<1)
                 return 1;
-            }
-
 
             List<MTitle> recents = p.getRecent();
             sum += recents.size();
@@ -194,7 +199,6 @@ public class Migrator extends Service {
             sum += favorites.size();
             //recent data
 
-            //test only favorites
             removeDups(favorites);
             removeDups(recents);
 
@@ -205,8 +209,8 @@ public class Migrator extends Service {
             for(int i=0; i<recents.size(); i++){
                 try {
                     current++;
-                    publishProgress();
                     MTitle newTitle = findTitle(recents.get(i));
+                    publishProgress(newTitle.getName());
                     if(newTitle !=null)
                         newRecents.add(newTitle);
                     else
@@ -219,8 +223,8 @@ public class Migrator extends Service {
             for(int i=0; i<favorites.size(); i++){
                 try {
                     current++;
-                    publishProgress();
                     MTitle newTitle = findTitle(favorites.get(i));
+                    publishProgress(newTitle.getName());
                     if(newTitle !=null)
                         newFavorites.add(newTitle);
                     else
@@ -282,6 +286,8 @@ public class Migrator extends Service {
                 for(String t : failed){
                     builder.append("\n"+t);
                 }
+                resultIntent.setAction(MIGRATE_RESULT);
+                resultIntent.putExtra("msg",builder.toString());
                 endNotification();
                 sendBroadcast(MIGRATE_SUCCESS, builder.toString());
             }

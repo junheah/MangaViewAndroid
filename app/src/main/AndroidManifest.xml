@@ -17,7 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -110,7 +109,6 @@
             android:name=".activity.LayoutEditActivity"
             android:configChanges="orientation|screenSize"
             android:label="레이아웃 수정" />
-
     </application>
 
 </manifest>
