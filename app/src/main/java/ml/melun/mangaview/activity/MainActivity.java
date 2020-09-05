@@ -67,6 +67,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Migrator.MIGRATE_FAIL;
 import static ml.melun.mangaview.Migrator.MIGRATE_PROGRESS;
+import static ml.melun.mangaview.Migrator.MIGRATE_RESULT;
 import static ml.melun.mangaview.Migrator.MIGRATE_START;
 import static ml.melun.mangaview.Migrator.MIGRATE_STOP;
 import static ml.melun.mangaview.Migrator.MIGRATE_SUCCESS;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity
     Toolbar toolbar;
     View progressView;
     private static final int FIRST_TIME_ACTIVITY = 9;
-    ProgressDialog mpd;
+
 
     Fragment[] fragments = new Fragment[3];
 
@@ -115,143 +116,154 @@ public class MainActivity extends AppCompatActivity
         fragments[1] = new MainSearch();
         fragments[2] = new RecyclerFragment();
         dark = p.getDarkTheme();
-        if(dark) setTheme(R.style.AppThemeDarkNoTitle);
+        if (dark) setTheme(R.style.AppThemeDarkNoTitle);
         else setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
         context = this;
+        Intent intent = getIntent();
 
 
         //check prefs
-       if(!p.getSharedPref().getBoolean("eula",false)) {
-           startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
+        if (!p.getSharedPref().getBoolean("eula", false)) {
+            startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
+        } else if (Migrator.running) {
+            ProgressDialog mpd;
+            if (p.getDarkTheme()) mpd = new ProgressDialog(context, R.style.darkDialog);
+            else mpd = new ProgressDialog(context);
+            mpd.setMessage("기록 업데이트중..");
+            mpd.setCancelable(false);
+            mpd.show();
 
-       }else if(Migrator.running){
-           if(mpd == null) {
-               if (p.getDarkTheme()) mpd = new ProgressDialog(context, R.style.darkDialog);
-               else mpd = new ProgressDialog(context);
-           }
-           mpd.setMessage("기록 업데이트중..");
-           mpd.setCancelable(false);
-           mpd.show();
+            BroadcastReceiver migratorStatusReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    switch (intent.getAction()) {
+                        case MIGRATE_PROGRESS:
+                            mpd.setMessage(intent.getStringExtra("msg"));
+                            break;
+                        case MIGRATE_START:
+                            break;
+                        case MIGRATE_STOP:
+                            mpd.dismiss();
+                            break;
+                        case MIGRATE_FAIL:
+                            mpd.dismiss();
+                            migratorEndPopup(savedInstanceState, 1, intent.getStringExtra("msg"));
+                            break;
+                        case MIGRATE_SUCCESS:
+                            mpd.dismiss();
+                            migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
+                            break;
+                    }
+                }
+            };
+            IntentFilter infil = new IntentFilter();
+            infil.addAction(MIGRATE_PROGRESS);
+            infil.addAction(MIGRATE_START);
+            infil.addAction(MIGRATE_STOP);
+            infil.addAction(MIGRATE_FAIL);
+            infil.addAction(MIGRATE_SUCCESS);
+            registerReceiver(migratorStatusReceiver, infil);
 
-           BroadcastReceiver migratorStatusReceiver = new BroadcastReceiver() {
-               @Override
-               public void onReceive(Context context, Intent intent) {
-                   switch(intent.getAction()){
-                       case MIGRATE_PROGRESS:
-                           mpd.setMessage(intent.getStringExtra("msg"));
-                           break;
-                       case MIGRATE_START:
-                           break;
-                       case MIGRATE_STOP:
-                           mpd.dismiss();
-                           break;
-                       case MIGRATE_FAIL:
-                           mpd.dismiss();
-                           migratorEndPopup(savedInstanceState, 1, intent.getStringExtra("msg"));
-                           break;
-                       case MIGRATE_SUCCESS:
-                           mpd.dismiss();
-                           migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
-                           break;
-                   }
-               }
-           };
-           IntentFilter infil = new IntentFilter();
-           infil.addAction(MIGRATE_PROGRESS);
-           infil.addAction(MIGRATE_START);
-           infil.addAction(MIGRATE_STOP);
-           infil.addAction(MIGRATE_FAIL);
-           infil.addAction(MIGRATE_SUCCESS);
-           registerReceiver(migratorStatusReceiver, infil);
+            Intent pintent = new Intent(getApplicationContext(), Migrator.class);
+            pintent.setAction(MIGRATE_PROGRESS);
+            if (Build.VERSION.SDK_INT >= 26) {
+                startForegroundService(pintent);
+            } else {
+                startService(pintent);
+            }
 
-       }else if(!p.check()) {
-           //popup to fix preferences
-           System.out.println("preference needs update");
-           showYesNoNeutralPopup(context, "기록 업데이트 필요",
-                   "저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?" +
-                           "\n(데이터 일부가 유실될 수 있습니다. 꼭 백업을 하고 진행해 주세요)",
-                   "데이터 백업",
-                   new DialogInterface.OnClickListener() {
-                       @Override
-                       public void onClick(DialogInterface dialogInterface, int i) {
+        } else if (!p.check()) {
+            //popup to fix preferences
+            System.out.println("preference needs update");
+            showYesNoNeutralPopup(context, "기록 업데이트 필요",
+                    "저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?" +
+                            "\n(데이터 일부가 유실될 수 있습니다. 꼭 백업을 하고 진행해 주세요)",
+                    "데이터 백업",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             //proceed
-                           final EditText editText = new EditText(context);
-                           editText.setHint(p.getDefUrl());
+                            final EditText editText = new EditText(context);
+                            editText.setHint(p.getDefUrl());
 
-                           AlertDialog.Builder builder;
-                           if (new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context, R.style.darkDialog);
-                           else builder = new AlertDialog.Builder(context);
-                           builder.setTitle("기록 업데이트")
-                                   .setView(editText)
-                                   .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요.")
-                                   .setPositiveButton("계속", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialogInterface, int i) {
-                                           String url = editText.getText().toString();
-                                           if(url == null || url.length()<1)
-                                               url = p.getDefUrl();
+                            AlertDialog.Builder builder;
+                            if (new Preference(context).getDarkTheme())
+                                builder = new AlertDialog.Builder(context, R.style.darkDialog);
+                            else builder = new AlertDialog.Builder(context);
+                            builder.setTitle("기록 업데이트")
+                                    .setView(editText)
+                                    .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요.")
+                                    .setPositiveButton("계속", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            String url = editText.getText().toString();
+                                            if (url == null || url.length() < 1)
+                                                url = p.getDefUrl();
 
-                                           Intent intent = new Intent(getApplicationContext(),Migrator.class);
-                                           intent.setAction(MIGRATE_START);
-                                           intent.putExtra("url", url);
-                                           if (Build.VERSION.SDK_INT >= 26) {
-                                               startForegroundService(intent);
-                                           }else{
-                                               startService(intent);
-                                           }
-                                           //queue title to service
-                                           Toast.makeText(getApplication(),"작업을 시작합니다.", Toast.LENGTH_LONG).show();
-                                           //restart activity
-                                           finish();
-                                           startActivity(getIntent());
-                                       }
-                                   })
-                                   .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialogInterface, int i) {
-                                           finish();
-                                       }
-                                   })
-                                   .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                       @Override
-                                       public void onCancel(DialogInterface dialogInterface) {
-                                           finish();
-                                       }
-                                   })
-                                   .show();
-                       }
-                   }, new DialogInterface.OnClickListener() {
-                       @Override
-                       public void onClick(DialogInterface dialogInterface, int i) {
-                           showPopup(context, "알림", "앱의 데이터를 초기화 하거나 데이터 업데이트를 진행하지 않으면 사용이 불가합니다.", new DialogInterface.OnClickListener() {
-                               @Override
-                               public void onClick(DialogInterface dialogInterface, int i) {
-                                   finish();
-                               }
-                           }, new DialogInterface.OnCancelListener() {
-                               @Override
-                               public void onCancel(DialogInterface dialogInterface) {
-                                   finish();
-                               }
-                           });
-                       }
-                   }, new DialogInterface.OnClickListener() {
-                       @Override
-                       public void onClick(DialogInterface dialogInterface, int i) {
-                           //backup
-                           Intent intent = new Intent(context, FolderSelectActivity.class);
-                           intent.putExtra("mode", MODE_FILE_SAVE);
-                           intent.putExtra("title", "백업");
-                           startActivityForResult(intent, MODE_FILE_SAVE);
-                       }
-                   }, new DialogInterface.OnCancelListener() {
-                       @Override
-                       public void onCancel(DialogInterface dialogInterface) {
-                           finish();
-                       }
-                   });
-       }else {
+                                            p.setUrl(url);
+
+                                            Intent intent = new Intent(getApplicationContext(), Migrator.class);
+                                            intent.setAction(MIGRATE_START);
+                                            if (Build.VERSION.SDK_INT >= 26) {
+                                                startForegroundService(intent);
+                                            } else {
+                                                startService(intent);
+                                            }
+                                            //queue title to service
+                                            Toast.makeText(getApplication(), "작업을 시작합니다.", Toast.LENGTH_LONG).show();
+                                            //restart activity
+                                            finish();
+                                            startActivity(getIntent());
+                                        }
+                                    })
+                                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            finish();
+                                        }
+                                    })
+                                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialogInterface) {
+                                            finish();
+                                        }
+                                    })
+                                    .show();
+                        }
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            showPopup(context, "알림", "앱의 데이터를 초기화 하거나 데이터 업데이트를 진행하지 않으면 사용이 불가합니다.", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                }
+                            }, new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialogInterface) {
+                                    finish();
+                                }
+                            });
+                        }
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            //backup
+                            Intent intent = new Intent(context, FolderSelectActivity.class);
+                            intent.putExtra("mode", MODE_FILE_SAVE);
+                            intent.putExtra("title", "백업");
+                            startActivityForResult(intent, MODE_FILE_SAVE);
+                        }
+                    }, new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            finish();
+                        }
+                    });
+        }else if(intent != null && intent.getAction().equals(MIGRATE_RESULT)){
+            migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
+        }else{
             activityInit(savedInstanceState);
        }
     }

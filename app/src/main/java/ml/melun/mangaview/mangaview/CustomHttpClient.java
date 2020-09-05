@@ -124,6 +124,8 @@ public class CustomHttpClient {
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cbuilder.toString());
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+        headers.put("Referer",p.getUrl() + "/comic");
+
 
         return get(p.getUrl()+url, headers);
     }

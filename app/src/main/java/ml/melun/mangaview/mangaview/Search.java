@@ -77,19 +77,19 @@ public class Search {
                 switch(mode){
                     //todo add more modes
                     case 0:
-                        searchUrl = "?stx=";
+                        searchUrl = "?bo_table=comic&stx=";
                         break;
                     case 1:
-                        searchUrl = "?artist=";
+                        searchUrl = "?bo_table=comic&artist=";
                         break;
                     case 2:
-                        searchUrl = "?tag=";
+                        searchUrl = "?bo_table=comic&tag=";
                         break;
                     case 3:
-                        searchUrl = "?jaum=";
+                        searchUrl = "?bo_table=comic&jaum=";
                         break;
                     case 4:
-                        searchUrl = "?publish=";
+                        searchUrl = "?bo_table=comic&publish=";
                         break;
                 }
 
