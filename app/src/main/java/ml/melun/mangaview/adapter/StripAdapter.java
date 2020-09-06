@@ -82,9 +82,8 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
 
     void glideBind(ViewHolder holder, int pos){
         if (autoCut) {
-            final int position = pos / 2;
             final int type = pos % 2;
-            String image = imgs.get(pos);
+            String image = imgs.get(pos / 2);
             //set image to holder view
             Glide.with(mainContext)
                     .asBitmap()
