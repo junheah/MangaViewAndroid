@@ -107,7 +107,7 @@ public class Manga {
                 //imgs
                 for(Element e : d.selectFirst("div.view-padding").select("img")) {
                     String img = e.attr("data-original");
-                    if(img != null && !img.isEmpty() && !img.contains("blank"))
+                    if(img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading") && !img.startsWith("/"))
                         imgs.add(img);
                 }
 

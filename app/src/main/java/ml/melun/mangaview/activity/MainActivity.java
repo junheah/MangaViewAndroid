@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         context = this;
         Intent intent = getIntent();
+        String action = intent.getAction();
 
 
         //check prefs
@@ -261,7 +262,7 @@ public class MainActivity extends AppCompatActivity
                             finish();
                         }
                     });
-        }else if(intent != null && intent.getAction().equals(MIGRATE_RESULT)){
+        }else if(action != null && action.equals(MIGRATE_RESULT)){
             migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
         }else{
             activityInit(savedInstanceState);
