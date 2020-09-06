@@ -435,12 +435,15 @@ public class Downloader extends Service {
             //String fileType = url.toString().substring(url.toString().lastIndexOf('.') + 1);
             URLConnection connection = url.openConnection();
 
-            String type = connection.getHeaderField("Content-Type");
 
-            if(!type.startsWith("image/")) {
-                //following file is not image
-                return false;
-            }
+            // manatoki gives image files as document
+//            String type = connection.getHeaderField("Content-Type");
+//
+//            if(!type.startsWith("image/")) {
+//                //following file is not image
+//                return false;
+//            }
+
             //load image as bitmap
             InputStream in = connection.getInputStream();
             Bitmap bitmap = BitmapFactory.decodeStream(in);
