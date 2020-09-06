@@ -102,8 +102,9 @@ public class CommentsActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.requestFocus();
 
-        tab.addTab(tab.newTab().setText("베스트 댓글"));
         tab.addTab(tab.newTab().setText("전체 댓글"));
+        tab.addTab(tab.newTab().setText("베스트 댓글"));
+
 
         mViewPager.addOnPageChangeListener(new
                 TabLayout.TabLayoutOnPageChangeListener(tab));
@@ -157,11 +158,11 @@ public class CommentsActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             CommentsTabFragment tab = new CommentsTabFragment();
             switch(position){
-                case 0:
+                case 1:
                     //best
                     tab.setAdapter(badapter);
                     return tab;
-                case 1:
+                case 0:
                     //comments
                     tab.setAdapter(adapter);
                     return tab;

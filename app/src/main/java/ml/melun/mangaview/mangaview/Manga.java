@@ -112,9 +112,54 @@ public class Manga {
                 }
 
                 //comments
-                //Element commentE = d.selectFirst("viewcomment");
+                Element commentdiv = d.selectFirst("div#viewcomment");
 
-                //todo: comments
+                String user;
+                String icon;
+                String content;
+                String timestamp;
+                int likes;
+                int level;
+                String lvlstr;
+                int indent;
+                String indentstr;
+
+                for(Element e : commentdiv.selectFirst("section#bo_vc").select("div.media")){
+                    if(e.id().contains("c_")){
+                        // is comment
+
+                        //indent
+                        indentstr = e.attr("style");
+                        if(indentstr!=null && indentstr.length()>0)
+                            indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':')+1,indentstr.lastIndexOf('p')))/64;
+                        else
+                            indent = 0;
+
+                        //icon
+                        Element icone = e.selectFirst(".media-object");
+                        if(icone.is("img"))
+                            icon = icone.attr("src");
+                        else
+                            icon = "";
+
+                        Element header = e.selectFirst("div.media-heading");
+                        Element userSpan = header.selectFirst("span");
+                        user = userSpan.ownText();
+                        if(userSpan.hasClass("guest"))
+                            level = 0;
+                        else {
+                            lvlstr = userSpan.selectFirst("img").attr("src");
+                            level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/')+1, lvlstr.lastIndexOf('.')));
+                        }
+                        timestamp = header.selectFirst("span.media-info").ownText();
+
+                        Element cbody = e.selectFirst("div.media-content");
+                        content = cbody.ownText();
+                        likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
+                        comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
+                    }
+
+                }
 
 
             } catch (Exception e) {

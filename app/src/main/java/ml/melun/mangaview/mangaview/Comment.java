@@ -19,7 +19,7 @@ public class Comment {
     public int getLikes() { return likes; }
     public int getLevel() { return level; }
 
-    String content, user, icon, timestamp;
+    String content, user, icon, timestamp ="";
     int indent = 0;
     int likes = 0;
     int level = 0;
