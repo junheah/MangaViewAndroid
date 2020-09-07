@@ -56,6 +56,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.fragment.MainMain;
 import ml.melun.mangaview.fragment.MainSearch;
 import ml.melun.mangaview.fragment.RecyclerFragment;
+import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -265,6 +266,8 @@ public class MainActivity extends AppCompatActivity
         }else if(action != null && action.equals(MIGRATE_RESULT)){
             migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
         }else{
+            if(p.getAutoUrl())
+                new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             activityInit(savedInstanceState);
        }
     }

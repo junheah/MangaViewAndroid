@@ -219,7 +219,7 @@ public class CommentsActivity extends AppCompatActivity {
             if(writeComment(httpClient, login, id, content, baseUrl)) return 0;
             else{
                 //login again and try again
-                login.submit(httpClient);
+                //login.submit(httpClient);
                 if(writeComment(httpClient, login, id, content, baseUrl)) return 0;
             }
             return 1;

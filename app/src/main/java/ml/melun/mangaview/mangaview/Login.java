@@ -1,35 +1,65 @@
 package ml.melun.mangaview.mangaview;
 
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import ml.melun.mangaview.Preference;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.internal.http2.Header;
 
+import static java.lang.System.currentTimeMillis;
+import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
 public class Login {
     private String user;
     private String pass;
     String cookie = "";
+    long currentTime = 0;
 
-    public Login(String user, String pass){
-        this.user = user;
+    public Login(){
+    }
+
+    public void set(String id, String pass){
+        this.user = id;
         this.pass = pass;
     }
 
-    public Boolean submit(CustomHttpClient client){
+    public byte[] prepare(CustomHttpClient client, Preference p){
+
+        Response r = client.get(p.getUrl() + "/bbs/login.php", new HashMap<>());
+        List<String> setcookie = r.headers("Set-Cookie");
+        r.close();
+        currentTime = currentTimeMillis();
+        for (String c : setcookie) {
+            if (c.contains("PHPSESSID=")) {
+                cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
+                System.out.println(cookie);
+            }
+        }
+        client.setCookie("PHPSESSID", "pppp "+cookie);
+        r = client.mget("/plugin/kcaptcha/kcaptcha_image.php?t=" + currentTime, false);
+        try {
+            return r.body().bytes();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Boolean submit(CustomHttpClient client, String answer){
         try{
             RequestBody requestBody = new FormBody.Builder()
+                    .addEncoded("auto_login", "on")
                     .addEncoded("mb_id",user)
                     .addEncoded("mb_password",pass)
+                    .addEncoded("captcha_key", answer)
                     .build();
 
             Response response = client.post(p.getUrl() + "/bbs/login_check.php", requestBody);
