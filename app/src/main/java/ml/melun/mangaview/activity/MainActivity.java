@@ -56,6 +56,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.fragment.MainMain;
 import ml.melun.mangaview.fragment.MainSearch;
 import ml.melun.mangaview.fragment.RecyclerFragment;
+import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Search;
 import ml.melun.mangaview.mangaview.Title;
@@ -274,6 +275,9 @@ public class MainActivity extends AppCompatActivity
         progressView = this.findViewById(R.id.progress_panel);
 
         // url updater
+        if(p.getAutoUrl())
+            new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -547,8 +551,7 @@ public class MainActivity extends AppCompatActivity
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://junheah.github.io/donate"));
                 startActivity(browserIntent);
             }else if(id==R.id.nav_account){
-                Toast.makeText(context,"사용 불가", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(context, LoginActivity.class));
+                startActivity(new Intent(context, LoginActivity.class));
                 return true;
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

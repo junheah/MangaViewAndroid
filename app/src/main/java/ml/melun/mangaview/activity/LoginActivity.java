@@ -21,9 +21,17 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.bumptech.glide.Glide;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Login;
@@ -53,11 +61,15 @@ public class LoginActivity extends AppCompatActivity {
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mCaptchaView;
+    private ImageView captchaImg;
     private View mProgressView;
     private View mLoginFormView;
     private View accountPanel;
     private Button logoutBtn;
     Context context;
+
+    Login login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +81,8 @@ public class LoginActivity extends AppCompatActivity {
         context = this;
         accountPanel = this.findViewById(R.id.account_panel);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mCaptchaView = findViewById(R.id.captcha_answer);
+        captchaImg = findViewById(R.id.captcha_img);
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -95,7 +109,6 @@ public class LoginActivity extends AppCompatActivity {
 
         if(p.getLogin() != null && p.getLogin().isValid()){
             mLoginFormView.setVisibility(View.GONE);
-
             accountPanel.setVisibility(View.VISIBLE);
             logoutBtn.setOnClickListener(new OnClickListener() {
                 @Override
@@ -149,6 +162,8 @@ public class LoginActivity extends AppCompatActivity {
                     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
+        }else{
+            new PreLoginTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
 
@@ -187,6 +202,7 @@ public class LoginActivity extends AppCompatActivity {
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String answer = mCaptchaView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -209,6 +225,12 @@ public class LoginActivity extends AppCompatActivity {
             cancel = true;
         }
 
+        if(TextUtils.isEmpty(answer)){
+            Toast.makeText(context, "자동입력 방지문자를 입력하세요", Toast.LENGTH_SHORT);
+            cancel = true;
+            focusView = mCaptchaView;
+        }
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -217,7 +239,7 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password, answer);
             mAuthTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -268,7 +290,28 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    public class PreLoginTask extends AsyncTask<Void, Void, Void>{
+        byte[] image;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgress(true);
+            login = new Login();
+        }
 
+        @Override
+        protected Void doInBackground(Void... voids) {
+            image = login.prepare(httpClient, p);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void a) {
+            super.onPostExecute(a);
+            Glide.with(context).asBitmap().load(image).into(captchaImg);
+            showProgress(false);
+        }
+    }
 
 
 
@@ -278,16 +321,16 @@ public class LoginActivity extends AppCompatActivity {
      * the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private Login login;
-        UserLoginTask(String email, String password) {
-            login = new Login(email, password);
+        String answer;
+        UserLoginTask(String email, String password, String answer) {
+            login.set(email, password);
+            this.answer = answer;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             String url = p.getUrl();
-            return login.submit(httpClient);
+            return login.submit(httpClient, answer);
         }
 
         @Override

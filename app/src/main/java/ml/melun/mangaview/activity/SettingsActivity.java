@@ -27,6 +27,7 @@ import android.widget.Toast;
 import java.io.File;
 
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.readPreferenceFromFile;
@@ -333,28 +334,28 @@ public class SettingsActivity extends AppCompatActivity {
             switch_layout.setGravity(Gravity.RIGHT);
             switch_layout.setPadding(0,0,10,0);
             final EditText input = new EditText(context);
-//            final TextView toggle_lbl = new TextView(context);
-//            toggle_lbl.setText("URL 자동 설정");
-//            final Switch toggle = new Switch(context);
-//            switch_layout.addView(toggle_lbl);
-//            switch_layout.addView(toggle);
+            final TextView toggle_lbl = new TextView(context);
+            toggle_lbl.setText("URL 자동 설정");
+            final Switch toggle = new Switch(context);
+            switch_layout.addView(toggle_lbl);
+            switch_layout.addView(toggle);
             layout.addView(input);
             layout.addView(switch_layout);
 
-//            toggle.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-//                @Override
-//                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//                    if(b){
-//                        input.setEnabled(false);
-//                        input.setText("...");
-//                    }else{
-//                        input.setEnabled(true);
-//                        input.setText(p.getUrl());
-//                    }
-//                }
-//            });
+            toggle.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if(b){
+                        input.setEnabled(false);
+                        input.setText("...");
+                    }else{
+                        input.setEnabled(true);
+                        input.setText(p.getUrl());
+                    }
+                }
+            });
 
-//            toggle.setChecked(p.getAutoUrl());
+            toggle.setChecked(p.getAutoUrl());
 
             input.setText(p.getUrl());
             input.setHint(p.getDefUrl());
@@ -365,9 +366,17 @@ public class SettingsActivity extends AppCompatActivity {
                     .setView(layout)
                     .setPositiveButton("설정", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int button) {
-                            if (input.getText().length() > 0)
-                                p.setUrl(input.getText().toString());
-                            else p.setUrl(input.getHint().toString());
+                            if(toggle.isChecked()){
+                                // 자동 설정
+                                p.setAutoUrl(true);
+                                new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            }else {
+                                // 수동 설정
+                                p.setAutoUrl(false);
+                                if (input.getText().length() > 0)
+                                    p.setUrl(input.getText().toString());
+                                else p.setUrl(input.getHint().toString());
+                            }
                         }
                     })
                     .setNegativeButton("취소", new DialogInterface.OnClickListener() {

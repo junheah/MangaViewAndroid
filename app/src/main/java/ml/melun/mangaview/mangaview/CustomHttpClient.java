@@ -131,6 +131,10 @@ public class CustomHttpClient {
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){
+        return post(url,body,headers,false);
+    }
+
+    public Response post(String url, RequestBody body, Map<String,String> headers, boolean localCookies){
 
         String cs = "";
         //get cookies from headers
@@ -138,9 +142,10 @@ public class CustomHttpClient {
             cs += headers.get("Cookie");
 
         // add local cookies
-        for(String key : this.cookies.keySet()){
-            cs += key + '=' + this.cookies.get(key) + "; ";
-        }
+        if(localCookies)
+            for(String key : this.cookies.keySet()){
+                cs += key + '=' + this.cookies.get(key) + "; ";
+            }
 
         headers.put("Cookie", cs);
 
