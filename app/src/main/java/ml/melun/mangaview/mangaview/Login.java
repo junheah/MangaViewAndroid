@@ -32,18 +32,26 @@ public class Login {
     }
 
     public byte[] prepare(CustomHttpClient client, Preference p){
-
-        Response r = client.get(p.getUrl() + "/bbs/login.php", new HashMap<>());
-        List<String> setcookie = r.headers("Set-Cookie");
-        r.close();
-        currentTime = currentTimeMillis();
-        for (String c : setcookie) {
-            if (c.contains("PHPSESSID=")) {
-                cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
-                System.out.println(cookie);
+        Response r;
+        int tries = 3;
+        while(tries > 0) {
+            r = client.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),false);
+            if(r.code() == 200) {
+                List<String> setcookie = r.headers("Set-Cookie");
+                for (String c : setcookie) {
+                    if (c.contains("PHPSESSID=")) {
+                        cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
+                        client.setCookie("PHPSESSID",cookie);
+                        System.out.println(cookie);
+                    }
+                }
+                break;
+            }else {
+                r.close();
+                tries--;
             }
         }
-        client.setCookie("PHPSESSID", "pppp "+cookie);
+        currentTime = currentTimeMillis();
         r = client.mget("/plugin/kcaptcha/kcaptcha_image.php?t=" + currentTime, false);
         try {
             return r.body().bytes();
@@ -61,25 +69,24 @@ public class Login {
                     .addEncoded("mb_password",pass)
                     .addEncoded("captcha_key", answer)
                     .build();
+            Map<String,String> headers = new HashMap<>();
+            headers.put("Cookie", "PHPSESSID="+cookie+";");
 
-            Response response = client.post(p.getUrl() + "/bbs/login_check.php", requestBody);
+            Response response = client.post(p.getUrl() + "/bbs/login_check.php", requestBody, headers);
             int responseCode = response.code();
-            List<String> cookies = response.headers("Set-Cookie");
 
-            response.close();
             if(responseCode == 302) {
-                for (String c : cookies) {
-                    if (c.contains("PHPSESSID=")) {
-                        cookie = c.substring(c.indexOf("=")+1,c.indexOf(";"));
-                        // session : copy of login that is used more frequently
-                        return true;
-                    }
-                }
-                // session already exists?
-                cookie = client.getCookie("PHPSESSID");
+                //follow redirect
+                client.get(response.header("Location"), headers);
+                //set session?
+                client.setCookie("PHPSESSID", cookie);
+                response.close();
                 return true;
             }
-            else return false;
+            else{
+                response.close();
+                return false;
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

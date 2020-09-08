@@ -28,6 +28,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import ml.melun.mangaview.R;
@@ -106,7 +109,6 @@ public class LoginActivity extends AppCompatActivity {
 
         if(p.getLogin() != null && p.getLogin().isValid()){
             mLoginFormView.setVisibility(View.GONE);
-
             accountPanel.setVisibility(View.VISIBLE);
             logoutBtn.setOnClickListener(new OnClickListener() {
                 @Override
@@ -160,9 +162,11 @@ public class LoginActivity extends AppCompatActivity {
                     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
+        }else{
+            new PreLoginTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
-        new PreLoginTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
@@ -304,7 +308,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void a) {
             super.onPostExecute(a);
-            Glide.with(context).load(image).into(captchaImg);
+            Glide.with(context).asBitmap().load(image).into(captchaImg);
             showProgress(false);
         }
     }

@@ -266,8 +266,6 @@ public class MainActivity extends AppCompatActivity
         }else if(action != null && action.equals(MIGRATE_RESULT)){
             migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
         }else{
-            if(p.getAutoUrl())
-                new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             activityInit(savedInstanceState);
        }
     }
@@ -277,6 +275,9 @@ public class MainActivity extends AppCompatActivity
         progressView = this.findViewById(R.id.progress_panel);
 
         // url updater
+        if(p.getAutoUrl())
+            new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -550,8 +551,7 @@ public class MainActivity extends AppCompatActivity
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://junheah.github.io/donate"));
                 startActivity(browserIntent);
             }else if(id==R.id.nav_account){
-                Toast.makeText(context,"사용 불가", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(context, LoginActivity.class));
+                startActivity(new Intent(context, LoginActivity.class));
                 return true;
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
