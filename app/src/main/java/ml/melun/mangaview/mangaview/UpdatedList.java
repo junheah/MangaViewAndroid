@@ -17,6 +17,10 @@ public class UpdatedList {
     ArrayList<Manga> result;
     int page = 1;
 
+    public int getPage(){
+        return this.page;
+    }
+
     public void fetch(CustomHttpClient client){
         //50 items per page
         result = new ArrayList<>();

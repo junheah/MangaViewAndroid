@@ -73,7 +73,7 @@ public class Manga {
         int tries = 0;
 
         while(imgs.size()==0 && tries < 2) {
-            Response r = client.mget("/comic/" + String.valueOf(id));
+            Response r = client.mget("/comic/" + String.valueOf(id), false, cookies);
             try {
                 String body = r.body().string();
                 r.close();
@@ -83,6 +83,7 @@ public class Manga {
                     tries = 0;
                     continue;
                 }
+
                 Document d = Jsoup.parse(body);
 
                 //name
@@ -91,17 +92,18 @@ public class Manga {
                 //temp title
                 Element navbar = d.selectFirst("div.toon-nav");
                 int tid = Integer.parseInt(navbar.select("a")
-                        .get(3)
+                        .last()
                         .attr("href")
                         .split("comic/")[1]
                         .split("\\?")[0]);
-                System.out.println(tid);
 
                 if(title == null) title = new Title(name, "", "", null, "", tid );
 
                 //eps
                 for(Element e :navbar.selectFirst("select").select("option")){
-                    eps.add(new Manga(Integer.parseInt(e.attr("value")),e.ownText(),""));
+                    String idstr = e.attr("value");
+                    if(idstr!=null && idstr.length()>0)
+                        eps.add(new Manga(Integer.parseInt(idstr),e.ownText(),""));
                 }
 
                 //imgs
