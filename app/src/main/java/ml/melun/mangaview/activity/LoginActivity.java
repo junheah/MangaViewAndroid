@@ -114,8 +114,10 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     p.setLogin(null);
+                    httpClient.setCookie("PHPSESSID", "");
                     mLoginFormView.setVisibility(View.VISIBLE);
                     accountPanel.setVisibility(View.GONE);
+                    new PreLoginTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
 
@@ -312,8 +314,6 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
         }
     }
-
-
 
 
     /**

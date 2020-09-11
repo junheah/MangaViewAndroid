@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
@@ -98,7 +99,10 @@ public class TagSearchActivity extends AppCompatActivity {
             swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                    if (!updated.isLast()) {
+                    if(p.getLogin() == null){
+                        Toast.makeText(context, "다음 페이지를 보려면 로그인 해야 합니다.",  Toast.LENGTH_SHORT).show();
+                        swipe.setRefreshing(false);
+                    } else if (!updated.isLast()) {
                         getUpdated gu = new getUpdated();
                         gu.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     } else swipe.setRefreshing(false);

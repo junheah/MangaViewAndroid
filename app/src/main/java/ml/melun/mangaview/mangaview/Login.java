@@ -77,9 +77,9 @@ public class Login {
 
             if(responseCode == 302) {
                 //follow redirect
-                client.get(response.header("Location"), headers);
-                //set session?
-                client.setCookie("PHPSESSID", cookie);
+                Map<String, String> cookies = new HashMap<>();
+                cookies.put("PHPSESSID", cookie);
+                client.mget("/?captcha_key="+answer+"&auto_login=on",false, cookies);
                 response.close();
                 return true;
             }
