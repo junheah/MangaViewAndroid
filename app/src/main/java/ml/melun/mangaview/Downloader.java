@@ -177,7 +177,7 @@ public class Downloader extends Service {
 
     boolean updateDownloading = false;
 
-    private class Download extends AsyncTask<String,Void,Integer> {
+    private class Download extends AsyncTask<String,Integer,Integer> {
         File downloaded;
         @Override
         protected void onPreExecute() {
@@ -195,6 +195,24 @@ public class Downloader extends Service {
                 noti.setSmallIcon(R.drawable.notification_logo);
             notificationManager.notify(nid+3, noti.build());
         }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            Intent intent = new Intent(serviceContext, MainActivity.class);
+            PendingIntent intentP = PendingIntent.getActivity(serviceContext, 0, intent, 0);
+            NotificationCompat.Builder noti = new NotificationCompat.Builder(serviceContext, channeld)
+                    .setContentIntent(intentP)
+                    .setContentTitle("업데이트 다운로드중")
+                    .setContentText(values[0] + "%")
+                    .setOngoing(true);
+            if (Build.VERSION.SDK_INT >= 26)
+                noti.setSmallIcon(R.drawable.ic_logo);
+            else
+                noti.setSmallIcon(R.drawable.notification_logo);
+            notificationManager.notify(nid+3, noti.build());
+        }
+
 
         @Override
         protected void onPostExecute(Integer integer) {
@@ -228,7 +246,12 @@ public class Downloader extends Service {
 
         protected Integer doInBackground(String... urls) {
             String url = urls[0];
-            downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(),"mangaview-update"));
+            downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(), "mangaview-update"), new ProgressInterface() {
+                @Override
+                public void publish(int progress) {
+                    publishProgress(progress);
+                }
+            });
             return null;
         }
 
@@ -412,23 +435,23 @@ public class Downloader extends Service {
         }
     }
 
-    boolean downloadImage(String urlStr, File outputFile, Decoder d){
+    boolean downloadImage(String urlStr, File outputFile, Decoder d) {
         try {
             URL url = new URL(urlStr);
-            if(url.getProtocol().toLowerCase().equals("https")) {
+            if (url.getProtocol().toLowerCase().equals("https")) {
                 HttpsURLConnection init = (HttpsURLConnection) url.openConnection();
                 int responseCode = init.getResponseCode();
-                if (responseCode >= 300 && responseCode<400) {
+                if (responseCode >= 300 && responseCode < 400) {
                     url = new URL(init.getHeaderField("location"));
-                }else if(responseCode>=400){
+                } else if (responseCode >= 400) {
                     return false;
                 }
-            }else{
+            } else {
                 HttpURLConnection init = (HttpURLConnection) url.openConnection();
                 int responseCode = init.getResponseCode();
-                if (responseCode >= 300 && responseCode<400) {
+                if (responseCode >= 300 && responseCode < 400) {
                     url = new URL(init.getHeaderField("location"));
-                }else if(responseCode>=400){
+                } else if (responseCode >= 400) {
                     return false;
                 }
             }
@@ -450,7 +473,7 @@ public class Downloader extends Service {
             //decode image
             bitmap = d.decode(bitmap);
             //save image
-            OutputStream outputStream = new FileOutputStream(outputFile.getAbsolutePath()+".jpg");
+            OutputStream outputStream = new FileOutputStream(outputFile.getAbsolutePath() + ".jpg");
             bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream); // saving the Bitmap to a file compressed as a JPEG with 85% compression rate
             in.close();
             outputStream.flush(); // Not really required
@@ -462,10 +485,13 @@ public class Downloader extends Service {
         }
         return true;
     }
-
-    File downloadFile(String urlStr, File outputFile){
+    File downloadFile(String urlStr, File outputFile) {
+        return downloadFile(urlStr, outputFile, null);
+    }
+    File downloadFile(String urlStr, File outputFile, ProgressInterface publisher){
         //returns file name with extension
         String name = "";
+        int filesize;
         try {
             URL url = new URL(urlStr);
             if(url.getProtocol().toLowerCase().equals("https")) {
@@ -483,6 +509,7 @@ public class Downloader extends Service {
             }
             String fileType = url.toString().substring(url.toString().lastIndexOf('.') + 1);
             URLConnection connection = url.openConnection();
+            filesize = connection.getContentLength();
 
             //load file
             InputStream in = connection.getInputStream();
@@ -492,8 +519,11 @@ public class Downloader extends Service {
             //save file
             byte[] buf = new byte[1024];
             int len = 0;
+            int cursize = 0;
             while ((len = in.read(buf)) > 0){
                 outputStream.write(buf, 0, len);
+                cursize += len;
+                if(publisher!=null) publisher.publish((int)(((double)cursize/(double)filesize)*100d));
             }
             in.close();
             outputStream.flush(); // Not really required
@@ -579,6 +609,10 @@ public class Downloader extends Service {
         else
             notification.setSmallIcon(R.drawable.notification_logo);
         notificationManager.notify(nid + 2, notification.build());
+    }
+
+    private interface ProgressInterface{
+        void publish(int progress);
     }
 
 

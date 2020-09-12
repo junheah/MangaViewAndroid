@@ -186,9 +186,6 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         if(data.hasCounter()){
             holder.counterContainer.setVisibility(View.VISIBLE);
             holder.recommend_c.setText(String.valueOf(data.getRecommend_c()));
-            holder.battery_c.setText(String.valueOf(data.getBattery_s()));
-            holder.comment_c.setText(String.valueOf(data.getComment_c()));
-            holder.bookmark_c.setText(String.valueOf(data.getBookmark_c()));
         }else{
             //no counter
             holder.counterContainer.setVisibility(View.GONE);

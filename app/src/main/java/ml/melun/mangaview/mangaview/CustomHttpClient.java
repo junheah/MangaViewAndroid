@@ -71,6 +71,10 @@ public class CustomHttpClient {
     public void setCookie(String k, String v){
         cookies.put(k, v);
     }
+    public void resetCookie(){
+        this.cookies = new HashMap<>();
+    }
+
 
     public String getCookie(String k){
         return cookies.get(k);

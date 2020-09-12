@@ -16,10 +16,7 @@ public class Title extends MTitle {
     int bookmark = 0;
     Boolean bookmarked = false;
     String bookmarkLink = "";
-    int bc = 0;
     int rc = 0;
-    int cc = 0;
-    int bmc = 0;
 
     public static final int BATTERY_EMPTY = 0;
     public static final int BATTERY_ONE_QUARTER = 1;
@@ -31,13 +28,10 @@ public class Title extends MTitle {
         super(n, id, t, a, tg, r);
     }
 
-    public Title(String n, String t, String a, List<String> tg, String r, int id, int rc, int bc, int cc, int bmc) {
+    public Title(String n, String t, String a, List<String> tg, String r, int id, int rc) {
         super(n, id, t, a, tg, r);
         this.id = id;
         this.rc = rc;
-        this.bc = bc;
-        this.cc = cc;
-        this.bmc = bmc;
     }
 
     public Title(MTitle title){
@@ -66,6 +60,27 @@ public class Title extends MTitle {
             }
             Document d = Jsoup.parse(body);
             Element header = d.selectFirst("div.view-title");
+
+            //extra info
+            try{
+                Element infoTable = d.selectFirst("table.table");
+                //recommend
+                rc = Integer.parseInt(infoTable.selectFirst("button.btn-red").selectFirst("b").ownText());
+                //bookmark
+                Element bookmark = infoTable.selectFirst("a#webtoon_bookmark");
+                if(bookmark != null) {
+                    //logged in
+                    bookmarked = bookmark.hasClass("btn-orangered");
+                    bookmarkLink = bookmark.attr("href").split("//")[1];
+                    bookmarkLink = bookmarkLink.substring(bookmarkLink.indexOf('/'));
+                }else{
+                    //not logged in
+                    bookmarked = false;
+                    bookmarkLink = "";
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
             //thumb
             try {
@@ -155,14 +170,6 @@ public class Title extends MTitle {
         return new Title(name, thumb, author, tags, release, id);
     }
 
-    public int getBattery_c() {
-        return bc;
-    }
-
-    public void setBattery_c(int battery_c) {
-        this.bc = battery_c;
-    }
-
     public int getRecommend_c() {
         return rc;
     }
@@ -171,32 +178,12 @@ public class Title extends MTitle {
         this.rc = recommend_c;
     }
 
-    public int getComment_c() {
-        return cc;
-    }
-
-    public void setComment_c(int comment_c) {
-        this.cc = comment_c;
-    }
-
-    public int getBookmark_c() {
-        return bmc;
-    }
-
-    public void setBookmark_c(int bookmark_c) {
-        this.bmc = bookmark_c;
-    }
-
-    public String getBattery_s(){
-        return (bc *25)+"%";
+    public MTitle minimize(){
+        return new MTitle(name, id, thumb, author, tags, release);
     }
 
     public boolean hasCounter(){
-        return !(bc==0 && rc==0 && cc==0 && bmc==0);
-    }
-
-    public MTitle minimize(){
-        return new MTitle(name, id, thumb, author, tags, release);
+        return !(rc==0&&(bookmarkLink==null||bookmarkLink.length()==0));
     }
 
     public static boolean isInteger(String s) {

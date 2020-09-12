@@ -100,60 +100,13 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/HeaderBattery"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:paddingEnd="6dp">
-
-            <ImageView
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_smile" />
-
-            <TextView
-                android:id="@+id/batteryText"
-                android:layout_gravity="center"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="123"
-                android:textColor="@color/smile" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/HeaderComment"
-            android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:paddingEnd="6dp">
-
-            <ImageView
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingTop="10dp"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_comment" />
-
-            <TextView
-                android:id="@+id/commentText"
-                android:layout_gravity="center"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="123"
-                android:textColor="@color/comment" />
-
-        </LinearLayout>
-
-        <LinearLayout
             android:background="@drawable/button_bg_light"
             android:foreground="?android:attr/selectableItemBackground"
             android:id="@+id/HeaderBookmark"
             android:layout_height="match_parent"
             android:layout_width="wrap_content"
-            android:paddingEnd="6dp">
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp">
 
             <ImageView
                 android:id="@+id/bookmarkIcon"
@@ -163,14 +116,6 @@
                 android:paddingTop="10dp"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_bookmark_border" />
-
-            <TextView
-                android:id="@+id/bookmarkText"
-                android:layout_gravity="center"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:text="123"
-                android:textColor="@color/bookmark" />
 
         </LinearLayout>
 
