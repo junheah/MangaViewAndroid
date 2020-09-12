@@ -40,6 +40,7 @@ import java.util.Map;
 
 import ml.melun.mangaview.activity.CaptchaActivity;
 import ml.melun.mangaview.activity.EpisodeActivity;
+import ml.melun.mangaview.activity.LoginActivity;
 import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
@@ -625,6 +626,15 @@ public class Utils {
         }
         popup.setOnMenuItemClickListener(listener);
         popup.show();
+    }
+
+    public final static int REQUEST_LOGIN = 232;
+
+    public static void requestLogin(Context context, Preference p){
+        //reset login
+        p.setLogin(null);
+        //open login activity
+        ((Activity) context).startActivityForResult(new Intent(context, LoginActivity.class), REQUEST_LOGIN);
     }
 
 

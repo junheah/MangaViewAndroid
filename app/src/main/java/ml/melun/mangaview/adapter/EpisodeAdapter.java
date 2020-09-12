@@ -124,17 +124,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
                 //set ext-info text
                 h.h_recommend_c.setText(String.valueOf(title.getRecommend_c()));
-                h.h_battery_c.setText(String.valueOf(title.getBattery_s()));
-                h.h_comment_c.setText(String.valueOf(title.getComment_c()));
-                h.h_bookmark_c.setText(String.valueOf(title.getBookmark_c()));
 
             }else{
                 //offline manga
                 h.h_download.setVisibility(View.GONE);
                 h.h_bookmark.setVisibility(View.GONE);
-                h.h_battery.setVisibility(View.GONE);
                 h.h_recommend.setVisibility(View.GONE);
-                h.h_comment.setVisibility(View.GONE);
+                h.h_recommend_c.setVisibility(View.GONE);
             }
 
         }else {
@@ -191,10 +187,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         Button h_download;
         RecyclerView h_tags;
-        View h_bookmark, h_star, h_recommend, h_comment, h_battery;
+        View h_bookmark, h_star, h_recommend;
 
-        TextView h_bookmark_c, h_recommend_c, h_comment_c, h_battery_c;
-        HeaderHolder(View itemView) {
+        TextView h_recommend_c;
+            HeaderHolder(View itemView) {
             super(itemView);
             h_title = itemView.findViewById(R.id.HeaderTitle);
             h_thumb = itemView.findViewById(R.id.HeaderThumb);
@@ -207,14 +203,9 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             h_star = itemView.findViewById(R.id.HeaderFavorite);
             h_bookmark = itemView.findViewById(R.id.HeaderBookmark);
-            h_comment = itemView.findViewById(R.id.HeaderComment);
-            h_recommend = itemView.findViewById(R.id.HeaderRecommend);
-            h_battery = itemView.findViewById(R.id.HeaderBattery);
+            h_recommend = itemView.findViewById(R.id.recommendIcon);
 
-            h_bookmark_c = itemView.findViewById(R.id.bookmarkText);
-            h_comment_c = itemView.findViewById(R.id.commentText);
             h_recommend_c = itemView.findViewById(R.id.recommendText);
-            h_battery_c = itemView.findViewById(R.id.batteryText);
 
 
             h_bookmark.setOnClickListener(new View.OnClickListener() {

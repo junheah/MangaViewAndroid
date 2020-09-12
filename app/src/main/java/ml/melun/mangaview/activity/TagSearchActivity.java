@@ -30,7 +30,9 @@ import ml.melun.mangaview.mangaview.UpdatedList;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.REQUEST_LOGIN;
 import static ml.melun.mangaview.Utils.episodeIntent;
+import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
@@ -100,7 +102,8 @@ public class TagSearchActivity extends AppCompatActivity {
                 @Override
                 public void onRefresh(SwipyRefreshLayoutDirection direction) {
                     if(p.getLogin() == null){
-                        Toast.makeText(context, "다음 페이지를 보려면 로그인 해야 합니다.",  Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "로그인 하세요",  Toast.LENGTH_SHORT).show();
+                        requestLogin(context, p);
                         swipe.setRefreshing(false);
                     } else if (!updated.isLast()) {
                         getUpdated gu = new getUpdated();
@@ -336,7 +339,13 @@ public class TagSearchActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        finish();
-        startActivity(getIntent());
+        if(requestCode == REQUEST_LOGIN){
+            //login
+
+        }else {
+            //captcha
+            finish();
+            startActivity(getIntent());
+        }
     }
 }
