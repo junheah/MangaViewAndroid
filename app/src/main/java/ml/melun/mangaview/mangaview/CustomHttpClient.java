@@ -109,7 +109,7 @@ public class CustomHttpClient {
         }
         Map<String,String> cookie = new HashMap<>();
         cookie.putAll(this.cookies);
-        cookie.putAll(customCookie);
+        if(customCookie != null) cookie.putAll(customCookie);
 
         StringBuilder cbuilder = new StringBuilder();
         for(String key : cookie.keySet()){
