@@ -101,11 +101,7 @@ public class TagSearchActivity extends AppCompatActivity {
             swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                    if(p.getLogin() == null){
-                        Toast.makeText(context, "로그인 하세요",  Toast.LENGTH_SHORT).show();
-                        requestLogin(context, p);
-                        swipe.setRefreshing(false);
-                    } else if (!updated.isLast()) {
+                     if (!updated.isLast()) {
                         getUpdated gu = new getUpdated();
                         gu.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     } else swipe.setRefreshing(false);
@@ -341,7 +337,8 @@ public class TagSearchActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == REQUEST_LOGIN){
             //login
-
+            finish();
+            startActivity(getIntent());
         }else {
             //captcha
             finish();

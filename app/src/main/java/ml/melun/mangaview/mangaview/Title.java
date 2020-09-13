@@ -137,6 +137,11 @@ public class Title extends MTitle {
 
     public void toggleBookmark(CustomHttpClient client){
         Response r = client.mget(bookmarkLink,true);
+        try {
+            System.out.println(r.body().string());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         if(r!=null) r.close();
     }
 

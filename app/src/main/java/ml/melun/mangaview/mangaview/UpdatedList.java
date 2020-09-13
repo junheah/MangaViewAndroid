@@ -24,7 +24,7 @@ public class UpdatedList {
     public void fetch(CustomHttpClient client){
         //50 items per page
         result = new ArrayList<>();
-        String url = "/thema/comic/widget/miso-post-comic-update/widget.rows.php?thema=comic&wname=miso-post-comic-update&wid=comic_update&page=";
+        String url = "/bbs/page.php?hid=update&page=";
         if(!last) {
             try {
                 Response response= client.mget(url + page++);
@@ -37,7 +37,7 @@ public class UpdatedList {
                 }
                 Document document = Jsoup.parse(body);
                 Elements items = document.select("div.post-row");
-                if (items == null || items.size() < 50) last = true;
+                if (items == null || items.size() < 70) last = true;
                 for(Element item : items){
                     try {
                         String img = item.selectFirst("img").attr("src");
@@ -46,7 +46,7 @@ public class UpdatedList {
                                 .selectFirst("div.pull-left")
                                 .selectFirst("a")
                                 .attr("href")
-                                .split("wr_id=")[1]);
+                                .split("comic/")[1]);
 
                         Elements rightInfo = item.selectFirst("div.pull-right").select("p");
 
@@ -54,7 +54,7 @@ public class UpdatedList {
                                 .get(0)
                                 .selectFirst("a")
                                 .attr("href")
-                                .split("wr_id=")[1]);
+                                .split("comic/")[1]);
 
                         String date = rightInfo.get(1).selectFirst("span").ownText();
 
