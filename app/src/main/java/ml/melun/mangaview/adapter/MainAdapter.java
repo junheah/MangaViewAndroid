@@ -24,6 +24,7 @@ import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Manga;
+import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
@@ -38,7 +39,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     boolean dark, loaded = false;
     Preference p;
 
-    List<Manga> ranking, recent, favUpdate;
+    List<Manga> recent, favUpdate;
+    List<Title> ranking;
 
     final static int ADDED = 0;
     final static int NAME = 1;
@@ -164,11 +166,11 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             h.setManga(recent.get(position-RECENT-1), 0);
         }else if(position == RANKING) {
             rankingHolder rkh = (rankingHolder) holder;
-            rkh.title.setText("주간랭킹 TOP30");
+            rkh.title.setText("일본만화 베스트");
         }else if(position > RANKING){
             //ranking item
             rankingHolder h = (rankingHolder) holder;
-            h.setManga(ranking.get(position-RANKING-1), position-RANKING);
+            h.setTitleObject(ranking.get(position-RANKING-1), position-RANKING);
         }
 
     }
@@ -207,7 +209,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if(rankingSize>1)
                 notifyItemRangeInserted(RANKING+2, rankingSize-1);
         }else{
-            ranking.add(new Manga(-1,"결과없음",""));
+            ranking.add(new Title("결과없음","", "", null, "", -1));
             notifyItemChanged(RANKING+1);
         }
 
@@ -249,6 +251,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView title;
         CardView card;
         TextView rank;
+        Title titleobj;
         Manga manga;
         View rankLayout;
 
@@ -273,6 +276,25 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onClick(View v) {
                     if(manga!=null && manga.getId()>0)
                         mainClickListener.clickedManga(manga);
+                }
+            });
+
+            if(r>0){
+                rankLayout.setVisibility(View.VISIBLE);
+                rank.setText(String.valueOf(r));
+            }else{
+                rankLayout.setVisibility(View.GONE);
+            }
+        }
+
+        public void setTitleObject(Title t, int r){
+            titleobj = t;
+            title.setText(t.getName());
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(titleobj!=null && titleobj.getId()>0)
+                        mainClickListener.clickedTitle(titleobj);
                 }
             });
 
@@ -351,6 +373,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void clickedTag(String t);
         void clickedName(String t);
         void clickedRelease(String t);
+        void clickedTitle(Title t);
         void clickedMoreUpdated();
         void captchaCallback();
     }

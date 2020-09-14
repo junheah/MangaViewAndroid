@@ -17,7 +17,9 @@ import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.mangaview.Manga;
+import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
@@ -40,6 +42,12 @@ public class MainMain extends Fragment{
         mainRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         mainRecycler.setAdapter(mainadapter);
         mainadapter.setMainClickListener(new MainAdapter.onItemClick() {
+
+            @Override
+            public void clickedTitle(Title t) {
+                startActivity(episodeIntent(getContext(), t));
+            }
+
             @Override
             public void clickedManga(Manga m) {
                 //mget title from manga m and start intent for manga m

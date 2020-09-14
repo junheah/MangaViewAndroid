@@ -11,7 +11,8 @@ import okhttp3.Response;
 
 
 public class MainPage {
-    List<Manga> recent, ranking, favUpdate, onlineRecent;
+    List<Manga> recent, favUpdate, onlineRecent;
+    List<Title> ranking;
 
     void fetch(CustomHttpClient client) {
 
@@ -38,7 +39,9 @@ public class MainPage {
             String thumb;
             Manga mtmp;
             Element infos;
-            for(Element e : d.selectFirst("div.main-box").select("div.post-row")){
+            Title ttmp;
+
+            for(Element e : d.selectFirst("div.miso-post-gallery").select("div.post-row")){
                 id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
                 infos = e.selectFirst("div.img-item");
                 thumb = infos.selectFirst("img").attr("src");
@@ -48,6 +51,17 @@ public class MainPage {
                 mtmp.addThumb(thumb);
                 recent.add(mtmp);
             }
+
+            for(Element e : d.select("div.miso-post-gallery").last().select("div.post-row")){
+                id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
+                infos = e.selectFirst("div.img-item");
+                thumb = infos.selectFirst("img").attr("src");
+                name = infos.selectFirst("div.in-subject").ownText();
+
+                ttmp = new Title(name, thumb, "" , null, "", id);
+                ranking.add(ttmp);
+            }
+
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -114,5 +128,5 @@ public class MainPage {
         return onlineRecent;
     }
 
-    public List<Manga> getRanking() { return ranking; }
+    public List<Title> getRanking() { return ranking; }
 }
