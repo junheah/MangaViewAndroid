@@ -52,7 +52,7 @@ public class CheckInfo {
             return false;
         }
         Long lastUpdateTime = sharedPref.getLong("lastUpdateTime", 0);
-        Long updateCycle = sharedPref.getLong("updateCycle",3600000); // def cycle = 1hr
+        Long updateCycle = sharedPref.getLong("updateCycle",900000); // def cycle = 15min
         if(uc.getStatus()== AsyncTask.Status.RUNNING) {
             Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
             return false;
@@ -69,7 +69,7 @@ public class CheckInfo {
             return false;
         }
         Long lastUpdateTime = sharedPref.getLong("lastNoticeTime", 0);
-        Long updateCycle = sharedPref.getLong("noticeCycle",3600000); // def cycle = 1hr
+        Long updateCycle = sharedPref.getLong("noticeCycle",900000); // def cycle = 15min
         if (nc.getStatus() == AsyncTask.Status.RUNNING){
             Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
             return false;

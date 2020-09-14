@@ -631,6 +631,8 @@ public class Utils {
     public final static int REQUEST_LOGIN = 232;
 
     public static void requestLogin(Context context, Preference p){
+        //toast
+        Toast.makeText(context, "로그인 하세요",  Toast.LENGTH_SHORT).show();
         //reset login
         p.setLogin(null);
         //open login activity

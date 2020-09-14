@@ -38,6 +38,7 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
+import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
@@ -307,15 +308,10 @@ public class EpisodeActivity extends AppCompatActivity {
             @Override
             public void onBookmarkClick() {
                 if(mode == 0 && p.getLogin() != null && p.getLogin().isValid()) {
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            title.toggleBookmark(httpClient);
-                            return null;
-                        }
-                    }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }else
+                    new ToggleBookmark().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }else {
                     Toast.makeText(context, "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -361,6 +357,27 @@ public class EpisodeActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+    }
+
+    private class ToggleBookmark extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            return title.toggleBookmark(httpClient, p);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+            episodeAdapter.toggleBookmark(success);
+            if(!success){
+                requestLogin(context, p);
+            }
+        }
     }
 
     private class getEpisodes extends AsyncTask<Void,Void,Integer> {
