@@ -1,14 +1,21 @@
 package ml.melun.mangaview.mangaview;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONObject;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
+import ml.melun.mangaview.Preference;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.HashingSource;
 
 
 public class Title extends MTitle {
@@ -71,8 +78,7 @@ public class Title extends MTitle {
                 if(bookmark != null) {
                     //logged in
                     bookmarked = bookmark.hasClass("btn-orangered");
-                    bookmarkLink = bookmark.attr("href").split("//")[1];
-                    bookmarkLink = bookmarkLink.substring(bookmarkLink.indexOf('/'));
+                    bookmarkLink = bookmark.attr("href");
                 }else{
                     //not logged in
                     bookmarked = false;
@@ -135,14 +141,33 @@ public class Title extends MTitle {
         }
     }
 
-    public void toggleBookmark(CustomHttpClient client){
-        Response r = client.mget(bookmarkLink,true);
+    public boolean toggleBookmark(CustomHttpClient client, Preference p){
+        RequestBody requestBody = new FormBody.Builder()
+                .addEncoded("mode", bookmarked?"off":"on")
+                .addEncoded("top","0")
+                .addEncoded("js","on")
+                .build();
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Cookie", p.getLogin().getCookie(true));
+        Response r = client.post(bookmarkLink, requestBody, headers);
         try {
-            System.out.println(r.body().string());
+            JSONObject obj = new JSONObject(r.body().string());
+            if(obj.getString("error").isEmpty() && !obj.getString("success").isEmpty()){
+                //success
+                bookmarked = !bookmarked;
+            }else{
+                //failed
+                r.close();
+                return false;
+            }
         }catch (Exception e){
+            r.close();
             e.printStackTrace();
+            return false;
         }
         if(r!=null) r.close();
+        return true;
     }
 
 

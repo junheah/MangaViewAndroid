@@ -47,6 +47,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     int mode = 0;
     boolean login;
 
+    boolean bookmarkSubmitting = false;
+
     // data is passed into the constructor
     public EpisodeAdapter(Context context, List<Manga> data, Title title, int mode) {
         this.mInflater = LayoutInflater.from(context);
@@ -149,6 +151,14 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    public void toggleBookmark(boolean success){
+        if(success) {
+            this.bookmarked = !this.bookmarked;
+        }
+        this.bookmarkSubmitting = false;
+        notifyItemChanged(0);
+    }
+
     // total number of rows
     @Override
     public int getItemCount() {
@@ -212,10 +222,14 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 @Override
                 public void onClick(View v) {
                     //set bookmark
-                    mClickListener.onBookmarkClick();
                     if(login) {
-                        bookmarked = !bookmarked;
-                        notifyItemChanged(0);
+                        if (!bookmarkSubmitting) {
+                            mClickListener.onBookmarkClick();
+                            bookmarkSubmitting = true;
+                        }
+                    }else{
+                        mClickListener.onBookmarkClick();
+                        bookmarkSubmitting = false;
                     }
                 }
             });
