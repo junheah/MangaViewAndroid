@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
@@ -21,6 +22,7 @@ import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -114,7 +116,7 @@ public class MainMain extends Fragment{
 
             @Override
             public void captchaCallback() {
-                Utils.showCaptchaPopup(getContext(), 3, fragment);
+                Utils.showCaptchaPopup(getContext(), 3, fragment, p);
             }
         });
         if(!wait)

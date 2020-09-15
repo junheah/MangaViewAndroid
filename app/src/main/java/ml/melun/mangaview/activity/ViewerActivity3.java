@@ -399,7 +399,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             lockUi(false);
             imgs = manga.getImgs();
             if(imgs == null || imgs.size()==0) {
-                showCaptchaPopup(context);
+                showCaptchaPopup(context, p);
                 return;
             }
             refreshAdapter();
@@ -414,7 +414,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             for(StackTraceElement s : stack){
                 message +=s.toString()+'\n';
             }
-            Utils.showCaptchaPopup(context, e);
+            Utils.showCaptchaPopup(context, e, p);
         }
     }
 

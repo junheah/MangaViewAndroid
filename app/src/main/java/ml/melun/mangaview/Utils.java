@@ -55,10 +55,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static ml.melun.mangaview.activity.SettingsActivity.urlSettingPopup;
 
 public class Utils {
 
-    private static int captchaCount = 0;
+    private static int captchaCount = 1;
 
     public static final String ReservedChars = "|\\?*<\":>+[]/'";
 
@@ -250,7 +251,7 @@ public class Utils {
 
 
 
-    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Fragment fragment){
+    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Fragment fragment, Preference p){
         if(!checkConnection(context)){
             //no internet
             //showErrorPopup(context, "네트워크 연결이 없습니다.", e, force_close);
@@ -261,22 +262,28 @@ public class Utils {
         }else {
             AlertDialog.Builder builder;
             String title = "오류";
-            String content = "정보를 불러오는데 실패하였습니다. CAPTCHA를 재인증 하겠습니까?";
+            String content = "정보를 불러오는데 실패하였습니다.";
             if (new Preference(context).getDarkTheme())
                 builder = new AlertDialog.Builder(context, R.style.darkDialog);
             else builder = new AlertDialog.Builder(context);
             builder.setTitle(title)
                     .setMessage(content)
-                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    .setNeutralButton("확인", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             if (force_close) ((Activity) context).finish();
                         }
                     })
-                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("CAPTCHA 인증", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             startCaptchaActivity(context, code, fragment);
+                        }
+                    })
+                    .setNegativeButton("URL 설정", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            urlSettingPopup(context, p);
                         }
                     })
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -310,28 +317,28 @@ public class Utils {
             fragment.startActivityForResult(captchaIntent, code);
     }
 
-    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close) {
-        showCaptchaPopup(context,code,e,force_close,null);
+    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Preference p) {
+        showCaptchaPopup(context,code,e,force_close,null, p);
     }
 
-    public static void showCaptchaPopup(Context context, Exception e) {
+    public static void showCaptchaPopup(Context context, Exception e, Preference p) {
         // viewer call
-        showCaptchaPopup(context, 0, e, true);
+        showCaptchaPopup(context, 0, e, true, p);
     }
 
-    public static void showCaptchaPopup(Context context, int code){
+    public static void showCaptchaPopup(Context context, int code, Preference p){
         // menu call
-        showCaptchaPopup(context, code, null, false);
+        showCaptchaPopup(context, code, null, false, p);
     }
 
-    public static void showCaptchaPopup(Context context, int code, Fragment fragment){
+    public static void showCaptchaPopup(Context context, int code, Fragment fragment, Preference p){
         // menu call
-        showCaptchaPopup(context, code, null, false, fragment);
+        showCaptchaPopup(context, code, null, false, fragment, p);
     }
 
-    public static void showCaptchaPopup(Context context){
+    public static void showCaptchaPopup(Context context, Preference p){
         // viewer call
-        showCaptchaPopup(context, 0, null, true);
+        showCaptchaPopup(context, 0, null, true, p);
     }
 
     private static void showStackTrace(Context context, Exception e){

@@ -132,7 +132,7 @@ public class MainSearch extends Fragment {
             super.onPostExecute(res);
             if(res != 0){
                 // error
-                Utils.showCaptchaPopup(getContext(), 4, fragment);
+                Utils.showCaptchaPopup(getContext(), 4, fragment, p);
             }
 
             if(searchAdapter.getItemCount()==0) {

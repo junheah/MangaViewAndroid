@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import java.io.File;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 
@@ -327,64 +328,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         this.findViewById(R.id.setting_url).setOnClickListener(v -> {
-            final LinearLayout layout = new LinearLayout(context);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            final LinearLayout switch_layout = new LinearLayout(context);
-            switch_layout.setOrientation(LinearLayout.HORIZONTAL);
-            switch_layout.setGravity(Gravity.RIGHT);
-            switch_layout.setPadding(0,0,10,0);
-            final EditText input = new EditText(context);
-            final TextView toggle_lbl = new TextView(context);
-            toggle_lbl.setText("URL 자동 설정");
-            final Switch toggle = new Switch(context);
-            switch_layout.addView(toggle_lbl);
-            switch_layout.addView(toggle);
-            layout.addView(input);
-            layout.addView(switch_layout);
-
-            toggle.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if(b){
-                        input.setEnabled(false);
-                        input.setText("...");
-                    }else{
-                        input.setEnabled(true);
-                        input.setText(p.getUrl());
-                    }
-                }
-            });
-
-            toggle.setChecked(p.getAutoUrl());
-
-            input.setText(p.getUrl());
-            input.setHint(p.getDefUrl());
-            AlertDialog.Builder builder;
-            if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
-            else builder = new AlertDialog.Builder(context);
-            builder.setTitle("URL 설정")
-                    .setView(layout)
-                    .setPositiveButton("설정", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int button) {
-                            if(toggle.isChecked()){
-                                // 자동 설정
-                                p.setAutoUrl(true);
-                                new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                            }else {
-                                // 수동 설정
-                                p.setAutoUrl(false);
-                                if (input.getText().length() > 0)
-                                    p.setUrl(input.getText().toString());
-                                else p.setUrl(input.getHint().toString());
-                            }
-                        }
-                    })
-                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int button) {
-                            //do nothing
-                        }
-                    })
-                    .show();
+            urlSettingPopup(context, p);
         });
 
         s_stretch = this.findViewById(R.id.setting_stretch);
@@ -431,6 +375,68 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
     }
+
+    public static void urlSettingPopup(Context context, Preference p){
+        final LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        final LinearLayout switch_layout = new LinearLayout(context);
+        switch_layout.setOrientation(LinearLayout.HORIZONTAL);
+        switch_layout.setGravity(Gravity.RIGHT);
+        switch_layout.setPadding(0,0,10,0);
+        final EditText input = new EditText(context);
+        final TextView toggle_lbl = new TextView(context);
+        toggle_lbl.setText("URL 자동 설정");
+        final Switch toggle = new Switch(context);
+        switch_layout.addView(toggle_lbl);
+        switch_layout.addView(toggle);
+        layout.addView(input);
+        layout.addView(switch_layout);
+
+        toggle.setOnCheckedChangeListener(new Switch.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    input.setEnabled(false);
+                    input.setText("...");
+                }else{
+                    input.setEnabled(true);
+                    input.setText(p.getUrl());
+                }
+            }
+        });
+
+        toggle.setChecked(p.getAutoUrl());
+
+        input.setText(p.getUrl());
+        input.setHint(p.getDefUrl());
+        AlertDialog.Builder builder;
+        if(p.getDarkTheme()) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        builder.setTitle("URL 설정")
+                .setView(layout)
+                .setPositiveButton("설정", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        if(toggle.isChecked()){
+                            // 자동 설정
+                            p.setAutoUrl(true);
+                            new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        }else {
+                            // 수동 설정
+                            p.setAutoUrl(false);
+                            if (input.getText().length() > 0)
+                                p.setUrl(input.getText().toString());
+                            else p.setUrl(input.getHint().toString());
+                        }
+                    }
+                })
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        //do nothing
+                    }
+                })
+                .show();
+    }
+
 
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {

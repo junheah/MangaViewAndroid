@@ -547,7 +547,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                         }
                     });
         }catch(Exception e) {
-            Utils.showCaptchaPopup(context, e);
+            Utils.showCaptchaPopup(context, e, p);
         }
     }
 
@@ -691,7 +691,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             lockUi(false);
             imgs = manga.getImgs();
             if(imgs == null || imgs.size()==0) {
-                showCaptchaPopup(context);
+                showCaptchaPopup(context, p);
                 return;
             }
             d = new Decoder(manga.getSeed(), manga.getId());
