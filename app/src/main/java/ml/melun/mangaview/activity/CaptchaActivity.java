@@ -7,10 +7,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.MotionEvent;
+import android.view.View;
 import android.webkit.CookieManager;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,8 +29,10 @@ import ml.melun.mangaview.mangaview.Login;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.popup;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showErrorPopup;
+import static ml.melun.mangaview.Utils.showPopup;
 
 public class CaptchaActivity extends AppCompatActivity {
     WebView webView;
@@ -37,6 +47,7 @@ public class CaptchaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_captcha);
         String purl = p.getUrl();
 
+        TextView infoText = this.findViewById(R.id.infoText);
         try {
             URL u = new URL(purl);
             domain = u.getHost();
@@ -59,7 +70,14 @@ public class CaptchaActivity extends AppCompatActivity {
             int count = 2;
 
             @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                showPopup(context, "오류", "연결에 실패했습니다. URL을 확인해 주세요");
+            }
+
+            @Override
             public void onLoadResource(WebView view, String url) {
+                System.out.println("ppppp " + url);
                 if(count == 0){
                     count--;
                     // read cookies and finish
@@ -89,6 +107,13 @@ public class CaptchaActivity extends AppCompatActivity {
 
         webView.setWebViewClient(client);
 
+        webView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
+
         Login login = p.getLogin();
         if(login != null && login.getCookie() !=null && login.getCookie().length()>0){
             //session exists
@@ -96,6 +121,14 @@ public class CaptchaActivity extends AppCompatActivity {
         }
 
         webView.loadUrl(purl);
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                infoText.setVisibility(View.VISIBLE);
+            }
+        }, 3000);
 
     }
 

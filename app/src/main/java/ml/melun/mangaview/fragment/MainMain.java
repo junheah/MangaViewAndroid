@@ -1,5 +1,6 @@
 package ml.melun.mangaview.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,13 +13,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -28,6 +32,29 @@ public class MainMain extends Fragment{
     RecyclerView mainRecycler;
     MainAdapter mainadapter;
     Fragment fragment;
+    boolean wait = false;
+    UrlUpdater.UrlUpdaterCallback callback;
+
+    boolean fragmentActive = false;
+
+    public void setWait(Boolean wait){
+        this.wait = wait;
+    }
+
+    public MainMain(){
+        callback = new UrlUpdater.UrlUpdaterCallback() {
+            @Override
+            public void callback() {
+                wait = false;
+                if(mainadapter != null && fragmentActive)
+                    mainadapter.fetch();
+            }
+        };
+    }
+
+    public UrlUpdater.UrlUpdaterCallback getCallback(){
+        return callback;
+    }
 
     @Nullable
     @Override
@@ -89,11 +116,24 @@ public class MainMain extends Fragment{
 
             @Override
             public void captchaCallback() {
-                Utils.showCaptchaPopup(getContext(), 3, fragment);
+                Utils.showCaptchaPopup(getContext(), 3, fragment, p);
             }
         });
-        mainadapter.fetch();
+        if(!wait)
+            mainadapter.fetch();
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        fragmentActive = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        fragmentActive = false;
     }
 
     @Override

@@ -397,7 +397,7 @@ public class EpisodeActivity extends AppCompatActivity {
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
             if(episodes == null || episodes.size()==0){
-                showCaptchaPopup(context);
+                showCaptchaPopup(context, p);
                 return;
             }
             afterLoad();

@@ -60,6 +60,7 @@ public class Downloader extends Service {
     int maxProgress=1000;
     String notiTitle="";
     public static boolean running = false;
+    public static boolean updateDownloading = false;
     NotificationCompat.Builder notification;
     public static final String ACTION_START = "ml.melun.mangaview.action.START";
     public static final String ACTION_STOP = "ml.melun.mangaview.action.STOP";
@@ -77,6 +78,10 @@ public class Downloader extends Service {
     Context serviceContext;
     Map<String, String> cookies;
     int failures = 0;
+
+    public static boolean isRunning(){
+        return updateDownloading || running;
+    }
 
     @Override
     public void onCreate() {
@@ -175,10 +180,11 @@ public class Downloader extends Service {
         }
     }
 
-    boolean updateDownloading = false;
+
 
     private class Download extends AsyncTask<String,Integer,Integer> {
         File downloaded;
+        int prevProgress = 0;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -199,18 +205,22 @@ public class Downloader extends Service {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            Intent intent = new Intent(serviceContext, MainActivity.class);
-            PendingIntent intentP = PendingIntent.getActivity(serviceContext, 0, intent, 0);
-            NotificationCompat.Builder noti = new NotificationCompat.Builder(serviceContext, channeld)
-                    .setContentIntent(intentP)
-                    .setContentTitle("업데이트 다운로드중")
-                    .setContentText(values[0] + "%")
-                    .setOngoing(true);
-            if (Build.VERSION.SDK_INT >= 26)
-                noti.setSmallIcon(R.drawable.ic_logo);
-            else
-                noti.setSmallIcon(R.drawable.notification_logo);
-            notificationManager.notify(nid+3, noti.build());
+            if(values[0] > 99) {
+                notificationManager.cancel(nid + 3);
+            }else {
+                Intent intent = new Intent(serviceContext, MainActivity.class);
+                PendingIntent intentP = PendingIntent.getActivity(serviceContext, 0, intent, 0);
+                NotificationCompat.Builder noti = new NotificationCompat.Builder(serviceContext, channeld)
+                        .setContentIntent(intentP)
+                        .setContentTitle("업데이트 다운로드중")
+                        .setContentText(values[0] + "%")
+                        .setOngoing(true);
+                if (Build.VERSION.SDK_INT >= 26)
+                    noti.setSmallIcon(R.drawable.ic_logo);
+                else
+                    noti.setSmallIcon(R.drawable.notification_logo);
+                notificationManager.notify(nid + 3, noti.build());
+            }
         }
 
 
@@ -237,7 +247,7 @@ public class Downloader extends Service {
                 noti.setSmallIcon(R.drawable.ic_logo);
             else
                 noti.setSmallIcon(R.drawable.notification_logo);
-            notificationManager.notify(nid+3, noti.build());
+            notificationManager.notify(nid+4, noti.build());
             updateDownloading = false;
             if(!running) stopSelf();
         }
@@ -249,7 +259,10 @@ public class Downloader extends Service {
             downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(), "mangaview-update"), new ProgressInterface() {
                 @Override
                 public void publish(int progress) {
-                    publishProgress(progress);
+                    if(progress>prevProgress) {
+                        prevProgress = progress;
+                        publishProgress(progress);
+                    }
                 }
             });
             return null;

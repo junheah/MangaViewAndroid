@@ -17,12 +17,14 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
     String fetchUrl = "https://manatoki.net/";
     boolean silent = false;
     Context c;
+    UrlUpdaterCallback callback;
     public UrlUpdater(Context c){
         this.c = c;
     }
-    public UrlUpdater(Context c, boolean silent){
+    public UrlUpdater(Context c, boolean silent, UrlUpdaterCallback callback){
         this.c = c;
         this.silent = silent;
+        this.callback = callback;
     }
     protected void onPreExecute() {
         if(!silent) Toast.makeText(c, "자동 URL 설정중...", Toast.LENGTH_SHORT).show();
@@ -58,5 +60,13 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
         }else{
             if(!silent)Toast.makeText(c, "자동 URL 설정 실패, 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
         }
+
+        if(callback!=null)
+            callback.callback();
+    }
+
+
+    public interface UrlUpdaterCallback{
+        void callback();
     }
 }

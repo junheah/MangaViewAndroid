@@ -459,7 +459,7 @@ public class ViewerActivity extends AppCompatActivity {
             lockUi(false);
             imgs = manga.getImgs();
             if(imgs == null || imgs.size()==0) {
-                showCaptchaPopup(context);
+                showCaptchaPopup(context, p);
                 return;
             }
             stripAdapter = new StripAdapter(context, imgs, autoCut, manga.getSeed(), id, width);
@@ -475,7 +475,7 @@ public class ViewerActivity extends AppCompatActivity {
             for(StackTraceElement s : stack){
                 message +=s.toString()+'\n';
             }
-            Utils.showCaptchaPopup(context, e);
+            Utils.showCaptchaPopup(context, e, p);
             e.printStackTrace();
         }
     }
