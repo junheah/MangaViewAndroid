@@ -275,8 +275,10 @@ public class MainActivity extends AppCompatActivity
         progressView = this.findViewById(R.id.progress_panel);
 
         // url updater
-        if(p.getAutoUrl())
-            new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if(p.getAutoUrl()) {
+            ((MainMain)fragments[0]).setWait(true);
+            new UrlUpdater(context, false, ((MainMain)fragments[0]).getCallback()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -398,7 +400,7 @@ public class MainActivity extends AppCompatActivity
                                 //block interactivity
                                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                                if(Downloader.running){
+                                if(Downloader.isRunning()){
                                     //downloader is running
                                     //show info prompt
                                     findViewById(R.id.waiting_panel).setVisibility(View.VISIBLE);
@@ -444,7 +446,7 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog.Builder builder;
                 if(dark) builder = new AlertDialog.Builder(this,R.style.darkDialog);
                 else builder = new AlertDialog.Builder(this);
-                builder.setMessage(Downloader.running ? "다운로드가 진행중입니다. 정말로 종료 하시겠습니까?" : "정말로 종료 하시겠습니까?")
+                builder.setMessage(Downloader.isRunning()  ? "다운로드가 진행중입니다. 정말로 종료 하시겠습니까?" : "정말로 종료 하시겠습니까?")
                         .setPositiveButton("네", dialogClickListener)
                         .setNegativeButton("아니오", dialogClickListener)
                         .show();

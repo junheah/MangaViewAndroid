@@ -7,10 +7,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,6 +41,7 @@ public class CaptchaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_captcha);
         String purl = p.getUrl();
 
+        TextView infoText = this.findViewById(R.id.infoText);
         try {
             URL u = new URL(purl);
             domain = u.getHost();
@@ -96,6 +101,14 @@ public class CaptchaActivity extends AppCompatActivity {
         }
 
         webView.loadUrl(purl);
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                infoText.setVisibility(View.VISIBLE);
+            }
+        }, 5000);
 
     }
 

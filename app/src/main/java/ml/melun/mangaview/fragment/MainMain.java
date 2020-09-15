@@ -1,5 +1,6 @@
 package ml.melun.mangaview.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
@@ -28,6 +30,29 @@ public class MainMain extends Fragment{
     RecyclerView mainRecycler;
     MainAdapter mainadapter;
     Fragment fragment;
+    boolean wait = false;
+    UrlUpdater.UrlUpdaterCallback callback;
+
+    boolean fragmentActive = false;
+
+    public void setWait(Boolean wait){
+        this.wait = wait;
+    }
+
+    public MainMain(){
+        callback = new UrlUpdater.UrlUpdaterCallback() {
+            @Override
+            public void callback() {
+                wait = false;
+                if(mainadapter != null && fragmentActive)
+                    mainadapter.fetch();
+            }
+        };
+    }
+
+    public UrlUpdater.UrlUpdaterCallback getCallback(){
+        return callback;
+    }
 
     @Nullable
     @Override
@@ -92,8 +117,21 @@ public class MainMain extends Fragment{
                 Utils.showCaptchaPopup(getContext(), 3, fragment);
             }
         });
-        mainadapter.fetch();
+        if(!wait)
+            mainadapter.fetch();
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        fragmentActive = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        fragmentActive = false;
     }
 
     @Override
