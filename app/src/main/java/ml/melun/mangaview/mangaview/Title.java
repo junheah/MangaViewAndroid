@@ -162,7 +162,7 @@ public class Title extends MTitle {
                 return false;
             }
         }catch (Exception e){
-            r.close();
+            if(r!=null) r.close();
             e.printStackTrace();
             return false;
         }

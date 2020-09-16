@@ -80,6 +80,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         favUpdate = new ArrayList<>();
 
         setHasStableIds(true);
+
+        uadapter.setLoad("URL 업데이트중...");
     }
 
     public void fetch(){
