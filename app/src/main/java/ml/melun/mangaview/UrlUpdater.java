@@ -14,17 +14,19 @@ import static ml.melun.mangaview.MainApplication.p;
 
 public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
     String result;
-    String fetchUrl = "https://manatoki.net/";
+    String fetchUrl;
     boolean silent = false;
     Context c;
     UrlUpdaterCallback callback;
     public UrlUpdater(Context c){
         this.c = c;
+        this.fetchUrl = p.getDefUrl();
     }
-    public UrlUpdater(Context c, boolean silent, UrlUpdaterCallback callback){
+    public UrlUpdater(Context c, boolean silent, UrlUpdaterCallback callback, String defUrl){
         this.c = c;
         this.silent = silent;
         this.callback = callback;
+        this.fetchUrl = defUrl;
     }
     protected void onPreExecute() {
         if(!silent) Toast.makeText(c, "자동 URL 설정중...", Toast.LENGTH_SHORT).show();
@@ -57,16 +59,17 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
         if(r && result !=null){
             p.setUrl(result);
             if(!silent)Toast.makeText(c, "자동 URL 설정 완료!", Toast.LENGTH_SHORT).show();
+            if(callback!=null) callback.callback(true);
         }else{
             if(!silent)Toast.makeText(c, "자동 URL 설정 실패, 잠시후 다시 시도해 주세요", Toast.LENGTH_LONG).show();
+            if(callback!=null) callback.callback(false);
         }
 
-        if(callback!=null)
-            callback.callback();
+
     }
 
 
     public interface UrlUpdaterCallback{
-        void callback();
+        void callback(boolean success);
     }
 }

@@ -710,7 +710,8 @@ public class ViewerActivity2 extends AppCompatActivity {
             // if manga is online or has title.gson
             p.addRecent(title);
             p.setBookmark(title, id);
-        }
+        }else
+            viewerBookmark = 0;
     }
 
     public void updateIntent(){

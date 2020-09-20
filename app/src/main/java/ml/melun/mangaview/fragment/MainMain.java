@@ -44,7 +44,7 @@ public class MainMain extends Fragment{
     public MainMain(){
         callback = new UrlUpdater.UrlUpdaterCallback() {
             @Override
-            public void callback() {
+            public void callback(boolean success) {
                 wait = false;
                 if(mainadapter != null && fragmentActive)
                     mainadapter.fetch();

@@ -494,7 +494,8 @@ public class ViewerActivity extends AppCompatActivity {
                 p.addRecent(title);
                 if (id > 0) p.setBookmark(title, id);
             }
-        }
+        }else
+            viewerBookmark = 0;
     }
 
     public void updateIntent(){

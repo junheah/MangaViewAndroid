@@ -383,12 +383,22 @@ public class SettingsActivity extends AppCompatActivity {
         switch_layout.setOrientation(LinearLayout.HORIZONTAL);
         switch_layout.setGravity(Gravity.RIGHT);
         switch_layout.setPadding(0,0,10,0);
+        final TextView definputtext = new TextView(context);
+        final EditText definput = new EditText(context);
+        final TextView inputtext = new TextView(context);
         final EditText input = new EditText(context);
         final TextView toggle_lbl = new TextView(context);
         toggle_lbl.setText("URL 자동 설정");
         final Switch toggle = new Switch(context);
+
+        definputtext.setText("기본 URL (숫자 없는 주소):");
+        inputtext.setText("URL:");
+
         switch_layout.addView(toggle_lbl);
         switch_layout.addView(toggle);
+        layout.addView(definputtext);
+        layout.addView(definput);
+        layout.addView(inputtext);
         layout.addView(input);
         layout.addView(switch_layout);
 
@@ -396,9 +406,11 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b){
+                    definput.setEnabled(true);
                     input.setEnabled(false);
                     input.setText("...");
                 }else{
+                    definput.setEnabled(false);
                     input.setEnabled(true);
                     input.setText(p.getUrl());
                 }
@@ -406,9 +418,21 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         toggle.setChecked(p.getAutoUrl());
+        if(toggle.isChecked()){
+            definput.setEnabled(true);
+            input.setEnabled(false);
+            input.setText("...");
+        }else{
+            definput.setEnabled(false);
+            input.setEnabled(true);
+            input.setText(p.getUrl());
+        }
 
         input.setText(p.getUrl());
-        input.setHint(p.getDefUrl());
+        input.setHint(p.getUrl());
+        definput.setText(p.getDefUrl());
+        definput.setHint(p.getDefUrl());
+
         AlertDialog.Builder builder;
         if(p.getDarkTheme()) builder = new AlertDialog.Builder(context,R.style.darkDialog);
         else builder = new AlertDialog.Builder(context);
@@ -418,6 +442,10 @@ public class SettingsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int button) {
                         if(toggle.isChecked()){
                             // 자동 설정
+                            if(definput.getText().length()>0)
+                                p.setDefUrl(definput.getText().toString());
+                            else
+                                p.setDefUrl(definput.getHint().toString());
                             p.setAutoUrl(true);
                             new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         }else {
@@ -425,7 +453,8 @@ public class SettingsActivity extends AppCompatActivity {
                             p.setAutoUrl(false);
                             if (input.getText().length() > 0)
                                 p.setUrl(input.getText().toString());
-                            else p.setUrl(input.getHint().toString());
+                            else
+                                p.setUrl(input.getHint().toString());
                         }
                     }
                 })

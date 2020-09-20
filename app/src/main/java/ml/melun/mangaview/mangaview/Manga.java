@@ -1,6 +1,8 @@
 package ml.melun.mangaview.mangaview;
 
 
+import com.eclipsesource.v8.V8;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -107,11 +109,28 @@ public class Manga {
                 }
 
                 //imgs
-                for(Element e : d.selectFirst("div.view-padding").select("img")) {
-                    String img = e.attr("data-original");
-                    if(img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading") && !img.startsWith("/"))
-                        imgs.add(img);
+                String script = d.select("div.view-padding").get(1).selectFirst("script").data();
+                StringBuilder encodedData = new StringBuilder();
+                encodedData.append('%');
+                for(String line : script.split("\n")){
+                    if(line.contains("html_data+=")){
+                        encodedData.append(line.substring(line.indexOf('\'')+1, line.lastIndexOf('\'')).replaceAll("[.]","%"));
+                    }
                 }
+                if(encodedData.lastIndexOf("%") == encodedData.length()-1)
+                    encodedData.deleteCharAt(encodedData.length()-1);
+                String imgdiv = URLDecoder.decode(encodedData.toString(), "UTF-8");
+
+                Document id = Jsoup.parse(imgdiv);
+                for(Element e : id.select("img")){
+                    String style = e.attr("style");
+                    if(style == null || style.length()==0) {
+                        String img = e.attr("data-original");
+                        if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading") && !img.startsWith("/"))
+                            imgs.add(img);
+                    }
+                }
+
 
                 //comments
                 Element commentdiv = d.selectFirst("div#viewcomment");
@@ -125,44 +144,46 @@ public class Manga {
                 String lvlstr;
                 int indent;
                 String indentstr;
+                try {
+                    for (Element e : commentdiv.selectFirst("section#bo_vc").select("div.media")) {
+                        if (e.id().contains("c_")) {
+                            // is comment
 
-                for(Element e : commentdiv.selectFirst("section#bo_vc").select("div.media")){
-                    if(e.id().contains("c_")){
-                        // is comment
+                            //indent
+                            indentstr = e.attr("style");
+                            if (indentstr != null && indentstr.length() > 0)
+                                indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':') + 1, indentstr.lastIndexOf('p'))) / 64;
+                            else
+                                indent = 0;
 
-                        //indent
-                        indentstr = e.attr("style");
-                        if(indentstr!=null && indentstr.length()>0)
-                            indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':')+1,indentstr.lastIndexOf('p')))/64;
-                        else
-                            indent = 0;
+                            //icon
+                            Element icone = e.selectFirst(".media-object");
+                            if (icone.is("img"))
+                                icon = icone.attr("src");
+                            else
+                                icon = "";
 
-                        //icon
-                        Element icone = e.selectFirst(".media-object");
-                        if(icone.is("img"))
-                            icon = icone.attr("src");
-                        else
-                            icon = "";
+                            Element header = e.selectFirst("div.media-heading");
+                            Element userSpan = header.selectFirst("span");
+                            user = userSpan.ownText();
+                            if (userSpan.hasClass("guest"))
+                                level = 0;
+                            else {
+                                lvlstr = userSpan.selectFirst("img").attr("src");
+                                level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/') + 1, lvlstr.lastIndexOf('.')));
+                            }
+                            timestamp = header.selectFirst("span.media-info").ownText();
 
-                        Element header = e.selectFirst("div.media-heading");
-                        Element userSpan = header.selectFirst("span");
-                        user = userSpan.ownText();
-                        if(userSpan.hasClass("guest"))
-                            level = 0;
-                        else {
-                            lvlstr = userSpan.selectFirst("img").attr("src");
-                            level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/')+1, lvlstr.lastIndexOf('.')));
+                            Element cbody = e.selectFirst("div.media-content");
+                            content = cbody.ownText();
+                            likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
+                            comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
                         }
-                        timestamp = header.selectFirst("span.media-info").ownText();
 
-                        Element cbody = e.selectFirst("div.media-content");
-                        content = cbody.ownText();
-                        likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
-                        comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
                     }
-
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-
 
             } catch (Exception e) {
                 e.printStackTrace();

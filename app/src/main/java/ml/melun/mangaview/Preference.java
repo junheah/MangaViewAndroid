@@ -37,7 +37,7 @@ public class Preference {
     boolean stretch;
     boolean leftRight;
     Login login;
-    final String defUrl = "https://manatoki73.net/";
+    String defUrl;
     boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
@@ -77,6 +77,7 @@ public class Preference {
             reverse = sharedPref.getBoolean("pageReverse",false);
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
+            defUrl = sharedPref.getString("defUrl", "설정되지 않음");
             url = sharedPref.getString("url", defUrl);
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
@@ -89,6 +90,13 @@ public class Preference {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void setDefUrl(String defUrl){
+        this.defUrl = defUrl;
+        prefsEditor.putString("defUrl", defUrl);
+        prefsEditor.commit();
+        setUrl(defUrl);
     }
 
     public String getDefUrl() {

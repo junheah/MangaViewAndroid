@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity
 
 
         //check prefs
-        if (!p.getSharedPref().getBoolean("eula", false)) {
+        if (p.getSharedPref().getLong("eula2", -1)<0) {
             startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
         } else if (Migrator.running) {
             ProgressDialog mpd;
@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity
         // url updater
         if(p.getAutoUrl()) {
             ((MainMain)fragments[0]).setWait(true);
-            new UrlUpdater(context, false, ((MainMain)fragments[0]).getCallback()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            new UrlUpdater(context, false, ((MainMain)fragments[0]).getCallback(), p.getDefUrl()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
