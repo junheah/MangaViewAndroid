@@ -424,7 +424,8 @@ public class ViewerActivity3 extends AppCompatActivity {
             viewPager.setCurrentItem(viewerBookmark, false);
             p.addRecent(title);
             p.setBookmark(title, id);
-        }
+        }else
+            viewerBookmark = 0;
     }
 
     public void updateIntent(){

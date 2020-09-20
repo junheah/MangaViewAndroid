@@ -527,7 +527,8 @@ public class Utils {
         editor.putBoolean("dataSave",data.getBoolean("dataSave", false));
         editor.putBoolean("stretch",data.getBoolean("stretch", false));
         editor.putInt("startTab",data.getInt("startTab", 0));
-        editor.putString("url",data.getString("url", "https://manamoa.net/"));
+        editor.putString("url",data.getString("url", ""));
+        editor.putString("defUrl",data.getString("defUrl", "설정되지 않음"));
         editor.putString("notice",data.getJSONArray("notice", new JSONArray()).toString());
         editor.putLong("lastUpdateTime", data.getLong("lastUpdateTime", 0));
         editor.putLong("lastNoticeTime", data.getLong("lastNoticeTime", 0));
@@ -566,7 +567,8 @@ public class Utils {
             data.put("stretch",sharedPref.getBoolean("stretch", false));
             data.put("leftRight", sharedPref.getBoolean("leftRight", false));
             data.put("startTab",sharedPref.getInt("startTab", 0));
-            data.put("url",sharedPref.getString("url", "http://188.214.128.5"));
+            data.put("url",sharedPref.getString("url", ""));
+            data.put("defUrl",sharedPref.getString("url", "설정되지 않음"));
             data.put("notice",new JSONArray(sharedPref.getString("notice", "[]")));
             data.put("lastNoticeTime",sharedPref.getLong("lastNoticeTime",0));
             data.put("lastUpdateTime",sharedPref.getLong("lastUpdateTime",0));

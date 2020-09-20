@@ -55,13 +55,17 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void setLoad(){
+        setLoad("로드중...");
+    }
+
+    public void setLoad(String msg){
         if(mData != null){
             mData.clear();
             loaded = false;
         }
         else
             mData = new ArrayList<>();
-        Manga loading = new Manga(0,"로드중...","");
+        Manga loading = new Manga(0,msg,"");
         loading.addThumb("");
         mData.add(loading);
         notifyDataSetChanged();
