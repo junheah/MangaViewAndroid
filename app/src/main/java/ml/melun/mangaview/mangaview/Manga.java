@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 import org.jsoup.*;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -125,9 +126,13 @@ public class Manga {
                 for(Element e : id.select("img")){
                     String style = e.attr("style");
                     if(style == null || style.length()==0) {
-                        String img = e.attr("data-original");
-                        if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading") && !img.startsWith("/"))
-                            imgs.add(img);
+                        for(Attribute a : e.attributes()){
+                            if(a.getKey().contains("data")){
+                                String img = a.getValue();
+                                if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading") && !img.startsWith("/"))
+                                    imgs.add(img);
+                            }
+                        }
                     }
                 }
 
