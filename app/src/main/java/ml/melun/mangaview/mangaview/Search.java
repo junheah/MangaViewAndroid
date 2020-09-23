@@ -20,7 +20,6 @@ import static ml.melun.mangaview.mangaview.Title.BATTERY_ONE_QUARTER;
 import static ml.melun.mangaview.mangaview.Title.BATTERY_THREE_QUARTER;
 
 public class Search {
-    static final String baseUrl = "/comic";
     /* mode
     * 0 : 제목
     * 1 : 작가
@@ -29,6 +28,13 @@ public class Search {
     * 4 : 발행
     * 5 : null
     * 6 : 종합
+    * 7 : (웹툰)제목
+    * 8 : (웹툰)작가
+    * 9 : (웹툰)태그
+    * 10 : (웹툰)글자
+    * 11 : (웹툰)발행
+    * 12 : (웹툰)null
+    * 13 : (웹툰)종합
      */
     public Search(String q, int mode) {
         query = q;
@@ -77,24 +83,24 @@ public class Search {
                 switch(mode){
                     //todo add more modes
                     case 0:
-                        searchUrl = "?bo_table=comic&stx=";
+                        searchUrl = "?bo_table="+client.getBaseMode()+"&stx=";
                         break;
                     case 1:
-                        searchUrl = "?bo_table=comic&artist=";
+                        searchUrl = "?bo_table="+client.getBaseMode()+"&artist=";
                         break;
                     case 2:
-                        searchUrl = "?bo_table=comic&tag=";
+                        searchUrl = "?bo_table="+client.getBaseMode()+"&tag=";
                         break;
                     case 3:
-                        searchUrl = "?bo_table=comic&jaum=";
+                        searchUrl = "?bo_table="+client.getBaseMode()+"&jaum=";
                         break;
                     case 4:
-                        searchUrl = "?bo_table=comic&publish=";
+                        searchUrl = "?bo_table="+client.getBaseMode()+"&publish=";
                         break;
                 }
 
 
-                Response response = client.mget(baseUrl + "/p" + page++ + searchUrl + URLEncoder.encode(query,"UTF-8"));
+                Response response = client.mget('/'+client.getBaseMode()+"/p" + page++ + searchUrl + URLEncoder.encode(query,"UTF-8"), true, null, false);
                 String body = response.body().string();
                 if(body.contains("Connect Error: Connection timed out")){
                     //adblock : try again

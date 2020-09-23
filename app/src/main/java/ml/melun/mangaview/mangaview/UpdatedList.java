@@ -27,7 +27,7 @@ public class UpdatedList {
         String url = "/bbs/page.php?hid=update&page=";
         if(!last) {
             try {
-                Response response= client.mget(url + page++);
+                Response response= client.mget(url + page++,true,null,false);
                 String body = response.body().string();
                 if(body.contains("Connect Error: Connection timed out")){
                     //adblock : try again
@@ -46,7 +46,7 @@ public class UpdatedList {
                                 .selectFirst("div.pull-left")
                                 .selectFirst("a")
                                 .attr("href")
-                                .split("comic/")[1]);
+                                .split(client.getBaseMode()+'/')[1]);
 
                         Elements rightInfo = item.selectFirst("div.pull-right").select("p");
 
@@ -54,7 +54,7 @@ public class UpdatedList {
                                 .get(0)
                                 .selectFirst("a")
                                 .attr("href")
-                                .split("comic/")[1]);
+                                .split(client.getBaseMode()+'/')[1]);
 
                         String date = rightInfo.get(1).selectFirst("span").ownText();
 

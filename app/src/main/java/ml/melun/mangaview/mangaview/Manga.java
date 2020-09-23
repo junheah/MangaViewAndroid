@@ -76,7 +76,7 @@ public class Manga {
         int tries = 0;
 
         while(imgs.size()==0 && tries < 2) {
-            Response r = client.mget("/comic/" + String.valueOf(id), false, cookies);
+            Response r = client.mget(String.valueOf(id), false, cookies);
             try {
                 String body = r.body().string();
                 r.close();
@@ -97,7 +97,7 @@ public class Manga {
                 int tid = Integer.parseInt(navbar.select("a")
                         .last()
                         .attr("href")
-                        .split("comic/")[1]
+                        .split(client.getBaseMode() +'/')[1]
                         .split("\\?")[0]);
 
                 if(title == null) title = new Title(name, "", "", null, "", tid );
@@ -129,8 +129,12 @@ public class Manga {
                         for(Attribute a : e.attributes()){
                             if(a.getKey().contains("data")){
                                 String img = a.getValue();
-                                if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading") && !img.startsWith("/"))
-                                    imgs.add(img);
+                                if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
+                                    if(img.startsWith("/"))
+                                        imgs.add(client.getUrl()+img);
+                                    else
+                                        imgs.add(img);
+                                }
                             }
                         }
                     }
@@ -186,12 +190,12 @@ public class Manga {
                         }
 
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
+                }catch (Exception e1){
+                    e1.printStackTrace();
                 }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception e2) {
+                e2.printStackTrace();
             }
             if(r!=null){
                 r.close();

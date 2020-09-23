@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.Utils.getNumberFromString;
+
 
 public class MainPage {
     List<Manga> recent, favUpdate, onlineRecent;
@@ -22,7 +24,7 @@ public class MainPage {
         onlineRecent = new ArrayList<>();
 
         try{
-            Response r = client.mget("");
+            Response r = client.mget("",true,null,false);
             String body = r.body().string();
             if(body.contains("Connect Error: Connection timed out")){
                 //adblock : try again
@@ -42,7 +44,7 @@ public class MainPage {
             Title ttmp;
 
             for(Element e : d.selectFirst("div.miso-post-gallery").select("div.post-row")){
-                id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
+                id = getNumberFromString(e.selectFirst("a").attr("href").split(client.getBaseMode()+'/')[1]);
                 infos = e.selectFirst("div.img-item");
                 thumb = infos.selectFirst("img").attr("src");
                 name = infos.selectFirst("b").ownText();
@@ -53,7 +55,7 @@ public class MainPage {
             }
 
             for(Element e : d.select("div.miso-post-gallery").last().select("div.post-row")){
-                id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
+                id = Integer.parseInt(e.selectFirst("a").attr("href").split(client.getBaseMode()+'/')[1]);
                 infos = e.selectFirst("div.img-item");
                 thumb = infos.selectFirst("img").attr("src");
                 name = infos.selectFirst("div.in-subject").ownText();

@@ -17,6 +17,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.HashingSource;
 
+import static ml.melun.mangaview.Utils.getNumberFromString;
+
 
 public class Title extends MTitle {
     private List<Manga> eps = null;
@@ -57,7 +59,7 @@ public class Title extends MTitle {
 
     public void fetchEps(CustomHttpClient client) {
         try {
-            Response r = client.mget("/comic/" + id);
+            Response r = client.mget(String.valueOf(id));
             String body = r.body().string();
             if(body.contains("Connect Error: Connection timed out")){
                 //adblock : try again
@@ -124,7 +126,8 @@ public class Title extends MTitle {
             try{
                 for(Element e : d.selectFirst("ul.list-body").select("li.list-item")) {
                     Element titlee = e.selectFirst("a.item-subject");
-                    id = Integer.parseInt(titlee.attr("href").split("comic/")[1].split("\\?")[0]);
+                    id = getNumberFromString(titlee.attr("href").split(client.getBaseMode()+'/')[1]);
+                    System.out.println(id);
                     title = titlee.ownText();
 
                     Elements infoe = e.selectFirst("div.item-details").select("span");
@@ -134,7 +137,7 @@ public class Title extends MTitle {
                     tmp.setMode(0);
                     eps.add(tmp);
                 }
-            }catch (Exception e){}
+            }catch (Exception e){e.printStackTrace();}
             r.close();
         }catch(Exception e) {
             e.printStackTrace();

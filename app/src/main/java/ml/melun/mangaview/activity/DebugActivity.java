@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.jhavar.main.DdosGuardBypass;
 
@@ -184,6 +185,19 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(context, LayoutEditActivity.class));
+            }
+        });
+
+        this.findViewById(R.id.debug_baseMode).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(p.getBaseMode().equals("comic")) {
+                    p.setBaseMode("webtoon");
+                    Toast.makeText(context, "webtoon", Toast.LENGTH_SHORT).show();
+                }else {
+                    p.setBaseMode("comic");
+                    Toast.makeText(context, "comic", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

@@ -75,6 +75,10 @@ public class CustomHttpClient {
         this.cookies = new HashMap<>();
     }
 
+    public String getBaseMode(){
+        return p.getBaseMode();
+    }
+
 
     public String getCookie(String k){
         return cookies.get(k);
@@ -107,7 +111,16 @@ public class CustomHttpClient {
         return mget(url,true);
     }
 
-    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
+    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie) {
+        return mget(url,doLogin,customCookie,true);
+    }
+
+    public String getUrl(){
+        return p.getUrl();
+    }
+
+
+    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie, boolean useBaseMode){
         if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
             customCookie.put("PHPSESSID", p.getLogin().cookie);
         }
@@ -128,10 +141,12 @@ public class CustomHttpClient {
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cbuilder.toString());
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-        headers.put("Referer",p.getUrl() + "/comic");
+        headers.put("Referer",p.getUrl() + '/'+p.getBaseMode());
 
-
-        return get(p.getUrl()+url, headers);
+        if(useBaseMode)
+            return get(p.getUrl() + '/'+p.getBaseMode() +'/' + url, headers);
+        else
+            return get(p.getUrl()+url, headers);
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){

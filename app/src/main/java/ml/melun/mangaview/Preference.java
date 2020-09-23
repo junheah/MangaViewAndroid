@@ -41,6 +41,7 @@ public class Preference {
     boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
+    String baseMode = "";
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
@@ -84,12 +85,23 @@ public class Preference {
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
             autoUrl = sharedPref.getBoolean("autoUrl", true);
             pageControlButtonOffset = sharedPref.getFloat("pageControlButtonOffset", -1);
+            baseMode = sharedPref.getString("baseMode", "comic");
 //            if(login != null && login.isValid()){
 //                setSession(login.getCookie());
 //            }
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public String getBaseMode(){
+        return this.baseMode;
+    }
+
+    public void setBaseMode(String baseMode){
+        this.baseMode = baseMode;
+        prefsEditor.putString("baseMode", baseMode);
+        prefsEditor.commit();
     }
 
     public void setDefUrl(String defUrl){

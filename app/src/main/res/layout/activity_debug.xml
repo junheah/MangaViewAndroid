@@ -73,6 +73,12 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:text="layout editor 테스트" />
+            <Button
+                android:id="@+id/debug_baseMode"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="baseModeChange" />
+
 
             <TextView
                 android:focusable="true"
@@ -103,6 +109,8 @@
                 android:layout_width="match_parent"
                 android:text="cancel"
                 android:visibility="gone" />
+
+
 
         </LinearLayout>
 

@@ -409,7 +409,6 @@ public class EpisodeActivity extends AppCompatActivity {
 
     public void openViewer(Manga manga, int code){
         manga.setMode(mode);
-        System.out.println("pppppppp " +manga.getMode());
         Intent viewer = null;
         switch (p.getViewerType()){
             case 0:
