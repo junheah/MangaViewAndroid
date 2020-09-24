@@ -17,6 +17,9 @@ import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.mangaview.CustomHttpClient.baseModeStr;
+import static ml.melun.mangaview.mangaview.CustomHttpClient.base_comic;
+import static ml.melun.mangaview.mangaview.CustomHttpClient.base_webtoon;
 import static ml.melun.mangaview.mangaview.Title.isInteger;
 
 public class Preference {
@@ -41,7 +44,7 @@ public class Preference {
     boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
-    String baseMode = "";
+    int baseMode;
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
@@ -85,7 +88,7 @@ public class Preference {
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
             autoUrl = sharedPref.getBoolean("autoUrl", true);
             pageControlButtonOffset = sharedPref.getFloat("pageControlButtonOffset", -1);
-            baseMode = sharedPref.getString("baseMode", "comic");
+            baseMode = sharedPref.getInt("baseMode", base_comic);
 //            if(login != null && login.isValid()){
 //                setSession(login.getCookie());
 //            }
@@ -94,13 +97,20 @@ public class Preference {
         }
     }
 
-    public String getBaseMode(){
+    public String getBaseModeStr(){
+        return baseModeStr(this.baseMode);
+    }
+
+    public int getBaseMode(){
+        System.out.println(baseMode);
         return this.baseMode;
     }
 
-    public void setBaseMode(String baseMode){
+    public void setBaseMode(int baseMode){
         this.baseMode = baseMode;
-        prefsEditor.putString("baseMode", baseMode);
+
+        System.out.println(this.baseMode);
+        prefsEditor.putInt("baseMode", baseMode);
         prefsEditor.commit();
     }
 

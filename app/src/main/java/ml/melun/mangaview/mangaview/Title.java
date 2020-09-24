@@ -26,6 +26,7 @@ public class Title extends MTitle {
     Boolean bookmarked = false;
     String bookmarkLink = "";
     int rc = 0;
+    String baseMode;
 
     public static final int BATTERY_EMPTY = 0;
     public static final int BATTERY_ONE_QUARTER = 1;
@@ -58,6 +59,8 @@ public class Title extends MTitle {
     }
 
     public void fetchEps(CustomHttpClient client) {
+        if(baseMode == null || baseMode.length()==0)
+            baseMode = client.getBaseMode();
         try {
             Response r = client.mget(String.valueOf(id));
             String body = r.body().string();
@@ -126,14 +129,14 @@ public class Title extends MTitle {
             try{
                 for(Element e : d.selectFirst("ul.list-body").select("li.list-item")) {
                     Element titlee = e.selectFirst("a.item-subject");
-                    id = getNumberFromString(titlee.attr("href").split(client.getBaseMode()+'/')[1]);
+                    id = getNumberFromString(titlee.attr("href").split(baseMode+'/')[1]);
                     System.out.println(id);
                     title = titlee.ownText();
 
                     Elements infoe = e.selectFirst("div.item-details").select("span");
                     date = infoe.get(0).ownText();
                     //has view-count, thumb-count and other extra info, implement later
-                    tmp = new Manga(id, title, date);
+                    tmp = new Manga(id, title, date, baseMode);
                     tmp.setMode(0);
                     eps.add(tmp);
                 }

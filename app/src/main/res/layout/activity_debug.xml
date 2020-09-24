@@ -77,7 +77,7 @@
                 android:id="@+id/debug_baseMode"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:text="baseModeChange" />
+                android:text="base mode change" />
 
 
             <TextView

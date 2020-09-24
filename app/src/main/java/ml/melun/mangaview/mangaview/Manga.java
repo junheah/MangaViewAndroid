@@ -23,6 +23,8 @@ import org.jsoup.select.Elements;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.mangaview.CustomHttpClient.baseModeStr;
+
     /*
     mode:
     0 = online
@@ -33,11 +35,13 @@ import okhttp3.Response;
      */
 
 public class Manga {
+    int baseMode;
 
-    public Manga(int i, String n, String d) {
+    public Manga(int i, String n, String d, int baseMode){
         id = i;
         name = n;
         date = d;
+        this.baseMode = baseMode;
     }
     public int getId() {
         return id;
@@ -68,6 +72,8 @@ public class Manga {
         fetch(client, false, cookies);
     }
     public void fetch(CustomHttpClient client, boolean doLogin, Map<String,String> cookies) {
+        if(baseMode==0)
+            baseMode = client.getBaseMode();
         mode = 0;
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
@@ -97,7 +103,7 @@ public class Manga {
                 int tid = Integer.parseInt(navbar.select("a")
                         .last()
                         .attr("href")
-                        .split(client.getBaseMode() +'/')[1]
+                        .split(baseModeStr(baseMode) +'/')[1]
                         .split("\\?")[0]);
 
                 if(title == null) title = new Title(name, "", "", null, "", tid );
@@ -106,7 +112,7 @@ public class Manga {
                 for(Element e :navbar.selectFirst("select").select("option")){
                     String idstr = e.attr("value");
                     if(idstr!=null && idstr.length()>0)
-                        eps.add(new Manga(Integer.parseInt(idstr),e.ownText(),""));
+                        eps.add(new Manga(Integer.parseInt(idstr),e.ownText(),"", baseMode));
                 }
 
                 //imgs

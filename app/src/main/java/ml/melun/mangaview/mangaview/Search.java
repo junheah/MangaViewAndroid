@@ -36,6 +36,8 @@ public class Search {
     * 12 : (웹툰)null
     * 13 : (웹툰)종합
      */
+
+    int baseMode;
     public Search(String q, int mode) {
         query = q;
         this.mode = mode;
@@ -74,6 +76,9 @@ public class Search {
     */
 
     public int fetch(CustomHttpClient client) {
+        if(baseMode == 0)
+            baseMode = client.getBaseMode();
+
         result = new ArrayList<>();
         if(!last) {
             try {
@@ -83,24 +88,24 @@ public class Search {
                 switch(mode){
                     //todo add more modes
                     case 0:
-                        searchUrl = "?bo_table="+client.getBaseMode()+"&stx=";
+                        searchUrl = "?bo_table="+baseMode+"&stx=";
                         break;
                     case 1:
-                        searchUrl = "?bo_table="+client.getBaseMode()+"&artist=";
+                        searchUrl = "?bo_table="+baseMode+"&artist=";
                         break;
                     case 2:
-                        searchUrl = "?bo_table="+client.getBaseMode()+"&tag=";
+                        searchUrl = "?bo_table="+baseMode+"&tag=";
                         break;
                     case 3:
-                        searchUrl = "?bo_table="+client.getBaseMode()+"&jaum=";
+                        searchUrl = "?bo_table="+baseMode+"&jaum=";
                         break;
                     case 4:
-                        searchUrl = "?bo_table="+client.getBaseMode()+"&publish=";
+                        searchUrl = "?bo_table="+baseMode+"&publish=";
                         break;
                 }
 
 
-                Response response = client.mget('/'+client.getBaseMode()+"/p" + page++ + searchUrl + URLEncoder.encode(query,"UTF-8"), true, null, false);
+                Response response = client.mget('/'+baseMode+"/p" + page++ + searchUrl + URLEncoder.encode(query,"UTF-8"), true, null, baseMode);
                 String body = response.body().string();
                 if(body.contains("Connect Error: Connection timed out")){
                     //adblock : try again

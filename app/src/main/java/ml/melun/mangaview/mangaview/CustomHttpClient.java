@@ -27,15 +27,19 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.MainApplication.p;
+
 public class CustomHttpClient {
     public OkHttpClient client;
-    Preference p;
     Map<String, String> cookies;
 
-    public CustomHttpClient(Preference p){
+    public static final int base_auto = 0;
+    public static final int base_comic = 1;
+    public static final int base_webtoon = 2;
+
+    public CustomHttpClient(){
         System.out.println("http client create");
         this.cookies = new HashMap<>();
-        this.p = p;
         if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // Necessary because our servers don't have the right cipher suites.
             // https://github.com/square/okhttp/issues/4053
@@ -75,8 +79,22 @@ public class CustomHttpClient {
         this.cookies = new HashMap<>();
     }
 
-    public String getBaseMode(){
+    public int getBaseMode(){
         return p.getBaseMode();
+    }
+    public static String baseModeStr(int mode){
+        switch(mode){
+            case base_comic:
+                return "comic";
+            case base_webtoon:
+                return "webtoon";
+            default:
+                return "comic";
+        }
+    }
+
+    public String getBaseModeStr(){
+        return p.getBaseModeStr();
     }
 
 
@@ -85,6 +103,7 @@ public class CustomHttpClient {
     }
 
     public Response get(String url, Map<String, String> headers){
+        System.out.println(url);
         Response response = null;
         try {
             Request.Builder builder = new Request.Builder()
@@ -112,7 +131,7 @@ public class CustomHttpClient {
     }
 
     public Response mget(String url, Boolean doLogin, Map<String, String> customCookie) {
-        return mget(url,doLogin,customCookie,true);
+        return mget(url,doLogin,customCookie,base_auto);
     }
 
     public String getUrl(){
@@ -120,7 +139,7 @@ public class CustomHttpClient {
     }
 
 
-    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie, boolean useBaseMode){
+    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie, int baseMode){
         if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
             customCookie.put("PHPSESSID", p.getLogin().cookie);
         }
@@ -143,10 +162,12 @@ public class CustomHttpClient {
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
         headers.put("Referer",p.getUrl() + '/'+p.getBaseMode());
 
-        if(useBaseMode)
-            return get(p.getUrl() + '/'+p.getBaseMode() +'/' + url, headers);
-        else
+        if(baseMode == null || baseMode.length()==0)
             return get(p.getUrl()+url, headers);
+        else if(baseMode.equals("auto"))
+            return get(p.getUrl() + '/'+p.getBaseModeStr() +'/' + url, headers);
+        else
+            return get(p.getUrl()+'/'+baseMode +'/'+url, headers);
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){
