@@ -282,7 +282,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index>0) {
+                if(eps!=null && index>0) {
                     lockUi(true);
                     index--;
                     manga = eps.get(index);
@@ -300,7 +300,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index<eps.size()-1) {
+                if(eps!=null && index<eps.size()-1) {
                     lockUi(true);
                     index++;
                     manga = eps.get(index);
