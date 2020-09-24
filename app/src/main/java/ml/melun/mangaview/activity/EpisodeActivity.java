@@ -165,9 +165,9 @@ public class EpisodeActivity extends AppCompatActivity {
                             //real index starts from [ 0001 ]
                             int realIndex = Integer.parseInt(episodeName.split("\\.")[0])-1;
                             int id = ids.getInt(realIndex);
-                            manga = new Manga(id, episodeName, String.valueOf(id));
+                            manga = new Manga(id, episodeName, String.valueOf(id), title.getBaseMode());
                         }catch(Exception e){
-                            manga = new Manga(-1,episodeName, "");
+                            manga = new Manga(-1,episodeName, "", title.getBaseMode());
                         }
                         manga.setMode(mode);
                         manga.setOfflinePath(offlineEpisodes.get(i));
@@ -193,7 +193,7 @@ public class EpisodeActivity extends AppCompatActivity {
                     //get id from listContent
                     String name = folder.getName();
                     try {
-                        int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)),"",""));
+                        int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)),"","", title.getBaseMode()));
                         if(index>-1){
                             episodes.get(index).setOfflinePath(folder);
                             episodes.get(index).setMode(mode);
@@ -211,7 +211,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 mode = 1;
                 for (File f : offlineEpisodes) {
                     Manga manga;
-                    manga = new Manga(-1, f.getName(), "");
+                    manga = new Manga(-1, f.getName(), "", title.getBaseMode());
                     manga.setMode(mode);
                     manga.setOfflinePath(f);
                     //add local images to manga

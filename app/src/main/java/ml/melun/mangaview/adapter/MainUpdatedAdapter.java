@@ -22,6 +22,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.mangaview.MTitle.base_auto;
 
 public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<Manga> mData;
@@ -50,7 +51,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
         else
             mData = new ArrayList<>();
-        mData.add(new Manga(0,"",""));
+        mData.add(new Manga(0,"","", base_auto));
         notifyDataSetChanged();
     }
 
@@ -65,7 +66,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
         else
             mData = new ArrayList<>();
-        Manga loading = new Manga(0,msg,"");
+        Manga loading = new Manga(0,msg,"", base_auto);
         loading.addThumb("");
         mData.add(loading);
         notifyDataSetChanged();
@@ -143,7 +144,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void setData(List<Manga> data){
         mData = data;
         if(mData.size()==0){
-            Manga none = new Manga(0,"결과 없음","");
+            Manga none = new Manga(0,"결과 없음","", base_auto);
             none.addThumb("reload");
             mData.add(none);
             notifyItemChanged(0);

@@ -26,7 +26,6 @@ public class Title extends MTitle {
     Boolean bookmarked = false;
     String bookmarkLink = "";
     int rc = 0;
-    String baseMode;
 
     public static final int BATTERY_EMPTY = 0;
     public static final int BATTERY_ONE_QUARTER = 1;
@@ -34,18 +33,13 @@ public class Title extends MTitle {
     public static final int BATTERY_THREE_QUARTER = 3;
     public static final int BATTERY_FULL = 4;
 
-    public Title(String n, String t, String a, List<String> tg, String r, int id) {
-        super(n, id, t, a, tg, r);
+    public Title(String n, String t, String a, List<String> tg, String r, int id, int baseMode) {
+        super(n, id, t, a, tg, r, baseMode);
     }
 
-    public Title(String n, String t, String a, List<String> tg, String r, int id, int rc) {
-        super(n, id, t, a, tg, r);
-        this.id = id;
-        this.rc = rc;
-    }
 
     public Title(MTitle title){
-        super(title.getName(), title.getId(), title.getThumb(), title.getAuthor(), title.getTags(), title.getRelease());
+        super(title.getName(), title.getId(), title.getThumb(), title.getAuthor(), title.getTags(), title.getRelease(), title.getBaseMode());
     }
 
 
@@ -59,10 +53,9 @@ public class Title extends MTitle {
     }
 
     public void fetchEps(CustomHttpClient client) {
-        if(baseMode == null || baseMode.length()==0)
-            baseMode = client.getBaseMode();
+
         try {
-            Response r = client.mget(String.valueOf(id));
+            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id));
             String body = r.body().string();
             if(body.contains("Connect Error: Connection timed out")){
                 //adblock : try again
@@ -129,8 +122,8 @@ public class Title extends MTitle {
             try{
                 for(Element e : d.selectFirst("ul.list-body").select("li.list-item")) {
                     Element titlee = e.selectFirst("a.item-subject");
-                    id = getNumberFromString(titlee.attr("href").split(baseMode+'/')[1]);
-                    System.out.println(id);
+                    id = getNumberFromString(titlee.attr("href").split(baseModeStr(baseMode)+'/')[1]);
+
                     title = titlee.ownText();
 
                     Elements infoe = e.selectFirst("div.item-details").select("span");
@@ -203,7 +196,7 @@ public class Title extends MTitle {
 
     @Override
     public Title clone(){
-        return new Title(name, thumb, author, tags, release, id);
+        return new Title(name, thumb, author, tags, release, id, baseMode);
     }
 
     public int getRecommend_c() {
@@ -215,7 +208,7 @@ public class Title extends MTitle {
     }
 
     public MTitle minimize(){
-        return new MTitle(name, id, thumb, author, tags, release);
+        return new MTitle(name, id, thumb, author, tags, release, baseMode);
     }
 
     public boolean hasCounter(){

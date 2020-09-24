@@ -28,6 +28,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mainContext;
@@ -193,7 +194,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if(updateSize>1)
                 notifyItemRangeInserted(UPDATE+2, updateSize-1);
         }else{
-            favUpdate.add(new Manga(-1,"결과없음",""));
+            favUpdate.add(new Manga(-1,"결과없음","", base_comic));
             notifyItemChanged(UPDATE+1);
         }
 
@@ -202,7 +203,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if(recentSize>1)
                 notifyItemRangeInserted(RECENT+2, recentSize-1);
         }else{
-            recent.add(new Manga(-1,"결과없음",""));
+            recent.add(new Manga(-1,"결과없음","", base_comic));
             notifyItemChanged(RECENT+1);
         }
 
@@ -211,7 +212,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if(rankingSize>1)
                 notifyItemRangeInserted(RANKING+2, rankingSize-1);
         }else{
-            ranking.add(new Title("결과없음","", "", null, "", -1));
+            ranking.add(new Title("결과없음","", "", null, "", -1, base_comic));
             notifyItemChanged(RANKING+1);
         }
 

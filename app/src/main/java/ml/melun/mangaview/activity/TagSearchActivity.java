@@ -95,7 +95,7 @@ public class TagSearchActivity extends AppCompatActivity {
 
         if(mode == 5) {
             uadapter = new UpdatedAdapter(context);
-            updated = new UpdatedList();
+            updated = new UpdatedList(p.getBaseMode());
             getUpdated gu = new getUpdated();
             gu.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
@@ -125,7 +125,7 @@ public class TagSearchActivity extends AppCompatActivity {
 
         }else {
             adapter = new TitleAdapter(context);
-            search = new Search(query,mode);
+            search = new Search(query,mode,p.getBaseMode());
             searchManga sm = new searchManga();
             sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
@@ -167,7 +167,7 @@ public class TagSearchActivity extends AppCompatActivity {
                 adapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
                     public void onResumeClick(int position, int id) {
-                        Intent viewer = viewerIntent(context, new Manga(id,"",""));
+                        Intent viewer = viewerIntent(context, new Manga(id,"","",adapter.getItem(position).getBaseMode()));
                         viewer.putExtra("online",true);
                         startActivity(viewer);
                     }
@@ -224,7 +224,7 @@ public class TagSearchActivity extends AppCompatActivity {
                 adapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
                     public void onResumeClick(int position, int id) {
-                        Intent viewer = viewerIntent(context, new Manga(id,"",""));
+                        Intent viewer = viewerIntent(context, new Manga(id,"","", search.getBaseMode()));
                         viewer.putExtra("online",true);
                         startActivity(viewer);
                     }

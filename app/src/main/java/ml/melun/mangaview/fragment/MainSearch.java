@@ -107,7 +107,7 @@ public class MainSearch extends Fragment {
             swipe.setRefreshing(true);
             if(searchAdapter != null) searchAdapter.removeAll();
             else searchAdapter = new TitleAdapter(getContext());
-            search = new Search(query,searchMode.getSelectedItemPosition());
+            search = new Search(query,searchMode.getSelectedItemPosition(), p.getBaseMode());
             new SearchManga().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -160,7 +160,7 @@ public class MainSearch extends Fragment {
 
                     @Override
                     public void onResumeClick(int position, int id) {
-                        openViewer(getContext(),new Manga(id,"",""),-1);
+                        openViewer(getContext(),new Manga(id,"","", search.getBaseMode()),-1);
                     }
 
                     @Override

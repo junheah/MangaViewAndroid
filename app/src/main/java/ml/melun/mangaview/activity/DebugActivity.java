@@ -43,11 +43,14 @@ import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SELECT;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FOLDER_SELECT;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
+import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class DebugActivity extends AppCompatActivity {
     TextView output;
     Context context;
     ScrollView scroll;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -191,11 +194,11 @@ public class DebugActivity extends AppCompatActivity {
         this.findViewById(R.id.debug_baseMode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(p.getBaseMode().equals("comic")) {
-                    p.setBaseMode("webtoon");
+                if(p.getBaseMode() == base_comic) {
+                    p.setBaseMode(base_webtoon);
                     Toast.makeText(context, "webtoon", Toast.LENGTH_SHORT).show();
                 }else {
-                    p.setBaseMode("comic");
+                    p.setBaseMode(base_comic);
                     Toast.makeText(context, "comic", Toast.LENGTH_SHORT).show();
                 }
             }

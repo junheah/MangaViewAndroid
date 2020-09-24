@@ -45,6 +45,7 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class Migrator extends Service {
     NotificationCompat.Builder notification;
@@ -259,12 +260,12 @@ public class Migrator extends Service {
         }
 
         MTitle findTitle(String title){
-            return findTitle(new MTitle(title,-1,"", "",new ArrayList<>(),""));
+            return findTitle(new MTitle(title,-1,"", "",new ArrayList<>(),"", base_comic));
         }
 
         MTitle findTitle(MTitle title){
             String name = title.getName();
-            Search s = new Search(name,0);
+            Search s = new Search(name,0, base_comic);
             while(!s.isLast()){
                 s.fetch(httpClient);
                 for(Title t : s.getResult()){

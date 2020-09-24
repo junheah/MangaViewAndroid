@@ -13,6 +13,9 @@ import java.util.List;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
+import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 import static ml.melun.mangaview.mangaview.Title.BATTERY_EMPTY;
 import static ml.melun.mangaview.mangaview.Title.BATTERY_FULL;
 import static ml.melun.mangaview.mangaview.Title.BATTERY_HALF;
@@ -38,10 +41,16 @@ public class Search {
      */
 
     int baseMode;
-    public Search(String q, int mode) {
+    public Search(String q, int mode, int baseMode) {
         query = q;
         this.mode = mode;
+        this.baseMode = baseMode;
         //if(mode==6) query = "";
+    }
+
+
+    public int getBaseMode() {
+        return baseMode;
     }
 
     public Boolean isLast() {
@@ -76,9 +85,6 @@ public class Search {
     */
 
     public int fetch(CustomHttpClient client) {
-        if(baseMode == 0)
-            baseMode = client.getBaseMode();
-
         result = new ArrayList<>();
         if(!last) {
             try {
@@ -88,24 +94,24 @@ public class Search {
                 switch(mode){
                     //todo add more modes
                     case 0:
-                        searchUrl = "?bo_table="+baseMode+"&stx=";
+                        searchUrl = "?bo_table="+baseModeStr(baseMode)+"&stx=";
                         break;
                     case 1:
-                        searchUrl = "?bo_table="+baseMode+"&artist=";
+                        searchUrl = "?bo_table="+baseModeStr(baseMode)+"&artist=";
                         break;
                     case 2:
-                        searchUrl = "?bo_table="+baseMode+"&tag=";
+                        searchUrl = "?bo_table="+baseModeStr(baseMode)+"&tag=";
                         break;
                     case 3:
-                        searchUrl = "?bo_table="+baseMode+"&jaum=";
+                        searchUrl = "?bo_table="+baseModeStr(baseMode)+"&jaum=";
                         break;
                     case 4:
-                        searchUrl = "?bo_table="+baseMode+"&publish=";
+                        searchUrl = "?bo_table="+baseModeStr(baseMode)+"&publish=";
                         break;
                 }
 
 
-                Response response = client.mget('/'+baseMode+"/p" + page++ + searchUrl + URLEncoder.encode(query,"UTF-8"), true, null, baseMode);
+                Response response = client.mget('/'+baseModeStr(baseMode)+"/p" + page++ + searchUrl + URLEncoder.encode(query,"UTF-8"), true, null);
                 String body = response.body().string();
                 if(body.contains("Connect Error: Connection timed out")){
                     //adblock : try again
@@ -146,7 +152,7 @@ public class Search {
                     if(re!=null) release = re.selectFirst("a").ownText();
                     else release = "";
 
-                    result.add(new Title(title,thumb,author,null,release,id));
+                    result.add(new Title(title,thumb,author,null,release,id, baseMode));
                 }
                 response.close();
                 if (result.size() < 210)

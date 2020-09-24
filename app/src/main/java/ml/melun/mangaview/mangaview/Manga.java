@@ -23,7 +23,8 @@ import org.jsoup.select.Elements;
 
 import okhttp3.Response;
 
-import static ml.melun.mangaview.mangaview.CustomHttpClient.baseModeStr;
+import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
+
 
     /*
     mode:
@@ -72,8 +73,6 @@ public class Manga {
         fetch(client, false, cookies);
     }
     public void fetch(CustomHttpClient client, boolean doLogin, Map<String,String> cookies) {
-        if(baseMode==0)
-            baseMode = client.getBaseMode();
         mode = 0;
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
@@ -82,7 +81,7 @@ public class Manga {
         int tries = 0;
 
         while(imgs.size()==0 && tries < 2) {
-            Response r = client.mget(String.valueOf(id), false, cookies);
+            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id), false, cookies);
             try {
                 String body = r.body().string();
                 r.close();
@@ -106,7 +105,7 @@ public class Manga {
                         .split(baseModeStr(baseMode) +'/')[1]
                         .split("\\?")[0]);
 
-                if(title == null) title = new Title(name, "", "", null, "", tid );
+                if(title == null) title = new Title(name, "", "", null, "", tid, baseMode);
 
                 //eps
                 for(Element e :navbar.selectFirst("select").select("option")){

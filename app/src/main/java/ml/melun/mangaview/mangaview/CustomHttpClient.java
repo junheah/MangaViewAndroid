@@ -28,14 +28,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.mangaview.MTitle.base_auto;
 
 public class CustomHttpClient {
     public OkHttpClient client;
     Map<String, String> cookies;
-
-    public static final int base_auto = 0;
-    public static final int base_comic = 1;
-    public static final int base_webtoon = 2;
 
     public CustomHttpClient(){
         System.out.println("http client create");
@@ -82,20 +79,7 @@ public class CustomHttpClient {
     public int getBaseMode(){
         return p.getBaseMode();
     }
-    public static String baseModeStr(int mode){
-        switch(mode){
-            case base_comic:
-                return "comic";
-            case base_webtoon:
-                return "webtoon";
-            default:
-                return "comic";
-        }
-    }
 
-    public String getBaseModeStr(){
-        return p.getBaseModeStr();
-    }
 
 
     public String getCookie(String k){
@@ -130,16 +114,13 @@ public class CustomHttpClient {
         return mget(url,true);
     }
 
-    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie) {
-        return mget(url,doLogin,customCookie,base_auto);
-    }
 
     public String getUrl(){
         return p.getUrl();
     }
 
 
-    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie, int baseMode){
+    public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
         if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
             customCookie.put("PHPSESSID", p.getLogin().cookie);
         }
@@ -160,14 +141,9 @@ public class CustomHttpClient {
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cbuilder.toString());
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-        headers.put("Referer",p.getUrl() + '/'+p.getBaseMode());
+        headers.put("Referer",p.getUrl());
 
-        if(baseMode == null || baseMode.length()==0)
-            return get(p.getUrl()+url, headers);
-        else if(baseMode.equals("auto"))
-            return get(p.getUrl() + '/'+p.getBaseModeStr() +'/' + url, headers);
-        else
-            return get(p.getUrl()+'/'+baseMode +'/'+url, headers);
+        return get(p.getUrl()+url, headers);
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){

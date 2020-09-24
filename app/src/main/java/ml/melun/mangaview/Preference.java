@@ -17,9 +17,8 @@ import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Title;
 
-import static ml.melun.mangaview.mangaview.CustomHttpClient.baseModeStr;
-import static ml.melun.mangaview.mangaview.CustomHttpClient.base_comic;
-import static ml.melun.mangaview.mangaview.CustomHttpClient.base_webtoon;
+import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.isInteger;
 
 public class Preference {
@@ -102,14 +101,11 @@ public class Preference {
     }
 
     public int getBaseMode(){
-        System.out.println(baseMode);
         return this.baseMode;
     }
 
     public void setBaseMode(int baseMode){
         this.baseMode = baseMode;
-
-        System.out.println(this.baseMode);
         prefsEditor.putInt("baseMode", baseMode);
         prefsEditor.commit();
     }

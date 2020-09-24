@@ -266,8 +266,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public void setResume(boolean resume){
         this.resume = resume;
     }
-    public Title getItem(int id) {
-        return mDataFiltered.get(id);
+    public Title getItem(int index) {
+        return mDataFiltered.get(index);
     }
 
     public void setClickListener(ItemClickListener itemClickListener) {
