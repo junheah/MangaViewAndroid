@@ -97,6 +97,11 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             h.thumb.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
         else
             Glide.with(context).load(thumb).into(h.thumb);
+
+        if(p.getBookmark(mData.get(position).getTitle())>0)
+            h.seen.setVisibility(View.VISIBLE);
+        else
+            h.seen.setVisibility(View.GONE);
     }
 
 
@@ -113,10 +118,12 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ImageView thumb;
         TextView title;
         CardView card;
+        ImageView seen;
         public viewHolder(View itemView) {
             super(itemView);
             thumb = itemView.findViewById(R.id.main_new_thumb);
             title = itemView.findViewById(R.id.main_new_name);
+            seen = itemView.findViewById(R.id.seenIcon);
             title.setEllipsize(TextUtils.TruncateAt.MARQUEE);
             title.setMarqueeRepeatLimit(-1);
             title.setSingleLine(true);

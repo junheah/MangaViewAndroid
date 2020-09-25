@@ -191,6 +191,8 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             holder.counterContainer.setVisibility(View.GONE);
         }
 
+
+
         if(thumb.length()>1 && (!save || forceThumbnail)) Glide.with(mainContext).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
         if(save && !forceThumbnail) holder.thumb.setVisibility(View.GONE);
@@ -208,7 +210,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
     class ViewHolder extends RecyclerView.ViewHolder{
         TextView name;
-        ImageView thumb;
+        ImageView thumb, fav;
         TextView author;
         TextView tags;
         TextView recommend_c, battery_c, comment_c, bookmark_c;

@@ -137,22 +137,26 @@ public class Search {
                 int id;
 
                 for(Element e : titles) {
-                    Element infos = e.selectFirst("div.img-item");
-                    Element infos2 = infos.selectFirst("div.in-lable");
+                    try {
+                        Element infos = e.selectFirst("div.img-item");
+                        Element infos2 = infos.selectFirst("div.in-lable");
 
-                    id = Integer.parseInt(infos2.attr("rel"));
-                    title = infos2.selectFirst("span").ownText();
-                    thumb = infos.selectFirst("img").attr("src");
+                        id = Integer.parseInt(infos2.attr("rel"));
+                        title = infos2.selectFirst("span").ownText();
+                        thumb = infos.selectFirst("img").attr("src");
 
-                    Element ae = e.selectFirst("div.list-artist");
-                    if(ae != null) author = ae.selectFirst("a").ownText();
-                    else author = "";
+                        Element ae = e.selectFirst("div.list-artist");
+                        if (ae != null) author = ae.selectFirst("a").ownText();
+                        else author = "";
 
-                    Element re = e.selectFirst("div.list-publish");
-                    if(re!=null) release = re.selectFirst("a").ownText();
-                    else release = "";
+                        Element re = e.selectFirst("div.list-publish");
+                        if (re != null) release = re.selectFirst("a").ownText();
+                        else release = "";
 
-                    result.add(new Title(title,thumb,author,null,release,id, baseMode));
+                        result.add(new Title(title, thumb, author, null, release, id, baseMode));
+                    }catch (Exception e2){
+                        e2.printStackTrace();
+                    }
                 }
                 response.close();
                 if (result.size() < 210)

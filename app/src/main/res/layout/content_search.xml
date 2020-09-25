@@ -16,17 +16,51 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_adv_search" />
 
-    <Spinner
-        android:entries="@array/searchModes"
-        android:id="@+id/searchMode"
+
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone"
+        android:orientation="horizontal"
+        android:id="@+id/searchOptionPanel"
+        app:layout_constraintTop_toBottomOf="@+id/searchBox">
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/searchBaseMode"
+            android:entries="@array/baseOption"/>
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:entries="@array/searchModes"
+            android:id="@+id/searchMode"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <Button
+        android:id="@+id/searchOptionToggleBtn"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/searchBox"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/searchBox" />
+        app:layout_constraintStart_toEndOf="@id/searchBox"
+        app:layout_constraintTop_toTopOf="@+id/searchBox"
+        android:background="?android:attr/selectableItemBackground"
+        android:text="옵션"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:padding="8dp"
+        android:layout_marginEnd="8dp"/>
+
 
     <TextView
         android:id="@+id/noResult"
@@ -53,18 +87,18 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_width="0dp"
-        app:layout_constraintEnd_toStartOf="@+id/searchMode"
+        app:layout_constraintEnd_toStartOf="@id/searchOptionToggleBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="검색어" />
 
     <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
         android:id="@+id/searchSwipe"
-        android:layout_height="0dp"
         android:layout_marginTop="8dp"
+        android:layout_height="0dp"
         android:layout_width="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchBox"
+        app:layout_constraintTop_toBottomOf="@+id/searchOptionPanel"
         app:srl_direction="bottom">
 
         <androidx.recyclerview.widget.RecyclerView
