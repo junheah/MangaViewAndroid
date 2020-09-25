@@ -33,17 +33,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/seenIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_margin="5dp"
-                android:layout_marginTop="8dp"
-                android:scaleType="fitCenter"
-                app:layout_constraintEnd_toStartOf="@+id/epsButton"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_history"
-                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/Title"
