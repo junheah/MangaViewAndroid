@@ -425,7 +425,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         }
         if(manga.useBookmark()) {
             p.setViewerBookmark(id, viewerBookmark);
-            if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(id);
+            if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(manga);
         }
         updatePageIndex();
     }
@@ -496,7 +496,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         }
         if(manga.useBookmark()) {
             p.setViewerBookmark(id, viewerBookmark);
-            if (0 == viewerBookmark) p.removeViewerBookmark(id);
+            if (0 == viewerBookmark) p.removeViewerBookmark(manga);
         }
         updatePageIndex();
 
@@ -706,7 +706,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     public void bookmarkRefresh(){
         if(manga.useBookmark()) {
-            viewerBookmark = p.getViewerBookmark(id);
+            viewerBookmark = p.getViewerBookmark(manga);
             // if manga is online or has title.gson
             p.addRecent(title);
             p.setBookmark(title, id);

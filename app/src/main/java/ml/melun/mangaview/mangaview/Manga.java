@@ -44,6 +44,10 @@ public class Manga {
         date = d;
         this.baseMode = baseMode;
     }
+
+    public int getBaseMode(){
+        return this.baseMode;
+    }
     public int getId() {
         return id;
     }

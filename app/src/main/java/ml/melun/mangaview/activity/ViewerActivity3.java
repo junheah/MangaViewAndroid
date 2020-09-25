@@ -157,7 +157,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                     pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
                     if(manga.useBookmark()) {
                         if (position == imgs.size() - 1 || position == 0) {
-                            p.removeViewerBookmark(id);
+                            p.removeViewerBookmark(manga);
                         } else p.setViewerBookmark(id, viewerBookmark);
                     }
 
@@ -202,7 +202,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             id = manga.getId();
 
             toolbarTitle.setText(name);
-            if(manga.useBookmark()) viewerBookmark = p.getViewerBookmark(id);
+            if(manga.useBookmark()) viewerBookmark = p.getViewerBookmark(manga);
 
             if(manga.useBookmark()){
                 result = new Intent();
@@ -420,7 +420,7 @@ public class ViewerActivity3 extends AppCompatActivity {
 
     public void bookmarkRefresh(){
         if(manga.useBookmark()) {
-            viewerBookmark = p.getViewerBookmark(manga.getId());
+            viewerBookmark = p.getViewerBookmark(manga);
             viewPager.setCurrentItem(viewerBookmark, false);
             p.addRecent(title);
             p.setBookmark(title, id);

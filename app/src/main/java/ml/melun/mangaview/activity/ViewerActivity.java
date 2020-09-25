@@ -136,7 +136,7 @@ public class ViewerActivity extends AppCompatActivity {
             id = manga.getId();
 
             toolbarTitle.setText(name);
-            viewerBookmark = p.getViewerBookmark(id);
+            viewerBookmark = p.getViewerBookmark(manga);
 
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);
@@ -209,7 +209,7 @@ public class ViewerActivity extends AppCompatActivity {
                         //bookmark handler
                         if (firstVisible == 0 || lastVisible >= imgs.size()-1){
                             if(manga.useBookmark())
-                                p.removeViewerBookmark(id);
+                                p.removeViewerBookmark(manga);
                         }else if (firstVisible != viewerBookmark) {
                             if(manga.useBookmark())
                                 p.setViewerBookmark(id, firstVisible);
@@ -339,7 +339,7 @@ public class ViewerActivity extends AppCompatActivity {
             if(manga.useBookmark()) {
                 if (viewerBookmark > 0 && viewerBookmark < stripAdapter.getItemCount() - 1) {
                     p.setViewerBookmark(id, viewerBookmark);
-                } else p.removeViewerBookmark(id);
+                } else p.removeViewerBookmark(manga);
             }
             if(toolbarshow) toggleToolbar();
             return true;
@@ -480,7 +480,7 @@ public class ViewerActivity extends AppCompatActivity {
 
     public void bookmarkRefresh(){
         if(manga.useBookmark()) {
-            viewerBookmark = p.getViewerBookmark(id);
+            viewerBookmark = p.getViewerBookmark(manga);
             if (viewerBookmark != -1) {
                 strip.scrollToPosition(viewerBookmark);
             }

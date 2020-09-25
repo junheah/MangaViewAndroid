@@ -271,6 +271,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void activityInit(Bundle savedInstanceState){
+        p.check2();
         setContentView(R.layout.activity_main);
         progressView = this.findViewById(R.id.progress_panel);
 
