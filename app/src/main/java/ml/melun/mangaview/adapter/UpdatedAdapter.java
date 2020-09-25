@@ -73,6 +73,10 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h.seen.setVisibility(View.VISIBLE);
         else
             h.seen.setVisibility(View.GONE);
+        if(p.findFavorite(m.getTitle())>-1)
+            h.fav.setVisibility(View.VISIBLE);
+        else
+            h.fav.setVisibility(View.GONE);
     }
 
     @Override
@@ -84,7 +88,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView text, date;
         ImageView thumb;
         CardView card;
-        ImageView seen;
+        ImageView seen, fav;
         Button viewEps;
         public viewHolder(View itemView) {
             super(itemView);
@@ -94,6 +98,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             thumb = itemView.findViewById(R.id.Thumb);
             viewEps = itemView.findViewById(R.id.epsButton);
             seen = itemView.findViewById(R.id.seenIcon);
+            fav = itemView.findViewById(R.id.favIcon);
             if(dark){
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
                 viewEps.setBackgroundColor(ContextCompat.getColor(context, R.color.resumeDark));

@@ -207,15 +207,13 @@ public class ViewerActivity extends AppCompatActivity {
                             lastVisible /=2;
                         }
                         //bookmark handler
-                        if (firstVisible == 0) p.removeViewerBookmark(id);
-                        if (firstVisible != viewerBookmark) {
+                        if (firstVisible == 0 || lastVisible >= imgs.size()-1){
+                            if(manga.useBookmark())
+                                p.removeViewerBookmark(id);
+                        }else if (firstVisible != viewerBookmark) {
                             if(manga.useBookmark())
                                 p.setViewerBookmark(id, firstVisible);
                             viewerBookmark = firstVisible;
-                        }
-                        if (lastVisible >= imgs.size() - 1) {
-                            if(manga.useBookmark())
-                                p.removeViewerBookmark(id);
                         }
 
                         if ((!strip.canScrollVertically(1)) && !toolbarshow) {

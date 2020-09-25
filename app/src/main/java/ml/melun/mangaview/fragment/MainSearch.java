@@ -72,7 +72,10 @@ public class MainSearch extends Fragment {
         optionsBtn = rootView.findViewById(R.id.searchOptionToggleBtn);
         optionsPanel = rootView.findViewById(R.id.searchOptionPanel);
         fragment = this;
-        if(p.getDarkTheme()) searchMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        if(p.getDarkTheme()){
+            searchMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+            baseMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        }
 
         optionsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
