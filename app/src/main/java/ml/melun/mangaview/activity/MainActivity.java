@@ -41,12 +41,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.Downloader;
@@ -54,12 +49,10 @@ import ml.melun.mangaview.Migrator;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.fragment.MainMain;
+
 import ml.melun.mangaview.fragment.MainSearch;
 import ml.melun.mangaview.fragment.RecyclerFragment;
 import ml.melun.mangaview.UrlUpdater;
-import ml.melun.mangaview.mangaview.MTitle;
-import ml.melun.mangaview.mangaview.Search;
-import ml.melun.mangaview.mangaview.Title;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -75,7 +68,6 @@ import static ml.melun.mangaview.Migrator.MIGRATE_SUCCESS;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.showYesNoNeutralPopup;
-import static ml.melun.mangaview.Utils.showYesNoPopup;
 import static ml.melun.mangaview.Utils.writePreferenceToFile;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;

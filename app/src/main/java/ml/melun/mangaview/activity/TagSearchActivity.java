@@ -35,6 +35,7 @@ import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class TagSearchActivity extends AppCompatActivity {
     RecyclerView searchResult;
@@ -48,6 +49,7 @@ public class TagSearchActivity extends AppCompatActivity {
     TextView noresult;
     SwipyRefreshLayout swipe;
     Bookmark bookmark;
+    int baseMode;
 
 
     @Override
@@ -64,6 +66,7 @@ public class TagSearchActivity extends AppCompatActivity {
         query = i.getStringExtra("query");
         mode = i.getIntExtra("mode",0);
         swipe = this.findViewById(R.id.tagSearchSwipe);
+        baseMode = i.getIntExtra("baseMode", base_comic);
 
         ActionBar ab = getSupportActionBar();
         switch(mode){
@@ -125,7 +128,7 @@ public class TagSearchActivity extends AppCompatActivity {
 
         }else {
             adapter = new TitleAdapter(context);
-            search = new Search(query,mode,p.getBaseMode());
+            search = new Search(query,mode,baseMode);
             searchManga sm = new searchManga();
             sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {

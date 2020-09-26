@@ -93,10 +93,10 @@ public class CustomHttpClient {
             Request.Builder builder = new Request.Builder()
                     .url(url)
                     .get();
-
-            for(String k : headers.keySet()){
-                builder.addHeader(k, headers.get(k));
-            }
+            if(headers !=null)
+                for(String k : headers.keySet()){
+                    builder.addHeader(k, headers.get(k));
+                }
 
             Request request = builder.build();
             response = this.client.newCall(request).execute();

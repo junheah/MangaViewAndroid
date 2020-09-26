@@ -13,12 +13,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.tabs.TabLayout;
+
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
+import ml.melun.mangaview.adapter.MainWebtoonAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -31,9 +34,13 @@ public class MainMain extends Fragment{
 
     RecyclerView mainRecycler;
     MainAdapter mainadapter;
+    MainWebtoonAdapter mainWebtoonAdapter;
     Fragment fragment;
     boolean wait = false;
     UrlUpdater.UrlUpdaterCallback callback;
+
+    final static int COMIC_TAB = 0;
+    final static int WEBTOON_TAB = 1;
 
     boolean fragmentActive = false;
 
@@ -46,8 +53,12 @@ public class MainMain extends Fragment{
             @Override
             public void callback(boolean success) {
                 wait = false;
-                if(mainadapter != null && fragmentActive)
+                if(mainadapter != null && fragmentActive) {
                     mainadapter.fetch();
+                }
+                if(mainWebtoonAdapter != null && fragmentActive) {
+                    mainWebtoonAdapter.fetch();
+                }
             }
         };
     }
@@ -61,13 +72,38 @@ public class MainMain extends Fragment{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_main , container, false);
 
+
+        TabLayout tabLayout = rootView.findViewById(R.id.mainTab);
+        tabLayout.addTab(tabLayout.newTab().setText("만화"));
+        tabLayout.addTab(tabLayout.newTab().setText("웹툰"));
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if(tab.getPosition() == COMIC_TAB){
+                    mainRecycler.setAdapter(mainadapter);
+                }else if(tab.getPosition() == WEBTOON_TAB){
+                    mainRecycler.setAdapter(mainWebtoonAdapter);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
         fragment = this;
         //main content
         // 최근 추가된 만화
         mainRecycler = rootView.findViewById(R.id.main_recycler);
-        mainadapter = new MainAdapter(getContext());
         mainRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        mainRecycler.setAdapter(mainadapter);
+
+        mainadapter = new MainAdapter(getContext());
         mainadapter.setMainClickListener(new MainAdapter.onItemClick() {
 
             @Override
@@ -119,8 +155,15 @@ public class MainMain extends Fragment{
                 Utils.showCaptchaPopup(getContext(), 3, fragment, p);
             }
         });
-        if(!wait)
+
+        mainWebtoonAdapter = new MainWebtoonAdapter(getContext());
+
+        mainRecycler.setAdapter(mainadapter);
+
+        if(!wait) {
             mainadapter.fetch();
+            mainWebtoonAdapter.fetch();
+        }
         return rootView;
     }
 

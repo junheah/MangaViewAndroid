@@ -23,22 +23,22 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MainPage;
+import ml.melun.mangaview.mangaview.MainPageWebtoon;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context mainContext;
     LayoutInflater mInflater, itemInflater;
-    LinearLayoutManager update_lm, name_lm, tag_lm, release_lm;
     MainUpdatedAdapter uadapter;
     onItemClick mainClickListener;
     MainTagAdapter nadapter, tadapter, radapter;
     boolean dark, loaded = false;
-    Preference p;
 
     List<Manga> recent, favUpdate;
     List<Title> ranking;
@@ -55,20 +55,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public MainAdapter(Context main) {
         super();
         mainContext = main;
-        p = new Preference(mainContext);
         dark = p.getDarkTheme();
         this.mInflater = LayoutInflater.from(main);
         this.itemInflater = LayoutInflater.from(main);
-
-        update_lm = new LinearLayoutManager(main);
-        tag_lm = new LinearLayoutManager(main);
-        name_lm = new LinearLayoutManager(main);
-        release_lm  = new LinearLayoutManager(main);
-
-        update_lm.setOrientation(LinearLayoutManager.HORIZONTAL);
-        tag_lm.setOrientation(LinearLayoutManager.HORIZONTAL);
-        name_lm.setOrientation(LinearLayoutManager.HORIZONTAL);
-        release_lm.setOrientation(LinearLayoutManager.HORIZONTAL);
 
         uadapter = new MainUpdatedAdapter(main);
         tadapter = new MainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_genre)), 0);
@@ -229,7 +218,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.main_tag_title);
             updatedList = itemView.findViewById(R.id.main_tag);
-            updatedList.setLayoutManager(update_lm);
+            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            lm.setOrientation(RecyclerView.HORIZONTAL);
+            updatedList.setLayoutManager(lm);
             updatedList.setAdapter(uadapter);
             uadapter.setClickListener(new MainUpdatedAdapter.onclick() {
                 @Override
@@ -318,7 +309,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.main_tag_title);
             tagList = itemView.findViewById(R.id.main_tag);
-            tagList.setLayoutManager(tag_lm);
+            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            lm.setOrientation(RecyclerView.HORIZONTAL);
+            tagList.setLayoutManager(lm);
             tagList.setAdapter(tadapter);
             tadapter.setClickListener(new MainTagAdapter.tagOnclick() {
                 @Override
@@ -335,7 +328,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.main_tag_title);
             nameList = itemView.findViewById(R.id.main_tag);
-            nameList.setLayoutManager(name_lm);
+            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            lm.setOrientation(RecyclerView.HORIZONTAL);
+            nameList.setLayoutManager(lm);
             nameList.setAdapter(nadapter);
             nadapter.setClickListener(new MainTagAdapter.tagOnclick() {
                 @Override
@@ -354,9 +349,11 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView title;
         public releaseHolder(View itemView) {
             super(itemView);
+            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            lm.setOrientation(RecyclerView.HORIZONTAL);
             title = itemView.findViewById(R.id.main_tag_title);
             releaseList = itemView.findViewById(R.id.main_tag);
-            releaseList.setLayoutManager(release_lm);
+            releaseList.setLayoutManager(lm);
             releaseList.setAdapter(radapter);
             radapter.setClickListener(new MainTagAdapter.tagOnclick() {
                 @Override
@@ -395,6 +392,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 p.getLogin().buildCookie(cookie);
             }
             MainPage u = new MainPage(httpClient);
+
+
+            MainPageWebtoon webtoon = new MainPageWebtoon(httpClient);
             return u;
         }
 
