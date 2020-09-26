@@ -279,7 +279,7 @@ public class Preference {
         int titleId = title.getId();
         if(titleId>0) {
             try {
-                bookmark.put(String.valueOf(title.getId()), id);
+                bookmark.put(String.valueOf(title.getBaseMode()+"."+title.getId()), id);
             } catch (Exception e) {
                 //
             }
@@ -328,11 +328,11 @@ public class Preference {
     }
 
 
-    public void setViewerBookmark(int id,int index){
-        if(id>-1) {
+    public void setViewerBookmark(Manga m,int index){
+        if(m.getId()>-1) {
             if (index > 0) {
                 try {
-                    pagebookmark.put(id + "", index);
+                    pagebookmark.put(m.getBaseMode() + "."+m.getId(), index);
                 } catch (Exception e) {
                     //
                 }
@@ -484,6 +484,12 @@ public class Preference {
         for(String f : fix){
             jsonStr = jsonStr.replace(f, String.valueOf(base_comic)+"."+f);
         }
+        try {
+            this.bookmark = new JSONObject(jsonStr);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        writeBookmark();
 
         fix.clear();
         keys = pagebookmark.keys();
@@ -493,10 +499,16 @@ public class Preference {
                 fix.add(key);
             }
         }
-        jsonStr = bookmark.toString();
+        jsonStr = pagebookmark.toString();
         for(String f : fix){
             jsonStr = jsonStr.replace(f, String.valueOf(base_comic)+"."+f);
         }
+        try {
+            this.pagebookmark = new JSONObject(jsonStr);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        writeViewerBookmark();
     }
     public Login getLogin(){
         return login;

@@ -212,7 +212,7 @@ public class ViewerActivity extends AppCompatActivity {
                                 p.removeViewerBookmark(manga);
                         }else if (firstVisible != viewerBookmark) {
                             if(manga.useBookmark())
-                                p.setViewerBookmark(id, firstVisible);
+                                p.setViewerBookmark(manga, firstVisible);
                             viewerBookmark = firstVisible;
                         }
 
@@ -338,7 +338,7 @@ public class ViewerActivity extends AppCompatActivity {
             }
             if(manga.useBookmark()) {
                 if (viewerBookmark > 0 && viewerBookmark < stripAdapter.getItemCount() - 1) {
-                    p.setViewerBookmark(id, viewerBookmark);
+                    p.setViewerBookmark(manga, viewerBookmark);
                 } else p.removeViewerBookmark(manga);
             }
             if(toolbarshow) toggleToolbar();

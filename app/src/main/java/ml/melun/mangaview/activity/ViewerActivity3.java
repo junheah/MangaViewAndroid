@@ -158,7 +158,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                     if(manga.useBookmark()) {
                         if (position == imgs.size() - 1 || position == 0) {
                             p.removeViewerBookmark(manga);
-                        } else p.setViewerBookmark(id, viewerBookmark);
+                        } else p.setViewerBookmark(manga, viewerBookmark);
                     }
 
                     boolean lastPage = viewerBookmark == imgs.size() - 1;

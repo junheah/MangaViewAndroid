@@ -424,7 +424,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             }
         }
         if(manga.useBookmark()) {
-            p.setViewerBookmark(id, viewerBookmark);
+            p.setViewerBookmark(manga, viewerBookmark);
             if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(manga);
         }
         updatePageIndex();
@@ -495,7 +495,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             }
         }
         if(manga.useBookmark()) {
-            p.setViewerBookmark(id, viewerBookmark);
+            p.setViewerBookmark(manga, viewerBookmark);
             if (0 == viewerBookmark) p.removeViewerBookmark(manga);
         }
         updatePageIndex();
