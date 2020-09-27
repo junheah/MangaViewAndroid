@@ -52,7 +52,6 @@ public class MainSearch extends Fragment {
     TitleAdapter searchAdapter;
     Search search;
     Fragment fragment;
-    Button optionsBtn;
     LinearLayoutCompat optionsPanel;
 
     @Nullable
@@ -69,7 +68,6 @@ public class MainSearch extends Fragment {
         baseMode = rootView.findViewById(R.id.searchBaseMode);
         advSearchBtn = rootView.findViewById(R.id.advSearchBtn);
         swipe = rootView.findViewById(R.id.searchSwipe);
-        optionsBtn = rootView.findViewById(R.id.searchOptionToggleBtn);
         optionsPanel = rootView.findViewById(R.id.searchOptionPanel);
         fragment = this;
         if(p.getDarkTheme()){
@@ -77,13 +75,14 @@ public class MainSearch extends Fragment {
             baseMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
         }
 
-        optionsBtn.setOnClickListener(new View.OnClickListener() {
+        searchBox.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onClick(View view) {
-                if(optionsPanel.getVisibility() == View.VISIBLE)
-                    optionsPanel.setVisibility(View.GONE);
-                else
+            public void onFocusChange(View view, boolean b) {
+                if(b){
                     optionsPanel.setVisibility(View.VISIBLE);
+                }else{
+                    optionsPanel.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -142,7 +141,7 @@ public class MainSearch extends Fragment {
 
     void optionUpdate(){
         //shows or hides options
-        p.setBaseMode(baseMode.getSelectedItemPosition()+1);
+        //p.setBaseMode(baseMode.getSelectedItemPosition()+1);
     }
 
     void searchSubmit(){

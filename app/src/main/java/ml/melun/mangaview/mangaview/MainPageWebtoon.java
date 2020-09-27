@@ -85,13 +85,19 @@ public class MainPageWebtoon {
     public void parseTitle(String title, Elements es, int baseMode){
         Ranking<Title> ranking = new Ranking<>(title);
         Title tmp;
-        String idString ,idString1;
+        String idString,idString1,name;
         int id;
         for(Element e : es){
+            Element img = e.selectFirst("div.img-item");
+            if(img!=null){
+                name = img.ownText();
+            }else{
+                name = e.ownText();
+            }
             idString = e.attr("href");
             idString1 = idString.substring(idString.lastIndexOf('/')+1);
             id = Integer.parseInt(idString1.substring(idString1.lastIndexOf('=')+1));
-            tmp = new Title(e.ownText(), "", "", null, "", id, baseMode);
+            tmp = new Title(name, "", "", null, "", id, baseMode);
             ranking.add(tmp);
         }
         dataSet.add(ranking);

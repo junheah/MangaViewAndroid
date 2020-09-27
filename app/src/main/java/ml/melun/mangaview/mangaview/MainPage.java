@@ -45,7 +45,7 @@ public class MainPage {
             Title ttmp;
 
             for(Element e : d.selectFirst("div.miso-post-gallery").select("div.post-row")){
-                id = getNumberFromString(e.selectFirst("a").attr("href").split("comic/")[1]);
+                id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
                 infos = e.selectFirst("div.img-item");
                 thumb = infos.selectFirst("img").attr("src");
                 name = infos.selectFirst("b").ownText();

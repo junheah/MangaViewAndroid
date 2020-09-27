@@ -30,6 +30,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     boolean dark;
     LayoutInflater inflater;
     List<Ranking<?>> dataSet;
+    MainAdapter.onItemClick listener;
 
     final static int HEADER = 23;
 
@@ -68,6 +69,10 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
+    public void setListener(MainAdapter.onItemClick listener){
+        this.listener = listener;
+    }
+
 
     @NonNull
     @Override
@@ -103,6 +108,15 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 //is title
                 h.content.setText(((Title) d).getName());
             }
+
+            if(type == SR){
+                //search
+            }else{
+                //title
+                listener.clickedTitle((Title)d);
+            }
+
+
         }
     }
 
@@ -199,6 +213,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             updateWidgets();
         }
     }
+
 
 
 

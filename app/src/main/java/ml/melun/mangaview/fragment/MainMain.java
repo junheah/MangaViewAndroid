@@ -29,6 +29,8 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
+import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class MainMain extends Fragment{
 
@@ -74,15 +76,26 @@ public class MainMain extends Fragment{
 
 
         TabLayout tabLayout = rootView.findViewById(R.id.mainTab);
-        tabLayout.addTab(tabLayout.newTab().setText("만화"));
-        tabLayout.addTab(tabLayout.newTab().setText("웹툰"));
+
+        TabLayout.Tab comicTab = tabLayout.newTab().setText("만화");
+        TabLayout.Tab webtoonTab = tabLayout.newTab().setText("웹툰");
+        tabLayout.addTab(comicTab);
+        tabLayout.addTab(webtoonTab);
+
+        if(p.getBaseMode() == base_comic)
+            comicTab.select();
+        else
+            webtoonTab.select();
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab.getPosition() == COMIC_TAB){
                     mainRecycler.setAdapter(mainadapter);
+                    p.setBaseMode(base_comic);
                 }else if(tab.getPosition() == WEBTOON_TAB){
                     mainRecycler.setAdapter(mainWebtoonAdapter);
+                    p.setBaseMode(base_webtoon);
                 }
             }
 
@@ -103,8 +116,7 @@ public class MainMain extends Fragment{
         mainRecycler = rootView.findViewById(R.id.main_recycler);
         mainRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mainadapter = new MainAdapter(getContext());
-        mainadapter.setMainClickListener(new MainAdapter.onItemClick() {
+        MainAdapter.onItemClick listener = new MainAdapter.onItemClick() {
 
             @Override
             public void clickedTitle(Title t) {
@@ -154,11 +166,18 @@ public class MainMain extends Fragment{
             public void captchaCallback() {
                 Utils.showCaptchaPopup(getContext(), 3, fragment, p);
             }
-        });
+        };
+
+        mainadapter = new MainAdapter(getContext());
+        mainadapter.setMainClickListener(listener);
 
         mainWebtoonAdapter = new MainWebtoonAdapter(getContext());
+        mainWebtoonAdapter.setListener(listener);
 
-        mainRecycler.setAdapter(mainadapter);
+        if(p.getBaseMode() == base_comic)
+            mainRecycler.setAdapter(mainadapter);
+        else
+            mainRecycler.setAdapter(mainWebtoonAdapter);
 
         if(!wait) {
             mainadapter.fetch();

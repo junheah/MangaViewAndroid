@@ -46,20 +46,6 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <Button
-        android:id="@+id/searchOptionToggleBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/searchBox"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/searchBox"
-        app:layout_constraintTop_toTopOf="@+id/searchBox"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="옵션"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:padding="8dp"
-        android:layout_marginEnd="8dp"/>
 
 
     <TextView
@@ -87,7 +73,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_width="0dp"
-        app:layout_constraintEnd_toStartOf="@id/searchOptionToggleBtn"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="검색어" />
