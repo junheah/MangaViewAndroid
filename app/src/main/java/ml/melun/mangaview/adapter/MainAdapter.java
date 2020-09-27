@@ -392,9 +392,6 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 p.getLogin().buildCookie(cookie);
             }
             MainPage u = new MainPage(httpClient);
-
-
-            MainPageWebtoon webtoon = new MainPageWebtoon(httpClient);
             return u;
         }
 

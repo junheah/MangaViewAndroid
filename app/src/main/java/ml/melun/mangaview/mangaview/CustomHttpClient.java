@@ -28,7 +28,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.mangaview.MTitle.base_auto;
 
 public class CustomHttpClient {
     public OkHttpClient client;
@@ -76,10 +75,6 @@ public class CustomHttpClient {
         this.cookies = new HashMap<>();
     }
 
-    public int getBaseMode(){
-        return p.getBaseMode();
-    }
-
 
 
     public String getCookie(String k){
@@ -121,6 +116,8 @@ public class CustomHttpClient {
 
 
     public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
+        if(customCookie==null)
+            customCookie = new HashMap<>();
         if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
             customCookie.put("PHPSESSID", p.getLogin().cookie);
         }
