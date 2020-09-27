@@ -88,7 +88,7 @@ public class MainPageWebtoon {
         String idString,idString1,name;
         int id;
         for(Element e : es){
-            Element img = e.selectFirst("div.img-item");
+            Element img = e.selectFirst("div.in-subject");
             if(img!=null){
                 name = img.ownText();
             }else{

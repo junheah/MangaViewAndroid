@@ -108,13 +108,19 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 //is title
                 h.content.setText(((Title) d).getName());
             }
+            h.card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(type == SR){
+                        //search
+                    }else{
+                        //title
+                        listener.clickedTitle((Title)d);
+                    }
+                }
+            });
 
-            if(type == SR){
-                //search
-            }else{
-                //title
-                listener.clickedTitle((Title)d);
-            }
+
 
 
         }
