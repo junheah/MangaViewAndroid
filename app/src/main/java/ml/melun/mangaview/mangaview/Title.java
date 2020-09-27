@@ -17,6 +17,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.HashingSource;
 
+import static ml.melun.mangaview.Utils.getNumberFromString;
+
 
 public class Title extends MTitle {
     private List<Manga> eps = null;
@@ -31,18 +33,13 @@ public class Title extends MTitle {
     public static final int BATTERY_THREE_QUARTER = 3;
     public static final int BATTERY_FULL = 4;
 
-    public Title(String n, String t, String a, List<String> tg, String r, int id) {
-        super(n, id, t, a, tg, r);
+    public Title(String n, String t, String a, List<String> tg, String r, int id, int baseMode) {
+        super(n, id, t, a, tg, r, baseMode);
     }
 
-    public Title(String n, String t, String a, List<String> tg, String r, int id, int rc) {
-        super(n, id, t, a, tg, r);
-        this.id = id;
-        this.rc = rc;
-    }
 
     public Title(MTitle title){
-        super(title.getName(), title.getId(), title.getThumb(), title.getAuthor(), title.getTags(), title.getRelease());
+        super(title.getName(), title.getId(), title.getThumb(), title.getAuthor(), title.getTags(), title.getRelease(), title.getBaseMode());
     }
 
 
@@ -56,8 +53,9 @@ public class Title extends MTitle {
     }
 
     public void fetchEps(CustomHttpClient client) {
+
         try {
-            Response r = client.mget("/comic/" + id);
+            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id));
             String body = r.body().string();
             if(body.contains("Connect Error: Connection timed out")){
                 //adblock : try again
@@ -124,17 +122,18 @@ public class Title extends MTitle {
             try{
                 for(Element e : d.selectFirst("ul.list-body").select("li.list-item")) {
                     Element titlee = e.selectFirst("a.item-subject");
-                    id = Integer.parseInt(titlee.attr("href").split("comic/")[1].split("\\?")[0]);
+                    id = getNumberFromString(titlee.attr("href").split(baseModeStr(baseMode)+'/')[1]);
+
                     title = titlee.ownText();
 
                     Elements infoe = e.selectFirst("div.item-details").select("span");
                     date = infoe.get(0).ownText();
                     //has view-count, thumb-count and other extra info, implement later
-                    tmp = new Manga(id, title, date);
+                    tmp = new Manga(id, title, date, baseMode);
                     tmp.setMode(0);
                     eps.add(tmp);
                 }
-            }catch (Exception e){}
+            }catch (Exception e){e.printStackTrace();}
             r.close();
         }catch(Exception e) {
             e.printStackTrace();
@@ -197,7 +196,7 @@ public class Title extends MTitle {
 
     @Override
     public Title clone(){
-        return new Title(name, thumb, author, tags, release, id);
+        return new Title(name, thumb, author, tags, release, id, baseMode);
     }
 
     public int getRecommend_c() {
@@ -209,7 +208,7 @@ public class Title extends MTitle {
     }
 
     public MTitle minimize(){
-        return new MTitle(name, id, thumb, author, tags, release);
+        return new MTitle(name, id, thumb, author, tags, release, baseMode);
     }
 
     public boolean hasCounter(){

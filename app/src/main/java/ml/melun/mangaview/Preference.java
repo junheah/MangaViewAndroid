@@ -15,8 +15,11 @@ import java.util.List;
 
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
+import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.isInteger;
 
 public class Preference {
@@ -41,6 +44,7 @@ public class Preference {
     boolean autoUrl;
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
+    int baseMode;
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
@@ -84,12 +88,27 @@ public class Preference {
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
             autoUrl = sharedPref.getBoolean("autoUrl", true);
             pageControlButtonOffset = sharedPref.getFloat("pageControlButtonOffset", -1);
+            baseMode = sharedPref.getInt("baseMode", base_comic);
 //            if(login != null && login.isValid()){
 //                setSession(login.getCookie());
 //            }
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public String getBaseModeStr(){
+        return baseModeStr(this.baseMode);
+    }
+
+    public int getBaseMode(){
+        return this.baseMode;
+    }
+
+    public void setBaseMode(int baseMode){
+        this.baseMode = baseMode;
+        prefsEditor.putInt("baseMode", baseMode);
+        prefsEditor.commit();
     }
 
     public void setDefUrl(String defUrl){
@@ -260,7 +279,7 @@ public class Preference {
         int titleId = title.getId();
         if(titleId>0) {
             try {
-                bookmark.put(String.valueOf(title.getId()), id);
+                bookmark.put(String.valueOf(title.getBaseMode()+"."+title.getId()), id);
             } catch (Exception e) {
                 //
             }
@@ -272,7 +291,7 @@ public class Preference {
         int titleId = title.getId();
         if(titleId>0) {
             try {
-                return bookmark.getInt(String.valueOf(titleId));
+                return bookmark.getInt(title.getBaseMode()+"."+titleId);
             } catch (Exception e) {
                 //
             }
@@ -309,11 +328,11 @@ public class Preference {
     }
 
 
-    public void setViewerBookmark(int id,int index){
-        if(id>-1) {
+    public void setViewerBookmark(Manga m,int index){
+        if(m.getId()>-1) {
             if (index > 0) {
                 try {
-                    pagebookmark.put(id + "", index);
+                    pagebookmark.put(m.getBaseMode() + "."+m.getId(), index);
                 } catch (Exception e) {
                     //
                 }
@@ -321,18 +340,18 @@ public class Preference {
             }
         }
     }
-    public int getViewerBookmark(int id){
-        if(id>-1) {
+    public int getViewerBookmark(Manga m){
+        if(m.getId()>-1) {
             try {
-                return pagebookmark.getInt(id + "");
+                return pagebookmark.getInt(m.getBaseMode()+"."+m.getId());
             } catch (Exception e) {
                 //
             }
         }
         return 0;
     }
-    public void removeViewerBookmark(int id){
-        pagebookmark.remove(id+"");
+    public void removeViewerBookmark(Manga m){
+        pagebookmark.remove(m.getBaseMode()+"."+m.getId());
         writeViewerBookmark();
     }
     public void resetViewerBookmark(){
@@ -399,9 +418,6 @@ public class Preference {
         return recent;
     }
 
-    public boolean isViewed(int id){
-        return pagebookmark.has(id+"");
-    }
 
 //    public boolean match(String s1, String s2){
 //        return filterString(s1).matches(filterString(s2));
@@ -451,6 +467,48 @@ public class Preference {
             if(isInteger(t.getRelease())) return false;
         }
         return true;
+    }
+
+
+    public void check2(){
+        //returns false if needs update
+        Iterator<String> keys = bookmark.keys();
+        List<String> fix = new ArrayList<>();
+        while(keys.hasNext()){
+            String key = keys.next();
+            if(key.toCharArray()[1] != '.'){
+                fix.add(key);
+            }
+        }
+        String jsonStr = bookmark.toString();
+        for(String f : fix){
+            jsonStr = jsonStr.replace(f, String.valueOf(base_comic)+"."+f);
+        }
+        try {
+            this.bookmark = new JSONObject(jsonStr);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        writeBookmark();
+
+        fix.clear();
+        keys = pagebookmark.keys();
+        while(keys.hasNext()){
+            String key = keys.next();
+            if(key.toCharArray()[1] != '.'){
+                fix.add(key);
+            }
+        }
+        jsonStr = pagebookmark.toString();
+        for(String f : fix){
+            jsonStr = jsonStr.replace(f, String.valueOf(base_comic)+"."+f);
+        }
+        try {
+            this.pagebookmark = new JSONObject(jsonStr);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        writeViewerBookmark();
     }
     public Login getLogin(){
         return login;

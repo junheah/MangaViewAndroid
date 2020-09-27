@@ -23,6 +23,9 @@ import org.jsoup.select.Elements;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
+
+
     /*
     mode:
     0 = online
@@ -33,11 +36,17 @@ import okhttp3.Response;
      */
 
 public class Manga {
+    int baseMode;
 
-    public Manga(int i, String n, String d) {
+    public Manga(int i, String n, String d, int baseMode){
         id = i;
         name = n;
         date = d;
+        this.baseMode = baseMode;
+    }
+
+    public int getBaseMode(){
+        return this.baseMode;
     }
     public int getId() {
         return id;
@@ -76,7 +85,7 @@ public class Manga {
         int tries = 0;
 
         while(imgs.size()==0 && tries < 2) {
-            Response r = client.mget("/comic/" + String.valueOf(id), false, cookies);
+            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id), false, cookies);
             try {
                 String body = r.body().string();
                 r.close();
@@ -97,16 +106,16 @@ public class Manga {
                 int tid = Integer.parseInt(navbar.select("a")
                         .last()
                         .attr("href")
-                        .split("comic/")[1]
+                        .split(baseModeStr(baseMode) +'/')[1]
                         .split("\\?")[0]);
 
-                if(title == null) title = new Title(name, "", "", null, "", tid );
+                if(title == null) title = new Title(name, "", "", null, "", tid, baseMode);
 
                 //eps
                 for(Element e :navbar.selectFirst("select").select("option")){
                     String idstr = e.attr("value");
                     if(idstr!=null && idstr.length()>0)
-                        eps.add(new Manga(Integer.parseInt(idstr),e.ownText(),""));
+                        eps.add(new Manga(Integer.parseInt(idstr),e.ownText(),"", baseMode));
                 }
 
                 //imgs
@@ -129,8 +138,12 @@ public class Manga {
                         for(Attribute a : e.attributes()){
                             if(a.getKey().contains("data")){
                                 String img = a.getValue();
-                                if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading") && !img.startsWith("/"))
-                                    imgs.add(img);
+                                if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
+                                    if(img.startsWith("/"))
+                                        imgs.add(client.getUrl()+img);
+                                    else
+                                        imgs.add(img);
+                                }
                             }
                         }
                     }
@@ -151,47 +164,51 @@ public class Manga {
                 String indentstr;
                 try {
                     for (Element e : commentdiv.selectFirst("section#bo_vc").select("div.media")) {
-                        if (e.id().contains("c_")) {
-                            // is comment
+                        try {
+                            if (e.id().contains("c_")) {
+                                // is comment
 
-                            //indent
-                            indentstr = e.attr("style");
-                            if (indentstr != null && indentstr.length() > 0)
-                                indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':') + 1, indentstr.lastIndexOf('p'))) / 64;
-                            else
-                                indent = 0;
+                                //indent
+                                indentstr = e.attr("style");
+                                if (indentstr != null && indentstr.length() > 0)
+                                    indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':') + 1, indentstr.lastIndexOf('p'))) / 64;
+                                else
+                                    indent = 0;
 
-                            //icon
-                            Element icone = e.selectFirst(".media-object");
-                            if (icone.is("img"))
-                                icon = icone.attr("src");
-                            else
-                                icon = "";
+                                //icon
+                                Element icone = e.selectFirst(".media-object");
+                                if (icone.is("img"))
+                                    icon = icone.attr("src");
+                                else
+                                    icon = "";
 
-                            Element header = e.selectFirst("div.media-heading");
-                            Element userSpan = header.selectFirst("span");
-                            user = userSpan.ownText();
-                            if (userSpan.hasClass("guest"))
-                                level = 0;
-                            else {
-                                lvlstr = userSpan.selectFirst("img").attr("src");
-                                level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/') + 1, lvlstr.lastIndexOf('.')));
+                                Element header = e.selectFirst("div.media-heading");
+                                Element userSpan = header.selectFirst("span");
+                                user = userSpan.ownText();
+                                if (userSpan.hasClass("guest"))
+                                    level = 0;
+                                else {
+                                    lvlstr = userSpan.selectFirst("img").attr("src");
+                                    level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/') + 1, lvlstr.lastIndexOf('.')));
+                                }
+                                timestamp = header.selectFirst("span.media-info").ownText();
+
+                                Element cbody = e.selectFirst("div.media-content");
+                                content = cbody.ownText();
+                                likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
+                                comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
                             }
-                            timestamp = header.selectFirst("span.media-info").ownText();
-
-                            Element cbody = e.selectFirst("div.media-content");
-                            content = cbody.ownText();
-                            likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
-                            comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
+                        }catch (Exception e3){
+                            e3.printStackTrace();
                         }
 
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
+                }catch (Exception e1){
+                    e1.printStackTrace();
                 }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception e2) {
+                e2.printStackTrace();
             }
             if(r!=null){
                 r.close();

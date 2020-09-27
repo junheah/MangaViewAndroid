@@ -30,6 +30,28 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/seenIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_margin="5dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toStartOf="@+id/epsButton"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/ic_history"
+                android:visibility="visible"/>
+            <ImageView
+                android:id="@+id/favIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_margin="5dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toStartOf="@+id/seenIcon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/ic_favorite"
+                android:visibility="visible"/>
 
             <TextView
                 android:id="@+id/Title"
@@ -45,7 +67,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:gravity="bottom|right"
+                android:gravity="bottom|left"
                 android:id="@+id/date"
                 android:layout_height="0dp"
                 android:layout_margin="8sp"

@@ -42,7 +42,6 @@ public class Login {
                     if (c.contains("PHPSESSID=")) {
                         cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
                         client.setCookie("PHPSESSID",cookie);
-                        System.out.println(cookie);
                     }
                 }
                 break;

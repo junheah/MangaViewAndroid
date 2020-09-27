@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.jhavar.main.DdosGuardBypass;
 
@@ -42,11 +43,14 @@ import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SELECT;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FOLDER_SELECT;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
+import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class DebugActivity extends AppCompatActivity {
     TextView output;
     Context context;
     ScrollView scroll;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,6 +188,19 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(context, LayoutEditActivity.class));
+            }
+        });
+
+        this.findViewById(R.id.debug_baseMode).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(p.getBaseMode() == base_comic) {
+                    p.setBaseMode(base_webtoon);
+                    Toast.makeText(context, "webtoon", Toast.LENGTH_SHORT).show();
+                }else {
+                    p.setBaseMode(base_comic);
+                    Toast.makeText(context, "comic", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

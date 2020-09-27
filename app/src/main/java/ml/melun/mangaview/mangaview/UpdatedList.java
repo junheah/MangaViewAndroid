@@ -12,10 +12,16 @@ import java.util.List;
 
 import okhttp3.Response;
 
+
 public class UpdatedList {
     Boolean last = false;
     ArrayList<Manga> result;
     int page = 1;
+    int baseMode;
+
+    public UpdatedList(int baseMode){
+        this.baseMode = baseMode;
+    }
 
     public int getPage(){
         return this.page;
@@ -27,7 +33,7 @@ public class UpdatedList {
         String url = "/bbs/page.php?hid=update&page=";
         if(!last) {
             try {
-                Response response= client.mget(url + page++);
+                Response response= client.mget(url + page++,true,null);
                 String body = response.body().string();
                 if(body.contains("Connect Error: Connection timed out")){
                     //adblock : try again
@@ -60,9 +66,9 @@ public class UpdatedList {
 
                         List<String> tags = Arrays.asList(item.selectFirst("div.post-text").ownText().split(","));
 
-                        Manga tmp = new Manga(id, name, date);
+                        Manga tmp = new Manga(id, name, date, baseMode);
                         tmp.setMode(0);
-                        tmp.setTitle(new Title(name, img, "", new ArrayList<String>(), "", tid));
+                        tmp.setTitle(new Title(name, img, "", new ArrayList<String>(), "", tid, MTitle.base_comic));
                         tmp.addThumb(img);
                         result.add(tmp);
                     }catch(Exception e){

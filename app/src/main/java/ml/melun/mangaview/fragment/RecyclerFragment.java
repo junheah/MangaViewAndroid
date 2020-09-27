@@ -34,6 +34,7 @@ import java.util.List;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -82,9 +83,9 @@ public class RecyclerFragment extends Fragment {
             public void onResumeClick(int position, int id) {
                 selectedPosition = position;
                 if(mode == R.id.nav_recent) {
-                    openViewer(new Manga(id, "", ""), 2);
+                    openViewer(new Manga(id, "", "" , titleAdapter.getItem(position).getBaseMode()), 2);
                 } else if(mode == R.id.nav_favorite) {
-                    openViewer(new Manga(id, "", ""), -1);
+                    openViewer(new Manga(id, "", "", titleAdapter.getItem(position).getBaseMode()), -1);
                 }
             }
 
@@ -192,27 +193,13 @@ public class RecyclerFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... voids) {
             titles = new ArrayList<>();
-            List<Title> savedTitles = new ArrayList<>();
             File homeDir = new File(p.getHomeDir());
             if (homeDir.exists()) {
                 File[] files = homeDir.listFiles();
                 for (File f : files) {
                     if (f.isDirectory()) {
-                        File oldData = new File(f, "title.data");
                         File data = new File(f, "title.gson");
-                        if (oldData.exists()) {
-                            try {
-                                JSONObject json = new JSONObject(readFileToString(oldData));
-                                Title title = new Gson().fromJson(json.getJSONObject("title").toString(), new TypeToken<Title>() {
-                                }.getType());
-                                if (title.getThumb().length() > 0)
-                                    title.setThumb(new File(f.getAbsolutePath(), title.getThumb()).getAbsolutePath());
-                                titles.add(title);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
-                            }
-                        } else if (data.exists()) {
+                        if (data.exists()) {
                             try {
                                 Title title = new Gson().fromJson(readFileToString(data), new TypeToken<Title>() {
                                 }.getType());
@@ -221,11 +208,11 @@ public class RecyclerFragment extends Fragment {
                                 titles.add(title);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
+                                titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto));
                             }
 
                         } else
-                            titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0));
+                            titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto));
                     }
                 }
                 //add titles to adapter

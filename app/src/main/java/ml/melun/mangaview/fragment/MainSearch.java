@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,10 +48,11 @@ public class MainSearch extends Fragment {
     TextView noresult;
     private EditText searchBox;
     RecyclerView searchResult;
-    Spinner searchMode;
+    Spinner searchMode, baseMode;
     TitleAdapter searchAdapter;
     Search search;
     Fragment fragment;
+    LinearLayoutCompat optionsPanel;
 
     @Nullable
     @Override
@@ -61,10 +65,26 @@ public class MainSearch extends Fragment {
         searchResult = rootView.findViewById(R.id.searchResult);
         searchResult.setLayoutManager(new LinearLayoutManager(getContext()));
         searchMode = rootView.findViewById(R.id.searchMode);
+        baseMode = rootView.findViewById(R.id.searchBaseMode);
         advSearchBtn = rootView.findViewById(R.id.advSearchBtn);
         swipe = rootView.findViewById(R.id.searchSwipe);
+        optionsPanel = rootView.findViewById(R.id.searchOptionPanel);
         fragment = this;
-        if(p.getDarkTheme()) searchMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        if(p.getDarkTheme()){
+            searchMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+            baseMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        }
+
+        searchBox.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(b){
+                    optionsPanel.setVisibility(View.VISIBLE);
+                }else{
+                    optionsPanel.setVisibility(View.GONE);
+                }
+            }
+        });
 
         advSearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +106,24 @@ public class MainSearch extends Fragment {
             }
         });
 
+        AdapterView.OnItemSelectedListener mlistener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                optionUpdate();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                optionUpdate();
+            }
+        };
+        baseMode.setOnItemSelectedListener(mlistener);
+        searchMode.setOnItemSelectedListener(mlistener);
+
+        baseMode.setSelection(p.getBaseMode()-1);
+
+
+
         swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh(SwipyRefreshLayoutDirection direction) {
@@ -101,13 +139,18 @@ public class MainSearch extends Fragment {
         return rootView;
     }
 
+    void optionUpdate(){
+        //shows or hides options
+        //p.setBaseMode(baseMode.getSelectedItemPosition()+1);
+    }
+
     void searchSubmit(){
         String query = searchBox.getText().toString();
         if(query.length()>0) {
             swipe.setRefreshing(true);
             if(searchAdapter != null) searchAdapter.removeAll();
             else searchAdapter = new TitleAdapter(getContext());
-            search = new Search(query,searchMode.getSelectedItemPosition());
+            search = new Search(query,searchMode.getSelectedItemPosition(), baseMode.getSelectedItemPosition()+1);
             new SearchManga().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -160,7 +203,7 @@ public class MainSearch extends Fragment {
 
                     @Override
                     public void onResumeClick(int position, int id) {
-                        openViewer(getContext(),new Manga(id,"",""),-1);
+                        openViewer(getContext(),new Manga(id,"","", search.getBaseMode()),-1);
                     }
 
                     @Override

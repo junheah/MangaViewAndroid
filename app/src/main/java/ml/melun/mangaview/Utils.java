@@ -649,5 +649,19 @@ public class Utils {
     }
 
 
+    public static int getNumberFromString(String input){
+        if(input.isEmpty()) return -1;
+        for(int i = 0; i < input.length(); i++) {
+            if(Character.digit(input.charAt(i),10) < 0){
+                if(i>0)
+                    return Integer.parseInt(input.substring(0,i));
+                else
+                    return -1;
+            }
+        }
+        return -1;
+    }
+
+
 
 }

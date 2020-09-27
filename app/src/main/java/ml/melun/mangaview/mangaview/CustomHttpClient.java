@@ -27,15 +27,16 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.mangaview.MTitle.base_auto;
+
 public class CustomHttpClient {
     public OkHttpClient client;
-    Preference p;
     Map<String, String> cookies;
 
-    public CustomHttpClient(Preference p){
+    public CustomHttpClient(){
         System.out.println("http client create");
         this.cookies = new HashMap<>();
-        this.p = p;
         if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             // Necessary because our servers don't have the right cipher suites.
             // https://github.com/square/okhttp/issues/4053
@@ -75,21 +76,27 @@ public class CustomHttpClient {
         this.cookies = new HashMap<>();
     }
 
+    public int getBaseMode(){
+        return p.getBaseMode();
+    }
+
+
 
     public String getCookie(String k){
         return cookies.get(k);
     }
 
     public Response get(String url, Map<String, String> headers){
+        System.out.println(url);
         Response response = null;
         try {
             Request.Builder builder = new Request.Builder()
                     .url(url)
                     .get();
-
-            for(String k : headers.keySet()){
-                builder.addHeader(k, headers.get(k));
-            }
+            if(headers !=null)
+                for(String k : headers.keySet()){
+                    builder.addHeader(k, headers.get(k));
+                }
 
             Request request = builder.build();
             response = this.client.newCall(request).execute();
@@ -106,6 +113,12 @@ public class CustomHttpClient {
     public Response mget(String url){
         return mget(url,true);
     }
+
+
+    public String getUrl(){
+        return p.getUrl();
+    }
+
 
     public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
         if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
@@ -128,8 +141,7 @@ public class CustomHttpClient {
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cbuilder.toString());
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-        headers.put("Referer",p.getUrl() + "/comic");
-
+        headers.put("Referer",p.getUrl());
 
         return get(p.getUrl()+url, headers);
     }

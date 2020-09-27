@@ -37,7 +37,7 @@ public class MainApplication extends Application{
     public void onCreate() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         p = new Preference(this);
-        httpClient = new CustomHttpClient(p);
+        httpClient = new CustomHttpClient();
         super.onCreate();
     }
 }

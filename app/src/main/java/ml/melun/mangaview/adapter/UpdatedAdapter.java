@@ -69,6 +69,14 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if(m.getThumb().length()>1 && !save) Glide.with(context).load(m.getThumb()).into(h.thumb);
         else h.thumb.setImageBitmap(null);
         if(save) h.thumb.setVisibility(View.GONE);
+        if(p.getBookmark(m.getTitle())>0)
+            h.seen.setVisibility(View.VISIBLE);
+        else
+            h.seen.setVisibility(View.GONE);
+        if(p.findFavorite(m.getTitle())>-1)
+            h.fav.setVisibility(View.VISIBLE);
+        else
+            h.fav.setVisibility(View.GONE);
     }
 
     @Override
@@ -80,6 +88,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView text, date;
         ImageView thumb;
         CardView card;
+        ImageView seen, fav;
         Button viewEps;
         public viewHolder(View itemView) {
             super(itemView);
@@ -88,6 +97,8 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             card = itemView.findViewById(R.id.updatedCard);
             thumb = itemView.findViewById(R.id.Thumb);
             viewEps = itemView.findViewById(R.id.epsButton);
+            seen = itemView.findViewById(R.id.seenIcon);
+            fav = itemView.findViewById(R.id.favIcon);
             if(dark){
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
                 viewEps.setBackgroundColor(ContextCompat.getColor(context, R.color.resumeDark));

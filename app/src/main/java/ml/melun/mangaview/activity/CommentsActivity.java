@@ -106,8 +106,7 @@ public class CommentsActivity extends AppCompatActivity {
         tab.addTab(tab.newTab().setText("베스트 댓글"));
 
 
-        mViewPager.addOnPageChangeListener(new
-                TabLayout.TabLayoutOnPageChangeListener(tab));
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tab));
         tab.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

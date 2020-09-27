@@ -10,17 +10,27 @@ public class MTitle{
     String author;
     List<String> tags;
     String release;
+    int baseMode = base_comic; // default is comic
     //public static final String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
     public MTitle(){
 
     }
-    public MTitle(String name, int id, String thumb, String author, List<String> tags, String release) {
+    public MTitle(String name, int id, String thumb, String author, List<String> tags, String release, int baseMode) {
         this.name = name;
         this.id = id;
         this.thumb = thumb;
         this.tags = tags;
         this.release = release;
         this.author = author;
+        this.baseMode = baseMode;
+    }
+
+    public int getBaseMode() {
+        return baseMode;
+    }
+
+    public void setBaseMode(int baseMode) {
+        this.baseMode = baseMode;
     }
 
     public String getName() {
@@ -75,11 +85,26 @@ public class MTitle{
 
     @Override
     public MTitle clone() {
-        return new MTitle(name, id, thumb, author, tags, release);
+        return new MTitle(name, id, thumb, author, tags, release, baseMode);
+    }
+
+    public static final int base_auto = 0;
+    public static final int base_comic = 1;
+    public static final int base_webtoon = 2;
+
+    public static String baseModeStr(int mode){
+        switch(mode){
+            case base_comic:
+                return "comic";
+            case base_webtoon:
+                return "webtoon";
+            default:
+                return "comic";
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
-        return ((MTitle)obj).getId() == this.id;
+        return ((MTitle)obj).getBaseMode() == this.baseMode && ((MTitle)obj).getId() == this.id ;
     }
 }

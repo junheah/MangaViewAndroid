@@ -282,7 +282,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index>0) {
+                if(eps!=null && index>0) {
                     lockUi(true);
                     index--;
                     manga = eps.get(index);
@@ -300,7 +300,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index<eps.size()-1) {
+                if(eps!=null && index<eps.size()-1) {
                     lockUi(true);
                     index++;
                     manga = eps.get(index);
@@ -424,8 +424,8 @@ public class ViewerActivity2 extends AppCompatActivity {
             }
         }
         if(manga.useBookmark()) {
-            p.setViewerBookmark(id, viewerBookmark);
-            if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(id);
+            p.setViewerBookmark(manga, viewerBookmark);
+            if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(manga);
         }
         updatePageIndex();
     }
@@ -495,8 +495,8 @@ public class ViewerActivity2 extends AppCompatActivity {
             }
         }
         if(manga.useBookmark()) {
-            p.setViewerBookmark(id, viewerBookmark);
-            if (0 == viewerBookmark) p.removeViewerBookmark(id);
+            p.setViewerBookmark(manga, viewerBookmark);
+            if (0 == viewerBookmark) p.removeViewerBookmark(manga);
         }
         updatePageIndex();
 
@@ -706,7 +706,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     public void bookmarkRefresh(){
         if(manga.useBookmark()) {
-            viewerBookmark = p.getViewerBookmark(id);
+            viewerBookmark = p.getViewerBookmark(manga);
             // if manga is online or has title.gson
             p.addRecent(title);
             p.setBookmark(title, id);

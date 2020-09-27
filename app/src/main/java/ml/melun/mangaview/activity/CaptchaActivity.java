@@ -77,7 +77,6 @@ public class CaptchaActivity extends AppCompatActivity {
 
             @Override
             public void onLoadResource(WebView view, String url) {
-                System.out.println("ppppp " + url);
                 if(count == 0){
                     count--;
                     // read cookies and finish

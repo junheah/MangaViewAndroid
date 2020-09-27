@@ -13,12 +13,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.tabs.TabLayout;
+
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
+import ml.melun.mangaview.adapter.MainWebtoonAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
@@ -26,14 +29,20 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.openViewer;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
+import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class MainMain extends Fragment{
 
     RecyclerView mainRecycler;
     MainAdapter mainadapter;
+    MainWebtoonAdapter mainWebtoonAdapter;
     Fragment fragment;
     boolean wait = false;
     UrlUpdater.UrlUpdaterCallback callback;
+
+    final static int COMIC_TAB = 0;
+    final static int WEBTOON_TAB = 1;
 
     boolean fragmentActive = false;
 
@@ -46,8 +55,12 @@ public class MainMain extends Fragment{
             @Override
             public void callback(boolean success) {
                 wait = false;
-                if(mainadapter != null && fragmentActive)
+                if(mainadapter != null && fragmentActive) {
                     mainadapter.fetch();
+                }
+                if(mainWebtoonAdapter != null && fragmentActive) {
+                    mainWebtoonAdapter.fetch();
+                }
             }
         };
     }
@@ -61,14 +74,49 @@ public class MainMain extends Fragment{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_main , container, false);
 
+
+        TabLayout tabLayout = rootView.findViewById(R.id.mainTab);
+
+        TabLayout.Tab comicTab = tabLayout.newTab().setText("만화");
+        TabLayout.Tab webtoonTab = tabLayout.newTab().setText("웹툰");
+        tabLayout.addTab(comicTab);
+        tabLayout.addTab(webtoonTab);
+
+        if(p.getBaseMode() == base_comic)
+            comicTab.select();
+        else
+            webtoonTab.select();
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if(tab.getPosition() == COMIC_TAB){
+                    mainRecycler.setAdapter(mainadapter);
+                    p.setBaseMode(base_comic);
+                }else if(tab.getPosition() == WEBTOON_TAB){
+                    mainRecycler.setAdapter(mainWebtoonAdapter);
+                    p.setBaseMode(base_webtoon);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
         fragment = this;
         //main content
         // 최근 추가된 만화
         mainRecycler = rootView.findViewById(R.id.main_recycler);
-        mainadapter = new MainAdapter(getContext());
         mainRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        mainRecycler.setAdapter(mainadapter);
-        mainadapter.setMainClickListener(new MainAdapter.onItemClick() {
+
+        MainAdapter.onItemClick listener = new MainAdapter.onItemClick() {
 
             @Override
             public void clickedTitle(Title t) {
@@ -118,9 +166,23 @@ public class MainMain extends Fragment{
             public void captchaCallback() {
                 Utils.showCaptchaPopup(getContext(), 3, fragment, p);
             }
-        });
-        if(!wait)
+        };
+
+        mainadapter = new MainAdapter(getContext());
+        mainadapter.setMainClickListener(listener);
+
+        mainWebtoonAdapter = new MainWebtoonAdapter(getContext());
+        mainWebtoonAdapter.setListener(listener);
+
+        if(p.getBaseMode() == base_comic)
+            mainRecycler.setAdapter(mainadapter);
+        else
+            mainRecycler.setAdapter(mainWebtoonAdapter);
+
+        if(!wait) {
             mainadapter.fetch();
+            mainWebtoonAdapter.fetch();
+        }
         return rootView;
     }
 

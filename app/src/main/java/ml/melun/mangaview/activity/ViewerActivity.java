@@ -136,7 +136,7 @@ public class ViewerActivity extends AppCompatActivity {
             id = manga.getId();
 
             toolbarTitle.setText(name);
-            viewerBookmark = p.getViewerBookmark(id);
+            viewerBookmark = p.getViewerBookmark(manga);
 
             strip = this.findViewById(R.id.strip);
             manager = new LinearLayoutManager(this);
@@ -207,15 +207,13 @@ public class ViewerActivity extends AppCompatActivity {
                             lastVisible /=2;
                         }
                         //bookmark handler
-                        if (firstVisible == 0) p.removeViewerBookmark(id);
-                        if (firstVisible != viewerBookmark) {
+                        if (firstVisible == 0 || lastVisible >= imgs.size()-1){
                             if(manga.useBookmark())
-                                p.setViewerBookmark(id, firstVisible);
+                                p.removeViewerBookmark(manga);
+                        }else if (firstVisible != viewerBookmark) {
+                            if(manga.useBookmark())
+                                p.setViewerBookmark(manga, firstVisible);
                             viewerBookmark = firstVisible;
-                        }
-                        if (lastVisible >= imgs.size() - 1) {
-                            if(manga.useBookmark())
-                                p.removeViewerBookmark(id);
                         }
 
                         if ((!strip.canScrollVertically(1)) && !toolbarshow) {
@@ -240,7 +238,7 @@ public class ViewerActivity extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index>0) {
+                if(eps!=null && index>0) {
                     lockUi(true);
                     index--;
                     manga = eps.get(index);
@@ -256,7 +254,7 @@ public class ViewerActivity extends AppCompatActivity {
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index<eps.size()-1) {
+                if(eps!=null && index<eps.size()-1) {
                     lockUi(true);
                     index++;
                     manga = eps.get(index);
@@ -340,8 +338,8 @@ public class ViewerActivity extends AppCompatActivity {
             }
             if(manga.useBookmark()) {
                 if (viewerBookmark > 0 && viewerBookmark < stripAdapter.getItemCount() - 1) {
-                    p.setViewerBookmark(id, viewerBookmark);
-                } else p.removeViewerBookmark(id);
+                    p.setViewerBookmark(manga, viewerBookmark);
+                } else p.removeViewerBookmark(manga);
             }
             if(toolbarshow) toggleToolbar();
             return true;
@@ -482,7 +480,7 @@ public class ViewerActivity extends AppCompatActivity {
 
     public void bookmarkRefresh(){
         if(manga.useBookmark()) {
-            viewerBookmark = p.getViewerBookmark(id);
+            viewerBookmark = p.getViewerBookmark(manga);
             if (viewerBookmark != -1) {
                 strip.scrollToPosition(viewerBookmark);
             }

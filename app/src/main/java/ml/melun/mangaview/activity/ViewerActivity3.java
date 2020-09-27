@@ -157,8 +157,8 @@ public class ViewerActivity3 extends AppCompatActivity {
                     pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
                     if(manga.useBookmark()) {
                         if (position == imgs.size() - 1 || position == 0) {
-                            p.removeViewerBookmark(id);
-                        } else p.setViewerBookmark(id, viewerBookmark);
+                            p.removeViewerBookmark(manga);
+                        } else p.setViewerBookmark(manga, viewerBookmark);
                     }
 
                     boolean lastPage = viewerBookmark == imgs.size() - 1;
@@ -202,7 +202,7 @@ public class ViewerActivity3 extends AppCompatActivity {
             id = manga.getId();
 
             toolbarTitle.setText(name);
-            if(manga.useBookmark()) viewerBookmark = p.getViewerBookmark(id);
+            if(manga.useBookmark()) viewerBookmark = p.getViewerBookmark(manga);
 
             if(manga.useBookmark()){
                 result = new Intent();
@@ -268,7 +268,7 @@ public class ViewerActivity3 extends AppCompatActivity {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index>0) {
+                if(eps!=null && index>0) {
                     lockUi(true);
                     index--;
                     manga = eps.get(index);
@@ -284,7 +284,7 @@ public class ViewerActivity3 extends AppCompatActivity {
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(index<eps.size()-1) {
+                if(eps!=null && index<eps.size()-1) {
                     lockUi(true);
                     index++;
                     manga = eps.get(index);
@@ -420,7 +420,7 @@ public class ViewerActivity3 extends AppCompatActivity {
 
     public void bookmarkRefresh(){
         if(manga.useBookmark()) {
-            viewerBookmark = p.getViewerBookmark(manga.getId());
+            viewerBookmark = p.getViewerBookmark(manga);
             viewPager.setCurrentItem(viewerBookmark, false);
             p.addRecent(title);
             p.setBookmark(title, id);

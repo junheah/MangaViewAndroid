@@ -86,10 +86,14 @@
     </string-array>
 
     <string-array name="searchSortMethod">
-        <item>최신순</item>
-        <item>추천수</item>
-        <item>인기수</item>
-        <item>덧글수</item>
-        <item>북마크수</item>
+        <item>초기화</item>
+        <item>날짜순</item>
+        <item>조회순</item>
+        <item>추천순</item>
+    </string-array>
+
+    <string-array name="baseOption">
+        <item>만화</item>
+        <item>웹툰</item>
     </string-array>
 </resources>
