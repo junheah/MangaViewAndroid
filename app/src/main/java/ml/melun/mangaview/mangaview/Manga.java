@@ -135,15 +135,26 @@ public class Manga {
                 for(Element e : id.select("img")){
                     String style = e.attr("style");
                     if(style == null || style.length()==0) {
+                        boolean flag = false;
                         for(Attribute a : e.attributes()){
                             if(a.getKey().contains("data")){
                                 String img = a.getValue();
                                 if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
+                                    flag = true;
                                     if(img.startsWith("/"))
                                         imgs.add(client.getUrl()+img);
                                     else
                                         imgs.add(img);
                                 }
+                            }
+                        }
+                        if(!flag){
+                            String img = e.attr("src");
+                            if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
+                                if(img.startsWith("/"))
+                                    imgs.add(client.getUrl()+img);
+                                else
+                                    imgs.add(img);
                             }
                         }
                     }
