@@ -212,8 +212,15 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         protected void onPostExecute(MainPageWebtoon main) {
             super.onPostExecute(main);
             //update adapters?
-            if(main.getDataSet().size()==0){
-                // captcha?
+            try {
+                for (Ranking<?> r : main.getDataSet()) {
+                    if (r.size() == 0) {
+                        // captcha?
+                        listener.captchaCallback();
+                    }
+                }
+            }catch (Exception e){
+                listener.captchaCallback();
             }
             dataSet = main.getDataSet();
             updateWidgets();

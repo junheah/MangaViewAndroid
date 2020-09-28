@@ -29,6 +29,7 @@ public class MainPageWebtoon {
 
     public String getUrl(CustomHttpClient client){
         Response r = client.mget("/site.php?id=1");
+        if(r==null) return null;
         if(r.code() == 302){
             this.baseUrl = r.header("Location");
         }else
@@ -39,7 +40,8 @@ public class MainPageWebtoon {
     }
     public void fetch(CustomHttpClient client){
         if(baseUrl == null || baseUrl.length()==0)
-            getUrl(client);
+            if(getUrl(client)==null)
+                return;
         try {
             Response r = client.get(baseUrl, null);
             String body = r.body().string();
