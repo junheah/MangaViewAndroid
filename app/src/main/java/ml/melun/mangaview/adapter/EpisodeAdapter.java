@@ -21,6 +21,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
@@ -41,7 +42,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     //title is in index 0
     Title title;
     TagAdapter ta;
-    LinearLayoutManager lm;
+    NpaLinearLayoutManager lm;
     boolean dark;
     boolean save;
     int mode = 0;
@@ -63,7 +64,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         if(title.getTags()!=null) {
             ta = new TagAdapter(context, title.getTags());
-            lm = new LinearLayoutManager(context);
+            lm = new NpaLinearLayoutManager(context);
             lm.setOrientation(LinearLayoutManager.HORIZONTAL);
         }
         setHasStableIds(true);

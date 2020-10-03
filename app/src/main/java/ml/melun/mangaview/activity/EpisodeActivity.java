@@ -115,7 +115,7 @@ public class EpisodeActivity extends AppCompatActivity {
         recentResult = intent.getBooleanExtra("recent",false);
         episodeList = this.findViewById(R.id.EpisodeList);
         progress = this.findViewById(R.id.progress);
-        episodeList.setLayoutManager(new LinearLayoutManager(this));
+        episodeList.setLayoutManager(new NpaLinearLayoutManager(this));
         homeDir = p.getHomeDir();
 
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);

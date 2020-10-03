@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
@@ -114,7 +115,7 @@ public class MainMain extends Fragment{
         //main content
         // 최근 추가된 만화
         mainRecycler = rootView.findViewById(R.id.main_recycler);
-        mainRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        mainRecycler.setLayoutManager(new NpaLinearLayoutManager(getContext()));
 
         MainAdapter.onItemClick listener = new MainAdapter.onItemClick() {
 

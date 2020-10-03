@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.adapter.CustomSpinnerAdapter;
@@ -139,7 +140,7 @@ public class ViewerActivity extends AppCompatActivity {
             viewerBookmark = p.getViewerBookmark(manga);
 
             strip = this.findViewById(R.id.strip);
-            manager = new LinearLayoutManager(this);
+            manager = new NpaLinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             if(intent.getBooleanExtra("recent",false)){

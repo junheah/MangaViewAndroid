@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
@@ -218,7 +219,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.main_tag_title);
             updatedList = itemView.findViewById(R.id.main_tag);
-            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
             lm.setOrientation(RecyclerView.HORIZONTAL);
             updatedList.setLayoutManager(lm);
             updatedList.setAdapter(uadapter);
@@ -309,7 +310,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.main_tag_title);
             tagList = itemView.findViewById(R.id.main_tag);
-            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
             lm.setOrientation(RecyclerView.HORIZONTAL);
             tagList.setLayoutManager(lm);
             tagList.setAdapter(tadapter);
@@ -328,7 +329,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(itemView);
             title = itemView.findViewById(R.id.main_tag_title);
             nameList = itemView.findViewById(R.id.main_tag);
-            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
             lm.setOrientation(RecyclerView.HORIZONTAL);
             nameList.setLayoutManager(lm);
             nameList.setAdapter(nadapter);
@@ -349,7 +350,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView title;
         public releaseHolder(View itemView) {
             super(itemView);
-            LinearLayoutManager lm = new LinearLayoutManager(mainContext);
+            LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
             lm.setOrientation(RecyclerView.HORIZONTAL);
             title = itemView.findViewById(R.id.main_tag_title);
             releaseList = itemView.findViewById(R.id.main_tag);

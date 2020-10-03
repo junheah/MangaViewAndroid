@@ -27,6 +27,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.activity.AdvSearchActivity;
@@ -63,7 +64,7 @@ public class MainSearch extends Fragment {
         noresult = rootView.findViewById(R.id.noResult);
         searchBox = rootView.findViewById(R.id.searchBox);
         searchResult = rootView.findViewById(R.id.searchResult);
-        searchResult.setLayoutManager(new LinearLayoutManager(getContext()));
+        searchResult.setLayoutManager(new NpaLinearLayoutManager(getContext()));
         searchMode = rootView.findViewById(R.id.searchMode);
         baseMode = rootView.findViewById(R.id.searchBaseMode);
         advSearchBtn = rootView.findViewById(R.id.advSearchBtn);

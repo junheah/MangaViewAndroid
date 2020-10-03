@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.MTitle;
@@ -76,7 +77,7 @@ public class RecyclerFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_recycler , container, false);
         recyclerView = rootView.findViewById(R.id.recycler_list);
         titleAdapter = new TitleAdapter(getContext());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new NpaLinearLayoutManager(getContext()));
         recyclerView.setAdapter(titleAdapter);
         titleAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
             @Override

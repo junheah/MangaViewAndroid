@@ -19,6 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 
 import ml.melun.mangaview.Downloader;
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.SelectEpisodeAdapter;
 import ml.melun.mangaview.mangaview.DownloadTitle;
@@ -44,7 +45,7 @@ public class DownloadActivity extends AppCompatActivity {
         Intent intent = getIntent();
         try {
             title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
-            eplist.setLayoutManager(new LinearLayoutManager(this));
+            eplist.setLayoutManager(new NpaLinearLayoutManager(this));
             adapter = new SelectEpisodeAdapter(getApplicationContext(),title.getEps());
             adapter.setClickListener(new SelectEpisodeAdapter.ItemClickListener() {
                 @Override

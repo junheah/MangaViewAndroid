@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.MainPageWebtoon;
 import ml.melun.mangaview.mangaview.Ranking;
@@ -49,7 +50,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public MainWebtoonAdapter(Context context){
         this.context = context;
         this.dark = p.getDarkTheme();
-        manager = new LinearLayoutManager(context);
+        manager = new NpaLinearLayoutManager(context);
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         inflater = LayoutInflater.from(context);
         dataSet = new ArrayList<>();

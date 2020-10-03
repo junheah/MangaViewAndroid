@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.UpdatedAdapter;
@@ -60,7 +61,7 @@ public class TagSearchActivity extends AppCompatActivity {
         context = this;
         searchResult = this.findViewById(R.id.tagSearchResult);
         noresult = this.findViewById(R.id.tagSearchNoResult);
-        LinearLayoutManager lm = new LinearLayoutManager(context);
+        LinearLayoutManager lm = new NpaLinearLayoutManager(context);
         searchResult.setLayoutManager(lm);
         Intent i = getIntent();
         query = i.getStringExtra("query");
