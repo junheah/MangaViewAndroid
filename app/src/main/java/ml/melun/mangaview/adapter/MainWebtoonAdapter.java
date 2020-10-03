@@ -53,7 +53,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         manager = new NpaLinearLayoutManager(context);
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         inflater = LayoutInflater.from(context);
-        dataSet = new ArrayList<>();
+        dataSet = MainPageWebtoon.getBlankDataSet();
         setLoading();
         setHasStableIds(true);
         setLoading();
@@ -215,12 +215,13 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             //update adapters?
             try {
                 for (Ranking<?> r : main.getDataSet()) {
-                    if (r.size() == 0) {
+                    if (r==null || r.size() == 0) {
                         // captcha?
                         listener.captchaCallback();
                     }
                 }
             }catch (Exception e){
+                e.printStackTrace();
                 listener.captchaCallback();
             }
             dataSet = main.getDataSet();
