@@ -1,16 +1,9 @@
 package ml.melun.mangaview.mangaview;
 
-
-import com.eclipsesource.v8.V8;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +12,10 @@ import org.jsoup.*;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import okhttp3.Response;
 
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
-
 
     /*
     mode:
@@ -35,25 +26,25 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
     4 = offline - new(moa) (title.gson)
      */
 
-public class Manga {
-    int baseMode;
+    public class Manga {
+        int baseMode;
 
-    public Manga(int i, String n, String d, int baseMode){
-        id = i;
-        name = n;
-        date = d;
-        this.baseMode = baseMode;
-    }
+        public Manga(int i, String n, String d, int baseMode){
+            id = i;
+            name = n;
+            date = d;
+            this.baseMode = baseMode;
+        }
 
-    public int getBaseMode(){
-        return this.baseMode;
-    }
-    public int getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
+        public int getBaseMode(){
+            return this.baseMode;
+        }
+        public int getId() {
+            return id;
+        }
+        public String getName() {
+            return name;
+        }
     public void addThumb(String src){
         thumb = src;
     }

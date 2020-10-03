@@ -144,6 +144,22 @@
                     app:srcCompat="@drawable/ic_tag" />
 
                 <TextView
+                    android:id="@+id/TitleBaseMode"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:singleLine="true"
+                    android:text="만화"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:singleLine="true"
+                    android:text=" "
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+                <TextView
                     android:id="@+id/TitleTag"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"

@@ -29,6 +29,10 @@ public class MTitle{
         return baseMode;
     }
 
+    public String getBaseModeStr(){
+        return baseModeKorStr(baseMode);
+    }
+
     public void setBaseMode(int baseMode) {
         this.baseMode = baseMode;
     }
@@ -100,6 +104,16 @@ public class MTitle{
                 return "webtoon";
             default:
                 return "comic";
+        }
+    }
+    public static String baseModeKorStr(int mode){
+        switch(mode){
+            case base_comic:
+                return "만화";
+            case base_webtoon:
+                return "웹툰";
+            default:
+                return "만화";
         }
     }
 

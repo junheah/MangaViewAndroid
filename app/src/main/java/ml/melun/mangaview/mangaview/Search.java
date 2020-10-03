@@ -1,26 +1,16 @@
 package ml.melun.mangaview.mangaview;
-import org.apache.commons.text.StringEscapeUtils;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.Response;
 
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
-import static ml.melun.mangaview.mangaview.MTitle.base_comic;
-import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
-import static ml.melun.mangaview.mangaview.Title.BATTERY_EMPTY;
-import static ml.melun.mangaview.mangaview.Title.BATTERY_FULL;
-import static ml.melun.mangaview.mangaview.Title.BATTERY_HALF;
-import static ml.melun.mangaview.mangaview.Title.BATTERY_ONE_QUARTER;
-import static ml.melun.mangaview.mangaview.Title.BATTERY_THREE_QUARTER;
 
 public class Search {
     /* mode
@@ -56,33 +46,7 @@ public class Search {
     public Boolean isLast() {
         return last;
     }
-    // not used in android version since we use seperate TagSearch activity
-    // which requires mode and single query value
-    /*
-    String q0= "", q1 = "", q2 = "", q3 = "";
-    
-    public void addQuery(int i, String q) {
-    	switch(i) {
-    	case 0:
-    		if(q0.length()>0) q0 += ","+q;
-    		else q0 = q;
-    		break;
-    	case 1:
-    		if(q1.length()>0) q1 += ","+q;
-    		else q1 = q;
-    		break;
-    	case 2:
-    		if(q2.length()>0) q2 += ","+q;
-    		else q2 = q;
-    		break;
-    	case 3:
-    		if(q3.length()>0) q3 += ","+q;
-    		else q3 = q;
-    		break;
-    	}
-    	
-    }
-    */
+
 
     public int fetch(CustomHttpClient client) {
         result = new ArrayList<>();
