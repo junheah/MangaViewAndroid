@@ -12,7 +12,7 @@ import okhttp3.Response;
 
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 
-public class Search{
+public class Search {
     /* mode
     * 0 : 제목
     * 1 : 작가
@@ -123,11 +123,12 @@ public class Search{
                     }
                 }
                 response.close();
-               if (result.size() < 210)
+                if (result.size() < 210)
                     last = true;
 
 
-
+                if(result.size()==0)
+                    page--;
 
             } catch (Exception e) {
                 page--;
