@@ -375,6 +375,7 @@ public class ViewerActivity extends AppCompatActivity {
             //viewerBookmark *= 2;
         }
         stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
+        stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
             public void onItemClick() {

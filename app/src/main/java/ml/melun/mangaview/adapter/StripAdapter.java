@@ -50,6 +50,14 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         setHasStableIds(true);
     }
 
+    public void preloadAll(){
+        for(String s : imgs) {
+            Glide.with(mainContext)
+                    .load("")
+                    .preload();
+        }
+    }
+
     @Override
     public int getItemViewType(int position) {
         return position;
