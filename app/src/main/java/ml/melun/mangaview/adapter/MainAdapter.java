@@ -377,6 +377,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void clickedTitle(Title t);
         void clickedMoreUpdated();
         void captchaCallback();
+        void clickedSearch(String query);
     }
 
     private class fetchMain extends AsyncTask<Void, Integer, MainPage> {

@@ -20,6 +20,7 @@ import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
+import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.adapter.MainWebtoonAdapter;
@@ -41,6 +42,7 @@ public class MainMain extends Fragment{
     Fragment fragment;
     boolean wait = false;
     UrlUpdater.UrlUpdaterCallback callback;
+    MainActivity.MainActivityCallback mainActivityCallback;
 
     final static int COMIC_TAB = 0;
     final static int WEBTOON_TAB = 1;
@@ -51,7 +53,9 @@ public class MainMain extends Fragment{
         this.wait = wait;
     }
 
-    public MainMain(){
+    public MainMain(MainActivity.MainActivityCallback mainActivityCallback){
+        this.mainActivityCallback = mainActivityCallback;
+
         callback = new UrlUpdater.UrlUpdaterCallback() {
             @Override
             public void callback(boolean success) {
@@ -166,6 +170,11 @@ public class MainMain extends Fragment{
             @Override
             public void captchaCallback() {
                 Utils.showCaptchaPopup(getContext(), 3, fragment, p);
+            }
+
+            @Override
+            public void clickedSearch(String query) {
+                mainActivityCallback.search(query);
             }
         };
 

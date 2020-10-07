@@ -114,6 +114,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public void onClick(View view) {
                     if(type == SR){
                         //search
+                        listener.clickedSearch((String)d);
                     }else{
                         //title
                         listener.clickedTitle((Title)d);

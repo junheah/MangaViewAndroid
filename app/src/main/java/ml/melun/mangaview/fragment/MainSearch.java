@@ -54,6 +54,7 @@ public class MainSearch extends Fragment {
     Search search;
     Fragment fragment;
     LinearLayoutCompat optionsPanel;
+    String prequery = null;
 
     @Nullable
     @Override
@@ -140,9 +141,22 @@ public class MainSearch extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(prequery != null){
+            searchBox.setText(prequery);
+            prequery = null;
+        }
+    }
+
     void optionUpdate(){
         //shows or hides options
         //p.setBaseMode(baseMode.getSelectedItemPosition()+1);
+    }
+
+    public void setSearch(String prequery){
+        this.prequery = prequery;
     }
 
     void searchSubmit(){

@@ -105,7 +105,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        fragments[0] = new MainMain();
+        MainActivityCallback mainActivityCallback = new MainActivityCallback() {
+            @Override
+            public void search(String query) {
+                ((MainSearch)fragments[1]).setSearch(query);
+                changeFragment(1);
+            }
+        };
+        fragments[0] = new MainMain(mainActivityCallback);
         fragments[1] = new MainSearch();
         fragments[2] = new RecyclerFragment();
         dark = p.getDarkTheme();
@@ -334,8 +341,7 @@ public class MainActivity extends AppCompatActivity
         else
             changeFragment(startTab);
 
-        getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(currentTab)).getTitle());
-        navigationView.getMenu().getItem(currentTab).setChecked(true);
+
 
         // savedInstanceState
 
@@ -478,6 +484,7 @@ public class MainActivity extends AppCompatActivity
     boolean changeFragment(int index){
         boolean change = !(currentTab >= 2 && index >= 2);
         int fragmentI = index>2 ? 2 : index;
+        boolean res = false;
         if(index>-1 && index != currentTab){
             currentTab = index;
             if(index >= 2){
@@ -486,10 +493,11 @@ public class MainActivity extends AppCompatActivity
             if(change) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, (Fragment) fragments[fragmentI]).commit();
             }
-
-            return true;
-        }else
-            return false;   //fragment does not exist
+            res = true;
+        }
+        getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(currentTab)).getTitle());
+        navigationView.getMenu().getItem(currentTab).setChecked(true);
+        return res;
     }
 
 
@@ -652,5 +660,9 @@ public class MainActivity extends AppCompatActivity
                     finish();
                 }
             });
+    }
+
+    public interface MainActivityCallback{
+        void search(String query);
     }
 }
