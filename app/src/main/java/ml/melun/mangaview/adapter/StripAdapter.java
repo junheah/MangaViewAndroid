@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -23,7 +25,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Decoder;
 
 
-public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> {
+public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<String> imgs;
     private LayoutInflater mInflater;
@@ -34,8 +36,6 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     int __seed;
     Decoder d;
     int width;
-
-
 
     // data is passed into the constructor
     public StripAdapter(Context context, List<String> data, Boolean cut, int seed, int id, int width) {
@@ -53,14 +53,21 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     public void preloadAll(){
         for(String s : imgs) {
             Glide.with(mainContext)
-                    .load("")
+                    .load(s)
                     .preload();
         }
     }
 
+    final static int IMG = 0;
+    final static int INFO = 1;
+
     @Override
     public int getItemViewType(int position) {
-        return position;
+        if(position == 0 || position == getItemCount()-1){
+            return INFO;
+        }else{
+            return IMG;
+        }
     }
 
     @Override
@@ -74,21 +81,30 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.item_strip, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if(viewType == IMG) {
+            View view = mInflater.inflate(R.layout.item_strip, parent, false);
+            return new ImgViewHolder(view);
+        }else{
+            //INFO
+            View view = mInflater.inflate(R.layout.item_strip_info, parent, false);
+            return new InfoViewHolder(view);
+        }
     }
-
 
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int pos) {
-        holder.frame.setImageResource(R.drawable.placeholder);
-        holder.refresh.setVisibility(View.VISIBLE);
-        glideBind(holder, pos);
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int pos) {
+        if(getItemViewType(pos) == IMG) {
+            ((ImgViewHolder)holder).frame.setImageResource(R.drawable.placeholder);
+            ((ImgViewHolder)holder).refresh.setVisibility(View.VISIBLE);
+            glideBind((ImgViewHolder)holder, pos);
+        }else{
+            //INFO
+        }
     }
 
-    void glideBind(ViewHolder holder, int pos){
+    void glideBind(ImgViewHolder holder, int pos){
         if (autoCut) {
             final int type = pos % 2;
             String image = imgs.get(pos / 2);
@@ -172,15 +188,19 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
     // total number of rows
     @Override
     public int getItemCount() {
+        return getImgCount() + 2;
+    }
+
+    public int getImgCount(){
         if(autoCut) return imgs.size()*2;
         else return imgs.size();
     }
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ImgViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView frame;
         ImageButton refresh;
-        ViewHolder(View itemView) {
+        ImgViewHolder(View itemView) {
             super(itemView);
             frame = itemView.findViewById(R.id.frame);
             refresh = itemView.findViewById(R.id.refreshButton);
@@ -197,6 +217,18 @@ public class StripAdapter extends RecyclerView.Adapter<StripAdapter.ViewHolder> 
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick();
         }
+    }
+
+    public class InfoViewHolder extends RecyclerView.ViewHolder{
+        TextView prevInfo, nextInfo;
+        ProgressBar loading;
+        InfoViewHolder(View itemView) {
+            super(itemView);
+            prevInfo = itemView.findViewById(R.id.prevEpInfo);
+            nextInfo = itemView.findViewById(R.id.nextEpInfo);
+            loading = itemView.findViewById(R.id.infoLoading);
+        }
+
     }
 
     // allows clicks events to be caught

@@ -203,6 +203,7 @@ public class ViewerActivity extends AppCompatActivity {
                     if(newState==RecyclerView.SCROLL_STATE_IDLE){
                         int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
                         int lastVisible = ((LinearLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
+                        System.out.println("ppppp first:" + firstVisible +" last:"+lastVisible);
                         if(autoCut){
                             firstVisible /=2;
                             lastVisible /=2;
