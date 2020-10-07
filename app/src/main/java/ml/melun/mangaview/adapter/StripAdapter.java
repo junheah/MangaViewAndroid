@@ -22,6 +22,7 @@ import java.util.List;
 
 import static ml.melun.mangaview.MainApplication.p;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.mangaview.Decoder;
 
 
@@ -36,9 +37,11 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     int __seed;
     Decoder d;
     int width;
+    ViewerActivity.InfiniteScrollCallback callback;
 
     // data is passed into the constructor
-    public StripAdapter(Context context, List<String> data, Boolean cut, int seed, int id, int width) {
+    public StripAdapter(Context context, List<String> data, Boolean cut, int seed, int id, int width, ViewerActivity.InfiniteScrollCallback callback) {
+        this.callback = callback;
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
         this.imgs = data;
@@ -63,11 +66,15 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0 || position == getItemCount()-1){
+        if(position == 0 || position == getImgCount()+1){
             return INFO;
         }else{
             return IMG;
         }
+    }
+
+    int getImgPos(int position){
+        return position-1;
     }
 
     @Override
@@ -98,9 +105,14 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if(getItemViewType(pos) == IMG) {
             ((ImgViewHolder)holder).frame.setImageResource(R.drawable.placeholder);
             ((ImgViewHolder)holder).refresh.setVisibility(View.VISIBLE);
-            glideBind((ImgViewHolder)holder, pos);
+            glideBind((ImgViewHolder)holder, getImgPos(pos));
         }else{
             //INFO
+            if(pos == 0){
+                callback.prevEp();
+            }else{
+                callback.nextEp();
+            }
         }
     }
 

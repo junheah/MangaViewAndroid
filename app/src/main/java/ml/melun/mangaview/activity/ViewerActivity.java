@@ -38,6 +38,7 @@ import java.util.Map;
 
 import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.StripLayoutManager;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.adapter.CustomSpinnerAdapter;
 import ml.melun.mangaview.adapter.StripAdapter;
@@ -84,6 +85,7 @@ public class ViewerActivity extends AppCompatActivity {
     boolean captchaChecked = false;
     Spinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
+    InfiniteScrollCallback infiniteScrollCallback;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -111,6 +113,18 @@ public class ViewerActivity extends AppCompatActivity {
         commentBtn = this.findViewById(R.id.commentButton);
         spinner = this.findViewById(R.id.toolbar_spinner);
         width = getScreenSize(getWindowManager().getDefaultDisplay());
+
+        infiniteScrollCallback = new InfiniteScrollCallback() {
+            @Override
+            public void nextEp() {
+                System.out.println("load next ep");
+            }
+
+            @Override
+            public void prevEp() {
+                System.out.println("load prev ep");
+            }
+        };
 
         this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +154,7 @@ public class ViewerActivity extends AppCompatActivity {
             viewerBookmark = p.getViewerBookmark(manga);
 
             strip = this.findViewById(R.id.strip);
-            manager = new NpaLinearLayoutManager(this);
+            manager = new StripLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             strip.setLayoutManager(manager);
             if(intent.getBooleanExtra("recent",false)){
@@ -201,9 +215,8 @@ public class ViewerActivity extends AppCompatActivity {
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
                     if(newState==RecyclerView.SCROLL_STATE_IDLE){
-                        int firstVisible = ((LinearLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
-                        int lastVisible = ((LinearLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
-                        System.out.println("ppppp first:" + firstVisible +" last:"+lastVisible);
+                        int firstVisible = ((StripLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
+                        int lastVisible = ((StripLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
                         if(autoCut){
                             firstVisible /=2;
                             lastVisible /=2;
@@ -215,8 +228,8 @@ public class ViewerActivity extends AppCompatActivity {
                         }else if (firstVisible != viewerBookmark) {
                             if(manga.useBookmark())
                                 p.setViewerBookmark(manga, firstVisible);
-                            viewerBookmark = firstVisible;
                         }
+                        viewerBookmark = firstVisible;
 
                         if ((!strip.canScrollVertically(1)) && !toolbarshow) {
                             toggleToolbar();
@@ -375,7 +388,7 @@ public class ViewerActivity extends AppCompatActivity {
             cut.setBackgroundResource(R.drawable.button_bg_on);
             //viewerBookmark *= 2;
         }
-        stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width);
+        stripAdapter = new StripAdapter(context,imgs, autoCut, seed, id, width, infiniteScrollCallback);
         stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
@@ -463,7 +476,7 @@ public class ViewerActivity extends AppCompatActivity {
                 showCaptchaPopup(context, p);
                 return;
             }
-            stripAdapter = new StripAdapter(context, imgs, autoCut, manga.getSeed(), id, width);
+            stripAdapter = new StripAdapter(context, imgs, autoCut, manga.getSeed(), id, width, infiniteScrollCallback);
 
             refreshAdapter();
             bookmarkRefresh();
@@ -584,5 +597,10 @@ public class ViewerActivity extends AppCompatActivity {
         if (resultCode == RESULT_CAPTCHA) {
             refresh();
         }
+    }
+
+    public interface InfiniteScrollCallback{
+        void nextEp();
+        void prevEp();
     }
 }

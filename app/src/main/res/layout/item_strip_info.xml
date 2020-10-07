@@ -6,11 +6,12 @@
     android:background="#000"
     android:orientation="vertical">
     <TextView
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:layout_marginBottom="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:textSize="13sp"
         android:textColor="#FFF"
         android:text="이전화"
         android:id="@+id/prevEpInfo"/>
@@ -24,11 +25,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:textSize="13sp"
         android:textColor="#FFF"
         android:text="다음화"
         android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="50dp"
         android:id="@+id/nextEpInfo"/>
 
 
