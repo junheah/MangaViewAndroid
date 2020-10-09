@@ -114,7 +114,6 @@ public class ViewerActivity extends AppCompatActivity {
             @Override
             public String nextEp(Runnable callback) {
                 if(index>0) {
-                    System.out.println("load next ep");
                     index--;
                     new loadImages(eps.get(index), new LoadImagesCallback() {
                         @Override
@@ -125,14 +124,14 @@ public class ViewerActivity extends AppCompatActivity {
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(index).getName();
                 }else{
-                    return "";
+                    callback.run();
+                    return "마지막 화 입니다";
                 }
             }
 
             @Override
             public String prevEp(Runnable callback) {
                 if(index < eps.size()-1) {
-                    System.out.println("load prev ep");
                     index++;
                     new loadImages(eps.get(index), new LoadImagesCallback() {
                         @Override
@@ -143,7 +142,8 @@ public class ViewerActivity extends AppCompatActivity {
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(index).getName();
                 }else {
-                    return "";
+                    callback.run();
+                    return "첫 화 입니다";
                 }
             }
         };
