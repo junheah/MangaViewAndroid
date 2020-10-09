@@ -53,6 +53,8 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         setHasStableIds(true);
     }
 
+
+
     public void preloadAll(){
         for(String s : imgs) {
             Glide.with(mainContext)
@@ -124,6 +126,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Glide.with(mainContext)
                     .asBitmap()
                     .load(image)
+                    .placeholder(R.drawable.placeholder)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {

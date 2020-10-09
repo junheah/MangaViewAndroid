@@ -33,7 +33,7 @@ public class FirstTimeActivity extends AppCompatActivity {
         context = this;
 
         //check update
-        CheckInfo cinfo = new CheckInfo(context, httpClient);
+        CheckInfo cinfo = new CheckInfo(context, httpClient, true);
         cinfo.update(true);
 
         setResult(RESULT_EULA_DISAGREE);

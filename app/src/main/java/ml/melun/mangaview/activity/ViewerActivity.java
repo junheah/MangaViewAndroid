@@ -1,5 +1,6 @@
 package ml.melun.mangaview.activity;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,8 +29,6 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
-import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,9 +55,8 @@ import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 public class ViewerActivity extends AppCompatActivity {
     String name;
     int id;
-    Manga manga;
+    Manga manga, nextmanga, prevmanga;
     RecyclerView strip;
-    ProgressDialog pd;
     Context context = this;
     StripAdapter stripAdapter;
     androidx.appcompat.widget.Toolbar toolbar;
@@ -76,7 +74,6 @@ public class ViewerActivity extends AppCompatActivity {
     List<String> imgs;
     boolean dark;
     Intent result;
-    SwipyRefreshLayout swipe;
     ImageButton commentBtn;
     int seed = 0;
     int epsCount = 0;
@@ -105,7 +102,6 @@ public class ViewerActivity extends AppCompatActivity {
         appbar = this.findViewById(R.id.viewerAppbar);
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
-        swipe = this.findViewById(R.id.viewerSwipe);
         cut = this.findViewById(R.id.viewerBtn2);
         cut.setText("자동 분할");
         pageBtn = this.findViewById(R.id.viewerBtn1);
@@ -118,6 +114,7 @@ public class ViewerActivity extends AppCompatActivity {
             @Override
             public void nextEp() {
                 System.out.println("load next ep");
+
             }
 
             @Override
@@ -190,7 +187,6 @@ public class ViewerActivity extends AppCompatActivity {
                 //load local imgs
 
                 commentBtn.setVisibility(View.GONE);
-                swipe.setEnabled(false);
 
 
                 reloadManga();
@@ -214,29 +210,31 @@ public class ViewerActivity extends AppCompatActivity {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if(newState==RecyclerView.SCROLL_STATE_IDLE){
-                        int firstVisible = ((StripLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
-                        int lastVisible = ((StripLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
-                        if(autoCut){
-                            firstVisible /=2;
-                            lastVisible /=2;
-                        }
-                        //bookmark handler
-                        if (firstVisible == 0 || lastVisible >= imgs.size()-1){
-                            if(manga.useBookmark())
-                                p.removeViewerBookmark(manga);
-                        }else if (firstVisible != viewerBookmark) {
-                            if(manga.useBookmark())
-                                p.setViewerBookmark(manga, firstVisible);
-                        }
-                        viewerBookmark = firstVisible;
+                    if(strip.getLayoutManager().getItemCount()>0) {
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            int firstVisible = ((StripLayoutManager) strip.getLayoutManager()).findFirstVisibleItemPosition();
+                            int lastVisible = ((StripLayoutManager) strip.getLayoutManager()).findLastVisibleItemPosition();
+                            if (autoCut) {
+                                firstVisible /= 2;
+                                lastVisible /= 2;
+                            }
+                            //bookmark handler
+                            if (firstVisible == 0 || lastVisible >= imgs.size() - 1) {
+                                if (manga.useBookmark())
+                                    p.removeViewerBookmark(manga);
+                            } else if (firstVisible != viewerBookmark) {
+                                if (manga.useBookmark())
+                                    p.setViewerBookmark(manga, firstVisible);
+                            }
+                            viewerBookmark = firstVisible;
 
-                        if ((!strip.canScrollVertically(1)) && !toolbarshow) {
-                            toggleToolbar();
-                        }
-                    }else if(newState==RecyclerView.SCROLL_STATE_DRAGGING){
-                        if(toolbarshow){
-                            toggleToolbar();
+                            if ((!strip.canScrollVertically(1)) && !toolbarshow) {
+                                toggleToolbar();
+                            }
+                        } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                            if (toolbarshow) {
+                                toggleToolbar();
+                            }
                         }
                     }
                 }
@@ -288,12 +286,7 @@ public class ViewerActivity extends AppCompatActivity {
                 toggleAutoCut();
             }
         });
-        swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                refresh();
-            }
-        });
+
         pageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -332,7 +325,12 @@ public class ViewerActivity extends AppCompatActivity {
 
     void refresh(){
         if(stripAdapter!=null) stripAdapter.removeAll();
-        loadImages l = new loadImages();
+        loadImages l = new loadImages(new Runnable() {
+            @Override
+            public void run() {
+                reloadManga();
+            }
+        });
         l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -407,32 +405,41 @@ public class ViewerActivity extends AppCompatActivity {
 //    }
 
 
+    @Override
+    public void onBackPressed() {
+        if(onBack!=null){
+            onBack.run();
+        }else{
+            super.onBackPressed();
+        }
+    }
+
+    Runnable onBack;
+
+    void setOnBackPressed(Runnable onBackPressed){
+        this.onBack = onBackPressed;
+    }
+    void resetOnBackPressed(){
+        this.onBack = null;
+    }
+
 
 
     private class loadImages extends AsyncTask<Void,String,Integer> {
-        @Override
-        protected void onProgressUpdate(String... values) {
-            pd.setMessage(values[0]);
+        Runnable callback;
+        public loadImages(Runnable callback){
+            this.callback = callback;
         }
 
         protected void onPreExecute() {
             super.onPreExecute();
-            if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
-            else pd = new ProgressDialog(context);
-            pd.setMessage("로드중");
-            pd.setCancelable(false);
-            pd.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            setOnBackPressed(new Runnable() {
                 @Override
-                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                    if(keyCode == KeyEvent.KEYCODE_BACK){
-                        loadImages.super.cancel(true);
-                        pd.dismiss();
-                        finish();
-                    }
-                    return true;
+                public void run(){
+                    loadImages.super.cancel(true);
+                    finish();
                 }
             });
-            pd.show();
         }
 
         protected Integer doInBackground(Void... params) {
@@ -460,12 +467,12 @@ public class ViewerActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            reloadManga();
-
-            if (pd.isShowing()) {
-                pd.dismiss();
-            }
+            callback.run();
         }
+    }
+
+    public void appendManga(){
+
     }
 
     public void reloadManga(){
@@ -571,7 +578,6 @@ public class ViewerActivity extends AppCompatActivity {
             prev.setEnabled(true);
             prev.setColorFilter(null);
         }
-        swipe.setRefreshing(false);
 
 
         pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
@@ -603,4 +609,5 @@ public class ViewerActivity extends AppCompatActivity {
         void nextEp();
         void prevEp();
     }
+
 }

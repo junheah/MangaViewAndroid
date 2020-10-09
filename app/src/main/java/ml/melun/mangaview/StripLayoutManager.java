@@ -18,6 +18,14 @@ public class StripLayoutManager extends NpaLinearLayoutManager {
     }
 
     @Override
+    public void scrollToPosition(int position) {
+        int realpos = position+1;
+        if(position>=getItemCount())
+            realpos--;
+        super.scrollToPosition(realpos);
+    }
+
+    @Override
     public int findFirstVisibleItemPosition() {
         int real = super.findFirstVisibleItemPosition();
         int imgs = getItemCount();

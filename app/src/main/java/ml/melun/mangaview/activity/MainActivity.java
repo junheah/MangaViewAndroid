@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity
 
 
         //check for update, notices
-        new CheckInfo(context,httpClient).all(false);
+        new CheckInfo(context,httpClient, true).all(false);
     }
 
     public int getTabId(int i){
@@ -510,7 +510,7 @@ public class MainActivity extends AppCompatActivity
             //don't refresh views
             if(id==R.id.nav_update) {
                 //check update
-                new CheckInfo(context,httpClient).all(true);
+                new CheckInfo(context,httpClient,false).all(true);
             }else if(id==R.id.nav_notice){
                 Intent noticesIntent = new Intent(context, NoticesActivity.class);
                 startActivity(noticesIntent);

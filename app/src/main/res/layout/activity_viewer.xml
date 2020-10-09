@@ -7,19 +7,14 @@
     android:layout_width="match_parent"
     tools:context=".activity.ViewerActivity">
 
-    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
-        android:id="@+id/viewerSwipe"
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/strip"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        app:srl_direction="top">
+        android:scrollbars="vertical" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/strip"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:scrollbars="vertical" />
-
-    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
     <com.google.android.material.appbar.AppBarLayout
         android:alpha="0.8"

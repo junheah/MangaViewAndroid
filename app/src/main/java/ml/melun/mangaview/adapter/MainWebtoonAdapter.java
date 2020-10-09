@@ -214,18 +214,16 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         protected void onPostExecute(MainPageWebtoon main) {
             super.onPostExecute(main);
             //update adapters?
-            try {
-                for (Ranking<?> r : main.getDataSet()) {
-                    if (r==null || r.size() == 0) {
-                        // captcha?
-                        listener.captchaCallback();
-                    }
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-                listener.captchaCallback();
-            }
             dataSet = main.getDataSet();
+            if(dataSet == null)
+                dataSet = main.getBlankDataSet();
+            for (Ranking<?> r : dataSet) {
+                if (r==null || r.size() == 0) {
+                    // captcha?
+                    listener.captchaCallback();
+                    return;
+                }
+            }
             updateWidgets();
         }
     }
