@@ -1,7 +1,5 @@
 package ml.melun.mangaview.activity;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -35,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ml.melun.mangaview.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.StripLayoutManager;
 import ml.melun.mangaview.Utils;
@@ -112,38 +109,40 @@ public class ViewerActivity extends AppCompatActivity {
 
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
-            public String nextEp(Runnable callback) {
-                if(index>0) {
-                    index--;
-                    new loadImages(eps.get(index), new LoadImagesCallback() {
+            public Manga prevEp(Runnable callback, Manga curm) {
+                int i = eps.indexOf(curm);
+                if(i<eps.size()-1) {
+                    new loadImages(eps.get(i+1), new LoadImagesCallback() {
                         @Override
                         public void post(Manga m) {
-                            stripAdapter.appendImgs(m);
+                            if(m.getImgs().size()>0)
+                                stripAdapter.insertManga(m);
                             callback.run();
                         }
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    return eps.get(index).getName();
+                    return eps.get(i+1);
                 }else{
                     callback.run();
-                    return "마지막 화 입니다";
+                    return null;
                 }
             }
 
             @Override
-            public String prevEp(Runnable callback) {
-                if(index < eps.size()-1) {
-                    index++;
-                    new loadImages(eps.get(index), new LoadImagesCallback() {
+            public Manga nextEp(Runnable callback, Manga curm) {
+                int i = eps.indexOf(curm);
+                if(i>0) {
+                    new loadImages(eps.get(i-1), new LoadImagesCallback() {
                         @Override
                         public void post(Manga m) {
-                            stripAdapter.insertImgs(m);
+                            if(m.getImgs().size()>0)
+                                stripAdapter.appendManga(m);
                             callback.run();
                         }
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    return eps.get(index).getName();
-                }else {
+                    return eps.get(i-1);
+                }else{
                     callback.run();
-                    return "첫 화 입니다";
+                    return null;
                 }
             }
         };
@@ -231,6 +230,7 @@ public class ViewerActivity extends AppCompatActivity {
                     startActivity(commentActivity);
                 }
             });
+            strip.setItemAnimator(null);
             strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -377,7 +377,7 @@ public class ViewerActivity extends AppCompatActivity {
             toolbarshow=false;
         }
         else {
-            pageBtn.setText(stripAdapter.getCurrentPos().imgPos+1+"/"+imgs.size());
+            pageBtn.setText("0 /"+imgs.size());
             appbar.animate().translationY(0);
             appbarBottom.animate().translationY(0);
             toolbarshow=true;
@@ -612,8 +612,8 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     public interface InfiniteScrollCallback{
-        String nextEp(Runnable callback);
-        String prevEp(Runnable callback);
+        Manga nextEp(Runnable callback, Manga curm);
+        Manga prevEp(Runnable callback, Manga curm);
     }
     private interface LoadImagesCallback{
         void post(Manga m);

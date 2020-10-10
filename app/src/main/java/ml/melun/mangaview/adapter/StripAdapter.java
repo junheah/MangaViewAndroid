@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +18,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.google.gson.internal.bind.DateTypeAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static ml.melun.mangaview.MainApplication.p;
 import ml.melun.mangaview.R;
@@ -31,7 +32,6 @@ import ml.melun.mangaview.mangaview.Manga;
 
 public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Manga>data;
     private LayoutInflater mInflater;
     private Context mainContext;
     private StripAdapter.ItemClickListener mClickListener;
@@ -41,12 +41,122 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     Decoder d;
     int width;
     int current = 0;
+    int count = 0;
     ViewerActivity.InfiniteScrollCallback callback;
+
+    List<Object> items;
+
+    public class PageItem{
+        public PageItem(int index, String img, Manga manga) {
+            this.index = index;
+            this.img = img;
+            this.manga = manga;
+        }
+
+        @Override
+        public int hashCode() {
+            return manga.getId()*10000 + index;
+        }
+
+        public int index;
+        public String img;
+        public Manga manga;
+    };
+
+    public class InfoItem{
+        public InfoItem(Manga prev, Manga next) {
+            this.next = next;
+            this.prev = prev;
+        }
+
+        @Override
+        public int hashCode() {
+            return (next==null?-1:next.getId()) * (prev==null?-1:prev.getId());
+        }
+
+        public Manga next;
+        public Manga prev;
+    };
+
+    @Override
+    public long getItemId(int position) {
+        Object o = items.get(position);
+        return o.hashCode();
+    }
+
+    public void appendManga(Manga m){
+        if(items == null)
+            items = new ArrayList<>();
+        int prevsize = items.size();
+        if(items.size() == 0)
+            items.add(new InfoItem(null, m));
+        List<String> imgs = m.getImgs();
+        for(int i=0; i<imgs.size(); i++){
+            items.add(new PageItem(i,imgs.get(i),m));
+        }
+        items.add(new InfoItem(m, null));
+        notifyItemRangeInserted(prevsize, items.size()-prevsize);
+        count++;
+        System.out.println(count);
+        if(count>2){
+            popFirst();
+        }
+    }
+
+    public void insertManga(Manga m){
+        if(items == null || items.size() == 0) {
+            appendManga(m);
+            return;
+        }
+        int prevsize = items.size();
+        List<String> imgs = m.getImgs();
+        for(int i=imgs.size()-1; i>=0; i--){
+            items.add(0,new PageItem(i,imgs.get(i),m));
+        }
+        items.add(0, new InfoItem(null, m));
+
+        notifyItemRangeInserted(0, items.size()-prevsize);
+        count++;
+
+        System.out.println(count);
+        if(count>2){
+            popLast();
+        }
+    }
+
+    public void popFirst(){
+        int size = 0;
+        for(int i=1; i<items.size(); i++){
+            if(items.get(i) instanceof InfoItem){
+                size = i;
+                break;
+            }
+        }
+        for(int i=size-1; i>=0; i--)
+            items.remove(i);
+        count--;
+        notifyItemRangeRemoved(0,size);
+    }
+
+    public void popLast(){
+        int rsize = 0;
+        items.remove(items.size()-1);
+        for(int i=items.size()-2; i>=0; i--){
+            if(items.get(i) instanceof InfoItem){
+                rsize = i;
+                break;
+            }
+        }
+        for(int i=items.size()-1; i>rsize; i--)
+            items.remove(i);
+        count--;
+        notifyItemRangeRemoved(rsize+1,items.size()-rsize);
+    }
 
     // data is passed into the constructor
     public StripAdapter(Context context, Manga manga, Boolean cut, int seed, int id, int width, ViewerActivity.InfiniteScrollCallback callback) {
-        this.data = new ArrayList<>();
-        this.data.add(manga);
+        appendManga(manga);
+
         this.callback = callback;
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
@@ -61,10 +171,12 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
 
     public void preloadAll(){
-        for(String s : data.get(current).getImgs()) {
-            Glide.with(mainContext)
-                    .load(s)
-                    .preload();
+        for(Object o : items) {
+            if(o instanceof PageItem) {
+                Glide.with(mainContext)
+                        .load(((PageItem)o).img)
+                        .preload();
+            }
         }
     }
 
@@ -73,59 +185,16 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0)
+        if(items.get(position) instanceof PageItem)
+            return IMG;
+        else if(items.get(position) instanceof InfoItem)
             return INFO;
-        int curpos = 0;
-        for(Manga m : data){
-            curpos += m.getImgs().size()+1;
-            if(position == curpos) return INFO;
-            if(position < curpos) return IMG;
-        }
-        return INFO;
-    }
-
-    public class PosData{
-        public int setPos;
-        public int imgPos;
-        public PosData(int setPos, int imgPos){
-          this.setPos = setPos;
-          this.imgPos = imgPos;
-        }
-    };
-
-    PosData getImgPos(int position){
-        if(position == 0)
-            return new PosData(0,0);
-        position-=1;
-        int i=0;
-        while(i<data.size()){
-            Manga m = data.get(i);
-            if(position >= m.getImgs().size())
-                position -= m.getImgs().size()+1;
-            else
-                return new PosData(i, position);
-            i++;
-        }
-        return new PosData(i,0);
-    }
-
-    public PosData getCurrentPos(){
-        return currentPos;
-    }
-
-
-    @Override
-    public long getItemId(int position) {
-        PosData p = getImgPos(position);
-        int type = getItemViewType(position);
-        if(p.setPos < data.size()){
-            return (data.get(p.setPos).getId()*10000) + (type*1000) + position;
-        }
-        return type;
+        else
+            return -1;
     }
 
     public void removeAll(){
-        data.clear();
+        items.clear();
         notifyDataSetChanged();
     }
 
@@ -141,28 +210,25 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int pos) {
-        PosData p = getImgPos(pos);
-        if(getItemViewType(pos) == IMG) {
+        int type = getItemViewType(pos);
+        if(type == IMG) {
             ((ImgViewHolder)holder).frame.setImageResource(R.drawable.placeholder);
             ((ImgViewHolder)holder).refresh.setVisibility(View.VISIBLE);
-            glideBind((ImgViewHolder)holder, p);
-        }else{
+            glideBind((ImgViewHolder)holder, pos);
+        }else if(type == INFO){
             //INFO
-            ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
-            //prev info
-            if(p.setPos==0) {
-                ((InfoViewHolder) holder).prevInfo.setText("");
-                ((InfoViewHolder) holder).nextInfo.setText(data.get(p.setPos).getName());
-            }else if(p.setPos<data.size()) {
-                ((InfoViewHolder) holder).prevInfo.setText(data.get(p.setPos-1).getName());
-                ((InfoViewHolder) holder).nextInfo.setText(data.get(p.setPos).getName());
-            }else{
-                ((InfoViewHolder) holder).prevInfo.setText(data.get(p.setPos-1).getName());
-                ((InfoViewHolder) holder).nextInfo.setText("");
-            }
+            ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
+            Manga prev = ((InfoItem)items.get(pos)).prev;
+            if(pos>0)
+                prev = ((PageItem) items.get(pos-1)).manga;
+            ((InfoViewHolder) holder).prevInfo.setText(prev == null ? "" : prev.getName());
+
+            Manga next = ((InfoItem)items.get(pos)).next;
+            if(pos<items.size()-1)
+                next = ((PageItem) items.get(pos+1)).manga;
+            ((InfoViewHolder) holder).nextInfo.setText(next == null ? "" : next.getName());
 
             Runnable r = new Runnable() {
                 @Override
@@ -170,25 +236,25 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
                 }
             };
+            Manga m;
             if(pos == 0){
-                //prev
-                ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
-                ((InfoViewHolder) holder).prevInfo.setText(callback.prevEp(r));
-            }else if(pos == getItemCount()-1){
-                //next
-                ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
-                ((InfoViewHolder) holder).nextInfo.setText(callback.nextEp(r));
+                m = callback.prevEp(r, next);
+                ((InfoItem)items.get(pos)).prev = m;
+                ((InfoViewHolder) holder).prevInfo.setText(m.getName());
+            }else if(pos == items.size()-1){
+                m = callback.nextEp(r, prev);
+                ((InfoItem)items.get(pos)).next = m;
+                ((InfoViewHolder) holder).nextInfo.setText(m.getName());
             }
-
         }
     }
 
 
 
-    void glideBind(ImgViewHolder holder, PosData pos){
+    void glideBind(ImgViewHolder holder, int pos){
         if (autoCut) {
-            final int type = pos.imgPos % 2;
-            String image = data.get(pos.setPos).getImgs().get(pos.imgPos / 2);
+            final int type = pos % 2;
+            String image = ((PageItem)items.get(pos%2)).img;
             //set image to holder view
             Glide.with(mainContext)
                     .asBitmap()
@@ -235,7 +301,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         }
                     });
         } else {
-            String image = data.get(pos.setPos).getImgs().get(pos.imgPos);
+            String image = ((PageItem)items.get(pos)).img;
             Glide.with(mainContext)
                     .asBitmap()
                     .load(image)
@@ -265,28 +331,15 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     // total number of rows
     @Override
     public int getItemCount() {
-        if(data.size() == 0) return 0;
-        return getImgCount() + data.size() + 1;
+        return items.size();
     }
 
-    public int getImgCount(){
-        int imgsSize = 0;
-        for(Manga m : data){
-            imgsSize+=m.getImgs().size();
-        }
-        if(autoCut) return imgsSize*2;
-        else return imgsSize;
-    }
-
-    PosData currentPos;
 
 
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         //handle bookmark
-            int layoutPos = holder.getLayoutPosition();
-            PosData pos = getImgPos(layoutPos);
-            currentPos = pos;
+        int layoutPos = holder.getLayoutPosition();
 //        int type = getItemViewType(layoutPos);
 //        if(pos.setPos < data.size()) {
 //            if (data.get(pos.setPos).useBookmark()) {
@@ -315,35 +368,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 //        }
 //    }
 
-    public void popFirst(){
-        int size = data.get(0).getImgs().size() +1;
-        data.remove(0);
-        notifyItemRangeRemoved(0,size);
-    }
-    public void popLast(){
-        int positionStart = getItemCount();
-        int size = data.get(data.size()-1).getImgs().size() +1;
-        data.remove(data.size()-1);
-        notifyItemRangeRemoved(positionStart,size);
-    }
-
-
-
-
-    public void appendImgs(Manga m){
-        int originalSize = getItemCount();
-        this.data.add(m);
-        notifyItemRangeInserted(originalSize-1,m.getImgs().size()+1);
-        if(data.size()>2)
-            popFirst();
-    }
-
-    public void insertImgs(Manga m){
-        this.data.add(0,m);
-        notifyItemRangeInserted(0,m.getImgs().size()+1);
-        if(data.size()>2)
-            popLast();
-    }
 
     // stores and recycles views as they are scrolled off screen
     public class ImgViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
