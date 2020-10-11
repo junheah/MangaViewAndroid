@@ -127,6 +127,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                 lockUi(true);
                 spinner.setSelection(m);
                 manga = m;
+                id = m.getId();
                 index = i;
                 hideSpinnerDropDown(spinner);
                 if(manga.isOnline())

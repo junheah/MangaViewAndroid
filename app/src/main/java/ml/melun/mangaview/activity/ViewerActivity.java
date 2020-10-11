@@ -107,17 +107,18 @@ public class ViewerActivity extends AppCompatActivity {
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
             public Manga prevEp(InfiniteLoadCallback callback, Manga curm) {
+                p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
                 if(i<eps.size()-1) {
-                    new loadImages(eps.get(i+1), new LoadMangaCallback() {
+                    new loadImages(eps.get(i + 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
-                            if(m.getImgs().size()>0)
+                            if (m.getImgs().size() > 0)
                                 stripAdapter.insertManga(m);
                             callback.prevLoaded(m);
                         }
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    return eps.get(i+1);
+                    return eps.get(i + 1);
                 }else{
                     callback.prevLoaded(null);
                     return null;
@@ -126,21 +127,28 @@ public class ViewerActivity extends AppCompatActivity {
 
             @Override
             public Manga nextEp(InfiniteLoadCallback callback, Manga curm) {
+                p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
                 if(i>0) {
-                    new loadImages(eps.get(i-1), new LoadMangaCallback() {
+                    new loadImages(eps.get(i - 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
-                            if(m.getImgs().size()>0)
+                            if (m.getImgs().size() > 0)
                                 stripAdapter.appendManga(m);
                             callback.nextLoaded(m);
                         }
                     }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    return eps.get(i-1);
+                    return eps.get(i - 1);
                 }else{
                     callback.nextLoaded(null);
                     return null;
                 }
+            }
+
+            @Override
+            public void updateInfo(Manga m) {
+                updateIntent(m);
+                refreshToolbar(m);
             }
         };
 
@@ -248,9 +256,8 @@ public class ViewerActivity extends AppCompatActivity {
                         if(input.getText().length()>0) {
                             int page = Integer.parseInt(input.getText().toString());
                             if (page < 1) page = 1;
-                            if (page > imgs.size()) page = current.manga.getImgs().size();
-                            if(autoCut) strip.scrollToPosition((page-1)*2);
-                            else strip.scrollToPosition(page-1);
+                            if (page > current.manga.getImgs().size()) page = current.manga.getImgs().size();
+                            manager.scrollToPage(new PageItem(page-1,"",current.manga));
                             pageBtn.setText(page+"/"+current.manga.getImgs().size());
                         }
                     }
@@ -272,23 +279,32 @@ public class ViewerActivity extends AppCompatActivity {
     void loadManga(Manga m, LoadMangaCallback callback){
         if(m!=null) {
             this.manga = m;
-            if (m.isOnline()) {
-                loadImages l = new loadImages(m, callback);
-                l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }else
-                setManga(m);
+            loadImages l = new loadImages(m, callback);
+            l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
     void loadManga(Manga m){
         if(stripAdapter!=null) stripAdapter.removeAll();
-        loadManga(m, new LoadMangaCallback() {
-            @Override
-            public void post(Manga m) {
-                manga = m;
-                setManga(m);
+        if(m.isOnline()) {
+            loadManga(m, new LoadMangaCallback() {
+                @Override
+                public void post(Manga m) {
+                    manga = m;
+                    setManga(m);
+                }
+            });
+        }else{
+            //offline
+            eps = title.getEps();
+            for(int i=0; i<eps.size(); i++){
+                eps.get(i).setTitle(title);
+                eps.get(i).setNextEp(i>0 ? eps.get(i-1) : null);
+                eps.get(i).setPrevEp(i<eps.size()-1 ? eps.get(i+1) : null);
             }
-        });
+            m = eps.get(eps.indexOf(m));
+            setManga(m);
+        }
     }
 
 
@@ -299,7 +315,7 @@ public class ViewerActivity extends AppCompatActivity {
                 showCaptchaPopup(context, p);
                 return;
             }
-            stripAdapter = new StripAdapter(context, m, autoCut, width, infiniteScrollCallback);
+            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback);
 
             refreshAdapter();
             bookmarkRefresh(m);
@@ -320,12 +336,11 @@ public class ViewerActivity extends AppCompatActivity {
             int index = manager.findFirstVisibleItemPosition();
             if (keyCode == p.getNextPageKey()) {
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    if (index < manager.getItemCount() - 1)
-                        strip.scrollToPosition(index+1);
+                    manager.scrollToPosition(index+1);
                 }
             } else if (keyCode == p.getPrevPageKey()) {
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    strip.scrollToPosition(index-1);
+                    manager.scrollToPosition(index-1);
                 }
             }
             if(toolbarshow) toggleToolbar();
@@ -377,7 +392,8 @@ public class ViewerActivity extends AppCompatActivity {
             cut.setBackgroundResource(R.drawable.button_bg_on);
             //viewerBookmark *= 2;
         }
-        stripAdapter = new StripAdapter(context, page.manga, autoCut, width, infiniteScrollCallback);
+        stripAdapter.removeAll();
+        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback);
         stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
@@ -435,16 +451,20 @@ public class ViewerActivity extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... params) {
-            Login login = p.getLogin();
-            Map<String, String> cookie = new HashMap<>();
-            if(login !=null) {
-                String php = p.getLogin().getCookie();
-                login.buildCookie(cookie);
+            if(m.isOnline()) {
+                Login login = p.getLogin();
+                Map<String, String> cookie = new HashMap<>();
+                if (login != null) {
+                    String php = p.getLogin().getCookie();
+                    login.buildCookie(cookie);
+                }
+                m.fetch(httpClient);
+                if (title == null)
+                    title = m.getTitle();
+                return 0;
+            }else{
+                return 0;
             }
-            m.fetch(httpClient);
-            if(title == null)
-                title = m.getTitle();
-            return 0;
         }
 
         @Override
@@ -550,6 +570,7 @@ public class ViewerActivity extends AppCompatActivity {
     public interface InfiniteScrollCallback{
         Manga nextEp(InfiniteLoadCallback callback, Manga curm);
         Manga prevEp(InfiniteLoadCallback callback, Manga curm);
+        void updateInfo(Manga m);
     }
     public interface LoadMangaCallback {
         void post(Manga m);

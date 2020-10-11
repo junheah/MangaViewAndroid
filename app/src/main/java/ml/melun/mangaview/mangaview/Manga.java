@@ -343,6 +343,12 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
         }
     }
 
+    public void setPrevEp(Manga m){
+        this.prevEp = m;
+    }
+    public void setNextEp(Manga m){
+        this.nextEp = m;
+    }
 
     private int id;
     String name;

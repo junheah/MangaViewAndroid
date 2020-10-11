@@ -30,7 +30,7 @@ public class MainApplication extends Application{
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         System.out.println("main app start");
-        //ACRA.init(this);
+        ACRA.init(this);
     }
 
     @Override

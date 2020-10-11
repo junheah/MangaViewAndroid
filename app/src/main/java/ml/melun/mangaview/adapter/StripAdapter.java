@@ -27,6 +27,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
+import ml.melun.mangaview.mangaview.Title;
 import ml.melun.mangaview.model.PageItem;
 
 
@@ -43,6 +44,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     int count = 0;
     final static int MaxStackSize = 2;
     ViewerActivity.InfiniteScrollCallback callback;
+    Title title;
 
     List<Object> items;
 
@@ -87,6 +89,8 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         List<String> imgs = m.getImgs();
         for(int i=0; i<imgs.size(); i++){
             items.add(new PageItem(i,imgs.get(i),m));
+            if(autoCut)
+                items.add(new PageItem(i,imgs.get(i),m,PageItem.SECOND));
         }
         items.add(new InfoItem(m, m.nextEp()));
         notifyItemRangeInserted(prevsize, items.size()-prevsize);
@@ -105,6 +109,8 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         int prevsize = items.size();
         List<String> imgs = m.getImgs();
         for(int i=imgs.size()-1; i>=0; i--){
+            if(autoCut)
+                items.add(new PageItem(0,imgs.get(i),m,PageItem.SECOND));
             items.add(0,new PageItem(i,imgs.get(i),m));
         }
         items.add(0, new InfoItem(null, m));
@@ -148,18 +154,18 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     // data is passed into the constructor
-    public StripAdapter(Context context, Manga manga, Boolean cut, int width, ViewerActivity.InfiniteScrollCallback callback) {
-        appendManga(manga);
-
+    public StripAdapter(Context context, Manga manga, Boolean cut, int width, Title title, ViewerActivity.InfiniteScrollCallback callback) {
+        autoCut = cut;
         this.callback = callback;
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
-        autoCut = cut;
         reverse = p.getReverse();
         __seed = manga.getSeed();
         d = new Decoder(manga.getSeed(), manga.getId());
         this.width = width;
+        this.title = title;
         setHasStableIds(true);
+        appendManga(manga);
     }
 
 
@@ -258,13 +264,12 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
 
     void glideBind(ImgViewHolder holder, int pos){
+        PageItem item = ((PageItem)items.get(pos));
         if (autoCut) {
-            final int type = pos % 2;
-            String image = ((PageItem)items.get(pos%2)).img;
             //set image to holder view
             Glide.with(mainContext)
                     .asBitmap()
-                    .load(image)
+                    .load(item.img)
                     .placeholder(R.drawable.placeholder)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
@@ -273,7 +278,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                             int width = bitmap.getWidth();
                             int height = bitmap.getHeight();
                             if (width > height) {
-                                if (type == 0) {
+                                if (item.side == PageItem.FIRST) {
                                     if (reverse)
                                         holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, width / 2, height));
                                     else
@@ -285,7 +290,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                         holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap, 0, 0, width / 2, height));
                                 }
                             } else {
-                                if (type == 0) {
+                                if (item.side == PageItem.FIRST) {
                                     holder.frame.setImageBitmap(bitmap);
                                 } else {
                                     holder.frame.setImageBitmap(Bitmap.createBitmap(bitmap.getWidth(), 1, Bitmap.Config.ARGB_8888));
@@ -307,10 +312,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         }
                     });
         } else {
-            String image = ((PageItem)items.get(pos)).img;
             Glide.with(mainContext)
                     .asBitmap()
-                    .load(image)
+                    .load(item.img)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
@@ -346,6 +350,8 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     PageItem current;
 
+    boolean needUpdate = true;
+
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         //handle bookmark
@@ -356,15 +362,19 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             current = pi;
             if(pi.manga.useBookmark()){
                 int index = pi.index;
-                if(autoCut) index/=2;
                 if (index == 0) {
                     p.removeViewerBookmark(pi.manga);
                 } else {
                     p.setViewerBookmark(pi.manga, index);
                 }
             }
+            p.setBookmark(title, pi.manga.getId());
+            if(needUpdate){
+                needUpdate = false;
+                callback.updateInfo(pi.manga);
+            }
         } else if(type == INFO){
-
+            needUpdate = true;
         }
     }
 //
@@ -424,7 +434,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.mClickListener = itemClickListener;
     }
 
-    // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick();
     }

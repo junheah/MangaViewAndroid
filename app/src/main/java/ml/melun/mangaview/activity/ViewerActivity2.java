@@ -708,6 +708,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     public void loadManga(Manga m){
         if(m!=null) {
             manga = m;
+            id = manga.getId();
             if (m.isOnline())
                 refresh();
             else
