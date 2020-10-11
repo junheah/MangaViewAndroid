@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,17 +19,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import ml.melun.mangaview.NpaLinearLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
-import ml.melun.mangaview.activity.AdvSearchActivity;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;

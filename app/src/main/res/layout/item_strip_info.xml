@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textSize="13sp"
+        android:textSize="15sp"
         android:textColor="#FFF"
         android:text="이전화"
         android:id="@+id/prevEpInfo"/>
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textSize="13sp"
+        android:textSize="15sp"
         android:textColor="#FFF"
         android:text="다음화"
         android:layout_marginTop="30dp"

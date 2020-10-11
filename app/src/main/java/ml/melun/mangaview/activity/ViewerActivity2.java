@@ -50,6 +50,7 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
+import ml.melun.mangaview.ui.CustomSpinner;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
@@ -85,7 +86,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Intent intent;
     boolean captchaChecked = false;
     ImageButton toolbar_toggleBtn;
-    Spinner spinner;
+    CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     Decoder d;
     boolean nextEpisodeVisible = false;
@@ -132,23 +133,13 @@ public class ViewerActivity2 extends AppCompatActivity {
         spinnerAdapter = new CustomSpinnerAdapter(context);
         spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
             @Override
-            public void onClick(int position) {
-                if(index!= position) {
-                    lockUi(true);
-                    index = position;
-                    manga = eps.get(index);
-                    id = manga.getId();
-                    name = manga.getName();
-                    spinner.setSelection(position, true);
-                    hideSpinnerDropDown(spinner);
-                    if(manga.isOnline())
-                        refresh();
-                    else
-                        reloadManga();
-                }else {
-                    spinner.setSelection(position, true);
-                    hideSpinnerDropDown(spinner);
-                }
+            public void onClick(Manga m, int i) {
+                lockUi(true);
+                spinner.setSelection(m);
+                index = i;
+                manga = m;
+                hideSpinnerDropDown(spinner);
+                loadManga(m);
             }
         });
         spinner.setAdapter(spinnerAdapter);
@@ -288,10 +279,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.isOnline())
-                        refresh();
-                    else
-                        reloadManga();
+                    loadManga(manga);
                 }else
                     Toast.makeText(context, "마지막화 입니다", Toast.LENGTH_SHORT).show();
 
@@ -306,10 +294,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     manga = eps.get(index);
                     id = manga.getId();
                     name = manga.getName();
-                    if(manga.isOnline())
-                        refresh();
-                    else
-                        reloadManga();
+                    loadManga(manga);
                 }
             }
         });
@@ -720,6 +705,16 @@ public class ViewerActivity2 extends AppCompatActivity {
         setResult(RESULT_OK, result);
     }
 
+    public void loadManga(Manga m){
+        if(m!=null) {
+            manga = m;
+            if (m.isOnline())
+                refresh();
+            else
+                reloadManga();
+        }
+    }
+
     public void refresh(){
         captchaChecked = false;
         loadImages l = new loadImages();
@@ -731,20 +726,15 @@ public class ViewerActivity2 extends AppCompatActivity {
         if(eps == null || eps.size() == 0){
             eps = title.getEps();
         }
-        List<String> epsName = new ArrayList<>();
         for(int i=0; i<eps.size(); i++){
-            if(id>0) {
-                if (eps.get(i).getId() == id)
-                    index = i;
-            }else{
-                if(eps.get(i).getName().equals(name))
-                    index = i;
+            if(eps.get(i).equals(manga)){
+                index = i;
+                break;
             }
-            epsName.add(eps.get(i).getName());
         }
         //refresh spinner
-        spinnerAdapter.setData(epsName, index);
-        spinner.setSelection(index);
+        spinnerAdapter.setData(eps, manga);
+        spinner.setSelection(manga);
 
         toolbarTitle.setText(manga.getName());
         toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);

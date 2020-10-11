@@ -14,12 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import ml.melun.mangaview.NpaLinearLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.adapter.UpdatedAdapter;
@@ -33,7 +32,6 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.REQUEST_LOGIN;
 import static ml.melun.mangaview.Utils.episodeIntent;
-import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;

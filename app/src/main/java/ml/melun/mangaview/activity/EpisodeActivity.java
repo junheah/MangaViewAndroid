@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ml.melun.mangaview.NpaLinearLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.EpisodeAdapter;
 import ml.melun.mangaview.adapter.TagAdapter;

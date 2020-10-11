@@ -316,22 +316,30 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
     }
 
     public Manga nextEp(){
-        if(eps == null || eps.size()==0){
-            return null;
+        if(isOnline()) {
+            if (eps == null || eps.size() == 0) {
+                return null;
+            } else {
+                int index = eps.indexOf(this);
+                if (index > 0) return eps.get(index - 1);
+                else return null;
+            }
         }else{
-            int index = eps.indexOf(this);
-            if(index>0) return eps.get(index-1);
-            else return null;
+            return nextEp;
         }
     }
 
     public Manga prevEp(){
-        if(eps == null || eps.size()==0){
-            return null;
+        if(isOnline()) {
+            if (eps == null || eps.size() == 0) {
+                return null;
+            } else {
+                int index = eps.indexOf(this);
+                if (index < eps.size() - 1) return eps.get(index + 1);
+                else return null;
+            }
         }else{
-            int index = eps.indexOf(this);
-            if(index<eps.size()-1) return eps.get(index+1);
-            else return null;
+            return prevEp;
         }
     }
 
@@ -348,6 +356,7 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
     int seed;
     int mode;
     Listener listener;
+    Manga nextEp, prevEp;
 
     public interface Listener{
         void setMessage(String msg);

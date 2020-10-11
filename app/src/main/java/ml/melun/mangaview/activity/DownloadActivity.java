@@ -6,7 +6,7 @@ import android.os.Build;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
+
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +19,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 
 import ml.melun.mangaview.Downloader;
-import ml.melun.mangaview.NpaLinearLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.SelectEpisodeAdapter;
 import ml.melun.mangaview.mangaview.DownloadTitle;

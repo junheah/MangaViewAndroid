@@ -13,10 +13,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import ml.melun.mangaview.NpaLinearLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.MainPageWebtoon;
 import ml.melun.mangaview.mangaview.Ranking;

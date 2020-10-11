@@ -21,13 +21,13 @@ import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static ml.melun.mangaview.MainApplication.p;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
+import ml.melun.mangaview.model.PageItem;
 
 
 public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -40,28 +40,16 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     int __seed;
     Decoder d;
     int width;
-    int current = 0;
     int count = 0;
+    final static int MaxStackSize = 2;
     ViewerActivity.InfiniteScrollCallback callback;
 
     List<Object> items;
 
-    public class PageItem{
-        public PageItem(int index, String img, Manga manga) {
-            this.index = index;
-            this.img = img;
-            this.manga = manga;
-        }
+    public List<Object> getItems(){
+        return items;
+    }
 
-        @Override
-        public int hashCode() {
-            return manga.getId()*10000 + index;
-        }
-
-        public int index;
-        public String img;
-        public Manga manga;
-    };
 
     public class InfoItem{
         public InfoItem(Manga prev, Manga next) {
@@ -104,7 +92,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemRangeInserted(prevsize, items.size()-prevsize);
         count++;
         System.out.println(count);
-        if(count>2){
+        if(count>MaxStackSize){
             popFirst();
         }
     }
@@ -125,7 +113,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         count++;
 
         System.out.println(count);
-        if(count>2){
+        if(count>MaxStackSize){
             popLast();
         }
     }
@@ -160,7 +148,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     // data is passed into the constructor
-    public StripAdapter(Context context, Manga manga, Boolean cut, int seed, int id, int width, ViewerActivity.InfiniteScrollCallback callback) {
+    public StripAdapter(Context context, Manga manga, Boolean cut, int width, ViewerActivity.InfiniteScrollCallback callback) {
         appendManga(manga);
 
         this.callback = callback;
@@ -168,8 +156,8 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         mainContext = context;
         autoCut = cut;
         reverse = p.getReverse();
-        __seed = seed;
-        d = new Decoder(seed, id);
+        __seed = manga.getSeed();
+        d = new Decoder(manga.getSeed(), manga.getId());
         this.width = width;
         setHasStableIds(true);
     }
@@ -225,8 +213,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             glideBind((ImgViewHolder)holder, pos);
         }else if(type == INFO){
             //INFO
-            ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
-
+            ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
             Manga prev = ((InfoItem)items.get(pos)).prev;
             Manga next = ((InfoItem)items.get(pos)).next;
 
@@ -239,25 +226,31 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ((InfoViewHolder) holder).prevInfo.setText(prev == null ? "첫 화" : prev.getName());
             ((InfoViewHolder) holder).nextInfo.setText(next == null ? "마지막 화" : next.getName());
 
-
-
-            ((InfoViewHolder) holder).nextInfo.setText(next == null ? "" : next.getName());
-
-            Runnable r = new Runnable() {
+            ViewerActivity.InfiniteLoadCallback r = new ViewerActivity.InfiniteLoadCallback() {
                 @Override
-                public void run() {
+                public void prevLoaded(Manga m) {
                     ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
+                    ((InfoViewHolder) holder).prevInfo.setText(m==null?"오류":m.getName());
+                }
+
+                @Override
+                public void nextLoaded(Manga m) {
+                    ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
+                    ((InfoViewHolder) holder).nextInfo.setText(m==null?"오류":m.getName());
                 }
             };
+
             Manga m;
             if(pos == 0){
+                ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
                 m = callback.prevEp(r, next);
                 ((InfoItem)items.get(pos)).prev = m;
-                ((InfoViewHolder) holder).prevInfo.setText(m.getName());
+                ((InfoViewHolder) holder).prevInfo.setText(m==null? "첫 화":"이전 화");
             }else if(pos == items.size()-1){
+                ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
                 m = callback.nextEp(r, prev);
                 ((InfoItem)items.get(pos)).next = m;
-                ((InfoViewHolder) holder).nextInfo.setText(m.getName());
+                ((InfoViewHolder) holder).nextInfo.setText(m==null? "마지막 화":"다음 화");
             }
         }
     }
@@ -347,23 +340,32 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return items.size();
     }
 
+    public PageItem getCurrentVisiblePage(){
+        return current;
+    }
 
+    PageItem current;
 
     @Override
     public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         //handle bookmark
         int layoutPos = holder.getLayoutPosition();
-//        int type = getItemViewType(layoutPos);
-//        if(pos.setPos < data.size()) {
-//            if (data.get(pos.setPos).useBookmark()) {
-//                if (autoCut) pos.imgPos /= 2;
-//                if (pos.imgPos == 0 || type == INFO) {
-//                    p.removeViewerBookmark(data.get(pos.setPos));
-//                } else {
-//                    p.setViewerBookmark(data.get(pos.setPos), pos.imgPos);
-//                }
-//            }
-//        }
+        int type = getItemViewType(layoutPos);
+        if(type == IMG) {
+            PageItem pi = (PageItem) items.get(layoutPos);
+            current = pi;
+            if(pi.manga.useBookmark()){
+                int index = pi.index;
+                if(autoCut) index/=2;
+                if (index == 0) {
+                    p.removeViewerBookmark(pi.manga);
+                } else {
+                    p.setViewerBookmark(pi.manga, index);
+                }
+            }
+        } else if(type == INFO){
+
+        }
     }
 //
 //    @Override
@@ -426,5 +428,10 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public interface ItemClickListener {
         void onItemClick();
     }
+
+    public interface AdapterInterface{
+        Object getItemAt(int pos);
+    }
+
 }
 

@@ -18,13 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ml.melun.mangaview.NpaLinearLayoutManager;
-import ml.melun.mangaview.Preference;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
-import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MainPage;
-import ml.melun.mangaview.mangaview.MainPageWebtoon;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 

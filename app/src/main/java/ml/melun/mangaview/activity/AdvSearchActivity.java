@@ -15,7 +15,7 @@ import android.widget.Spinner;
 import java.util.Arrays;
 import java.util.List;
 
-import ml.melun.mangaview.NpaLinearLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.MainTagAdapter;
 
