@@ -26,7 +26,7 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
     4 = offline - new(moa) (title.gson)
      */
 
-    public class Manga {
+    public class Manga{
         int baseMode;
 
         public Manga(int i, String n, String d, int baseMode){
@@ -314,6 +314,27 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
     public boolean isOnline(){
         return id>0&&mode==0;
     }
+
+    public Manga nextEp(){
+        if(eps == null || eps.size()==0){
+            return null;
+        }else{
+            int index = eps.indexOf(this);
+            if(index>0) return eps.get(index-1);
+            else return null;
+        }
+    }
+
+    public Manga prevEp(){
+        if(eps == null || eps.size()==0){
+            return null;
+        }else{
+            int index = eps.indexOf(this);
+            if(index<eps.size()-1) return eps.get(index+1);
+            else return null;
+        }
+    }
+
 
     private int id;
     String name;

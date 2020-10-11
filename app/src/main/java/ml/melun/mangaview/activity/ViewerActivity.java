@@ -209,12 +209,8 @@ public class ViewerActivity extends AppCompatActivity {
             if(!manga.isOnline()){
                 // is offline
                 //load local imgs
-
                 commentBtn.setVisibility(View.GONE);
-
-
                 reloadManga(manga);
-
             }else {
                 refresh();
             }
@@ -475,10 +471,6 @@ public class ViewerActivity extends AppCompatActivity {
             resetOnBackPressed();
             callback.post(m);
         }
-    }
-
-    public void appendManga(){
-
     }
 
     public void reloadManga(Manga m){

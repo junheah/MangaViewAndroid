@@ -65,13 +65,19 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public class InfoItem{
         public InfoItem(Manga prev, Manga next) {
-            this.next = next;
-            this.prev = prev;
+            if(next == null)
+                this.next = prev.nextEp();
+            else
+                this.next = next;
+            if(prev == null)
+                this.prev = next.prevEp();
+            else
+                this.prev = prev;
         }
 
         @Override
         public int hashCode() {
-            return (next==null?-1:next.getId()) * (prev==null?-1:prev.getId());
+            return (next==null?1:next.getId()) * (prev==null?1:prev.getId());
         }
 
         public Manga next;
@@ -89,12 +95,12 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             items = new ArrayList<>();
         int prevsize = items.size();
         if(items.size() == 0)
-            items.add(new InfoItem(null, m));
+            items.add(new InfoItem(m.prevEp(), m));
         List<String> imgs = m.getImgs();
         for(int i=0; i<imgs.size(); i++){
             items.add(new PageItem(i,imgs.get(i),m));
         }
-        items.add(new InfoItem(m, null));
+        items.add(new InfoItem(m, m.nextEp()));
         notifyItemRangeInserted(prevsize, items.size()-prevsize);
         count++;
         System.out.println(count);
@@ -220,14 +226,21 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }else if(type == INFO){
             //INFO
             ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
-            Manga prev = ((InfoItem)items.get(pos)).prev;
-            if(pos>0)
-                prev = ((PageItem) items.get(pos-1)).manga;
-            ((InfoViewHolder) holder).prevInfo.setText(prev == null ? "" : prev.getName());
 
+            Manga prev = ((InfoItem)items.get(pos)).prev;
             Manga next = ((InfoItem)items.get(pos)).next;
-            if(pos<items.size()-1)
-                next = ((PageItem) items.get(pos+1)).manga;
+
+            if(prev == null){
+                prev = next.prevEp();
+            }else if(next == null){
+                next = prev.nextEp();
+            }
+
+            ((InfoViewHolder) holder).prevInfo.setText(prev == null ? "첫 화" : prev.getName());
+            ((InfoViewHolder) holder).nextInfo.setText(next == null ? "마지막 화" : next.getName());
+
+
+
             ((InfoViewHolder) holder).nextInfo.setText(next == null ? "" : next.getName());
 
             Runnable r = new Runnable() {
