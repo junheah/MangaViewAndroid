@@ -42,6 +42,7 @@ import ml.melun.mangaview.interfaces.PageInterface;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
+import ml.melun.mangaview.ui.CustomSpinner;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
@@ -76,7 +77,7 @@ public class ViewerActivity3 extends AppCompatActivity {
     List<Manga> eps;
     boolean toolbarshow = true;
     ViewPager.OnPageChangeListener listener;
-    Spinner spinner;
+    CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
 
     @Override
@@ -122,23 +123,17 @@ public class ViewerActivity3 extends AppCompatActivity {
         spinnerAdapter = new CustomSpinnerAdapter(context);
         spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
             @Override
-            public void onClick(int position) {
-                if(index!= position) {
-                    lockUi(true);
-                    index = position;
-                    manga = eps.get(index);
-                    id = manga.getId();
-                    name = manga.getName();
-                    spinner.setSelection(position, true);
-                    hideSpinnerDropDown(spinner);
-                    if(manga.isOnline())
-                        refresh();
-                    else
-                        reloadManga();
-                }else {
-                    spinner.setSelection(position, true);
-                    hideSpinnerDropDown(spinner);
-                }
+            public void onClick(Manga m, int i) {
+                lockUi(true);
+                spinner.setSelection(m);
+                manga = m;
+                id = m.getId();
+                index = i;
+                hideSpinnerDropDown(spinner);
+                if(manga.isOnline())
+                    refresh();
+                else
+                    reloadManga();
             }
         });
         spinner.setAdapter(spinnerAdapter);
@@ -446,19 +441,14 @@ public class ViewerActivity3 extends AppCompatActivity {
         if(eps == null || eps.size() == 0){
             eps = title.getEps();
         }
-        List<String> epsName = new ArrayList<>();
         for(int i=0; i<eps.size(); i++){
-            if(id>0) {
-                if (eps.get(i).getId() == id)
-                    index = i;
-            }else{
-                if(eps.get(i).getName().equals(name))
-                    index = i;
+            if(eps.get(i).equals(manga)){
+                index = i;
+                break;
             }
-            epsName.add(eps.get(i).getName());
         }
-        spinnerAdapter.setData(epsName, index);
-        spinner.setSelection(index);
+        spinnerAdapter.setData(eps, manga);
+        spinner.setSelection(manga);
 
         toolbarTitle.setText(manga.getName());
         toolbarTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);

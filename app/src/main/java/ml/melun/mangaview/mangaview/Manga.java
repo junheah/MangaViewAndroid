@@ -1,16 +1,9 @@
 package ml.melun.mangaview.mangaview;
 
-
-import com.eclipsesource.v8.V8;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +12,11 @@ import org.jsoup.*;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import okhttp3.Response;
 
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
-
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
     /*
     mode:
@@ -35,25 +27,25 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
     4 = offline - new(moa) (title.gson)
      */
 
-public class Manga {
-    int baseMode;
+    public class Manga{
+        int baseMode = base_comic;
 
-    public Manga(int i, String n, String d, int baseMode){
-        id = i;
-        name = n;
-        date = d;
-        this.baseMode = baseMode;
-    }
+        public Manga(int i, String n, String d, int baseMode){
+            id = i;
+            name = n;
+            date = d;
+            this.baseMode = baseMode;
+        }
 
-    public int getBaseMode(){
-        return this.baseMode;
-    }
-    public int getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
+        public int getBaseMode(){
+            return this.baseMode;
+        }
+        public int getId() {
+            return id;
+        }
+        public String getName() {
+            return name;
+        }
     public void addThumb(String src){
         thumb = src;
     }
@@ -324,6 +316,41 @@ public class Manga {
         return id>0&&mode==0;
     }
 
+    public Manga nextEp(){
+        if(isOnline()) {
+            if (eps == null || eps.size() == 0) {
+                return null;
+            } else {
+                int index = eps.indexOf(this);
+                if (index > 0) return eps.get(index - 1);
+                else return null;
+            }
+        }else{
+            return nextEp;
+        }
+    }
+
+    public Manga prevEp(){
+        if(isOnline()) {
+            if (eps == null || eps.size() == 0) {
+                return null;
+            } else {
+                int index = eps.indexOf(this);
+                if (index < eps.size() - 1) return eps.get(index + 1);
+                else return null;
+            }
+        }else{
+            return prevEp;
+        }
+    }
+
+    public void setPrevEp(Manga m){
+        this.prevEp = m;
+    }
+    public void setNextEp(Manga m){
+        this.nextEp = m;
+    }
+
     private int id;
     String name;
     List<Manga> eps;
@@ -336,6 +363,7 @@ public class Manga {
     int seed;
     int mode;
     Listener listener;
+    Manga nextEp, prevEp;
 
     public interface Listener{
         void setMessage(String msg);

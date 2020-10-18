@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.EpisodeAdapter;
 import ml.melun.mangaview.adapter.TagAdapter;
@@ -115,7 +116,7 @@ public class EpisodeActivity extends AppCompatActivity {
         recentResult = intent.getBooleanExtra("recent",false);
         episodeList = this.findViewById(R.id.EpisodeList);
         progress = this.findViewById(R.id.progress);
-        episodeList.setLayoutManager(new LinearLayoutManager(this));
+        episodeList.setLayoutManager(new NpaLinearLayoutManager(this));
         homeDir = p.getHomeDir();
 
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
@@ -179,6 +180,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }else if(data.exists()){
                 mode = 3;
+                System.out.println(title);
 
                 if(!title.useBookmark()){
                     // is migrated

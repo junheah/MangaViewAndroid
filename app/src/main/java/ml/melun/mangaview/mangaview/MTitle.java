@@ -1,5 +1,7 @@
 package ml.melun.mangaview.mangaview;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +28,13 @@ public class MTitle{
     }
 
     public int getBaseMode() {
+        if(baseMode == base_auto)
+            baseMode = base_comic;
         return baseMode;
+    }
+
+    public String getBaseModeStr(){
+        return baseModeKorStr(baseMode);
     }
 
     public void setBaseMode(int baseMode) {
@@ -101,6 +109,22 @@ public class MTitle{
             default:
                 return "comic";
         }
+    }
+    public static String baseModeKorStr(int mode){
+        switch(mode){
+            case base_comic:
+                return "만화";
+            case base_webtoon:
+                return "웹툰";
+            default:
+                return "만화";
+        }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return name + " . " + id + " . " +  thumb + " . " + author + " . " + baseMode;
     }
 
     @Override

@@ -20,18 +20,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.MTitle;
@@ -76,7 +74,7 @@ public class RecyclerFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_recycler , container, false);
         recyclerView = rootView.findViewById(R.id.recycler_list);
         titleAdapter = new TitleAdapter(getContext());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new NpaLinearLayoutManager(getContext()));
         recyclerView.setAdapter(titleAdapter);
         titleAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
             @Override

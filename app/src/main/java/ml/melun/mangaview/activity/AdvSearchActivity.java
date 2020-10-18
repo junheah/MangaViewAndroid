@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import java.util.Arrays;
 import java.util.List;
 
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.MainTagAdapter;
 
@@ -52,9 +53,9 @@ public class AdvSearchActivity extends AppCompatActivity {
         rr = this.findViewById(R.id.search_release);
         tr = this.findViewById(R.id.search_tags);
 
-        tm = new LinearLayoutManager(context);
-        rm = new LinearLayoutManager(context);
-        nm = new LinearLayoutManager(context);
+        tm = new NpaLinearLayoutManager(context);
+        rm = new NpaLinearLayoutManager(context);
+        nm = new NpaLinearLayoutManager(context);
 
         tm.setOrientation(LinearLayoutManager.HORIZONTAL);
         rm.setOrientation(LinearLayoutManager.HORIZONTAL);

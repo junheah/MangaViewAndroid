@@ -171,15 +171,13 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         String author = data.getAuthor();
         String tags ="";
         int bookmark = data.getBookmark();
-        if(data.getTags().size()>0) {
-            holder.tagContainer.setVisibility(View.VISIBLE);
-            for (String s : data.getTags()) {
-                tags += s + " ";
-            }
-            holder.tags.setText(tags);
-        }else{
-            holder.tagContainer.setVisibility(View.GONE);
+        holder.tagContainer.setVisibility(View.VISIBLE);
+        holder.baseModeStr.setText(data.getBaseModeStr());
+        for (String s : data.getTags()) {
+            tags += s + " ";
         }
+        holder.tags.setText(tags);
+
         holder.name.setText(title);
         holder.author.setText(author);
 
@@ -214,6 +212,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         TextView author;
         TextView tags;
         TextView recommend_c, battery_c, comment_c, bookmark_c;
+        TextView baseModeStr;
         Button resume;
         CardView card;
 
@@ -232,6 +231,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             battery_c = itemView.findViewById(R.id.TitleBattery_c);
             comment_c = itemView.findViewById(R.id.TitleComment_c);
             bookmark_c = itemView.findViewById(R.id.TitleBookmark_c);
+            baseModeStr = itemView.findViewById(R.id.TitleBaseMode);
 
             tagContainer = itemView.findViewById(R.id.TitleTagContainer);
             counterContainer = itemView.findViewById(R.id.TitleCounterContainer);

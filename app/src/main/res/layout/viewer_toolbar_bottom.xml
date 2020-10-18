@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_arrow_right" />
 
-    <Spinner
+    <ml.melun.mangaview.ui.CustomSpinner
         android:background="?android:attr/selectableItemBackground"
         android:dropDownWidth="200dp"
         android:id="@+id/toolbar_spinner"

@@ -13,9 +13,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.MainPageWebtoon;
 import ml.melun.mangaview.mangaview.Ranking;
@@ -49,10 +49,10 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public MainWebtoonAdapter(Context context){
         this.context = context;
         this.dark = p.getDarkTheme();
-        manager = new LinearLayoutManager(context);
+        manager = new NpaLinearLayoutManager(context);
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         inflater = LayoutInflater.from(context);
-        dataSet = new ArrayList<>();
+        dataSet = MainPageWebtoon.getBlankDataSet();
         setLoading();
         setHasStableIds(true);
         setLoading();
@@ -113,6 +113,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public void onClick(View view) {
                     if(type == SR){
                         //search
+                        listener.clickedSearch((String)d);
                     }else{
                         //title
                         listener.clickedTitle((Title)d);
@@ -212,17 +213,16 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         protected void onPostExecute(MainPageWebtoon main) {
             super.onPostExecute(main);
             //update adapters?
-            try {
-                for (Ranking<?> r : main.getDataSet()) {
-                    if (r.size() == 0) {
-                        // captcha?
-                        listener.captchaCallback();
-                    }
-                }
-            }catch (Exception e){
-                listener.captchaCallback();
-            }
             dataSet = main.getDataSet();
+            if(dataSet == null)
+                dataSet = main.getBlankDataSet();
+            for (Ranking<?> r : dataSet) {
+                if (r==null || r.size() == 0) {
+                    // captcha?
+                    listener.captchaCallback();
+                    return;
+                }
+            }
             updateWidgets();
         }
     }

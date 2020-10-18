@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,16 +19,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
-import ml.melun.mangaview.activity.AdvSearchActivity;
 import ml.melun.mangaview.adapter.TitleAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Search;
@@ -53,6 +51,7 @@ public class MainSearch extends Fragment {
     Search search;
     Fragment fragment;
     LinearLayoutCompat optionsPanel;
+    String prequery = null;
 
     @Nullable
     @Override
@@ -63,7 +62,7 @@ public class MainSearch extends Fragment {
         noresult = rootView.findViewById(R.id.noResult);
         searchBox = rootView.findViewById(R.id.searchBox);
         searchResult = rootView.findViewById(R.id.searchResult);
-        searchResult.setLayoutManager(new LinearLayoutManager(getContext()));
+        searchResult.setLayoutManager(new NpaLinearLayoutManager(getContext()));
         searchMode = rootView.findViewById(R.id.searchMode);
         baseMode = rootView.findViewById(R.id.searchBaseMode);
         advSearchBtn = rootView.findViewById(R.id.advSearchBtn);
@@ -139,9 +138,22 @@ public class MainSearch extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(prequery != null){
+            searchBox.setText(prequery);
+            prequery = null;
+        }
+    }
+
     void optionUpdate(){
         //shows or hides options
         //p.setBaseMode(baseMode.getSelectedItemPosition()+1);
+    }
+
+    public void setSearch(String prequery){
+        this.prequery = prequery;
     }
 
     void searchSubmit(){

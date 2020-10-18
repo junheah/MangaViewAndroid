@@ -1,6 +1,5 @@
 package ml.melun.mangaview.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,15 +9,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
-import ml.melun.mangaview.Preference;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
+import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.TagSearchActivity;
 import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.adapter.MainWebtoonAdapter;
@@ -40,6 +39,7 @@ public class MainMain extends Fragment{
     Fragment fragment;
     boolean wait = false;
     UrlUpdater.UrlUpdaterCallback callback;
+    MainActivity.MainActivityCallback mainActivityCallback;
 
     final static int COMIC_TAB = 0;
     final static int WEBTOON_TAB = 1;
@@ -50,7 +50,9 @@ public class MainMain extends Fragment{
         this.wait = wait;
     }
 
-    public MainMain(){
+    public MainMain(MainActivity.MainActivityCallback mainActivityCallback){
+        this.mainActivityCallback = mainActivityCallback;
+
         callback = new UrlUpdater.UrlUpdaterCallback() {
             @Override
             public void callback(boolean success) {
@@ -114,7 +116,7 @@ public class MainMain extends Fragment{
         //main content
         // 최근 추가된 만화
         mainRecycler = rootView.findViewById(R.id.main_recycler);
-        mainRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        mainRecycler.setLayoutManager(new NpaLinearLayoutManager(getContext()));
 
         MainAdapter.onItemClick listener = new MainAdapter.onItemClick() {
 
@@ -165,6 +167,11 @@ public class MainMain extends Fragment{
             @Override
             public void captchaCallback() {
                 Utils.showCaptchaPopup(getContext(), 3, fragment, p);
+            }
+
+            @Override
+            public void clickedSearch(String query) {
+                mainActivityCallback.search(query);
             }
         };
 

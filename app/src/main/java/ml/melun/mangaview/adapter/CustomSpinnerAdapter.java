@@ -13,11 +13,12 @@ import android.widget.TextView;
 import java.util.List;
 
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.mangaview.Manga;
 
 public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
 
     private Context context;
-    private List<String> data;
+    private List<Manga> data;
     private static LayoutInflater inflater = null;
     private CustomSpinnerListener listener;
     private int selected = -1;
@@ -33,9 +34,10 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
             return data.size();
         return 0;
     }
-    public void setData(List<String> data, int position){
+
+    public void setData(List<Manga> data, Manga m){
         this.data = data;
-        this.selected = position;
+        setSelection(m);
         notifyDataSetChanged();
     }
 
@@ -44,15 +46,22 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
             this.selected = position;
     }
 
+    public void setSelection(Manga m){
+        for(int i=0; i< data.size(); i++){
+            if(m.equals(data.get(i)))
+                setSelection(i);
+        }
+    }
+    public int getSelected(){
+        return selected;
+    }
     public Object getItem(int position) {
         return data.get(position);
     }
 
     public long getItemId(int position) {
-        return position;
+        return data.get(position).getId();
     }
-
-
 
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
@@ -60,7 +69,6 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
         }
         return convertView;
     }
-
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
@@ -81,14 +89,15 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
                 holder.name.setTextColor(Color.WHITE);
             }
 
-            holder.name.setText(data.get(position));
+            holder.name.setText(data.get(position).getName());
             holder.name.setSelected(true);
 
             convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(listener != null){
-                        listener.onClick(position);
+                    if(listener != null && selected != position) {
+                        listener.onClick(data.get(position), position);
+                        setSelection(position);
                     }
                 }
             });
@@ -109,6 +118,6 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
     }
 
     public interface CustomSpinnerListener{
-        void onClick(int position);
+        void onClick(Manga m, int i);
     }
 }

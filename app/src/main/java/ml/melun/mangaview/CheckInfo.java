@@ -32,7 +32,9 @@ public class CheckInfo {
     noticeCheck nc;
     SharedPreferences sharedPref;
     CustomHttpClient client;
-    public CheckInfo(Context context, CustomHttpClient client){
+    boolean silent = false;
+    public CheckInfo(Context context, CustomHttpClient client, boolean silent){
+        this.silent = silent;
         this.context = context;
         this.client = client;
         uc = new updateCheck();
@@ -48,13 +50,13 @@ public class CheckInfo {
     }
     public Boolean update(Boolean force){
         if(!checkConnection(context)){
-            Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_SHORT).show();
+            if(!silent) Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_SHORT).show();
             return false;
         }
         Long lastUpdateTime = sharedPref.getLong("lastUpdateTime", 0);
         Long updateCycle = sharedPref.getLong("updateCycle",900000); // def cycle = 15min
         if(uc.getStatus()== AsyncTask.Status.RUNNING) {
-            Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
+            if(!silent) Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
             return false;
         }
         else{
@@ -65,13 +67,13 @@ public class CheckInfo {
     }
     public Boolean notice(Boolean force) {
         if(!checkConnection(context)){
-            Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_SHORT).show();
+            if(!silent) Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_SHORT).show();
             return false;
         }
         Long lastUpdateTime = sharedPref.getLong("lastNoticeTime", 0);
         Long updateCycle = sharedPref.getLong("noticeCycle",900000); // def cycle = 15min
         if (nc.getStatus() == AsyncTask.Status.RUNNING){
-            Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
+            if(!silent) Toast.makeText(context, "이미 실행중입니다. 잠시후에 다시 시도해 주세요",Toast.LENGTH_SHORT).show();
             return false;
         }
         else {
@@ -120,7 +122,7 @@ public class CheckInfo {
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-            Toast.makeText(context, "업데이트 확인중..", Toast.LENGTH_SHORT).show();
+            if(!silent) Toast.makeText(context, "업데이트 확인중..", Toast.LENGTH_SHORT).show();
         }
 
         protected Integer doInBackground(Void... params) {
@@ -142,10 +144,10 @@ public class CheckInfo {
             super.onPostExecute(result);
             switch(result){
                 case -1:
-                    Toast.makeText(context, "오류가 발생했습니다. 나중에 다시 시도해 주세요.", Toast.LENGTH_LONG).show();
+                    if(!silent) Toast.makeText(context, "오류가 발생했습니다. 나중에 다시 시도해 주세요.", Toast.LENGTH_LONG).show();
                     break;
                 case 0:
-                    Toast.makeText(context, "최신버전 입니다.", Toast.LENGTH_LONG).show();
+                    if(!silent) Toast.makeText(context, "최신버전 입니다.", Toast.LENGTH_LONG).show();
                     break;
                 case 1:
                     showPrompt(data);
