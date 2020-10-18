@@ -180,6 +180,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }else if(data.exists()){
                 mode = 3;
+                System.out.println(title);
 
                 if(!title.useBookmark()){
                     // is migrated

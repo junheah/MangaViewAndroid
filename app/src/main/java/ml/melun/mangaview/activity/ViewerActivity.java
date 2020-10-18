@@ -80,6 +80,7 @@ public class ViewerActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        System.out.println(title);
         outState.putString("manga", new Gson().toJson(manga));
         outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
@@ -297,11 +298,10 @@ public class ViewerActivity extends AppCompatActivity {
         }else{
             //offline
             eps = title.getEps();
-            for(int i=0; i<eps.size(); i++){
-                eps.get(i).setTitle(title);
-                eps.get(i).setNextEp(i>0 ? eps.get(i-1) : null);
-                eps.get(i).setPrevEp(i<eps.size()-1 ? eps.get(i+1) : null);
-            }
+//            for(int i=0; i<eps.size(); i++){
+//                eps.get(i).setNextEp(i>0 ? eps.get(i-1) : null);
+//                eps.get(i).setPrevEp(i<eps.size()-1 ? eps.get(i+1) : null);
+//            }
             m = eps.get(eps.indexOf(m));
             setManga(m);
         }
@@ -459,8 +459,6 @@ public class ViewerActivity extends AppCompatActivity {
                     login.buildCookie(cookie);
                 }
                 m.fetch(httpClient);
-                if (title == null)
-                    title = m.getTitle();
                 return 0;
             }else{
                 return 0;
@@ -469,6 +467,8 @@ public class ViewerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Integer res) {
+            if (title == null)
+                title = m.getTitle();
             super.onPostExecute(res);
             resetOnBackPressed();
             callback.post(m);

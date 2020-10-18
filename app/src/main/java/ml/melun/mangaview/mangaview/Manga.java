@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 import okhttp3.Response;
 
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
     /*
     mode:
@@ -27,7 +28,7 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
      */
 
     public class Manga{
-        int baseMode;
+        int baseMode = base_comic;
 
         public Manga(int i, String n, String d, int baseMode){
             id = i;

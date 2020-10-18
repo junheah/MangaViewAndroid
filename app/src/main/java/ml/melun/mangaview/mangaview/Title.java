@@ -1,4 +1,6 @@
 package ml.melun.mangaview.mangaview;
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +44,11 @@ public class Title extends MTitle {
         super(title.getName(), title.getId(), title.getThumb(), title.getAuthor(), title.getTags(), title.getRelease(), title.getBaseMode());
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString()  + " . " + eps;
+    }
 
     public List<Manga> getEps(){
         return eps;
