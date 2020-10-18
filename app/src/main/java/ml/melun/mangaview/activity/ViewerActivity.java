@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -80,7 +81,6 @@ public class ViewerActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        System.out.println(title);
         outState.putString("manga", new Gson().toJson(manga));
         outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
@@ -118,7 +118,7 @@ public class ViewerActivity extends AppCompatActivity {
                                 stripAdapter.insertManga(m);
                             callback.prevLoaded(m);
                         }
-                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    },false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i + 1);
                 }else{
                     callback.prevLoaded(null);
@@ -138,7 +138,7 @@ public class ViewerActivity extends AppCompatActivity {
                                 stripAdapter.appendManga(m);
                             callback.nextLoaded(m);
                         }
-                    }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    },false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i - 1);
                 }else{
                     callback.nextLoaded(null);
@@ -280,7 +280,7 @@ public class ViewerActivity extends AppCompatActivity {
     void loadManga(Manga m, LoadMangaCallback callback){
         if(m!=null) {
             this.manga = m;
-            loadImages l = new loadImages(m, callback);
+            loadImages l = new loadImages(m, callback,true);
             l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
@@ -432,15 +432,18 @@ public class ViewerActivity extends AppCompatActivity {
 
 
     private class loadImages extends AsyncTask<Void,String,Integer> {
+        boolean lockui;
         LoadMangaCallback callback;
         Manga m;
-        public loadImages(Manga m, LoadMangaCallback callback){
+        public loadImages(Manga m, LoadMangaCallback callback, boolean lockui){
+            this.lockui = lockui;
             this.m = m;
             this.callback = callback;
         }
 
         protected void onPreExecute() {
             super.onPreExecute();
+            if(lockui) lockUi(true);
             setOnBackPressed(new Runnable() {
                 @Override
                 public void run(){
@@ -467,6 +470,7 @@ public class ViewerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Integer res) {
+            if(lockui) lockUi(false);
             if (title == null)
                 title = m.getTitle();
             super.onPostExecute(res);

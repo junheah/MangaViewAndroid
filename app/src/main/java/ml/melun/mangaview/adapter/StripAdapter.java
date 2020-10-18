@@ -95,7 +95,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         items.add(new InfoItem(m, m.nextEp()));
         notifyItemRangeInserted(prevsize, items.size()-prevsize);
         count++;
-        System.out.println(count);
         if(count>MaxStackSize){
             popFirst();
         }
@@ -118,7 +117,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemRangeInserted(0, items.size()-prevsize);
         count++;
 
-        System.out.println(count);
         if(count>MaxStackSize){
             popLast();
         }
@@ -417,7 +415,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    public class InfoViewHolder extends RecyclerView.ViewHolder{
+    public class InfoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView prevInfo, nextInfo;
         ProgressBar loading;
         InfoViewHolder(View itemView) {
@@ -425,8 +423,12 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             prevInfo = itemView.findViewById(R.id.prevEpInfo);
             nextInfo = itemView.findViewById(R.id.nextEpInfo);
             loading = itemView.findViewById(R.id.infoLoading);
+            itemView.setOnClickListener(this);
         }
-
+        @Override
+        public void onClick(View view) {
+            if (mClickListener != null) mClickListener.onItemClick();
+        }
     }
 
     // allows clicks events to be caught
