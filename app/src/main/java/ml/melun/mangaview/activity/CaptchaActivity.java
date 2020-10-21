@@ -37,6 +37,7 @@ import static ml.melun.mangaview.Utils.showPopup;
 public class CaptchaActivity extends AppCompatActivity {
     WebView webView;
     public static final int RESULT_CAPTCHA = 15;
+    public static final int REQUEST_CAPTCHA = 32;
     String domain = "";
 
     @Override
