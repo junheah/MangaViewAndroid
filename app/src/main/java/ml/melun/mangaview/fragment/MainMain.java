@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 
+import ml.melun.mangaview.interfaces.MainActivityCallback;
 import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
@@ -39,7 +40,7 @@ public class MainMain extends Fragment{
     Fragment fragment;
     boolean wait = false;
     UrlUpdater.UrlUpdaterCallback callback;
-    MainActivity.MainActivityCallback mainActivityCallback;
+    MainActivityCallback mainActivityCallback;
 
     final static int COMIC_TAB = 0;
     final static int WEBTOON_TAB = 1;
@@ -50,9 +51,15 @@ public class MainMain extends Fragment{
         this.wait = wait;
     }
 
-    public MainMain(MainActivity.MainActivityCallback mainActivityCallback){
-        this.mainActivityCallback = mainActivityCallback;
 
+    public MainMain(){
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.mainActivityCallback = (MainActivity)getActivity();
         callback = new UrlUpdater.UrlUpdaterCallback() {
             @Override
             public void callback(boolean success) {
