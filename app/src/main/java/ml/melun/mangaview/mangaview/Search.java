@@ -123,7 +123,7 @@ public class Search {
                     }
                 }
                 response.close();
-                if (result.size() < 210)
+                if (result.size() < 70)
                     last = true;
 
 
