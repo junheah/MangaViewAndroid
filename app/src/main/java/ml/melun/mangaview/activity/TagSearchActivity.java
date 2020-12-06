@@ -34,6 +34,8 @@ import static ml.melun.mangaview.Utils.REQUEST_LOGIN;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
+import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
+import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class TagSearchActivity extends AppCompatActivity {
@@ -341,7 +343,8 @@ public class TagSearchActivity extends AppCompatActivity {
             //login
             finish();
             startActivity(getIntent());
-        }else {
+        }
+        if(resultCode == RESULT_CAPTCHA){
             //captcha
             finish();
             startActivity(getIntent());

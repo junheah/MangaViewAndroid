@@ -55,6 +55,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
 import static ml.melun.mangaview.activity.SettingsActivity.urlSettingPopup;
 
 public class Utils {
@@ -323,7 +324,7 @@ public class Utils {
 
     public static void showCaptchaPopup(Context context, Exception e, Preference p) {
         // viewer call
-        showCaptchaPopup(context, 0, e, true, p);
+        showCaptchaPopup(context, REQUEST_CAPTCHA, e, true, p);
     }
 
     public static void showCaptchaPopup(Context context, int code, Preference p){

@@ -53,6 +53,7 @@ import ml.melun.mangaview.fragment.MainMain;
 import ml.melun.mangaview.fragment.MainSearch;
 import ml.melun.mangaview.fragment.RecyclerFragment;
 import ml.melun.mangaview.UrlUpdater;
+import ml.melun.mangaview.interfaces.MainActivityCallback;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -78,7 +79,7 @@ import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 //TODO: smooth transitioning between fragments
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, MainActivityCallback {
 
     public static int PERMISSION_CODE = 132322;
     int startTab;
@@ -104,15 +105,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void search(String query) {
+        ((MainSearch)fragments[1]).setSearch(query);
+        changeFragment(1);
+    }
+
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
-        MainActivityCallback mainActivityCallback = new MainActivityCallback() {
-            @Override
-            public void search(String query) {
-                ((MainSearch)fragments[1]).setSearch(query);
-                changeFragment(1);
-            }
-        };
-        fragments[0] = new MainMain(mainActivityCallback);
+        fragments[0] = new MainMain();
         fragments[1] = new MainSearch();
         fragments[2] = new RecyclerFragment();
         dark = p.getDarkTheme();
@@ -660,9 +662,5 @@ public class MainActivity extends AppCompatActivity
                     finish();
                 }
             });
-    }
-
-    public interface MainActivityCallback{
-        void search(String query);
     }
 }
