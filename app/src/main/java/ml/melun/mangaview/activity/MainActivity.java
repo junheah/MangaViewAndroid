@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        fragments[0] = new MainMain();
+        fragments[0] = MainMain.newInstance();
         fragments[1] = new MainSearch();
         fragments[2] = new RecyclerFragment();
         dark = p.getDarkTheme();
