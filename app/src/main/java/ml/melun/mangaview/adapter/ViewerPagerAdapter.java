@@ -8,12 +8,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import ml.melun.mangaview.fragment.ViewerPageFragment;
 import ml.melun.mangaview.interfaces.PageInterface;
 import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
+
+import static ml.melun.mangaview.MainApplication.p;
 
 public class ViewerPagerAdapter extends FragmentStatePagerAdapter
 {
@@ -34,6 +37,7 @@ public class ViewerPagerAdapter extends FragmentStatePagerAdapter
     public void setManga(Manga m){
         fragments.clear();
         List<String> imgs = m.getImgs();
+        if (p.getPageRtl()) Collections.reverse(imgs);
         for(int i = 0; i<imgs.size(); i++){
             String s = imgs.get(i);
 

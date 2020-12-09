@@ -147,16 +147,18 @@ public class ViewerActivity3 extends AppCompatActivity {
         listener = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if(viewerBookmark != position) {
-                    viewerBookmark = position;
+                int pageSize = pageAdapter.getCount();
+                int pos = p.getPageRtl() ? pageSize - position - 1 : position;
+                if(viewerBookmark != pos) {
+                    viewerBookmark = pos;
                     pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
                     if(manga.useBookmark()) {
-                        if (position == imgs.size() - 1 || position == 0) {
+                        if (viewerBookmark == pageSize - 1 || viewerBookmark == 0) {
                             p.removeViewerBookmark(manga);
                         } else p.setViewerBookmark(manga, viewerBookmark);
                     }
 
-                    boolean lastPage = viewerBookmark == imgs.size() - 1;
+                    boolean lastPage = viewerBookmark == pageSize - 1;
                     boolean firstPage = viewerBookmark == 0;
                     if (toolbarshow && !lastPage)
                         toggleToolbar();
@@ -247,7 +249,7 @@ public class ViewerActivity3 extends AppCompatActivity {
                             if (page < 1) page = 1;
                             if (page > imgs.size()) page = imgs.size();
                             viewerBookmark = page - 1;
-                            viewPager.setCurrentItem(viewerBookmark, false);
+                            goPage(viewerBookmark, false);
                             pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
                         }
                     }
@@ -305,11 +307,11 @@ public class ViewerActivity3 extends AppCompatActivity {
         int keyCode = event.getKeyCode();
         if(keyCode == p.getNextPageKey()){
             if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark<pageAdapter.getCount()-1)
-                viewPager.setCurrentItem(viewerBookmark+1);
+                goPage(viewerBookmark+1, false);
             return true;
         }else if(keyCode == p.getPrevPageKey()){
             if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark>0)
-                viewPager.setCurrentItem(viewerBookmark-1);
+                goPage(viewerBookmark-1, false);
             return true;
         }
         return super.dispatchKeyEvent(event);
@@ -389,6 +391,10 @@ public class ViewerActivity3 extends AppCompatActivity {
         }
     }
 
+    public void goPage(int item, boolean smoothScroll) {
+        viewPager.setCurrentItem(p.getPageRtl() ? pageAdapter.getCount() - item - 1 : item, smoothScroll);
+    }
+
     public void reloadManga(){
         try {
             lockUi(false);
@@ -416,11 +422,11 @@ public class ViewerActivity3 extends AppCompatActivity {
     public void bookmarkRefresh(){
         if(manga.useBookmark()) {
             viewerBookmark = p.getViewerBookmark(manga);
-            viewPager.setCurrentItem(viewerBookmark, false);
             p.addRecent(title);
             p.setBookmark(title, id);
         }else
             viewerBookmark = 0;
+        goPage(viewerBookmark, false);
     }
 
     public void updateIntent(){
