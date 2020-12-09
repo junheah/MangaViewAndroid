@@ -44,9 +44,9 @@ public class SettingsActivity extends AppCompatActivity {
     //데이터 절약 모드 : 외부 이미지 로드 안함
     //
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_dark, s_viewer, s_reverse, s_dataSave, s_tab, s_stretch;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_dark, s_viewer, s_reverse, s_pageRtl, s_dataSave, s_tab, s_stretch;
     Spinner s_tab_spinner, s_viewer_spinner;
-    Switch s_dark_switch, s_reverse_switch, s_dataSave_switch, s_stretch_switch;
+    Switch s_dark_switch, s_reverse_switch, s_pageRtl_switch, s_dataSave_switch, s_stretch_switch;
     Boolean dark;
     public static final String prefExtension = ".mvpref";
     public static final int RESULT_NEED_RESTART = 7;
@@ -290,6 +290,21 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 p.setReverse(isChecked);
+            }
+        });
+        s_pageRtl = this.findViewById(R.id.setting_pageRtl);
+        s_pageRtl_switch = this.findViewById(R.id.setting_pageRtl_switch);
+        s_pageRtl_switch.setChecked(p.getPageRtl());
+        s_pageRtl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_pageRtl_switch.toggle();
+            }
+        });
+        s_pageRtl_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setPageRtl(isChecked);
             }
         });
 
