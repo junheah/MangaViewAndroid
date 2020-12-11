@@ -215,8 +215,10 @@ public class Preference {
         prefsEditor.commit();
     }
     public void removeRecent(int position){
-        recent.remove(position);
+        MTitle title = recent.remove(position);
         writeRecent();
+        removeBookmark(title);
+        writeBookmark();
     }
 
     public void addRecent(MTitle tmp){
@@ -298,6 +300,18 @@ public class Preference {
         }
         return -1;
     }
+
+    private void removeBookmark(MTitle title){
+        int titleId = title.getId();
+        if(titleId>0) {
+            try {
+                bookmark.remove(title.getBaseMode()+"."+titleId);
+            } catch (Exception e) {
+                //
+            }
+        }
+    }
+
     public void writeBookmark(){
         prefsEditor.putString("bookmark2", bookmark.toString());
         prefsEditor.commit();

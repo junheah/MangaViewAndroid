@@ -182,7 +182,7 @@ public class MainMain extends Fragment{
 
             @Override
             public void captchaCallback() {
-                Utils.showCaptchaPopup(getContext(), 3, fragment, p);
+                Utils.showCaptchaPopup(getActivity(), 3, fragment, p);
             }
 
             @Override
