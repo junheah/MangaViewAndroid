@@ -52,6 +52,12 @@ public class MainMain extends Fragment{
     }
 
 
+    public static MainMain newInstance(){
+        MainMain frag = new MainMain();
+        frag.initializeCallback();
+        return frag;
+    }
+
     public MainMain(){
 
     }
@@ -60,6 +66,9 @@ public class MainMain extends Fragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mainActivityCallback = (MainActivity)getActivity();
+    }
+
+    public void initializeCallback(){
         callback = new UrlUpdater.UrlUpdaterCallback() {
             @Override
             public void callback(boolean success) {
@@ -173,7 +182,7 @@ public class MainMain extends Fragment{
 
             @Override
             public void captchaCallback() {
-                Utils.showCaptchaPopup(getContext(), 3, fragment, p);
+                Utils.showCaptchaPopup(getActivity(), 3, fragment, p);
             }
 
             @Override

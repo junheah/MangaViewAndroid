@@ -244,10 +244,12 @@ public class Utils {
     }
 
     public static boolean checkConnection(Context context){
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) ((Activity)context).getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+        if(context != null) {
+            ConnectivityManager connectivityManager
+                    = (ConnectivityManager) ((Activity) context).getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+        }else return false;
     }
 
 
