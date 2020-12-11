@@ -34,6 +34,7 @@ public class Preference {
     boolean darkTheme;
     int viewerType;
     boolean reverse;
+    boolean pageRtl;
     boolean dataSave;
     int startTab;
     String url;
@@ -79,6 +80,7 @@ public class Preference {
             darkTheme = sharedPref.getBoolean("darkTheme", false);
             viewerType = sharedPref.getInt("viewerType",0);
             reverse = sharedPref.getBoolean("pageReverse",false);
+            pageRtl = sharedPref.getBoolean("pageRtl",false);
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
             defUrl = sharedPref.getString("defUrl", "설정되지 않음");
@@ -189,6 +191,16 @@ public class Preference {
     public void setReverse(boolean reverse) {
         this.reverse = reverse;
         prefsEditor.putBoolean("pageReverse", reverse);
+        prefsEditor.commit();
+    }
+
+    public boolean getPageRtl() {
+        return pageRtl;
+    }
+
+    public void setPageRtl(boolean pageRtl) {
+        this.pageRtl = pageRtl;
+        prefsEditor.putBoolean("pageRtl", pageRtl);
         prefsEditor.commit();
     }
 
