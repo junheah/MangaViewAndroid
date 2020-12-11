@@ -255,61 +255,63 @@ public class Utils {
 
 
     public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Fragment fragment, Preference p){
-        if(!checkConnection(context)){
-            //no internet
-            //showErrorPopup(context, "네트워크 연결이 없습니다.", e, force_close);
-            Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_LONG).show();
-            if(force_close) ((Activity) context).finish();
-        }else if(captchaCount == 0){
-            startCaptchaActivity(context, code, fragment);
-        }else {
-            AlertDialog.Builder builder;
-            String title = "오류";
-            String content = "정보를 불러오는데 실패하였습니다.";
-            if (new Preference(context).getDarkTheme())
-                builder = new AlertDialog.Builder(context, R.style.darkDialog);
-            else builder = new AlertDialog.Builder(context);
-            builder.setTitle(title)
-                    .setMessage(content)
-                    .setNeutralButton("확인", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (force_close) ((Activity) context).finish();
-                        }
-                    })
-                    .setPositiveButton("CAPTCHA 인증", new DialogInterface.OnClickListener() {
+        if(context != null) {
+            if (!checkConnection(context)) {
+                //no internet
+                //showErrorPopup(context, "네트워크 연결이 없습니다.", e, force_close);
+                Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_LONG).show();
+                if (force_close) ((Activity) context).finish();
+            } else if (captchaCount == 0) {
+                startCaptchaActivity(context, code, fragment);
+            } else {
+                AlertDialog.Builder builder;
+                String title = "오류";
+                String content = "정보를 불러오는데 실패하였습니다.";
+                if (new Preference(context).getDarkTheme())
+                    builder = new AlertDialog.Builder(context, R.style.darkDialog);
+                else builder = new AlertDialog.Builder(context);
+                builder.setTitle(title)
+                        .setMessage(content)
+                        .setNeutralButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (force_close) ((Activity) context).finish();
+                            }
+                        })
+                        .setPositiveButton("CAPTCHA 인증", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startCaptchaActivity(context, code, fragment);
+                            }
+                        })
+                        .setNegativeButton("URL 설정", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                urlSettingPopup(context, p);
+                            }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                if (force_close) ((Activity) context).finish();
+                            }
+                        });
+                if (e != null) {
+                    builder.setNeutralButton("자세히", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startCaptchaActivity(context, code, fragment);
-                        }
-                    })
-                    .setNegativeButton("URL 설정", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            urlSettingPopup(context, p);
-                        }
-                    })
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialogInterface) {
-                            if (force_close) ((Activity) context).finish();
+                            showStackTrace(context, e);
                         }
                     });
-            if (e != null) {
-                builder.setNeutralButton("자세히", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        showStackTrace(context, e);
-                    }
-                });
+                }
+                try {
+                    builder.show();
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
             }
-            try {
-                builder.show();
-            }catch (Exception e2){
-                e2.printStackTrace();
-            }
+            captchaCount++;
         }
-        captchaCount++;
     }
 
     static void startCaptchaActivity(Context context, int code, Fragment fragment){
