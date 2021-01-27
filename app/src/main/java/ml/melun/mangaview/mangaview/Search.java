@@ -123,9 +123,8 @@ public class Search {
                     }
                 }
                 response.close();
-                if (result.size() < 70)
+                if (result.size() < 35)
                     last = true;
-
 
                 if(result.size()==0)
                     page--;

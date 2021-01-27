@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.showYesNoPopup;
 
 public class FirstTimeActivity extends AppCompatActivity {
 
@@ -80,6 +82,27 @@ public class FirstTimeActivity extends AppCompatActivity {
                         }
                     }, defurl).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
+            }
+        });
+
+        this.findViewById(R.id.eulaNoUrlBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showYesNoPopup(true, context, "주의",
+                        "기본주소를 설정하지 않으면\n[설정] > [URL 설정] 에서 직접 유효한 주소를 설정해 줘야 앱 사용이 가능합니다.\nURL 자동 설정이 작동하지 않을때만 이 옵션을 사용해 주세요.\n계속 하시겠습니까?",
+                        new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                p.setAutoUrl(false);
+                                long time = System.currentTimeMillis();
+                                p.getSharedPref().edit().putLong("eula2", time).commit();
+                                // not a migrator
+                                p.getSharedPref().edit().putBoolean("manamoa", false).commit();
+                                Toast.makeText(context, new SimpleDateFormat("yyyy MM dd HH:mm:ss").format(time) + " 부로 EULA에 동의했습니다.",Toast.LENGTH_LONG).show();
+                                setResult(RESULT_EULA_AGREE);
+                                finish();
+                            }
+                        },null, null);
             }
         });
     }

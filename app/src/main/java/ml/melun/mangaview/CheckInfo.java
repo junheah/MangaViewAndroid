@@ -33,6 +33,10 @@ public class CheckInfo {
     SharedPreferences sharedPref;
     CustomHttpClient client;
     boolean silent = false;
+    boolean forceDark = false;
+    public void setForceDark(){
+        this.forceDark = true;
+    }
     public CheckInfo(Context context, CustomHttpClient client, boolean silent){
         this.silent = silent;
         this.context = context;
@@ -163,7 +167,7 @@ public class CheckInfo {
             final String message = "버전: " + data.getString("tag_name") +"\n체인지 로그:\n"+ data.getString("body");
             final String url = data.getJSONArray("assets").getJSONObject(0).getString("browser_download_url");
             AlertDialog.Builder builder;
-            if(new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+            if(new Preference(context).getDarkTheme() || forceDark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
             else builder = new AlertDialog.Builder(context);
             builder.setTitle("업데이트")
                     .setMessage(message)

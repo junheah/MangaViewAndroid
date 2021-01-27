@@ -98,6 +98,18 @@
                 android:paddingStart="10dp"
                 android:text="동의하고 계속하기" />
 
+            <Button
+                android:background="@drawable/button_bg_white"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:id="@+id/eulaNoUrlBtn"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:text="동의하고 기본주소 없이 계속하기" />
+
         </LinearLayout>
 
     </ScrollView>

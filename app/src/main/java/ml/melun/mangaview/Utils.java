@@ -195,6 +195,22 @@ public class Utils {
                 .show();
     }
 
+    public static void showYesNoPopup(boolean dark, Context context, String title, String content,
+                                      DialogInterface.OnClickListener posClickListener,
+                                      DialogInterface.OnClickListener negClickListener,
+                                      DialogInterface.OnCancelListener cancelListener){
+
+        AlertDialog.Builder builder;
+        if (dark) builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setMessage(content)
+                .setPositiveButton("예", posClickListener)
+                .setNegativeButton("아니오", negClickListener)
+                .setOnCancelListener(cancelListener)
+                .show();
+    }
+
     public static void showYesNoNeutralPopup(Context context, String title, String content, String neutral,
                                              DialogInterface.OnClickListener posClickListener,
                                              DialogInterface.OnClickListener negClickListener,
