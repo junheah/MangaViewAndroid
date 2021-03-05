@@ -11,6 +11,8 @@ import com.google.android.material.appbar.AppBarLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +21,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -78,6 +81,7 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
+    ImageButton fullScreenBtn;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -104,6 +108,8 @@ public class ViewerActivity extends AppCompatActivity {
         commentBtn = this.findViewById(R.id.commentButton);
         spinner = this.findViewById(R.id.toolbar_spinner);
         width = getScreenSize(getWindowManager().getDefaultDisplay());
+        fullScreenBtn = this.findViewById(R.id.fullBtn);
+
 
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
@@ -263,6 +269,7 @@ public class ViewerActivity extends AppCompatActivity {
                         }
                     }
                 });
+
                 alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int button) {
                         //취소 시
@@ -271,6 +278,41 @@ public class ViewerActivity extends AppCompatActivity {
                 alert.show();
             }
         });
+
+        p.setFullScreen(!p.getFullScreen());
+        toggleFullScreen();
+
+        fullScreenBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleFullScreen();
+            }
+        });
+    }
+
+
+    void toggleFullScreen(){
+        if(p.getFullScreen()){
+            //disable full
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            fullScreenBtn.setImageResource(R.drawable.ic_baseline_fullscreen_24);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            }
+        }else{
+            //enable full
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            }
+
+            fullScreenBtn.setImageResource(R.drawable.ic_baseline_fullscreen_exit_24);
+        }
+        p.setFullScreen(!p.getFullScreen());
     }
 
     void refresh(){

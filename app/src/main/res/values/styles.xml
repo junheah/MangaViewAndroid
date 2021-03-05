@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="AppTheme.Launcher">
     <item name="android:windowBackground">@drawable/launch_screen</item>
@@ -11,6 +11,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">
+            shortEdges
+        </item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

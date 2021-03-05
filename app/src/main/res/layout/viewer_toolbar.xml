@@ -39,33 +39,26 @@
         style="@android:style/TextAppearance.Large" />
 
     <ImageButton
-        android:background="@drawable/button_bg"
+        android:background="?android:attr/selectableItemBackground"
         android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/commentButton"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:padding="8dp"
+        android:layout_width="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/moreBtn"
+        app:layout_constraintEnd_toStartOf="@+id/fullBtn"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_comments" />
 
     <ImageButton
         android:background="?android:attr/selectableItemBackground"
-        android:id="@+id/moreBtn"
+        android:id="@+id/fullBtn"
+        android:padding="3dp"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
         android:layout_width="wrap_content"
-        android:paddingLeft="0dp"
-        android:paddingRight="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_more_vert_24px" />
+        app:srcCompat="@drawable/ic_baseline_fullscreen_24"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

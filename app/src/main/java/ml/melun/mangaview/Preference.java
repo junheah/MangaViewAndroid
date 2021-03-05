@@ -46,6 +46,7 @@ public class Preference {
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
     int baseMode;
+    boolean fullScreen;
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
@@ -91,12 +92,23 @@ public class Preference {
             autoUrl = sharedPref.getBoolean("autoUrl", true);
             pageControlButtonOffset = sharedPref.getFloat("pageControlButtonOffset", -1);
             baseMode = sharedPref.getInt("baseMode", base_comic);
+            fullScreen = sharedPref.getBoolean("fullScreen", false);
 //            if(login != null && login.isValid()){
 //                setSession(login.getCookie());
 //            }
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public boolean getFullScreen(){
+        return this.fullScreen;
+    }
+
+    public void setFullScreen(boolean fullScreen){
+        this.fullScreen = fullScreen;
+        prefsEditor.putBoolean("fullScreen", fullScreen);
+        prefsEditor.commit();
     }
 
     public String getBaseModeStr(){
