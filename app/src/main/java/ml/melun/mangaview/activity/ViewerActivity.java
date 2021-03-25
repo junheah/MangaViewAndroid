@@ -4,16 +4,23 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.core.view.DisplayCutoutCompat;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
@@ -81,7 +88,7 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
-    ImageButton fullScreenBtn;
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -89,12 +96,12 @@ public class ViewerActivity extends AppCompatActivity {
         outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
+
         next = this.findViewById(R.id.toolbar_next);
         prev = this.findViewById(R.id.toolbar_previous);
         toolbar = this.findViewById(R.id.viewerToolbar);
@@ -108,8 +115,27 @@ public class ViewerActivity extends AppCompatActivity {
         commentBtn = this.findViewById(R.id.commentButton);
         spinner = this.findViewById(R.id.toolbar_spinner);
         width = getScreenSize(getWindowManager().getDefaultDisplay());
-        fullScreenBtn = this.findViewById(R.id.fullBtn);
 
+        //initial padding setup
+        appbar.setPadding(0, getStatusBarHeight(),0,0);
+        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+
+
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
+                //This is where you get DisplayCutoutCompat
+                int statusBarHeight = getStatusBarHeight();
+                int ci;
+                if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
+                else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+
+                //System.out.println(ci + " : " + statusBarHeight);
+                appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
+                view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+                return windowInsetsCompat;
+            }
+        });
 
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
@@ -279,41 +305,9 @@ public class ViewerActivity extends AppCompatActivity {
             }
         });
 
-        p.setFullScreen(!p.getFullScreen());
-        toggleFullScreen();
-
-        fullScreenBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleFullScreen();
-            }
-        });
     }
 
 
-    void toggleFullScreen(){
-        if(p.getFullScreen()){
-            //disable full
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-            fullScreenBtn.setImageResource(R.drawable.ic_baseline_fullscreen_24);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            }
-        }else{
-            //enable full
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            }
-
-            fullScreenBtn.setImageResource(R.drawable.ic_baseline_fullscreen_exit_24);
-        }
-        p.setFullScreen(!p.getFullScreen());
-    }
 
     void refresh(){
         loadManga(manga);
@@ -390,6 +384,14 @@ public class ViewerActivity extends AppCompatActivity {
         }
         return super.dispatchKeyEvent(event);
     }
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
 
     public void toggleToolbar(){
         //attrs = getWindow().getAttributes();
@@ -397,6 +399,7 @@ public class ViewerActivity extends AppCompatActivity {
             appbar.animate().translationY(-appbar.getHeight());
             appbarBottom.animate().translationY(+appbarBottom.getHeight());
             toolbarshow=false;
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         }
         else {
             PageItem item = stripAdapter.getCurrentVisiblePage();
@@ -418,7 +421,9 @@ public class ViewerActivity extends AppCompatActivity {
                 appbar.animate().translationY(0);
                 appbarBottom.animate().translationY(0);
                 toolbarshow = true;
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             }
+
         }
         //getWindow().setAttributes(attrs);
     }

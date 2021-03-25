@@ -83,6 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:singleLine="true"
+                android:textColor="#FFF"
                 android:maxLines="1"
                 android:hint="기본 주소 입력 (숫자없는 주소)"/>
 

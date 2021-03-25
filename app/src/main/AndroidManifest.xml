@@ -51,11 +51,11 @@
         <activity
             android:name=".activity.ViewerActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.Viewer"/>
         <activity
             android:name=".activity.DownloadActivity"
             android:configChanges="orientation|screenSize"
-            android:label="다운로드" />
+            android:label="다운로드"/>
         <activity
             android:name=".activity.SettingsActivity"
             android:configChanges="orientation|screenSize"
@@ -69,7 +69,7 @@
         <activity
             android:name=".activity.ViewerActivity2"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.Viewer" />
         <activity
             android:name=".activity.LicenseActivity"
             android:configChanges="orientation|screenSize" />
@@ -92,7 +92,7 @@
         <activity
             android:name=".activity.ViewerActivity3"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.Viewer" />
         <activity
             android:name=".activity.LoginActivity"
             android:configChanges="orientation|screenSize"

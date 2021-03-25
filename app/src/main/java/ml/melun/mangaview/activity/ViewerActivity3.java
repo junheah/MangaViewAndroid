@@ -10,6 +10,9 @@ import android.os.AsyncTask;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.Nullable;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -86,6 +89,14 @@ public class ViewerActivity3 extends AppCompatActivity {
         outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
     }
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +119,27 @@ public class ViewerActivity3 extends AppCompatActivity {
                 finish();
             }
         });
+
+        //initial padding setup
+        appbar.setPadding(0, getStatusBarHeight(),0,0);
+        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
+                //This is where you get DisplayCutoutCompat
+                int statusBarHeight = getStatusBarHeight();
+                int ci;
+                if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
+                else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+
+                //System.out.println(ci + " : " + statusBarHeight);
+                appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
+                view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+                return windowInsetsCompat;
+            }
+        });
+
 
         cut.setText("자동 분할");
         //TODO: autoCut
@@ -324,12 +356,14 @@ public class ViewerActivity3 extends AppCompatActivity {
             appbar.animate().translationY(-appbar.getHeight());
             appbarBottom.animate().translationY(+appbarBottom.getHeight());
             toolbarshow=false;
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         }
         else {
             pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
             appbar.animate().translationY(0);
             appbarBottom.animate().translationY(0);
             toolbarshow=true;
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
         }
         //getWindow().setAttributes(attrs);
     }

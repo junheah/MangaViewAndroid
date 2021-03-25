@@ -69,6 +69,7 @@ public class FirstTimeActivity extends AppCompatActivity {
                                 pd.dismiss();
                             if(success){
                                 p.setDefUrl(defurl);
+                                p.setAutoUrl(true);
                                 long time = System.currentTimeMillis();
                                 p.getSharedPref().edit().putLong("eula2", time).commit();
                                 // not a migrator

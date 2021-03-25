@@ -14,11 +14,18 @@
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">
             shortEdges
         </item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/colorPrimary</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.Viewer" parent="AppTheme.NoActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
     </style>
 
     <style name="AppThemeDarkNoTitle" parent="AppThemeDark">

@@ -14,6 +14,10 @@ import androidx.annotation.Nullable;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -99,11 +103,18 @@ public class ViewerActivity2 extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
-        if(dark) setTheme(R.style.AppThemeDarkNoTitle);
-        else setTheme(R.style.AppTheme_NoActionBar);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer2);
 
@@ -123,6 +134,28 @@ public class ViewerActivity2 extends AppCompatActivity {
         nextEpisode = this.findViewById(R.id.viewerNextEpisode);
 
         nextEpisode.setVisibility(View.GONE);
+
+        //initial padding setup
+        appbar.setPadding(0, getStatusBarHeight(),0,0);
+        getWindow().getDecorView().setBackgroundColor(Color.BLACK);
+
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
+                //This is where you get DisplayCutoutCompat
+                int statusBarHeight = getStatusBarHeight();
+                int ci;
+                if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
+                else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+
+                System.out.println(windowInsetsCompat.getStableInsetTop() +" && " + windowInsetsCompat.getSystemWindowInsetTop() + " _ " +windowInsetsCompat.getStableInsetBottom() +" && " + windowInsetsCompat.getSystemWindowInsetBottom());
+
+                //System.out.println(ci + " : " + statusBarHeight);
+                appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
+                view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+                return windowInsetsCompat;
+            }
+        });
 
         this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -587,6 +620,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             appbarBottom.animate().translationY(+appbarBottom.getHeight());
             toolbarshow=false;
             toolbar_toggleBtn.setVisibility(View.VISIBLE);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         }
         else {
             //show toolbar
@@ -594,6 +628,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             appbarBottom.animate().translationY(0);
             toolbarshow=true;
             toolbar_toggleBtn.setVisibility(View.GONE);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
         }
         //getWindow().setAttributes(attrs);
     }

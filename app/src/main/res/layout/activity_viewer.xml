@@ -2,12 +2,11 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:fitsSystemWindows="false"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    tools:context=".activity.ViewerActivity">
-
-
+    android:theme="@style/AppTheme.Viewer"
+    tools:context=".activity.ViewerActivity"
+    android:fitsSystemWindows="false">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/strip"
@@ -26,8 +25,9 @@
         <androidx.appcompat.widget.Toolbar
             android:background="?attr/colorPrimary"
             android:id="@+id/viewerToolbar"
-            android:layout_height="@dimen/toolbar_height"
             android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:layout_gravity="bottom"
             app:contentInsetLeft="0dp"
             app:contentInsetStart="0dp"
             app:popupTheme="@style/AppTheme.PopupOverlay">
