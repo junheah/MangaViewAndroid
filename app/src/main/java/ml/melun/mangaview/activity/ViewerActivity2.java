@@ -97,6 +97,13 @@ public class ViewerActivity2 extends AppCompatActivity {
     View nextEpisode;
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(toolbarshow) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("manga", new Gson().toJson(manga));
         outState.putString("title", new Gson().toJson(title));

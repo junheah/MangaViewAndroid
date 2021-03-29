@@ -393,6 +393,14 @@ public class ViewerActivity extends AppCompatActivity {
         return result;
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(toolbarshow) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
     public void toggleToolbar(){
         //attrs = getWindow().getAttributes();
         if(toolbarshow){

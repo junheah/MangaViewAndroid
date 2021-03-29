@@ -83,6 +83,14 @@ public class ViewerActivity3 extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(toolbarshow) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("manga", new Gson().toJson(manga));
