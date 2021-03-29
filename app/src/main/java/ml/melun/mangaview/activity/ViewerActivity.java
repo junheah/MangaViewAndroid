@@ -552,8 +552,9 @@ public class ViewerActivity extends AppCompatActivity {
             manager.scrollToPage(new PageItem(0,"",m));
         }
     }
-
+    
     public void updateIntent(Manga m){
+        this.manga = m;
         result = new Intent();
         result.putExtra("id", m.getId());
         setResult(RESULT_OK, result);
