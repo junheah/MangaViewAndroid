@@ -88,6 +88,7 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
+    loadImages loader;
 
 
     @Override
@@ -137,20 +138,23 @@ public class ViewerActivity extends AppCompatActivity {
             }
         });
 
+
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
             public Manga prevEp(InfiniteLoadCallback callback, Manga curm) {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
                 if(i<eps.size()-1) {
-                    new loadImages(eps.get(i + 1), new LoadMangaCallback() {
+                    if(loader != null) loader.cancel(true);
+                    loader = new loadImages(eps.get(i + 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
                             if (m.getImgs().size() > 0)
                                 stripAdapter.insertManga(m);
                             callback.prevLoaded(m);
                         }
-                    },false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    },false);
+                    loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i + 1);
                 }else{
                     callback.prevLoaded(null);
@@ -163,14 +167,16 @@ public class ViewerActivity extends AppCompatActivity {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
                 if(i>0) {
-                    new loadImages(eps.get(i - 1), new LoadMangaCallback() {
+                    if(loader != null) loader.cancel(true);
+                    loader = new loadImages(eps.get(i - 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
                             if (m.getImgs().size() > 0)
                                 stripAdapter.appendManga(m);
                             callback.nextLoaded(m);
                         }
-                    },false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    },false);
+                    loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i - 1);
                 }else{
                     callback.nextLoaded(null);
@@ -490,6 +496,7 @@ public class ViewerActivity extends AppCompatActivity {
         boolean lockui;
         LoadMangaCallback callback;
         Manga m;
+
         public loadImages(Manga m, LoadMangaCallback callback, boolean lockui){
             this.lockui = lockui;
             this.m = m;
@@ -534,8 +541,6 @@ public class ViewerActivity extends AppCompatActivity {
         }
     }
 
-
-
     public void bookmarkRefresh(Manga m){
         if(m.useBookmark()) {
             PageItem page = new PageItem(p.getViewerBookmark(m), "", m);
@@ -552,7 +557,7 @@ public class ViewerActivity extends AppCompatActivity {
             manager.scrollToPage(new PageItem(0,"",m));
         }
     }
-    
+
     public void updateIntent(Manga m){
         this.manga = m;
         result = new Intent();
