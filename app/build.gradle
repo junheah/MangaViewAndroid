@@ -22,7 +22,7 @@ android {
     def code = formattedDate.toInteger()
     defaultConfig {
         applicationId "ml.melun.mangaview"
-        minSdkVersion 18
+        minSdkVersion 17
         targetSdkVersion 27
         versionName "4.3-" + code
         versionCode code

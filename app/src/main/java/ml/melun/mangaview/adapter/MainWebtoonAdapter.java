@@ -87,6 +87,8 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         int type = getItemViewType(position);
+        if(dataSet.size()==0)
+            return;
         if(type == HEADER){
             HeaderHolder h = (HeaderHolder) holder;
             for(int i=0; i<headers.length; i++){
