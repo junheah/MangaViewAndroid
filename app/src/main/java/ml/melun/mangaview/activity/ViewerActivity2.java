@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -30,7 +32,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +45,6 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +61,6 @@ import ml.melun.mangaview.ui.CustomSpinner;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
-import static ml.melun.mangaview.Utils.getScreenWidth;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -90,7 +89,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Bitmap imgCache, preloadImg;
     Intent result;
     AlertDialog.Builder alert;
-    int width = 0;
+    int swidth = 0;
     Intent intent;
     boolean captchaChecked = false;
     ImageButton toolbar_toggleBtn;
@@ -169,7 +168,8 @@ public class ViewerActivity2 extends AppCompatActivity {
                 split = size.x > size.y;
                 frame2.setVisibility(split ? View.VISIBLE : View.GONE);
                 //TODO split image on landscape
-                refreshImage();
+                if(imgs != null && viewerBookmark < imgs.size())
+                    refreshImage();
 
                 //System.out.println(ci + " : " + statusBarHeight);
                 appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
@@ -216,7 +216,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
         //refreshBtn = this.findViewById(R.id.refreshButton);
         if(stretch) frame.setScaleType(ImageView.ScaleType.FIT_XY);
-        width = getScreenSize(getWindowManager().getDefaultDisplay());
+        swidth = getScreenSize(getWindowManager().getDefaultDisplay());
 
         intent = getIntent();
         if(savedInstanceState == null) {
@@ -391,7 +391,19 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void nextPage(){
         //refreshbtn.setVisibility(View.VISIBLE);
-        if(viewerBookmark==imgs.size()-1 && (type==-1 || type==1)){
+        if(split) {
+            if(viewerBookmark+type-1 == imgs.size()-1){
+                if(nextEpisodeVisible) {
+                    next.performClick();
+                }
+                toggleNextEpisode();
+            }else {
+                viewerBookmark += type;
+                refreshImage();
+            }
+
+
+        }else if(viewerBookmark==imgs.size()-1 && (type==-1 || type==1)){
             //end of manga
             //refreshbtn.setVisibility(View.INVISIBLE);
             // 다음화 로드
@@ -434,7 +446,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                             public void onResourceReady(Bitmap bitmap,
                                                         Transition<? super Bitmap> transition) {
                                 //refreshbtn.setVisibility(View.INVISIBLE);
-                                bitmap = d.decode(bitmap,width);
+                                bitmap = d.decode(bitmap, swidth);
                                 int width = bitmap.getWidth();
                                 int height = bitmap.getHeight();
                                 if(width>height){
@@ -465,6 +477,9 @@ public class ViewerActivity2 extends AppCompatActivity {
         if(manga.useBookmark()) {
             p.setViewerBookmark(manga, viewerBookmark);
             if (imgs.size() - 1 == viewerBookmark) p.removeViewerBookmark(manga);
+            if(split) {
+                if(viewerBookmark == imgs.size()-1)
+            }
         }
         updatePageIndex();
     }
@@ -500,7 +515,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                         .into(new CustomTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                                bitmap = d.decode(bitmap, width);
+                                bitmap = d.decode(bitmap, swidth);
                                 //refreshbtn.setVisibility(View.INVISIBLE);
                                 int width = bitmap.getWidth();
                                 int height = bitmap.getHeight();
@@ -563,19 +578,55 @@ public class ViewerActivity2 extends AppCompatActivity {
                         @Override
                         public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
                             //refreshbtn.setVisibility(View.INVISIBLE);
-                            bitmap = d.decode(bitmap, width);
+                            bitmap = d.decode(bitmap, swidth);
                             int width = bitmap.getWidth();
                             int height = bitmap.getHeight();
                             if (width > height) {
-                                imgCache = bitmap;
-                                type = 0;
-                                if (reverse)
-                                    frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
-                                else
-                                    frame.setImageBitmap(Bitmap.createBitmap(imgCache, width / 2, 0, width / 2, height));
+                                if(split){
+                                    //split일경우 자를 필요 없음, frame2만 없애주기
+                                    type = 1;
+                                    frame2.setVisibility(View.GONE);
+                                    frame.setImageBitmap(bitmap);
+                                } else {
+                                    imgCache = bitmap;
+                                    type = 0;
+                                    if (reverse) {
+                                        frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
+                                    } else {
+                                        frame.setImageBitmap(Bitmap.createBitmap(imgCache, width / 2, 0, width / 2, height));
+                                    }
+                                }
+
                             } else {
-                                type = -1;
+                                type = 1;
                                 frame.setImageBitmap(bitmap);
+
+                                if(split && viewerBookmark+1 < imgs.size()){
+                                    //다음 페이지 로드하고 landscape 인지 확인, portrait일 경우에만 보여주기
+                                    String image2 = imgs.get(viewerBookmark+1);
+                                    frame2.setVisibility(View.VISIBLE);
+                                    frame2.setImageResource(R.drawable.placeholder);
+                                    Glide.with(context)
+                                            .asBitmap()
+                                            .load(image2)
+                                            .into(new CustomTarget<Bitmap>() {
+                                                @Override
+                                                public void onResourceReady(@NonNull Bitmap bitmap1, @Nullable Transition<? super Bitmap> transition) {
+                                                    bitmap1 = d.decode(bitmap1, swidth);
+                                                    int width = bitmap1.getWidth();
+                                                    int height = bitmap1.getHeight();
+                                                    if(width<height){
+                                                        type = 2;
+                                                        frame2.setImageBitmap(bitmap1);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                                                }
+                                            });
+                                }
                             }
                             preload();
                         }
@@ -586,48 +637,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                             }
                         }
                     });
-
-
-            if(split){
-                String image2 = imgs.get(viewerBookmark);
-                //placeholder
-                //frame.setImageResource(R.drawable.placeholder);
-                Glide.with(context)
-                        .asBitmap()
-                        .load(image2)
-                        .into(new CustomTarget<Bitmap>() {
-                            @Override
-                            public void onLoadCleared(@Nullable Drawable placeholder) {
-
-                            }
-
-                            @Override
-                            public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
-                                //refreshbtn.setVisibility(View.INVISIBLE);
-                                bitmap = d.decode(bitmap, width);
-                                int width = bitmap.getWidth();
-                                int height = bitmap.getHeight();
-                                if (width > height) {
-                                    imgCache = bitmap;
-                                    type = 0;
-                                    if (reverse)
-                                        frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
-                                    else
-                                        frame.setImageBitmap(Bitmap.createBitmap(imgCache, width / 2, 0, width / 2, height));
-                                } else {
-                                    type = -1;
-                                    frame.setImageBitmap(bitmap);
-                                }
-                                preload();
-                            }
-                            @Override
-                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                if(imgs.size()>0) {
-                                    refreshImage();
-                                }
-                            }
-                        });
-            }
         }catch(Exception e) {
             Utils.showCaptchaPopup(context, e, p);
         }
