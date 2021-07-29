@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity
         // set initial tab
         startTab = p.getStartTab();
         if(savedInstanceState != null)
-            changeFragment(savedInstanceState.getInt("currentTab"));
+            changeFragment(savedInstanceState.getInt("currentTab", 0));
         else
             changeFragment(startTab);
 
