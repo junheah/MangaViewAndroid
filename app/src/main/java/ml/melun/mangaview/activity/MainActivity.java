@@ -76,7 +76,6 @@ import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
 
 
-//TODO: smooth transitioning between fragments
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainActivityCallback {

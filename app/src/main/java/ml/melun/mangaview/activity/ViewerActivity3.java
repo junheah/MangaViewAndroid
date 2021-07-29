@@ -150,9 +150,8 @@ public class ViewerActivity3 extends AppCompatActivity {
 
 
         cut.setText("자동 분할");
-        //TODO: autoCut
         cut.setVisibility(View.GONE);
-        //
+
         pageBtn = this.findViewById(R.id.viewerBtn1);
         pageBtn.setText("-/-");
         commentBtn = this.findViewById(R.id.commentButton);

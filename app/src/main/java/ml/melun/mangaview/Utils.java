@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 
@@ -16,10 +17,12 @@ import androidx.fragment.app.Fragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -45,6 +48,7 @@ import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
+import ml.melun.mangaview.interfaces.IntegerCallback;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
@@ -464,6 +468,7 @@ public class Utils {
         display.getSize(size);
         return size.x;
     }
+
     public static boolean writeComment(CustomHttpClient client, Login login, int id, String content, String baseUrl){
         try {
             Map<String, String> headers = new HashMap<>();
@@ -682,6 +687,34 @@ public class Utils {
         }
         return -1;
     }
+
+
+    public static void showIntegerInputPopup(Context context, String title, IntegerCallback callback, boolean dark){
+        AlertDialog.Builder alert;
+        if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
+        else alert = new AlertDialog.Builder(context);
+
+        alert.setTitle(title);
+        final EditText input = new EditText(context);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setRawInputType(Configuration.KEYBOARD_12KEY);
+        alert.setView(input);
+        alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int button) {
+                //이동 시
+                if(input.getText().length()>0) {
+                    callback.callback(Integer.parseInt(input.getText().toString()));
+                }
+            }
+        });
+        alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int button) {
+                //취소 시
+            }
+        });
+        alert.show();
+    }
+
 
 
 

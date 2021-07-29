@@ -1,5 +1,6 @@
 package ml.melun.mangaview.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,14 +36,19 @@ import ml.melun.mangaview.CustomJSONObject;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
+import ml.melun.mangaview.interfaces.IntegerCallback;
 import ml.melun.mangaview.mangaview.Cloudflare;
+import ml.melun.mangaview.mangaview.Manga;
 import okhttp3.Response;
 
 import static ml.melun.mangaview.Utils.readPref;
+import static ml.melun.mangaview.Utils.showIntegerInputPopup;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.Utils.viewerIntent;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SELECT;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FOLDER_SELECT;
+import static ml.melun.mangaview.mangaview.MTitle.base_auto;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
@@ -201,6 +207,21 @@ public class DebugActivity extends AppCompatActivity {
                     p.setBaseMode(base_comic);
                     Toast.makeText(context, "comic", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        this.findViewById(R.id.debug_idInput).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //show popup
+                showIntegerInputPopup(context, "input manga id", new IntegerCallback() {
+                    @Override
+                    public void callback(int i) {
+                        Intent viewer = viewerIntent(context, new Manga(i,"","",base_auto));
+                        viewer.putExtra("online",true);
+                        ((Activity)context).startActivity(viewer);
+                    }
+                },false);
             }
         });
 

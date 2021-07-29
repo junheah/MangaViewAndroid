@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import androidx.annotation.Nullable;
@@ -21,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +61,7 @@ import ml.melun.mangaview.ui.CustomSpinner;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
+import static ml.melun.mangaview.Utils.getScreenWidth;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -81,7 +84,8 @@ public class ViewerActivity2 extends AppCompatActivity {
     List<Manga> eps;
     int index;
     Title title;
-    ImageView frame;
+    ImageView frame; // left
+    ImageView frame2; // right
     int type=-1;
     Bitmap imgCache, preloadImg;
     Intent result;
@@ -95,6 +99,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     Decoder d;
     boolean nextEpisodeVisible = false;
     View nextEpisode;
+    boolean split = false;
 
     @Override
     protected void onResume() {
@@ -139,7 +144,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         leftRight = p.getLeftRight();
         spinner = this.findViewById(R.id.toolbar_spinner);
         nextEpisode = this.findViewById(R.id.viewerNextEpisode);
-
+        frame2 = this.findViewById(R.id.viewer_image2);
         nextEpisode.setVisibility(View.GONE);
 
         //initial padding setup
@@ -156,6 +161,15 @@ public class ViewerActivity2 extends AppCompatActivity {
                 else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
                 System.out.println(windowInsetsCompat.getStableInsetTop() +" && " + windowInsetsCompat.getSystemWindowInsetTop() + " _ " +windowInsetsCompat.getStableInsetBottom() +" && " + windowInsetsCompat.getSystemWindowInsetBottom());
+
+                //window orientation change
+                Display display  = getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                split = size.x > size.y;
+                frame2.setVisibility(split ? View.VISIBLE : View.GONE);
+                //TODO split image on landscape
+                refreshImage();
 
                 //System.out.println(ci + " : " + statusBarHeight);
                 appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
@@ -531,6 +545,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void refreshImage(){
         frame.setImageResource(R.drawable.placeholder);
+        if(split) frame2.setImageResource(R.drawable.placeholder);
         //refreshbtn.setVisibility(View.VISIBLE);
         try {
             String image = imgs.get(viewerBookmark);
@@ -571,6 +586,48 @@ public class ViewerActivity2 extends AppCompatActivity {
                             }
                         }
                     });
+
+
+            if(split){
+                String image2 = imgs.get(viewerBookmark);
+                //placeholder
+                //frame.setImageResource(R.drawable.placeholder);
+                Glide.with(context)
+                        .asBitmap()
+                        .load(image2)
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                            }
+
+                            @Override
+                            public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                                //refreshbtn.setVisibility(View.INVISIBLE);
+                                bitmap = d.decode(bitmap, width);
+                                int width = bitmap.getWidth();
+                                int height = bitmap.getHeight();
+                                if (width > height) {
+                                    imgCache = bitmap;
+                                    type = 0;
+                                    if (reverse)
+                                        frame.setImageBitmap(Bitmap.createBitmap(imgCache, 0, 0, width / 2, height));
+                                    else
+                                        frame.setImageBitmap(Bitmap.createBitmap(imgCache, width / 2, 0, width / 2, height));
+                                } else {
+                                    type = -1;
+                                    frame.setImageBitmap(bitmap);
+                                }
+                                preload();
+                            }
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                if(imgs.size()>0) {
+                                    refreshImage();
+                                }
+                            }
+                        });
+            }
         }catch(Exception e) {
             Utils.showCaptchaPopup(context, e, p);
         }
