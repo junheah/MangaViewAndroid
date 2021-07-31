@@ -261,4 +261,6 @@
     <string name="prev_page">이전 페이지</string>
     <string name="next_page">다음 페이지</string>
 
+    <string name="touch_viewer_info">툴바 숨김을 해제하려면\n화면을 길게 누르세요</string>
+
 </resources>
