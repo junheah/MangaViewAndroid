@@ -79,6 +79,13 @@
                 android:layout_width="match_parent"
                 android:text="base mode change" />
 
+            <Button
+                android:id="@+id/debug_idInput"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="open manga with id" />
+
+
 
             <TextView
                 android:focusable="true"

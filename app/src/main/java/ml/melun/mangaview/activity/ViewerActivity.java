@@ -38,6 +38,12 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +62,10 @@ import ml.melun.mangaview.model.PageItem;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
+import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
@@ -88,12 +96,12 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
+    loadImages loader;
 
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("manga", new Gson().toJson(manga));
-        outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
     }
     @Override
@@ -137,20 +145,23 @@ public class ViewerActivity extends AppCompatActivity {
             }
         });
 
+
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
             public Manga prevEp(InfiniteLoadCallback callback, Manga curm) {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
                 if(i<eps.size()-1) {
-                    new loadImages(eps.get(i + 1), new LoadMangaCallback() {
+                    if(loader != null) loader.cancel(true);
+                    loader = new loadImages(eps.get(i + 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
                             if (m.getImgs().size() > 0)
                                 stripAdapter.insertManga(m);
                             callback.prevLoaded(m);
                         }
-                    },false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    },false);
+                    loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i + 1);
                 }else{
                     callback.prevLoaded(null);
@@ -163,14 +174,16 @@ public class ViewerActivity extends AppCompatActivity {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
                 if(i>0) {
-                    new loadImages(eps.get(i - 1), new LoadMangaCallback() {
+                    if(loader != null) loader.cancel(true);
+                    loader = new loadImages(eps.get(i - 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
                             if (m.getImgs().size() > 0)
                                 stripAdapter.appendManga(m);
                             callback.nextLoaded(m);
                         }
-                    },false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    },false);
+                    loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i - 1);
                 }else{
                     callback.nextLoaded(null);
@@ -192,16 +205,15 @@ public class ViewerActivity extends AppCompatActivity {
             }
         });
         //imageZoomHelper = new ImageZoomHelper(this);
+
         try {
             intent = getIntent();
+            title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+            }.getType());
             if(savedInstanceState == null) {
-                title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
-                }.getType());
                 manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
             }else{
-                title = new Gson().fromJson(savedInstanceState.getString("title"), new TypeToken<Title>() {
-                }.getType());
                 manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }
@@ -229,7 +241,6 @@ public class ViewerActivity extends AppCompatActivity {
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK,resultIntent);
             }
-
 
             if(!manga.isOnline()){
                 commentBtn.setVisibility(View.GONE);
@@ -306,8 +317,6 @@ public class ViewerActivity extends AppCompatActivity {
         });
 
     }
-
-
 
     void refresh(){
         loadManga(manga);
@@ -391,6 +400,14 @@ public class ViewerActivity extends AppCompatActivity {
             result = getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(toolbarshow) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
 
     public void toggleToolbar(){
@@ -482,6 +499,7 @@ public class ViewerActivity extends AppCompatActivity {
         boolean lockui;
         LoadMangaCallback callback;
         Manga m;
+
         public loadImages(Manga m, LoadMangaCallback callback, boolean lockui){
             this.lockui = lockui;
             this.m = m;
@@ -526,8 +544,6 @@ public class ViewerActivity extends AppCompatActivity {
         }
     }
 
-
-
     public void bookmarkRefresh(Manga m){
         if(m.useBookmark()) {
             PageItem page = new PageItem(p.getViewerBookmark(m), "", m);
@@ -546,6 +562,7 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     public void updateIntent(Manga m){
+        this.manga = m;
         result = new Intent();
         result.putExtra("id", m.getId());
         setResult(RESULT_OK, result);

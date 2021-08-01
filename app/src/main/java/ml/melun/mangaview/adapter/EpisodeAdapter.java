@@ -4,6 +4,8 @@ import android.content.Context;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -146,8 +148,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
             }
             else{
-                if(dark) h.itemView.setBackgroundResource(R.drawable.item_bg_dark);
-                else h.itemView.setBackgroundResource(R.drawable.item_bg);
+                h.itemView.setBackgroundColor(Color.TRANSPARENT);
             }
         }
     }
@@ -256,7 +257,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 h_tags.setLayoutManager(lm);
                 h_tags.setAdapter(ta);
             }
-            if(dark) h_tags.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
         }
     }
 

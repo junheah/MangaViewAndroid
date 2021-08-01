@@ -39,6 +39,7 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
+import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -84,13 +85,14 @@ public class EpisodeActivity extends AppCompatActivity {
             if(newid>0 && newid!=bookmarkId){
                 bookmarkId = newid;
                 //find index of bookmark;
-                for(int i=0; i< episodes.size(); i++){
-                    if(episodes.get(i).getId()==bookmarkId){
-                        bookmarkIndex = i+1;
-                        episodeAdapter.setBookmark(bookmarkIndex);
-                        break;
+                if(episodes != null)
+                    for(int i=0; i< episodes.size(); i++){
+                        if(episodes.get(i).getId()==bookmarkId){
+                            bookmarkIndex = i+1;
+                            episodeAdapter.setBookmark(bookmarkIndex);
+                            break;
+                        }
                     }
-                }
             }
         }else if(resultCode == RESULT_CAPTCHA){
             //captcha Checked
@@ -140,9 +142,9 @@ public class EpisodeActivity extends AppCompatActivity {
             episodes = new ArrayList<>();
 
             //get child folder list of title dir
-            offlineEpisodes = getOfflineEpisodes();
+            offlineEpisodes = getOfflineEpisodes(title.getPath());
             //read ids and folder names
-            File titleDir = new File(homeDir,filterFolder(title.getName()));
+            File titleDir = new File(title.getPath());
             File oldData = new File(titleDir,"title.data");
             File data = new File(titleDir,"title.gson");
             if(oldData.exists()){
@@ -159,21 +161,22 @@ public class EpisodeActivity extends AppCompatActivity {
                     br.close();
                     JSONObject json = new JSONObject(raw.toString());
                     JSONArray ids = json.getJSONArray("ids");
-                    for(int i=0; i<offlineEpisodes.size();i++){
-                        Manga manga;
-                        String episodeName = offlineEpisodes.get(i).getName();
-                        try {
-                            //real index starts from [ 0001 ]
-                            int realIndex = Integer.parseInt(episodeName.split("\\.")[0])-1;
-                            int id = ids.getInt(realIndex);
-                            manga = new Manga(id, episodeName, String.valueOf(id), title.getBaseMode());
-                        }catch(Exception e){
-                            manga = new Manga(-1,episodeName, "", title.getBaseMode());
+                    if(offlineEpisodes != null)
+                        for(int i=0; i<offlineEpisodes.size();i++){
+                            Manga manga;
+                            String episodeName = offlineEpisodes.get(i).getName();
+                            try {
+                                //real index starts from [ 0001 ]
+                                int realIndex = Integer.parseInt(episodeName.split("\\.")[0])-1;
+                                int id = ids.getInt(realIndex);
+                                manga = new Manga(id, episodeName, String.valueOf(id), title.getBaseMode());
+                            }catch(Exception e){
+                                manga = new Manga(-1,episodeName, "", title.getBaseMode());
+                            }
+                            manga.setMode(mode);
+                            manga.setOfflinePath(offlineEpisodes.get(i));
+                            episodes.add(manga);
                         }
-                        manga.setMode(mode);
-                        manga.setOfflinePath(offlineEpisodes.get(i));
-                        episodes.add(manga);
-                    }
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -191,7 +194,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
                 episodes =  title.getEps();
                 offlineEpisodes = new ArrayList<>();
-                for(File folder : getOfflineEpisodes()){
+                for(File folder : getOfflineEpisodes(title.getPath())){
                     //get id from listContent
                     String name = folder.getName();
                     try {
@@ -205,9 +208,10 @@ public class EpisodeActivity extends AppCompatActivity {
                     }
                 }
                 //for loop to remove non-existing episodes
-                for(int i = episodes.size()-1;i>=0 ;i--){
-                    if(episodes.get(i).getOfflinePath()==null) episodes.remove(i);
-                }
+                if(episodes != null)
+                    for(int i = episodes.size()-1;i>=0 ;i--){
+                        if(episodes.get(i).getOfflinePath()==null) episodes.remove(i);
+                    }
 
             } else {
                 mode = 1;
@@ -226,19 +230,6 @@ public class EpisodeActivity extends AppCompatActivity {
             episodeAdapter = new EpisodeAdapter(context, episodes, title, mode);
             afterLoad();
         }
-    }
-
-    public List<File> getOfflineEpisodes(){
-        File[] episodeFiles = new File(homeDir, filterFolder(title.getName())).listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        });
-        //sort
-        Arrays.sort(episodeFiles);
-        //add as manga
-        return Arrays.asList(episodeFiles);
     }
 
 //    @Override
@@ -260,13 +251,14 @@ public class EpisodeActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         if(bookmarkId>-1){
-            for(int i=0; i< episodes.size(); i++){
-                if(episodes.get(i).getId()==bookmarkId){
-                    bookmarkIndex=i+1;
-                    episodeAdapter.setBookmark(bookmarkIndex);
-                    break;
+            if(episodes != null)
+                for(int i=0; i< episodes.size(); i++){
+                    if(episodes.get(i).getId()==bookmarkId){
+                        bookmarkIndex=i+1;
+                        episodeAdapter.setBookmark(bookmarkIndex);
+                        break;
+                    }
                 }
-            }
         }
         episodeAdapter.setFavorite(p.findFavorite(title)>-1);
         episodeList.setAdapter(episodeAdapter);

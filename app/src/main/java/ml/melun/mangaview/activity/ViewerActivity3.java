@@ -83,10 +83,17 @@ public class ViewerActivity3 extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(toolbarshow) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("manga", new Gson().toJson(manga));
-        outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
     }
     public int getStatusBarHeight() {
@@ -142,9 +149,8 @@ public class ViewerActivity3 extends AppCompatActivity {
 
 
         cut.setText("자동 분할");
-        //TODO: autoCut
         cut.setVisibility(View.GONE);
-        //
+
         pageBtn = this.findViewById(R.id.viewerBtn1);
         pageBtn.setText("-/-");
         commentBtn = this.findViewById(R.id.commentButton);
@@ -212,14 +218,12 @@ public class ViewerActivity3 extends AppCompatActivity {
 
         try {
             intent = getIntent();
+            title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+            }.getType());
             if(savedInstanceState == null) {
-                title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
-                }.getType());
                 manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
             }else{
-                title = new Gson().fromJson(savedInstanceState.getString("title"), new TypeToken<Title>() {
-                }.getType());
                 manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }

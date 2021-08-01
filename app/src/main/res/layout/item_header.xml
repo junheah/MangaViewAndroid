@@ -6,7 +6,7 @@
     android:layout_width="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="#333333"
+        android:background="#282828"
         android:id="@+id/constraintLayout2"
         android:layout_height="200sp"
         android:layout_width="match_parent"
@@ -155,7 +155,7 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:background="@color/selected"
+        android:background="#282828"
         android:id="@+id/tagsContainer"
         android:layout_gravity="left"
         android:layout_height="wrap_content"

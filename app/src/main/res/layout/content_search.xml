@@ -11,6 +11,7 @@
         android:id="@+id/advSearchBtn"
         android:layout_height="wrap_content"
         android:layout_margin="14dp"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

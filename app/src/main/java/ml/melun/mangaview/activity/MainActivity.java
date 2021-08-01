@@ -76,7 +76,6 @@ import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
 
 
-//TODO: smooth transitioning between fragments
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainActivityCallback {
@@ -339,7 +338,7 @@ public class MainActivity extends AppCompatActivity
         // set initial tab
         startTab = p.getStartTab();
         if(savedInstanceState != null)
-            changeFragment(savedInstanceState.getInt("currentTab"));
+            changeFragment(savedInstanceState.getInt("currentTab", 0));
         else
             changeFragment(startTab);
 

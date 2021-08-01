@@ -53,20 +53,9 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/fullBtn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_comments" />
-
-        <ImageButton
-            android:id="@+id/fullBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="?android:attr/selectableItemBackground"
-            android:padding="3dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_fullscreen_24" />
+            app:srcCompat="@drawable/ic_comments" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
