@@ -71,8 +71,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
                 if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
                 else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
             } else {
-                if(dark)h.itemView.setBackgroundResource(R.drawable.item_bg_dark);
-                else h.itemView.setBackgroundResource(R.drawable.item_bg);
+                h.itemView.setBackgroundColor(Color.TRANSPARENT);
             }
 
             if(position == rs || position == re){

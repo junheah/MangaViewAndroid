@@ -39,6 +39,7 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.filterFolder;
+import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -141,9 +142,9 @@ public class EpisodeActivity extends AppCompatActivity {
             episodes = new ArrayList<>();
 
             //get child folder list of title dir
-            offlineEpisodes = getOfflineEpisodes();
+            offlineEpisodes = getOfflineEpisodes(title.getPath());
             //read ids and folder names
-            File titleDir = new File(homeDir,filterFolder(title.getName()));
+            File titleDir = new File(title.getPath());
             File oldData = new File(titleDir,"title.data");
             File data = new File(titleDir,"title.gson");
             if(oldData.exists()){
@@ -193,7 +194,7 @@ public class EpisodeActivity extends AppCompatActivity {
 
                 episodes =  title.getEps();
                 offlineEpisodes = new ArrayList<>();
-                for(File folder : getOfflineEpisodes()){
+                for(File folder : getOfflineEpisodes(title.getPath())){
                     //get id from listContent
                     String name = folder.getName();
                     try {
@@ -229,19 +230,6 @@ public class EpisodeActivity extends AppCompatActivity {
             episodeAdapter = new EpisodeAdapter(context, episodes, title, mode);
             afterLoad();
         }
-    }
-
-    public List<File> getOfflineEpisodes(){
-        File[] episodeFiles = new File(homeDir, filterFolder(title.getName())).listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        });
-        //sort
-        Arrays.sort(episodeFiles);
-        //add as manga
-        return Arrays.asList(episodeFiles);
     }
 
 //    @Override

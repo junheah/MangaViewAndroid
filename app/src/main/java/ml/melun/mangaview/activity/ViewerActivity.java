@@ -38,6 +38,12 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +62,10 @@ import ml.melun.mangaview.model.PageItem;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
+import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
@@ -94,7 +102,6 @@ public class ViewerActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("manga", new Gson().toJson(manga));
-        outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
     }
     @Override
@@ -198,16 +205,15 @@ public class ViewerActivity extends AppCompatActivity {
             }
         });
         //imageZoomHelper = new ImageZoomHelper(this);
+
         try {
             intent = getIntent();
+            title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+            }.getType());
             if(savedInstanceState == null) {
-                title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
-                }.getType());
                 manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
             }else{
-                title = new Gson().fromJson(savedInstanceState.getString("title"), new TypeToken<Title>() {
-                }.getType());
                 manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }
@@ -235,7 +241,6 @@ public class ViewerActivity extends AppCompatActivity {
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK,resultIntent);
             }
-
 
             if(!manga.isOnline()){
                 commentBtn.setVisibility(View.GONE);
@@ -312,8 +317,6 @@ public class ViewerActivity extends AppCompatActivity {
         });
 
     }
-
-
 
     void refresh(){
         loadManga(manga);

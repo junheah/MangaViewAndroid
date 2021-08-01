@@ -201,6 +201,7 @@ public class RecyclerFragment extends Fragment {
                             try {
                                 Title title = new Gson().fromJson(readFileToString(data), new TypeToken<Title>() {
                                 }.getType());
+                                title.setPath(f.getAbsolutePath());
                                 if (title.getThumb().length() > 0)
                                     title.setThumb(f.getAbsolutePath() + '/' + title.getThumb());
                                 titles.add(title);

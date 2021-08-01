@@ -12,6 +12,7 @@ public class MTitle{
     String author;
     List<String> tags;
     String release;
+    String path;
     int baseMode = base_comic; // default is comic
     //public static final String[] releases = {"미분류","주간","격주","월간","격월/비정기","단편","단행본","완결"};
     public MTitle(){
@@ -25,6 +26,14 @@ public class MTitle{
         this.release = release;
         this.author = author;
         this.baseMode = baseMode;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public int getBaseMode() {

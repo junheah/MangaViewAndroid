@@ -113,7 +113,6 @@ public class ViewerActivity2 extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("manga", new Gson().toJson(manga));
-        outState.putString("title", new Gson().toJson(title));
         super.onSaveInstanceState(outState);
     }
 
@@ -161,6 +160,13 @@ public class ViewerActivity2 extends AppCompatActivity {
         appbar.setPadding(0, getStatusBarHeight(),0,0);
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
+        Display display  = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        split = size.x > size.y;
+        System.out.println(split);
+
+
         ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
@@ -171,18 +177,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                 else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
                 System.out.println(windowInsetsCompat.getStableInsetTop() +" && " + windowInsetsCompat.getSystemWindowInsetTop() + " _ " +windowInsetsCompat.getStableInsetBottom() +" && " + windowInsetsCompat.getSystemWindowInsetBottom());
-
-                //window orientation change
-                Display display  = getWindowManager().getDefaultDisplay();
-                Point size = new Point();
-                display.getSize(size);
-                frame2.setVisibility(split ? View.VISIBLE : View.GONE);
-                //TODO split image on landscape
-                if(imgs != null && viewerBookmark < imgs.size() && (split != size.x > size.y)) {
-                    //needs update
-                    split = size.x > size.y;
-                    refreshImage();
-                }
 
                 //System.out.println(ci + " : " + statusBarHeight);
                 appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
@@ -232,14 +226,12 @@ public class ViewerActivity2 extends AppCompatActivity {
         swidth = getScreenSize(getWindowManager().getDefaultDisplay());
 
         intent = getIntent();
+        title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+        }.getType());
         if(savedInstanceState == null) {
-            title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
-            }.getType());
             manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
             }.getType());
         }else{
-            title = new Gson().fromJson(savedInstanceState.getString("title"), new TypeToken<Title>() {
-            }.getType());
             manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
             }.getType());
         }
@@ -647,6 +639,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void refreshImage(){
         frame.setVisibility(View.VISIBLE);
+        frame2.setVisibility(View.GONE);
         frame.setImageResource(R.drawable.placeholder);
         if(split) frame2.setImageResource(R.drawable.placeholder);
         //refreshbtn.setVisibility(View.VISIBLE);
@@ -784,7 +777,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             appbar.animate().translationY(-appbar.getHeight());
             appbarBottom.animate().translationY(+appbarBottom.getHeight());
             toolbarshow=false;
-            toolbar_toggleBtn.setVisibility(View.VISIBLE);
+            //toolbar_toggleBtn.setVisibility(View.VISIBLE);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         }
         else {
@@ -792,7 +785,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             appbar.animate().translationY(0);
             appbarBottom.animate().translationY(0);
             toolbarshow=true;
-            toolbar_toggleBtn.setVisibility(View.GONE);
+            //toolbar_toggleBtn.setVisibility(View.GONE);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
         }
         //getWindow().setAttributes(attrs);
@@ -987,6 +980,15 @@ public class ViewerActivity2 extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        //window orientation change
+        Display display  = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        if(imgs != null && viewerBookmark < imgs.size() && (split != size.x > size.y)) {
+            //needs update
+            split = size.x > size.y;
+            refreshImage();
+        }
         refreshPageControlButton();
     }
 

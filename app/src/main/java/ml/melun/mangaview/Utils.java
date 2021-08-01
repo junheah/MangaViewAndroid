@@ -34,11 +34,14 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ml.melun.mangaview.activity.CaptchaActivity;
@@ -715,6 +718,18 @@ public class Utils {
         alert.show();
     }
 
+    public static List<File> getOfflineEpisodes(String path){
+        File[] episodeFiles = new File(path).listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
+        //sort
+        Arrays.sort(episodeFiles);
+        //add as manga
+        return Arrays.asList(episodeFiles);
+    }
 
 
 

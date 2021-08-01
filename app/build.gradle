@@ -24,7 +24,7 @@ android {
         applicationId "ml.melun.mangaview"
         minSdkVersion 17
         targetSdkVersion 27
-        versionName "4.3-" + code
+        versionName "4.4-" + code
         versionCode code
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -81,7 +81,6 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.omadahealth:swipy:1.2.3@aar'
-//    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.2'
     implementation 'com.eclipsesource.j2v8:j2v8:6.0.0@aar'
