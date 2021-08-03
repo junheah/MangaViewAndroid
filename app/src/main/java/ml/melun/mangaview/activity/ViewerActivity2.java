@@ -101,6 +101,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     boolean nextEpisodeVisible = false;
     View nextEpisode;
     boolean split = false;
+    boolean dirty = false;
     TextView info;
 
     @Override
@@ -234,6 +235,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         }else{
             manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
             }.getType());
+            dirty = true;
         }
 
         name = manga.getName();
@@ -859,17 +861,20 @@ public class ViewerActivity2 extends AppCompatActivity {
             reloadManga();
 
             //show info overlay
-            info.setVisibility(View.VISIBLE);
-            info.setAlpha(1f);
-            info.animate()
-                    .alpha(0f)
-                    .setDuration(5000)
-                    .setListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            info.setVisibility(View.GONE);
-                        }
-                    });
+            if(!dirty) {
+                dirty = true;
+                info.setVisibility(View.VISIBLE);
+                info.setAlpha(1f);
+                info.animate()
+                        .alpha(0f)
+                        .setDuration(4000)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                info.setVisibility(View.GONE);
+                            }
+                        });
+            }
 
 
             if (pd.isShowing()) {
