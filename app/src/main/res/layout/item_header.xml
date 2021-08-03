@@ -144,12 +144,12 @@
             android:background="@drawable/button_bg_light"
             android:enabled="true"
             android:foreground="?android:attr/selectableItemBackground"
-            android:id="@+id/HeaderDownload"
+            android:id="@+id/HeaderFirst"
             android:layout_height="match_parent"
             android:layout_marginStart="3dp"
             android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:text="다운로드"
+            android:text="첫화보기"
             android:textColor="@android:color/white" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
