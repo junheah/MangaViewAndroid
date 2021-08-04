@@ -125,14 +125,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 h.h_star.setVisibility(View.GONE);
 
             if(mode == 0){
-                h.h_download.setVisibility(View.VISIBLE);
-
                 //set ext-info text
                 h.h_recommend_c.setText(String.valueOf(title.getRecommend_c()));
 
             }else{
                 //offline manga
-                h.h_download.setVisibility(View.GONE);
                 h.h_bookmark.setVisibility(View.GONE);
                 h.h_recommend.setVisibility(View.GONE);
                 h.h_recommend_c.setVisibility(View.GONE);
@@ -197,7 +194,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         ImageView h_star_icon;
         ImageView h_bookmark_icon;
 
-        Button h_download;
+        Button h_first;
         RecyclerView h_tags;
         View h_bookmark, h_star, h_recommend;
 
@@ -207,7 +204,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h_title = itemView.findViewById(R.id.HeaderTitle);
             h_thumb = itemView.findViewById(R.id.HeaderThumb);
             h_star_icon = itemView.findViewById(R.id.favoriteIcon);
-            h_download = itemView.findViewById(R.id.HeaderDownload);
+            h_first = itemView.findViewById(R.id.HeaderFirst);
             h_tags = itemView.findViewById(R.id.tagsContainer);
             h_author = itemView.findViewById(R.id.headerAuthor);
             h_release = itemView.findViewById(R.id.HeaderRelease);
@@ -241,10 +238,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     mClickListener.onStarClick();
                 }
             });
-            h_download.setOnClickListener(new View.OnClickListener() {
+            h_first.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onDownloadClick();
+                    mClickListener.onFirstClick();
                 }
             });
             h_author.setOnClickListener(new View.OnClickListener() {
@@ -291,7 +288,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public interface ItemClickListener {
         void onItemClick(int position, Manga m);
         void onStarClick();
-        void onDownloadClick();
+        void onFirstClick();
         void onAuthorClick();
         void onBookmarkClick();
     }

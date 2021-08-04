@@ -1,5 +1,6 @@
 package ml.melun.mangaview.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -7,12 +8,19 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
+
+import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
+
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -23,10 +31,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileReader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ml.melun.mangaview.ui.NpaLinearLayoutManager;
@@ -38,7 +45,6 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.filterFolder;
 import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
@@ -56,8 +62,6 @@ public class EpisodeActivity extends AppCompatActivity {
     int position;
     int bookmarkId = -1;
     int bookmarkIndex = -1;
-    FloatingActionButton upBtn;
-    boolean upBtnVisible = false;
     List<Manga> episodes;
     boolean dark, online=true;
     Intent viewer;
@@ -65,13 +69,21 @@ public class EpisodeActivity extends AppCompatActivity {
     String homeDir;
     List<File> offlineEpisodes;
     int mode = 0;
+    FloatingActionButton resumefab;
     ProgressBar progress;
+    boolean loaded = false;
+    LinearLayoutCompat fab_container;
 
 
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.episode_download:
+                Intent download = new Intent(context, DownloadActivity.class);
+                download.putExtra("title", new Gson().toJson(title));
+                startActivity(download);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -94,6 +106,10 @@ public class EpisodeActivity extends AppCompatActivity {
                         }
                     }
             }
+            if(bookmarkId>-1)
+                resumefab.show();
+            else
+                resumefab.hide();
         }else if(resultCode == RESULT_CAPTCHA){
             //captcha Checked
             finish();
@@ -104,11 +120,10 @@ public class EpisodeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
-        if(dark) setTheme(R.style.AppThemeDark);
+        if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
-        upBtn = (FloatingActionButton) findViewById(R.id.upBtn);
         title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
         online = intent.getBooleanExtra("online", true);
         if(title.useBookmark())
@@ -120,6 +135,8 @@ public class EpisodeActivity extends AppCompatActivity {
         progress = this.findViewById(R.id.progress);
         episodeList.setLayoutManager(new NpaLinearLayoutManager(this));
         homeDir = p.getHomeDir();
+        resumefab = this.findViewById(R.id.resumefab);
+        fab_container = findViewById(R.id.fab_container);
 
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
         if(recentResult){
@@ -127,13 +144,18 @@ public class EpisodeActivity extends AppCompatActivity {
             setResult(RESULT_OK,resultIntent);
         }
 
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
         if(actionBar!=null){
             actionBar.setTitle(title.getName());
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
         if(online) {
             mode = 0;
+            fab_container.setVisibility(View.GONE);
             getEpisodes g = new getEpisodes();
             g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }else{
@@ -262,41 +284,32 @@ public class EpisodeActivity extends AppCompatActivity {
         }
         episodeAdapter.setFavorite(p.findFavorite(title)>-1);
         episodeList.setAdapter(episodeAdapter);
-        if(bookmarkIndex>8){
+        if(bookmarkIndex>8) {
             episodeList.scrollToPosition(bookmarkIndex);
-            upBtn.setAlpha(1.0f);
-            upBtnVisible = true;
-        }else{
-            upBtn.setAlpha(0.0f);
-            upBtnVisible = false;
         }
-        episodeList.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int firstVisible = ((LinearLayoutManager) episodeList.getLayoutManager()).findFirstVisibleItemPosition();
-                if(firstVisible>0 && !upBtnVisible){
-                    upBtn.animate().translationX(0);
-                    upBtn.animate().alpha(1.0f);
-                    upBtnVisible = true;
-                } else if(firstVisible==0 && upBtnVisible){
-                    upBtn.animate().alpha(0.0f);
-                    upBtn.animate().translationX(upBtn.getWidth());
-                    upBtnVisible = false;
-                }
-            }
-        });
-        upBtn.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.upfab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(upBtnVisible) {
-                    episodeList.scrollToPosition(0);
-                    upBtn.animate().alpha(0.0f);
-                    upBtn.animate().translationX(upBtn.getWidth());
-                    upBtnVisible = false;
-                }
+                episodeList.scrollToPosition(0);
             }
         });
+        findViewById(R.id.downfab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                episodeList.scrollToPosition(episodes.size()); //헤더가 0이기 때문
+            }
+        });
+        if(bookmarkIndex>-1)
+            resumefab.show();
+        else
+            resumefab.hide();
+        resumefab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openViewer(episodes.get(bookmarkIndex-1),0);
+            }
+        });
+
         episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
 
             @Override
@@ -335,11 +348,9 @@ public class EpisodeActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDownloadClick(){
-                //start download activity
-                Intent download = new Intent(context, DownloadActivity.class);
-                download.putExtra("title", new Gson().toJson(title));
-                startActivity(download);
+            public void onFirstClick(){
+                if(episodes != null && episodes.size()>0)
+                    openViewer(episodes.get(episodes.size()-1),0);
             }
         });
         episodeAdapter.setTagClickListener(new TagAdapter.tagOnclick() {
@@ -398,6 +409,9 @@ public class EpisodeActivity extends AppCompatActivity {
             p.addRecent(title);
             p.updateRecentData(title);
             progress.setVisibility(View.GONE);
+            loaded = true;
+            fab_container.setVisibility(View.VISIBLE);
+            invalidateOptionsMenu();
         }
     }
 
@@ -420,5 +434,15 @@ public class EpisodeActivity extends AppCompatActivity {
         viewer.putExtra("recent",true);
         startActivityForResult(viewer, code);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        if(loaded)
+            inflater.inflate(R.menu.episode_menu, menu);
+        return true;
+    }
+
 
 }
