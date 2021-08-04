@@ -120,7 +120,7 @@ public class EpisodeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
-        if(dark) setTheme(R.style.AppThemeDark);
+        if(dark) setTheme(R.style.AppThemeDarkNoTitle);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
