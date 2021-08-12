@@ -61,4 +61,33 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:elevation="5dp"
+        android:id="@+id/zoom">
+        <View
+            android:background="#C6000000"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <com.jsibbold.zoomage.ZoomageView
+            android:id="@+id/zoom_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_baseline_close_24"
+            android:backgroundTint="#75210840"
+            app:borderWidth="0dp"
+            app:elevation="1dp"
+            app:pressedTranslationZ="1dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/zoom_x"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

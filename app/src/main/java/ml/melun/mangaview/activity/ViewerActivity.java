@@ -7,6 +7,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
+
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.Nullable;
@@ -17,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.DisplayCutoutCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
@@ -32,6 +35,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -50,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.interfaces.StringCallback;
 import ml.melun.mangaview.ui.StripLayoutManager;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.adapter.CustomSpinnerAdapter;
@@ -96,6 +101,9 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
+    StringCallback zoom;
+    ConstraintLayout zoom_layout;
+    ImageView zoom_image;
     loadImages loader;
 
 
@@ -110,6 +118,8 @@ public class ViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
 
+        zoom_layout = this.findViewById(R.id.zoom);
+        zoom_image = this.findViewById(R.id.zoom_image);
         next = this.findViewById(R.id.toolbar_next);
         prev = this.findViewById(R.id.toolbar_previous);
         toolbar = this.findViewById(R.id.viewerToolbar);
@@ -145,6 +155,27 @@ public class ViewerActivity extends AppCompatActivity {
             }
         });
 
+        this.findViewById(R.id.zoom_x).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoom_layout.setVisibility(View.GONE);
+            }
+        });
+
+        zoom = new StringCallback() {
+            @Override
+            public void callback(String data) {
+                System.out.println(data);
+                zoom_layout.setVisibility(View.VISIBLE);
+                Glide.with(context)
+                        .load(data)
+                        .placeholder(R.drawable.placeholder)
+                        .into(zoom_image);
+
+                //todo : 이미지 확대 팝업
+
+            }
+        };
 
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
@@ -360,7 +391,7 @@ public class ViewerActivity extends AppCompatActivity {
                 showCaptchaPopup(context, p);
                 return;
             }
-            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback);
+            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback, zoom);
 
             refreshAdapter();
             bookmarkRefresh(m);
@@ -457,7 +488,7 @@ public class ViewerActivity extends AppCompatActivity {
             //viewerBookmark *= 2;
         }
         stripAdapter.removeAll();
-        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback);
+        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback, zoom);
         stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
@@ -480,7 +511,10 @@ public class ViewerActivity extends AppCompatActivity {
         if(onBack!=null){
             onBack.run();
         }else{
-            super.onBackPressed();
+            if(zoom_layout.getVisibility() == View.VISIBLE)
+                zoom_layout.setVisibility(View.GONE);
+            else
+                super.onBackPressed();
         }
     }
 
@@ -630,6 +664,7 @@ public class ViewerActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_CAPTCHA) {
             refresh();
         }
