@@ -54,8 +54,6 @@ public class RecyclerFragment extends Fragment {
     SearchView searchView;
 
 
-
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt("mode", mode);
@@ -207,11 +205,16 @@ public class RecyclerFragment extends Fragment {
                                 titles.add(title);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto));
+                                Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                title.setPath(f.getAbsolutePath());
+                                titles.add(title);
                             }
 
-                        } else
-                            titles.add(new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto));
+                        } else{
+                            Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                            title.setPath(f.getAbsolutePath());
+                            titles.add(title);
+                        }
                     }
                 }
                 //add titles to adapter

@@ -719,6 +719,7 @@ public class Utils {
     }
 
     public static List<File> getOfflineEpisodes(String path){
+        System.out.println(path);
         File[] episodeFiles = new File(path).listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {

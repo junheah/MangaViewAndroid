@@ -84,7 +84,7 @@ public class Preference {
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
             defUrl = sharedPref.getString("defUrl", "설정되지 않음");
-            url = sharedPref.getString("url", defUrl);
+            url = sharedPref.getString("url", "");
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
@@ -118,7 +118,6 @@ public class Preference {
         this.defUrl = defUrl;
         prefsEditor.putString("defUrl", defUrl);
         prefsEditor.commit();
-        setUrl(defUrl);
     }
 
     public String getDefUrl() {

@@ -1,5 +1,6 @@
 package ml.melun.mangaview.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -72,6 +73,8 @@ import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
+import static ml.melun.mangaview.Utils.showErrorPopup;
+import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 
 public class ViewerActivity extends AppCompatActivity {
@@ -362,6 +365,19 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     void loadManga(Manga m){
+        if(m == null){
+            showPopup(context, "오류", "만화를 불러 오던중 오류가 발생했습니다.", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ViewerActivity.this.finish();
+                }
+            }, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    ViewerActivity.this.finish();
+                }
+            });
+        }
         if(stripAdapter!=null) stripAdapter.removeAll();
         if(m.isOnline()) {
             loadManga(m, new LoadMangaCallback() {
