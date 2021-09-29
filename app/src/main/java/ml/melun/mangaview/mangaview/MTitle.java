@@ -19,7 +19,7 @@ public class MTitle{
 
     }
     public MTitle(String name, int id, String thumb, String author, List<String> tags, String release, int baseMode) {
-        this.name = name;
+        this.name = name.replace("\"", "");
         this.id = id;
         this.thumb = thumb;
         this.tags = tags;
@@ -81,7 +81,7 @@ public class MTitle{
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.replace("\"", "");
     }
 
     public void setThumb(String thumb) {
