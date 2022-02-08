@@ -95,7 +95,7 @@ public class CustomHttpClient {
 
             Request request = builder.build();
             response = this.client.newCall(request).execute();
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             return null;
         }
@@ -177,7 +177,7 @@ public class CustomHttpClient {
             Request request = builder.build();
             response = this.client.newCall(request).execute();
         }catch (Exception e){
-
+            e.printStackTrace();
         }
         return response;
 

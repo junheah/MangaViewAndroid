@@ -17,15 +17,20 @@ import androidx.fragment.app.Fragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -62,6 +67,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static java.lang.System.currentTimeMillis;
+import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
 import static ml.melun.mangaview.activity.SettingsActivity.urlSettingPopup;
 
@@ -367,6 +375,94 @@ public class Utils {
     public static void showCaptchaPopup(Context context, Preference p){
         // viewer call
         showCaptchaPopup(context, 0, null, true, p);
+    }
+
+    public static void showTokiCaptchaPopup(Context context, Runnable callback, Preference p){
+        AlertDialog.Builder builder;
+        String title = "캡차";
+        if (new Preference(context).getDarkTheme())
+            builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        View v = ((Activity)context).getLayoutInflater().inflate(R.layout.content_toki_captcha_popup, null);
+
+        ImageView img = v.findViewById(R.id.toki_captcha_image);
+        EditText answer = v.findViewById(R.id.toki_captcha_answer);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String cookie;
+                Response r;
+                int tries = 3;
+                while(tries > 0) {
+                    r = httpClient.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),false);
+                    if(r.code() == 200) {
+                        List<String> setcookie = r.headers("Set-Cookie");
+                        for (String c : setcookie) {
+                            if (c.contains("PHPSESSID=")) {
+                                cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
+                                httpClient.setCookie("PHPSESSID",cookie);
+                                System.out.println(cookie);
+                            }
+                        }
+                        break;
+                    }else {
+                        r.close();
+                        tries--;
+                    }
+                }
+                r = httpClient.mget("/plugin/kcaptcha/kcaptcha_image.php?t=" + currentTimeMillis(), false);
+                try {
+                    final byte[] b = r.body().bytes();
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(img)
+                                    .load(b)
+                                    .into(img);
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        builder.setTitle(title)
+                .setView(v)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                RequestBody requestBody = new FormBody.Builder()
+                                        .addEncoded("url", p.getUrl())
+                                        .addEncoded("captcha_key", answer.getText().toString())
+                                        .build();
+                                Map<String,String> headers = new HashMap<>();
+                                headers.put("cookie", "PHPSESSID="+ httpClient.getCookie("PHPSESSID") +";");
+                                Response response = httpClient.post(p.getUrl() + "/bbs/captcha_check.php", requestBody, headers);
+                                System.out.println(response.code());
+                                ((Activity)context).runOnUiThread(callback);
+                            }
+                        }).start();
+                    }
+                })
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ((Activity) context).finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        ((Activity) context).finish();
+                    }
+                });
+
+        builder.show();
     }
 
     private static void showStackTrace(Context context, Exception e){

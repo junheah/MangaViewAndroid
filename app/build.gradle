@@ -16,18 +16,20 @@ android {
 //        }
     }
 
-    compileSdkVersion 29
+    compileSdkVersion 31
     def date = new Date()
     def formattedDate = date.format('YYMMdd')
+    // integer max value is 2147483647
     def code = formattedDate.toInteger() + 2112000000
     defaultConfig {
         applicationId "ml.melun.mangaview"
         minSdkVersion 17
-        targetSdkVersion 29
-        versionName "4.4-" + code
+        targetSdkVersion 31
+        versionName "4.5-" + code
         versionCode code
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
 
         setProperty("archivesBaseName", "mangaViewer_" + code)
     }
@@ -40,7 +42,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '30.0.2'
 }
 repositories {
     mavenCentral()
@@ -50,8 +52,8 @@ repositories {
 
 
 dependencies {
-    implementation 'ch.acra:acra-dialog:5.1.3'
-    implementation 'ch.acra:acra-mail:5.1.3'
+    implementation 'ch.acra:acra-dialog:5.8.4'
+    implementation 'ch.acra:acra-mail:5.8.4'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
@@ -64,6 +66,8 @@ dependencies {
         // Excludes the support library because it's already included by Glide.
         transitive = false
     }
+
+    implementation "androidx.multidex:multidex:2.0.1"
 
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
