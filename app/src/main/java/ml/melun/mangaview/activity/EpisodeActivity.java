@@ -405,12 +405,7 @@ public class EpisodeActivity extends AppCompatActivity {
             super.onPostExecute(res);
             if(res == LOAD_CAPTCHA){
                 //캡차 처리 팝업
-                showTokiCaptchaPopup(context, new Runnable() {
-                    @Override
-                    public void run() {
-                        //todo : reload
-                    }
-                }, p);
+                showTokiCaptchaPopup(context, p);
                 return;
             }else if(episodes == null || episodes.size()==0){
                 showCaptchaPopup(context, p);

@@ -52,7 +52,9 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
+import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
 
 public class ViewerActivity3 extends AppCompatActivity {
     List<String> imgs;
@@ -415,15 +417,20 @@ public class ViewerActivity3 extends AppCompatActivity {
                 cookie.put("last_percent",String.valueOf(1));
                 cookie.put("last_page",String.valueOf(0));
             }
-            manga.fetch(httpClient);
+            int res = manga.fetch(httpClient);
             if(title == null)
                 title = manga.getTitle();
-            return 0;
+            return res;
         }
 
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
+            if(res == LOAD_CAPTCHA){
+                //캡차 처리 팝업
+                showTokiCaptchaPopup(context, p);
+                return;
+            }
             reloadManga();
             if(pd.isShowing()) pd.dismiss();
         }

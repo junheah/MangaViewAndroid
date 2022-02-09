@@ -377,9 +377,9 @@ public class Utils {
         showCaptchaPopup(context, 0, null, true, p);
     }
 
-    public static void showTokiCaptchaPopup(Context context, Runnable callback, Preference p){
+    public static void showTokiCaptchaPopup(Context context, Preference p){
         AlertDialog.Builder builder;
-        String title = "캡차";
+        String title = "캡차 인증";
         if (new Preference(context).getDarkTheme())
             builder = new AlertDialog.Builder(context, R.style.darkDialog);
         else builder = new AlertDialog.Builder(context);
@@ -444,7 +444,14 @@ public class Utils {
                                 headers.put("cookie", "PHPSESSID="+ httpClient.getCookie("PHPSESSID") +";");
                                 Response response = httpClient.post(p.getUrl() + "/bbs/captcha_check.php", requestBody, headers);
                                 System.out.println(response.code());
-                                ((Activity)context).runOnUiThread(callback);
+                                ((Activity)context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //restart activity
+                                        ((Activity)context).finish();
+                                        ((Activity)context).startActivity(((Activity)context).getIntent());
+                                    }
+                                });
                             }
                         }).start();
                     }

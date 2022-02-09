@@ -75,7 +75,10 @@ import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
+import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
 
 public class ViewerActivity extends AppCompatActivity {
 
@@ -576,15 +579,20 @@ public class ViewerActivity extends AppCompatActivity {
                     String php = p.getLogin().getCookie();
                     login.buildCookie(cookie);
                 }
-                m.fetch(httpClient);
-                return 0;
+                return m.fetch(httpClient);
             }else{
-                return 0;
+                return LOAD_OK;
             }
         }
 
         @Override
         protected void onPostExecute(Integer res) {
+            if(res == LOAD_CAPTCHA){
+                //캡차 처리 팝업
+                showTokiCaptchaPopup(context, p);
+                return;
+            }
+
             if(lockui) lockUi(false);
             if (title == null)
                 title = m.getTitle();

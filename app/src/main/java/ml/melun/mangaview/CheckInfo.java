@@ -101,14 +101,16 @@ public class CheckInfo {
                 String rawdata = response.body().string();
                 response.close();
                 notice = new Gson().fromJson(rawdata, new TypeToken<Notice>(){}.getType());
+                if(notice.id == -1) return -1;
             }catch (Exception e){
                 e.printStackTrace();
+                return -1;
             }
             return 0;
         }
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
-            showNotice(notice);
+            if(result == 0) showNotice(notice);
         }
     }
 
