@@ -18,6 +18,7 @@ import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.Utils.getDefHomeDir;
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.isInteger;
@@ -72,7 +73,7 @@ public class Preference {
             if(recent==null) recent = new ArrayList<>();
             favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<MTitle>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
-            homeDir = sharedPref.getString("homeDir","/sdcard/MangaView/saved");
+            homeDir = sharedPref.getString("homeDir", getDefHomeDir(mcontext).getAbsolutePath());
             prevPageKey = sharedPref.getInt("prevPageKey", -1);
             nextPageKey = sharedPref.getInt("nextPageKey", -1);
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));
@@ -84,7 +85,7 @@ public class Preference {
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
             defUrl = sharedPref.getString("defUrl", "설정되지 않음");
-            url = sharedPref.getString("url", defUrl);
+            url = sharedPref.getString("url", "");
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
@@ -118,7 +119,6 @@ public class Preference {
         this.defUrl = defUrl;
         prefsEditor.putString("defUrl", defUrl);
         prefsEditor.commit();
-        setUrl(defUrl);
     }
 
     public String getDefUrl() {

@@ -17,6 +17,8 @@ import okhttp3.Response;
 
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
+import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
+import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
 
     /*
     mode:
@@ -62,13 +64,13 @@ import static ml.melun.mangaview.mangaview.MTitle.base_comic;
         return thumb;
     }
 
-    public void fetch(CustomHttpClient client){
-        fetch(client, true ,null);
+    public int fetch(CustomHttpClient client){
+        return fetch(client, true ,null);
     }
-    public void fetch(CustomHttpClient client, Map<String,String> cookies){
-        fetch(client, false, cookies);
+    public int fetch(CustomHttpClient client, Map<String,String> cookies){
+        return fetch(client, false, cookies);
     }
-    public void fetch(CustomHttpClient client, boolean doLogin, Map<String,String> cookies) {
+    public int fetch(CustomHttpClient client, boolean doLogin, Map<String,String> cookies) {
         mode = 0;
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
@@ -79,6 +81,9 @@ import static ml.melun.mangaview.mangaview.MTitle.base_comic;
         while(imgs.size()==0 && tries < 2) {
             Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id), false, cookies);
             try {
+                if(r.code() == 302 && r.header("location").contains("captcha.php")){
+                    return LOAD_CAPTCHA;
+                }
                 String body = r.body().string();
                 r.close();
                 if(body.contains("Connect Error: Connection timed out")){
@@ -218,6 +223,7 @@ import static ml.melun.mangaview.mangaview.MTitle.base_comic;
             }
             tries++;
         }
+        return LOAD_OK;
     }
 
 

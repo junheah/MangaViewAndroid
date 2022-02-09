@@ -48,7 +48,9 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
+import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
 
 
 public class EpisodeActivity extends AppCompatActivity {
@@ -392,26 +394,31 @@ public class EpisodeActivity extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... params) {
-            title.fetchEps(httpClient);
+            int code = title.fetchEps(httpClient);
             episodes = title.getEps();
             episodeAdapter = new EpisodeAdapter(context, episodes, title, mode);
-            return null;
+            return code;
         }
 
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(episodes == null || episodes.size()==0){
+            if(res == LOAD_CAPTCHA){
+                //캡차 처리 팝업
+                showTokiCaptchaPopup(context, p);
+                return;
+            }else if(episodes == null || episodes.size()==0){
                 showCaptchaPopup(context, p);
                 return;
+            }else {
+                afterLoad();
+                p.addRecent(title);
+                p.updateRecentData(title);
+                progress.setVisibility(View.GONE);
+                loaded = true;
+                fab_container.setVisibility(View.VISIBLE);
+                invalidateOptionsMenu();
             }
-            afterLoad();
-            p.addRecent(title);
-            p.updateRecentData(title);
-            progress.setVisibility(View.GONE);
-            loaded = true;
-            fab_container.setVisibility(View.VISIBLE);
-            invalidateOptionsMenu();
         }
     }
 

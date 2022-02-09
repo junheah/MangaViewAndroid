@@ -82,7 +82,7 @@ public class CustomHttpClient {
     }
 
     public Response get(String url, Map<String, String> headers){
-        System.out.println(url);
+//        System.out.println(url);
         Response response = null;
         try {
             Request.Builder builder = new Request.Builder()
@@ -95,7 +95,7 @@ public class CustomHttpClient {
 
             Request request = builder.build();
             response = this.client.newCall(request).execute();
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
             return null;
         }
@@ -177,7 +177,7 @@ public class CustomHttpClient {
             Request request = builder.build();
             response = this.client.newCall(request).execute();
         }catch (Exception e){
-
+            e.printStackTrace();
         }
         return response;
 

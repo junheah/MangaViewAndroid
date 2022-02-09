@@ -33,9 +33,12 @@ public class CheckInfo {
     SharedPreferences sharedPref;
     CustomHttpClient client;
     boolean silent = false;
-    boolean forceDark = false;
-    public void setForceDark(){
-        this.forceDark = true;
+    public static final int COLOR_DARK = 1;
+    public static final int COLOR_AUTO = 0;
+    public static final int COLOR_LIGHT = 2;
+    int colormode = 0;
+    public void setColorMode(int c){
+        this.colormode = c;
     }
     public CheckInfo(Context context, CustomHttpClient client, boolean silent){
         this.silent = silent;
@@ -101,14 +104,16 @@ public class CheckInfo {
                 String rawdata = response.body().string();
                 response.close();
                 notice = new Gson().fromJson(rawdata, new TypeToken<Notice>(){}.getType());
+                if(notice.id == -1) return -1;
             }catch (Exception e){
                 e.printStackTrace();
+                return -1;
             }
             return 0;
         }
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
-            showNotice(notice);
+            if(result == 0) showNotice(notice);
         }
     }
 
@@ -162,13 +167,28 @@ public class CheckInfo {
     }
 
     void showPrompt(JSONObject data){
+        showPrompt(data, false);
+    }
+
+    void showPrompt(JSONObject data, boolean forceLight){
         try{
             final String page = "https://junheah.github.io/MangaViewAndroid/";
             final String message = "버전: " + data.getString("tag_name") +"\n체인지 로그:\n"+ data.getString("body");
             final String url = data.getJSONArray("assets").getJSONObject(0).getString("browser_download_url");
             AlertDialog.Builder builder;
-            if(new Preference(context).getDarkTheme() || forceDark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
-            else builder = new AlertDialog.Builder(context);
+            switch (colormode){
+                case COLOR_DARK:
+                    builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                    break;
+                case COLOR_LIGHT:
+                    builder = new AlertDialog.Builder(context);
+                    break;
+                default:
+                case COLOR_AUTO:
+                    if(new Preference(context).getDarkTheme()) builder = new AlertDialog.Builder(context,R.style.darkDialog);
+                    else builder = new AlertDialog.Builder(context);
+            }
+
             builder.setTitle("업데이트")
                     .setMessage(message)
                     .setPositiveButton("다운로드", new DialogInterface.OnClickListener() {

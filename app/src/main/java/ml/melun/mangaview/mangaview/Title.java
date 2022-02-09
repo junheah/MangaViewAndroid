@@ -34,6 +34,9 @@ public class Title extends MTitle {
     public static final int BATTERY_HALF = 2;
     public static final int BATTERY_THREE_QUARTER = 3;
     public static final int BATTERY_FULL = 4;
+    public static final int LOAD_OK = 0;
+    public static final int LOAD_CAPTCHA = 1;
+
 
     public Title(String n, String t, String a, List<String> tg, String r, int id, int baseMode) {
         super(n, id, t, a, tg, r, baseMode);
@@ -59,16 +62,20 @@ public class Title extends MTitle {
         return bookmarked;
     }
 
-    public void fetchEps(CustomHttpClient client) {
+    public int fetchEps(CustomHttpClient client) {
 
         try {
             Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id));
+            //웹툰의 경우 캡차 있을 수 있음.
+            if(r.code() == 302 && r.header("location").contains("captcha.php")){
+                return LOAD_CAPTCHA;
+            }
             String body = r.body().string();
             if(body.contains("Connect Error: Connection timed out")){
                 //adblock : try again
                 r.close();
                 fetchEps(client);
-                return;
+                return LOAD_OK;
             }
             Document d = Jsoup.parse(body);
             Element header = d.selectFirst("div.view-title");
@@ -145,6 +152,7 @@ public class Title extends MTitle {
         }catch(Exception e) {
             e.printStackTrace();
         }
+        return LOAD_OK;
     }
 
     public boolean toggleBookmark(CustomHttpClient client, Preference p){

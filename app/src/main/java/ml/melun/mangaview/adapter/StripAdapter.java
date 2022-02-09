@@ -25,6 +25,7 @@ import java.util.List;
 import static ml.melun.mangaview.MainApplication.p;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.activity.ViewerActivity;
+import ml.melun.mangaview.interfaces.StringCallback;
 import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
@@ -43,6 +44,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     int width;
     int count = 0;
     final static int MaxStackSize = 2;
+    StringCallback stringCallback;
     ViewerActivity.InfiniteScrollCallback callback;
     Title title;
 
@@ -152,8 +154,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     // data is passed into the constructor
-    public StripAdapter(Context context, Manga manga, Boolean cut, int width, Title title, ViewerActivity.InfiniteScrollCallback callback) {
+    public StripAdapter(Context context, Manga manga, Boolean cut, int width, Title title, ViewerActivity.InfiniteScrollCallback callback, StringCallback zoom) {
         autoCut = cut;
+        this.stringCallback  = zoom;
         this.callback = callback;
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
@@ -393,7 +396,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
 
     // stores and recycles views as they are scrolled off screen
-    public class ImgViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ImgViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         ImageView frame;
         ImageButton refresh;
         ImgViewHolder(View itemView) {
@@ -408,10 +411,18 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             });
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick();
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            String url = ((PageItem)items.get(getAdapterPosition())).img;
+            stringCallback.callback(url);
+            return true;
         }
     }
 

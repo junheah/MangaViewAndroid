@@ -17,6 +17,8 @@ import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 
+import static ml.melun.mangaview.CheckInfo.COLOR_DARK;
+import static ml.melun.mangaview.CheckInfo.COLOR_LIGHT;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.showYesNoPopup;
@@ -36,6 +38,7 @@ public class FirstTimeActivity extends AppCompatActivity {
 
         //check update
         CheckInfo cinfo = new CheckInfo(context, httpClient, true);
+        cinfo.setColorMode(COLOR_DARK);
         cinfo.update(true);
 
         setResult(RESULT_EULA_DISAGREE);

@@ -17,15 +17,21 @@ import androidx.fragment.app.Fragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -61,7 +67,13 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static java.lang.System.console;
+import static java.lang.System.currentTimeMillis;
+import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
 import static ml.melun.mangaview.activity.SettingsActivity.urlSettingPopup;
 
@@ -369,6 +381,100 @@ public class Utils {
         showCaptchaPopup(context, 0, null, true, p);
     }
 
+    public static void showTokiCaptchaPopup(Context context, Preference p){
+        AlertDialog.Builder builder;
+        String title = "캡차 인증";
+        if (new Preference(context).getDarkTheme())
+            builder = new AlertDialog.Builder(context, R.style.darkDialog);
+        else builder = new AlertDialog.Builder(context);
+        View v = ((Activity)context).getLayoutInflater().inflate(R.layout.content_toki_captcha_popup, null);
+
+        ImageView img = v.findViewById(R.id.toki_captcha_image);
+        EditText answer = v.findViewById(R.id.toki_captcha_answer);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String cookie;
+                Response r;
+                int tries = 3;
+                while(tries > 0) {
+                    r = httpClient.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),false);
+                    if(r.code() == 200) {
+                        List<String> setcookie = r.headers("Set-Cookie");
+                        for (String c : setcookie) {
+                            if (c.contains("PHPSESSID=")) {
+                                cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
+                                httpClient.setCookie("PHPSESSID",cookie);
+                            }
+                        }
+                        break;
+                    }else {
+                        r.close();
+                        tries--;
+                    }
+                }
+                r = httpClient.mget("/plugin/kcaptcha/kcaptcha_image.php?t=" + currentTimeMillis(), false);
+                try {
+                    final byte[] b = r.body().bytes();
+                    ((Activity) context).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(img)
+                                    .load(b)
+                                    .into(img);
+                        }
+                    });
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        builder.setTitle(title)
+                .setView(v)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                RequestBody requestBody = new FormBody.Builder()
+                                        .addEncoded("url", p.getUrl())
+                                        .addEncoded("captcha_key", answer.getText().toString())
+                                        .build();
+                                Map<String,String> headers = new HashMap<>();
+                                headers.put("cookie", "PHPSESSID="+ httpClient.getCookie("PHPSESSID") +";");
+                                Response response = httpClient.post(p.getUrl() + "/bbs/captcha_check.php", requestBody, headers);
+                                System.out.println(response.code());
+                                ((Activity)context).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //restart activity
+                                        ((Activity)context).finish();
+                                        ((Activity)context).startActivity(((Activity)context).getIntent());
+                                    }
+                                });
+                            }
+                        }).start();
+                    }
+                })
+                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ((Activity) context).finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        ((Activity) context).finish();
+                    }
+                });
+
+        builder.show();
+    }
+
     private static void showStackTrace(Context context, Exception e){
         StringBuilder sbuilder = new StringBuilder();
         sbuilder.append(e.getMessage()+"\n");
@@ -405,6 +511,14 @@ public class Utils {
                     }
                 })
                 .show();
+    }
+
+    public static File getDefHomeDir(Context context){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            return context.getExternalFilesDir("");
+        } else {
+            return new File("/sdcard/MangaView/saved/");
+        }
     }
 
 
@@ -545,7 +659,7 @@ public class Utils {
         SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
         editor.putString("recent",data.getJSONArray("recent", new JSONArray()).toString());
         editor.putString("favorite",data.getJSONArray("favorite", new JSONArray()).toString());
-        editor.putString("homeDir",data.getString("homeDir", "/sdcard/MangaView/saved"));
+        editor.putString("homeDir",data.getString("homeDir", ""));
         editor.putBoolean("darkTheme",data.getBoolean("darkTheme",false));
         editor.putInt("prevPageKey", data.getInt("prevPageKey", -1));
         editor.putInt("nextPageKey", data.getInt("nextPageKey", -1));
@@ -586,7 +700,7 @@ public class Utils {
         try {
             data.put("recent",new JSONArray(sharedPref.getString("recent", "[]")));
             data.put("favorite",new JSONArray(sharedPref.getString("favorite", "[]")));
-            data.put("homeDir",sharedPref.getString("homeDir","/sdcard/MangaView/saved"));
+            data.put("homeDir",sharedPref.getString("homeDir",""));
             data.put("darkTheme",sharedPref.getBoolean("darkTheme", false));
             data.put("bookmark",new JSONObject(sharedPref.getString("bookmark", "{}")));
             data.put("bookmark2",new JSONObject(sharedPref.getString("bookmark2", "{}")));
@@ -719,6 +833,7 @@ public class Utils {
     }
 
     public static List<File> getOfflineEpisodes(String path){
+        System.out.println(path);
         File[] episodeFiles = new File(path).listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -730,7 +845,5 @@ public class Utils {
         //add as manga
         return Arrays.asList(episodeFiles);
     }
-
-
 
 }

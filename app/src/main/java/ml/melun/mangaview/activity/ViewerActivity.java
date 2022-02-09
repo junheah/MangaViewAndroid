@@ -1,5 +1,6 @@
 package ml.melun.mangaview.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,6 +8,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
+
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.Nullable;
@@ -17,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.DisplayCutoutCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
@@ -32,6 +36,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -50,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 
 import ml.melun.mangaview.R;
+import ml.melun.mangaview.interfaces.StringCallback;
 import ml.melun.mangaview.ui.StripLayoutManager;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.adapter.CustomSpinnerAdapter;
@@ -67,7 +73,12 @@ import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
+import static ml.melun.mangaview.Utils.showErrorPopup;
+import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
+import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
+import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
 
 public class ViewerActivity extends AppCompatActivity {
 
@@ -96,6 +107,9 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
+    StringCallback zoom;
+    ConstraintLayout zoom_layout;
+    ImageView zoom_image;
     loadImages loader;
 
 
@@ -110,6 +124,8 @@ public class ViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
 
+        zoom_layout = this.findViewById(R.id.zoom);
+        zoom_image = this.findViewById(R.id.zoom_image);
         next = this.findViewById(R.id.toolbar_next);
         prev = this.findViewById(R.id.toolbar_previous);
         toolbar = this.findViewById(R.id.viewerToolbar);
@@ -138,13 +154,32 @@ public class ViewerActivity extends AppCompatActivity {
                 if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
                 else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
-                //System.out.println(ci + " : " + statusBarHeight);
                 appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
                 view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
                 return windowInsetsCompat;
             }
         });
 
+        this.findViewById(R.id.zoom_x).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoom_layout.setVisibility(View.GONE);
+            }
+        });
+
+        zoom = new StringCallback() {
+            @Override
+            public void callback(String data) {
+                zoom_layout.setVisibility(View.VISIBLE);
+                Glide.with(context)
+                        .load(data)
+                        .placeholder(R.drawable.placeholder)
+                        .into(zoom_image);
+
+                //todo : 이미지 확대 팝업
+
+            }
+        };
 
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
@@ -331,6 +366,19 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     void loadManga(Manga m){
+        if(m == null){
+            showPopup(context, "오류", "만화를 불러 오던중 오류가 발생했습니다.", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ViewerActivity.this.finish();
+                }
+            }, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    ViewerActivity.this.finish();
+                }
+            });
+        }
         if(stripAdapter!=null) stripAdapter.removeAll();
         if(m.isOnline()) {
             loadManga(m, new LoadMangaCallback() {
@@ -360,7 +408,7 @@ public class ViewerActivity extends AppCompatActivity {
                 showCaptchaPopup(context, p);
                 return;
             }
-            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback);
+            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback, zoom);
 
             refreshAdapter();
             bookmarkRefresh(m);
@@ -457,7 +505,7 @@ public class ViewerActivity extends AppCompatActivity {
             //viewerBookmark *= 2;
         }
         stripAdapter.removeAll();
-        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback);
+        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback, zoom);
         stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
@@ -480,7 +528,10 @@ public class ViewerActivity extends AppCompatActivity {
         if(onBack!=null){
             onBack.run();
         }else{
-            super.onBackPressed();
+            if(zoom_layout.getVisibility() == View.VISIBLE)
+                zoom_layout.setVisibility(View.GONE);
+            else
+                super.onBackPressed();
         }
     }
 
@@ -526,15 +577,20 @@ public class ViewerActivity extends AppCompatActivity {
                     String php = p.getLogin().getCookie();
                     login.buildCookie(cookie);
                 }
-                m.fetch(httpClient);
-                return 0;
+                return m.fetch(httpClient);
             }else{
-                return 0;
+                return LOAD_OK;
             }
         }
 
         @Override
         protected void onPostExecute(Integer res) {
+            if(res == LOAD_CAPTCHA){
+                //캡차 처리 팝업
+                showTokiCaptchaPopup(context, p);
+                return;
+            }
+
             if(lockui) lockUi(false);
             if (title == null)
                 title = m.getTitle();
@@ -630,6 +686,7 @@ public class ViewerActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_CAPTCHA) {
             refresh();
         }

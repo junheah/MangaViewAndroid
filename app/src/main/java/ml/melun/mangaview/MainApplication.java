@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.multidex.MultiDexApplication;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
@@ -23,7 +24,7 @@ import static org.acra.ReportField.STACK_TRACE;
 @AcraCore(reportContent = { APP_VERSION_NAME, ANDROID_VERSION, PHONE_MODEL, STACK_TRACE, REPORT_ID})
 @AcraDialog(resText=R.string.acra_dialog_text)
 
-public class MainApplication extends Application{
+public class MainApplication extends MultiDexApplication {
     public static CustomHttpClient httpClient;
     public static Preference p;
     @Override
