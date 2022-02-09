@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "ml.melun.mangaview",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 2112220209,
+      "versionName": "4.5-2112220209",
+      "outputFile": "mangaViewer_2112220209-release.apk"
+    }
+  ],
+  "elementType": "File"
+}
