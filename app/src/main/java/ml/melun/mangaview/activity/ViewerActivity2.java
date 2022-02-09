@@ -167,7 +167,6 @@ public class ViewerActivity2 extends AppCompatActivity {
         Point size = new Point();
         display.getSize(size);
         split = size.x > size.y;
-        System.out.println(split);
 
 
         ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
@@ -178,8 +177,6 @@ public class ViewerActivity2 extends AppCompatActivity {
                 int ci;
                 if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
                 else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
-
-                System.out.println(windowInsetsCompat.getStableInsetTop() +" && " + windowInsetsCompat.getSystemWindowInsetTop() + " _ " +windowInsetsCompat.getStableInsetBottom() +" && " + windowInsetsCompat.getSystemWindowInsetBottom());
 
                 //System.out.println(ci + " : " + statusBarHeight);
                 appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);

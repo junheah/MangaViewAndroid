@@ -31,7 +31,7 @@ public class MainApplication extends MultiDexApplication {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         System.out.println("main app start");
-//        ACRA.init(this);
+        ACRA.init(this);
     }
 
     @Override

@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -66,7 +67,10 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static java.lang.System.console;
 import static java.lang.System.currentTimeMillis;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
@@ -402,7 +406,6 @@ public class Utils {
                             if (c.contains("PHPSESSID=")) {
                                 cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
                                 httpClient.setCookie("PHPSESSID",cookie);
-                                System.out.println(cookie);
                             }
                         }
                         break;
@@ -508,6 +511,14 @@ public class Utils {
                     }
                 })
                 .show();
+    }
+
+    public static File getDefHomeDir(Context context){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            return context.getExternalFilesDir("");
+        } else {
+            return new File("/sdcard/MangaView/saved/");
+        }
     }
 
 
@@ -648,7 +659,7 @@ public class Utils {
         SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
         editor.putString("recent",data.getJSONArray("recent", new JSONArray()).toString());
         editor.putString("favorite",data.getJSONArray("favorite", new JSONArray()).toString());
-        editor.putString("homeDir",data.getString("homeDir", "/sdcard/MangaView/saved"));
+        editor.putString("homeDir",data.getString("homeDir", ""));
         editor.putBoolean("darkTheme",data.getBoolean("darkTheme",false));
         editor.putInt("prevPageKey", data.getInt("prevPageKey", -1));
         editor.putInt("nextPageKey", data.getInt("nextPageKey", -1));
@@ -689,7 +700,7 @@ public class Utils {
         try {
             data.put("recent",new JSONArray(sharedPref.getString("recent", "[]")));
             data.put("favorite",new JSONArray(sharedPref.getString("favorite", "[]")));
-            data.put("homeDir",sharedPref.getString("homeDir","/sdcard/MangaView/saved"));
+            data.put("homeDir",sharedPref.getString("homeDir",""));
             data.put("darkTheme",sharedPref.getBoolean("darkTheme", false));
             data.put("bookmark",new JSONObject(sharedPref.getString("bookmark", "{}")));
             data.put("bookmark2",new JSONObject(sharedPref.getString("bookmark2", "{}")));

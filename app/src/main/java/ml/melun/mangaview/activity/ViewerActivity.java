@@ -154,7 +154,6 @@ public class ViewerActivity extends AppCompatActivity {
                 if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
                 else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
-                //System.out.println(ci + " : " + statusBarHeight);
                 appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
                 view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
                 return windowInsetsCompat;
@@ -171,7 +170,6 @@ public class ViewerActivity extends AppCompatActivity {
         zoom = new StringCallback() {
             @Override
             public void callback(String data) {
-                System.out.println(data);
                 zoom_layout.setVisibility(View.VISIBLE);
                 Glide.with(context)
                         .load(data)

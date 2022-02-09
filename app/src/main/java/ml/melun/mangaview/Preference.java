@@ -18,6 +18,7 @@ import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
+import static ml.melun.mangaview.Utils.getDefHomeDir;
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.isInteger;
@@ -72,7 +73,7 @@ public class Preference {
             if(recent==null) recent = new ArrayList<>();
             favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<MTitle>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
-            homeDir = sharedPref.getString("homeDir","/sdcard/MangaView/saved");
+            homeDir = sharedPref.getString("homeDir", getDefHomeDir(mcontext).getAbsolutePath());
             prevPageKey = sharedPref.getInt("prevPageKey", -1);
             nextPageKey = sharedPref.getInt("nextPageKey", -1);
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));

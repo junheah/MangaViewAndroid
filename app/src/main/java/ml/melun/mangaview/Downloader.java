@@ -50,6 +50,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.filterFolder;
+import static ml.melun.mangaview.Utils.getDefHomeDir;
 
 public class Downloader extends Service {
     File homeDir;
@@ -86,10 +87,12 @@ public class Downloader extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        serviceContext = this;
         if(titles==null) titles = new ArrayList<>();
         if(selected==null) selected = new ArrayList<>();
-        homeDir = new File(getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir","/sdcard/MangaView/saved"));
-        baseUrl = getApplicationContext().getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "https://manamoa.net/");
+        homeDir = new File(serviceContext.getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir",
+                getDefHomeDir(serviceContext).getAbsolutePath()));
+        baseUrl = serviceContext.getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "");
         if(dt==null) dt = new downloadTitle();
         //android O bullshit
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -109,7 +112,6 @@ public class Downloader extends Service {
         Intent previousIntent = new Intent(this, Downloader.class);
         previousIntent.setAction(ACTION_STOP);
         stopIntent = PendingIntent.getService(this, 0, previousIntent, 0);
-        serviceContext = this;
         startNotification();
     }
 
@@ -270,7 +272,7 @@ public class Downloader extends Service {
 
         Uri getFileUri(Context context, File file) {
             return FileProvider.getUriForFile(context,
-                    context.getApplicationContext().getPackageName() + "."
+                    context.getPackageName() + "."
                     , file);
         }
     }

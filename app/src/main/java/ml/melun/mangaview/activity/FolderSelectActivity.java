@@ -38,6 +38,7 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.ReservedChars;
 import static ml.melun.mangaview.Utils.checkWriteable;
 import static ml.melun.mangaview.Utils.deleteRecursive;
+import static ml.melun.mangaview.Utils.getDefHomeDir;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.activity.SettingsActivity.prefExtension;
 
@@ -75,7 +76,7 @@ public class FolderSelectActivity extends AppCompatActivity {
 
         context = this;
         currentDir = new File(p.getHomeDir());
-        defDir = new File("/sdcard/MangaView/saved/");
+        defDir = getDefHomeDir(context);
         if(!currentDir.exists()){
             p.setHomeDir(defDir.getAbsolutePath());
             showPopup(context, "알림","설정된 폴더를 찾을 수 없습니다. 기본 폴더로 이동 합니다.");
@@ -231,7 +232,7 @@ public class FolderSelectActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 File[] dirs =  ContextCompat.getExternalFilesDirs(context, null);
-                dirs[0] = defDir; //기본 내부 저장소로 설정
+                dirs[0] = getDefHomeDir(context); //기본 내부 저장소로 설정
                 PopupMenu popup = new PopupMenu(FolderSelectActivity.this, storageSelectBtn);
                 for(int i=0;i<dirs.length;i++){
                     if(i==0) popup.getMenu().add(i+".내부 저장소");

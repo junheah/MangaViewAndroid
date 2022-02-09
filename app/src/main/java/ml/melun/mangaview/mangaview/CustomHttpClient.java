@@ -82,7 +82,7 @@ public class CustomHttpClient {
     }
 
     public Response get(String url, Map<String, String> headers){
-        System.out.println(url);
+//        System.out.println(url);
         Response response = null;
         try {
             Request.Builder builder = new Request.Builder()

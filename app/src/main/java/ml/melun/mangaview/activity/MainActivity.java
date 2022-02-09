@@ -327,7 +327,9 @@ public class MainActivity extends AppCompatActivity
         //check for permission
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                //doesn't have to do anything
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE},
                         PERMISSION_CODE);
             }
@@ -349,6 +351,7 @@ public class MainActivity extends AppCompatActivity
 
         //check for update, notices
         new CheckInfo(context,httpClient, true).all(false);
+
     }
 
     public int getTabId(int i){
