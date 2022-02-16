@@ -64,7 +64,6 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
-import static ml.melun.mangaview.Utils.mangaDeserializer;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -227,13 +226,13 @@ public class ViewerActivity2 extends AppCompatActivity {
         swidth = getScreenSize(getWindowManager().getDefaultDisplay());
 
         intent = getIntent();
-        title = mangaDeserializer().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+        title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
         }.getType());
         if(savedInstanceState == null) {
-            manga = mangaDeserializer().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
+            manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
             }.getType());
         }else{
-            manga = mangaDeserializer().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
+            manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
             }.getType());
             dirty = true;
         }
@@ -893,7 +892,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     public void reloadManga(){
         try{
             lockUi(false);
-            imgs = manga.getImgs();
+            imgs = manga.getImgs(context);
             if(imgs == null || imgs.size()==0) {
                 showCaptchaPopup(context, p);
                 return;

@@ -1,14 +1,18 @@
 package ml.melun.mangaview.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -31,6 +35,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.openDirectory;
 import static ml.melun.mangaview.Utils.readPreferenceFromFile;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.writePreferenceToFile;
@@ -65,8 +70,12 @@ public class SettingsActivity extends AppCompatActivity {
         s_setHomeDir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, FolderSelectActivity.class);
-                startActivityForResult(intent, MODE_FOLDER_SELECT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    openDirectory(context, null, MODE_FOLDER_SELECT);
+                }else{
+                    Intent intent = new Intent(context, FolderSelectActivity.class);
+                    startActivityForResult(intent, MODE_FOLDER_SELECT);
+                }
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -494,39 +503,54 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(data != null) {
-            String path = data.getStringExtra("path");
-            if (path != null) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (resultCode == Activity.RESULT_OK) {
                 switch (requestCode) {
-                    case MODE_FILE_SELECT:
-                        if(readPreferenceFromFile(p, context, new File(path))) {
-                            setResult(RESULT_NEED_RESTART);
-                            showPopup(context, "데이터 불러오기", "데이터 불러오기를 성공했습니다. 변경사항을 적용하기 위해 앱을 재시작 합니다.", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    finish();
-                                }
-                            }, new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialogInterface) {
-                                    finish();
-                                }
-                            });
-                        }else
-                            Toast.makeText(context, "불러오기 실패", Toast.LENGTH_LONG).show();
-                        break;
                     case MODE_FOLDER_SELECT:
-                        p.setHomeDir(path);
-                        Toast.makeText(context, "설정 완료!", Toast.LENGTH_LONG).show();
+                        Uri uri = null;
+                        if (data != null) uri = data.getData();
+                        getContentResolver().takePersistableUriPermission(uri, (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));
+                        System.out.println(uri.toString());
+                        p.setHomeDir(uri.toString());
                         break;
-                    case MODE_FILE_SAVE:
+                }
+            }
+        }else {
+            if (data != null) {
+                String path = data.getStringExtra("path");
+                if (path != null) {
+                    switch (requestCode) {
+                        case MODE_FILE_SELECT:
+                            if (readPreferenceFromFile(p, context, new File(path))) {
+                                setResult(RESULT_NEED_RESTART);
+                                showPopup(context, "데이터 불러오기", "데이터 불러오기를 성공했습니다. 변경사항을 적용하기 위해 앱을 재시작 합니다.", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        finish();
+                                    }
+                                }, new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialogInterface) {
+                                        finish();
+                                    }
+                                });
+                            } else
+                                Toast.makeText(context, "불러오기 실패", Toast.LENGTH_LONG).show();
+                            break;
+                        case MODE_FOLDER_SELECT:
+                            p.setHomeDir(path);
+                            Toast.makeText(context, "설정 완료!", Toast.LENGTH_LONG).show();
+                            break;
+                        case MODE_FILE_SAVE:
 
-                        if(writePreferenceToFile(context, new File(path)))
-                            Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
-                        else
-                            Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
+                            if (writePreferenceToFile(context, new File(path)))
+                                Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
 
-                        break;
+                            break;
+                    }
                 }
             }
         }

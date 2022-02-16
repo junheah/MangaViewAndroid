@@ -85,6 +85,12 @@
                 android:layout_width="match_parent"
                 android:text="open manga with id" />
 
+            <Button
+                android:id="@+id/debug_file_test"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="file write test" />
+
 
 
             <TextView

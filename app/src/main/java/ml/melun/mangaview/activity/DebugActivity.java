@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.documentfile.provider.DocumentFile;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.Menu;
@@ -64,6 +67,16 @@ public class DebugActivity extends AppCompatActivity {
         Button pref =this.findViewById(R.id.debug_pref);
         output = this.findViewById(R.id.debug_out);
         context = this;
+
+        this.findViewById(R.id.debug_file_test).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Uri uri = Uri.parse(p.getHomeDir());
+                DocumentFile t = DocumentFile.fromTreeUri(context, uri);
+                output.setText("path : " + t.getUri() + "\ncan read : " + t.canRead() + "\ncan write : " + t.canWrite());
+            }
+        });
+
         this.findViewById(R.id.debug_webTest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

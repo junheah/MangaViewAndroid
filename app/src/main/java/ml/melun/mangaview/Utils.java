@@ -13,12 +13,15 @@ import android.graphics.Point;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.provider.DocumentsContract;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -44,12 +47,16 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import ml.melun.mangaview.activity.CaptchaActivity;
 import ml.melun.mangaview.activity.EpisodeActivity;
@@ -58,8 +65,6 @@ import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
-import ml.melun.mangaview.gson.MangaDeserializer;
-import ml.melun.mangaview.gson.MangaSerializer;
 import ml.melun.mangaview.interfaces.IntegerCallback;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Login;
@@ -848,17 +853,45 @@ public class Utils {
         //add as manga
         return Arrays.asList(episodeFiles);
     }
-
-    public static Gson mangaSerializer(){
-        return new GsonBuilder()
-                .registerTypeAdapter(new TypeToken<Manga>() {}.getType(), new MangaSerializer())
-                .create();
+    public static List<DocumentFile> getOfflineEpisodes(DocumentFile home){
+        DocumentFile[] files = home.listFiles();
+        Arrays.sort(files, new Comparator<DocumentFile>() {
+            @Override
+            public int compare(DocumentFile documentFile, DocumentFile t1) {
+                return documentFile.getName().compareTo(t1.getName());
+            }
+        });
+        List<DocumentFile> res = new ArrayList<>();
+        for(DocumentFile f : files){
+            if(f.isDirectory()) res.add(f);
+        }
+        return res;
     }
 
-    public static Gson mangaDeserializer(){
-        return new GsonBuilder()
-                .registerTypeAdapter(new TypeToken<Manga>() {}.getType(), new MangaDeserializer())
-                .create();
+    public static void openDirectory(Context context, Uri uriToLoad, int code) {
+        // Choose a directory using the system's file picker.
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+
+        // Optionally, specify a URI for the directory that should be opened in
+        // the system file picker when it loads.
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uriToLoad);
+
+        ((Activity)context).startActivityForResult(intent, code);
+    }
+
+    public static String readUriToString(Context context, Uri uri){
+        try {
+            InputStream in = context.getContentResolver().openInputStream(uri);
+            BufferedReader r = new BufferedReader(new InputStreamReader(in));
+            StringBuilder s = new StringBuilder();
+            for (String line; (line = r.readLine()) != null; ) {
+                s.append(line).append('\n');
+            }
+            return s.toString();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
 }

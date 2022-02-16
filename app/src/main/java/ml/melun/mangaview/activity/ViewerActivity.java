@@ -71,7 +71,6 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
-import static ml.melun.mangaview.Utils.mangaDeserializer;
 import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showErrorPopup;
@@ -192,7 +191,7 @@ public class ViewerActivity extends AppCompatActivity {
                     loader = new loadImages(eps.get(i + 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
-                            if (m.getImgs().size() > 0)
+                            if (m.getImgs(context).size() > 0)
                                 stripAdapter.insertManga(m);
                             callback.prevLoaded(m);
                         }
@@ -214,7 +213,7 @@ public class ViewerActivity extends AppCompatActivity {
                     loader = new loadImages(eps.get(i - 1), new LoadMangaCallback() {
                         @Override
                         public void post(Manga m) {
-                            if (m.getImgs().size() > 0)
+                            if (m.getImgs(context).size() > 0)
                                 stripAdapter.appendManga(m);
                             callback.nextLoaded(m);
                         }
@@ -244,13 +243,13 @@ public class ViewerActivity extends AppCompatActivity {
 
         try {
             intent = getIntent();
-            title = mangaDeserializer().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+            title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
             }.getType());
             if(savedInstanceState == null) {
-                manga = mangaDeserializer().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
+                manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
             }else{
-                manga = mangaDeserializer().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
+                manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }
 
@@ -325,7 +324,7 @@ public class ViewerActivity extends AppCompatActivity {
                 if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
                 else alert = new AlertDialog.Builder(context);
 
-                alert.setTitle("페이지 선택\n(1~"+current.manga.getImgs().size()+")");
+                alert.setTitle("페이지 선택\n(1~"+current.manga.getImgs(context).size()+")");
                 final EditText input = new EditText(context);
                 input.setInputType(InputType.TYPE_CLASS_NUMBER);
                 input.setRawInputType(Configuration.KEYBOARD_12KEY);
@@ -336,9 +335,9 @@ public class ViewerActivity extends AppCompatActivity {
                         if(input.getText().length()>0) {
                             int page = Integer.parseInt(input.getText().toString());
                             if (page < 1) page = 1;
-                            if (page > current.manga.getImgs().size()) page = current.manga.getImgs().size();
+                            if (page > current.manga.getImgs(context).size()) page = current.manga.getImgs(context).size();
                             manager.scrollToPage(new PageItem(page-1,"",current.manga));
-                            pageBtn.setText(page+"/"+current.manga.getImgs().size());
+                            pageBtn.setText(page+"/"+current.manga.getImgs(context).size());
                         }
                     }
                 });
@@ -405,7 +404,7 @@ public class ViewerActivity extends AppCompatActivity {
     public void setManga(Manga m){
         try {
             lockUi(false);
-            if(m.getImgs() == null || m.getImgs().size()==0) {
+            if(m.getImgs(context) == null || m.getImgs(context).size()==0) {
                 showCaptchaPopup(context, p);
                 return;
             }
@@ -470,7 +469,7 @@ public class ViewerActivity extends AppCompatActivity {
         else {
             PageItem item = stripAdapter.getCurrentVisiblePage();
             if(item != null) {
-                pageBtn.setText(item.index+1 + "/" + item.manga.getImgs().size());
+                pageBtn.setText(item.index+1 + "/" + item.manga.getImgs(context).size());
                 toolbarTitle.setText(item.manga.getName());
                 commentBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -667,7 +666,7 @@ public class ViewerActivity extends AppCompatActivity {
         }
         PageItem page = stripAdapter.getCurrentVisiblePage();
         if(page!=null)
-            pageBtn.setText(page.index+1+"/"+page.manga.getImgs().size());
+            pageBtn.setText(page.index+1+"/"+page.manga.getImgs(context).size());
     }
 
     @Override

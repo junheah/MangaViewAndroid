@@ -4,7 +4,9 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +46,7 @@ import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.filterFolder;
 import static ml.melun.mangaview.Utils.readFileToString;
+import static ml.melun.mangaview.Utils.readUriToString;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
 
@@ -189,35 +194,76 @@ public class RecyclerFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... voids) {
             titles = new ArrayList<>();
-            File homeDir = new File(p.getHomeDir());
-            if (homeDir.exists()) {
-                File[] files = homeDir.listFiles();
-                for (File f : files) {
-                    if (f.isDirectory()) {
-                        File data = new File(f, "title.gson");
-                        if (data.exists()) {
-                            try {
-                                Title title = new Gson().fromJson(readFileToString(data), new TypeToken<Title>() {
-                                }.getType());
-                                title.setPath(f.getAbsolutePath());
-                                if (title.getThumb().length() > 0)
-                                    title.setThumb(f.getAbsolutePath() + '/' + title.getThumb());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                //scoped storage
+                Uri uri = Uri.parse(p.getHomeDir());
+                DocumentFile home;
+                try {
+                    home = DocumentFile.fromTreeUri(getContext(), uri);
+                }catch (IllegalArgumentException e){
+                    //home not set
+                    return null;
+                }
+                if(home.exists() && home.canRead()){
+                    for(DocumentFile f : home.listFiles()){
+                        if(f.isDirectory()) {
+                            DocumentFile d = f.findFile("title.gson");
+                            if (d != null) {
+                                try {
+                                    Title title = new Gson().fromJson(readUriToString(getContext(), d.getUri()), new TypeToken<Title>() {
+                                    }.getType());
+                                    title.setPath(f.getUri().toString());
+                                    if (title.getThumb().length() > 0) {
+                                        DocumentFile t = f.findFile(title.getThumb());
+                                        if (t.exists()) title.setThumb(t.getUri().toString());
+                                    }
+                                    titles.add(title);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                    title.setPath(f.getUri().toString());
+                                    titles.add(title);
+                                }
+                            } else {
+                                Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                title.setPath(f.getUri().toString());
                                 titles.add(title);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+
+            }else {
+                File homeDir = new File(p.getHomeDir());
+                if (homeDir.exists()) {
+                    File[] files = homeDir.listFiles();
+                    for (File f : files) {
+                        if (f.isDirectory()) {
+                            File data = new File(f, "title.gson");
+                            if (data.exists()) {
+                                try {
+                                    Title title = new Gson().fromJson(readFileToString(data), new TypeToken<Title>() {
+                                    }.getType());
+                                    title.setPath(f.getAbsolutePath());
+                                    if (title.getThumb().length() > 0)
+                                        title.setThumb(f.getAbsolutePath() + '/' + title.getThumb());
+                                    titles.add(title);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                    title.setPath(f.getAbsolutePath());
+                                    titles.add(title);
+                                }
+
+                            } else {
                                 Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
                                 title.setPath(f.getAbsolutePath());
                                 titles.add(title);
                             }
-
-                        } else{
-                            Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
-                            title.setPath(f.getAbsolutePath());
-                            titles.add(title);
                         }
                     }
+                    //add titles to adapter
                 }
-                //add titles to adapter
             }
             return null;
         }
@@ -314,19 +360,22 @@ public class RecyclerFragment extends Fragment {
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                switch (which){
-                                    case DialogInterface.BUTTON_POSITIVE:
+                                if(which == DialogInterface.BUTTON_POSITIVE){
                                         //Yes button clicked
-                                        File folder = new File(p.getHomeDir(), filterFolder(title.getName()));
-                                        if(deleteRecursive(folder)) {
-                                            titleAdapter.remove(position);
-                                            Toast.makeText(getContext(),"삭제가 완료되었습니다.",Toast.LENGTH_SHORT).show();
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                            DocumentFile f = DocumentFile.fromTreeUri(getContext(), Uri.parse(p.getHomeDir()));
+                                            DocumentFile target = f.findFile(title.getName());
+                                            if(target != null && target.delete()){
+                                                titleAdapter.remove(position);
+                                                Toast.makeText(getContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                                            }else showPopup(getContext(), "알림", "삭제를 실패했습니다");
+                                        }else {
+                                            File folder = new File(p.getHomeDir(), filterFolder(title.getName()));
+                                            if (deleteRecursive(folder)) {
+                                                titleAdapter.remove(position);
+                                                Toast.makeText(getContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                                            } else showPopup(getContext(), "알림", "삭제를 실패했습니다");
                                         }
-                                        else showPopup(getContext(), "알림","삭제를 실패했습니다");
-                                        break;
-                                    case DialogInterface.BUTTON_NEGATIVE:
-                                        //No button clicked
-                                        break;
                                 }
                             }
                         };

@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,12 @@ import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
 import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
+
+import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
+
+import androidx.documentfile.provider.DocumentFile;
 
     /*
     mode:
@@ -235,25 +242,30 @@ import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
         return title;
     }
 
-    public List<String> getImgs(){
+    public List<String> getImgs(Context context){
         if(mode == 0) {
             return imgs;
         }else{
             if(imgs == null) {
                 imgs = new ArrayList<>();
                 //is offline : read image list
-                File[] offimgs = null;
-                switch (mode) {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        offimgs = offlinePath.listFiles();
-                        break;
-                }
-                Arrays.sort(offimgs);
-                for (File img : offimgs) {
-                    imgs.add(img.getAbsolutePath());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    DocumentFile[] offimgs = DocumentFile.fromTreeUri(context, Uri.parse(offlinePath)).listFiles();
+                    Arrays.sort(offimgs, new Comparator<DocumentFile>() {
+                        @Override
+                        public int compare(DocumentFile documentFile, DocumentFile t1) {
+                            return documentFile.getName().compareTo(t1.getName());
+                        }
+                    });
+                    for(DocumentFile f : offimgs){
+                        imgs.add(f.getUri().toString());
+                    }
+                }else {
+                    File[] offimgs = new File(offlinePath).listFiles();
+                    Arrays.sort(offimgs);
+                    for (File img : offimgs) {
+                        imgs.add(img.getAbsolutePath());
+                    }
                 }
             }
              return imgs;
@@ -292,11 +304,11 @@ import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
         return id;
     }
 
-    public void setOfflinePath(File offlinePath) {
+    public void setOfflinePath(String offlinePath) {
         this.offlinePath = offlinePath;
     }
 
-    public File getOfflinePath(){
+    public String getOfflinePath(){
         return this.offlinePath;
     }
 
@@ -362,7 +374,7 @@ import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
     List<Manga> eps;
     List<String> imgs;
     List<Comment> comments, bcomments;
-    File offlinePath;
+    String offlinePath;
     String thumb;
     Title title;
     String date;

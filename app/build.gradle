@@ -20,13 +20,13 @@ android {
     def date = new Date()
     def formattedDate = date.format('YYMMdd')
     // integer max value is 2147483647
-    def code = formattedDate.toInteger() + 2112000000 + 1
+    def code = formattedDate.toInteger() + 2112000000
     defaultConfig {
         applicationId "ml.melun.mangaview"
         minSdkVersion 17
         targetSdkVersion 31
         versionName "4.5-" + code
-        versionCode code
+        versionCode code-9000
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -53,6 +53,7 @@ repositories {
 
 dependencies {
 //    implementation 'androidx.work:work-runtime-ktx:2.7.0'
+    implementation "androidx.documentfile:documentfile:1.0.1"
     implementation 'ch.acra:acra-dialog:5.8.4'
     implementation 'ch.acra:acra-mail:5.8.4'
     implementation 'androidx.appcompat:appcompat:1.4.1'

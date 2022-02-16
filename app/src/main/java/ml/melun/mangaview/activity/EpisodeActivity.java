@@ -3,14 +3,18 @@ package ml.melun.mangaview.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
@@ -46,7 +50,6 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getOfflineEpisodes;
-import static ml.melun.mangaview.Utils.mangaSerializer;
 import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
@@ -70,7 +73,6 @@ public class EpisodeActivity extends AppCompatActivity {
     Intent viewer;
     ActionBar actionBar;
     String homeDir;
-    List<File> offlineEpisodes;
     int mode = 0;
     FloatingActionButton resumefab;
     ProgressBar progress;
@@ -167,87 +169,93 @@ public class EpisodeActivity extends AppCompatActivity {
             episodes = new ArrayList<>();
 
             //get child folder list of title dir
-            offlineEpisodes = getOfflineEpisodes(title.getPath());
-            //read ids and folder names
-            File titleDir = new File(title.getPath());
-            File oldData = new File(titleDir,"title.data");
-            File data = new File(titleDir,"title.gson");
-            if(oldData.exists()){
-                mode = 2;
-                p.addRecent(title);
-                //read file to string
-                StringBuilder raw = new StringBuilder();
-                try {
-                    BufferedReader br = new BufferedReader(new FileReader(oldData));
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        raw.append(line);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                //scoped storage
+                DocumentFile titleDir = DocumentFile.fromTreeUri(context, Uri.parse(title.getPath()));
+                DocumentFile data = titleDir.findFile("title.gson");
+                if(data!=null){
+                    mode = 3;
+                    if (!title.useBookmark()) {
+                        // is migrated
+                        mode = 4;
+                    } else {
+                        p.addRecent(title);
                     }
-                    br.close();
-                    JSONObject json = new JSONObject(raw.toString());
-                    JSONArray ids = json.getJSONArray("ids");
-                    if(offlineEpisodes != null)
-                        for(int i=0; i<offlineEpisodes.size();i++){
-                            Manga manga;
-                            String episodeName = offlineEpisodes.get(i).getName();
-                            try {
-                                //real index starts from [ 0001 ]
-                                int realIndex = Integer.parseInt(episodeName.split("\\.")[0])-1;
-                                int id = ids.getInt(realIndex);
-                                manga = new Manga(id, episodeName, String.valueOf(id), title.getBaseMode());
-                            }catch(Exception e){
-                                manga = new Manga(-1,episodeName, "", title.getBaseMode());
+
+                    episodes = title.getEps();
+                    for(DocumentFile f : getOfflineEpisodes(titleDir)){
+                        String name = f.getName();
+                        try {
+                            int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)), "", "", title.getBaseMode()));
+                            if (index > -1) {
+                                episodes.get(index).setOfflinePath(f.getUri().toString());
+                                episodes.get(index).setMode(mode);
                             }
-                            manga.setMode(mode);
-                            manga.setOfflinePath(offlineEpisodes.get(i));
-                            episodes.add(manga);
+                        } catch (Exception e) {
+                            // folder name is not properly formatted
                         }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }else if(data.exists()){
-                mode = 3;
+                    }
+                    //for loop to remove non-existing episodes
+                    if (episodes != null)
+                        for (int i = episodes.size() - 1; i >= 0; i--) {
+                            if (episodes.get(i).getOfflinePath() == null) episodes.remove(i);
+                        }
 
-                if(!title.useBookmark()){
-                    // is migrated
-                   mode = 4;
                 }else{
-                    p.addRecent(title);
+                    mode = 1;
+                    for(DocumentFile f : getOfflineEpisodes(titleDir)){
+                        Manga m = new Manga(-1, f.getName(), "", title.getBaseMode());
+                        m.setMode(mode);
+                        m.setOfflinePath(f.toString());
+                    }
                 }
+            }else {
 
-                episodes =  title.getEps();
-                offlineEpisodes = new ArrayList<>();
-                for(File folder : getOfflineEpisodes(title.getPath())){
-                    //get id from listContent
-                    String name = folder.getName();
-                    try {
-                        int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)),"","", title.getBaseMode()));
-                        if(index>-1){
-                            episodes.get(index).setOfflinePath(folder);
-                            episodes.get(index).setMode(mode);
+                //read ids and folder names
+                File titleDir = new File(title.getPath());
+                File data = new File(titleDir, "title.gson");
+                if (data.exists()) {
+                    mode = 3;
+
+                    if (!title.useBookmark()) {
+                        // is migrated
+                        mode = 4;
+                    } else {
+                        p.addRecent(title);
+                    }
+
+                    episodes = title.getEps();
+                    for (File folder : getOfflineEpisodes(title.getPath())) {
+                        //get id from listContent
+                        String name = folder.getName();
+                        try {
+                            int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)), "", "", title.getBaseMode()));
+                            if (index > -1) {
+                                episodes.get(index).setOfflinePath(folder.getAbsolutePath());
+                                episodes.get(index).setMode(mode);
+                            }
+                        } catch (Exception e) {
+                            // folder name is not properly formatted
                         }
-                    }catch(Exception e){
-                        // folder name is not properly formatted
                     }
-                }
-                //for loop to remove non-existing episodes
-                if(episodes != null)
-                    for(int i = episodes.size()-1;i>=0 ;i--){
-                        if(episodes.get(i).getOfflinePath()==null) episodes.remove(i);
-                    }
+                    //for loop to remove non-existing episodes
+                    if (episodes != null)
+                        for (int i = episodes.size() - 1; i >= 0; i--) {
+                            if (episodes.get(i).getOfflinePath() == null) episodes.remove(i);
+                        }
 
-            } else {
-                mode = 1;
-                for (File f : offlineEpisodes) {
-                    Manga manga;
-                    manga = new Manga(-1, f.getName(), "", title.getBaseMode());
-                    manga.setMode(mode);
-                    manga.setOfflinePath(f);
-                    //add local images to manga
-                    episodes.add(manga);
-                    // set eps to title object
-                    title.setEps(episodes);
+                } else {
+                    mode = 1;
+                    for (File f : getOfflineEpisodes(title.getPath())) {
+                        Manga manga;
+                        manga = new Manga(-1, f.getName(), "", title.getBaseMode());
+                        manga.setMode(mode);
+                        manga.setOfflinePath(f.getAbsolutePath());
+                        //add local images to manga
+                        episodes.add(manga);
+                        // set eps to title object
+                        title.setEps(episodes);
+                    }
                 }
             }
             //set up adapter
@@ -436,8 +444,8 @@ public class EpisodeActivity extends AppCompatActivity {
                 viewer = new Intent(context, ViewerActivity2.class);
                 break;
         }
-        viewer.putExtra("manga", mangaSerializer().toJson(manga));
-        viewer.putExtra("title", mangaSerializer().toJson(title));
+        viewer.putExtra("manga", new Gson().toJson(manga));
+        viewer.putExtra("title", new Gson().toJson(title));
         viewer.putExtra("recent",true);
         startActivityForResult(viewer, code);
     }

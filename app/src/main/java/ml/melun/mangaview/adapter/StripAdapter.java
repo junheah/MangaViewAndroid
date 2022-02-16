@@ -88,7 +88,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         int prevsize = items.size();
         if(items.size() == 0)
             items.add(new InfoItem(m.prevEp(), m));
-        List<String> imgs = m.getImgs();
+        List<String> imgs = m.getImgs(mainContext);
         for(int i=0; i<imgs.size(); i++){
             items.add(new PageItem(i,imgs.get(i),m));
             if(autoCut)
@@ -108,7 +108,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return;
         }
         int prevsize = items.size();
-        List<String> imgs = m.getImgs();
+        List<String> imgs = m.getImgs(mainContext);
         for(int i=imgs.size()-1; i>=0; i--){
             if(autoCut)
                 items.add(new PageItem(0,imgs.get(i),m,PageItem.SECOND));
