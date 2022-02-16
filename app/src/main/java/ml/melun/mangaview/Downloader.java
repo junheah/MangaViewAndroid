@@ -108,10 +108,10 @@ public class Downloader extends Service {
             notificationManager.createNotificationChannel(mchannel);
         }
         Intent notificationIntent = new Intent(this, MainActivity.class);
-        pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
         Intent previousIntent = new Intent(this, Downloader.class);
         previousIntent.setAction(ACTION_STOP);
-        stopIntent = PendingIntent.getService(this, 0, previousIntent, 0);
+        stopIntent = PendingIntent.getService(this, 0, previousIntent, PendingIntent.FLAG_IMMUTABLE);
         startNotification();
     }
 

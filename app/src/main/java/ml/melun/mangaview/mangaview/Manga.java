@@ -293,6 +293,7 @@ import static ml.melun.mangaview.mangaview.Title.LOAD_OK;
     }
 
     public void setOfflinePath(File offlinePath) {
+            System.out.println("ppppp set " + offlinePath.getAbsolutePath());
         this.offlinePath = offlinePath;
     }
 
