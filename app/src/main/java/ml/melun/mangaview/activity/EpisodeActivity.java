@@ -46,6 +46,7 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getOfflineEpisodes;
+import static ml.melun.mangaview.Utils.mangaSerializer;
 import static ml.melun.mangaview.Utils.requestLogin;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
@@ -207,7 +208,6 @@ public class EpisodeActivity extends AppCompatActivity {
                 }
             }else if(data.exists()){
                 mode = 3;
-                System.out.println(title);
 
                 if(!title.useBookmark()){
                     // is migrated
@@ -425,6 +425,7 @@ public class EpisodeActivity extends AppCompatActivity {
     public void openViewer(Manga manga, int code){
         manga.setMode(mode);
         Intent viewer = null;
+        System.out.println("pppp open viewer! " + manga.getOfflinePath().getAbsolutePath());
         switch (p.getViewerType()){
             case 0:
                 viewer = new Intent(context, ViewerActivity.class);
@@ -436,8 +437,9 @@ public class EpisodeActivity extends AppCompatActivity {
                 viewer = new Intent(context, ViewerActivity2.class);
                 break;
         }
-        viewer.putExtra("manga", new Gson().toJson(manga));
-        viewer.putExtra("title", new Gson().toJson(title));
+        viewer.putExtra("manga", mangaSerializer().toJson(manga));
+        viewer.putExtra("title", mangaSerializer().toJson(title));
+        System.out.println("ppp title serial " + mangaSerializer().toJson(title));
         viewer.putExtra("recent",true);
         startActivityForResult(viewer, code);
     }

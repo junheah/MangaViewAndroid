@@ -51,6 +51,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
+import static ml.melun.mangaview.Utils.mangaDeserializer;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -220,13 +221,13 @@ public class ViewerActivity3 extends AppCompatActivity {
 
         try {
             intent = getIntent();
-            title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+            title = mangaDeserializer().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
             }.getType());
             if(savedInstanceState == null) {
-                manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
+                manga = mangaDeserializer().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
             }else{
-                manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
+                manga = mangaDeserializer().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }
 

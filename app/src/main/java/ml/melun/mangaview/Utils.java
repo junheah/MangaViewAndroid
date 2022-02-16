@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
@@ -57,6 +58,8 @@ import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
+import ml.melun.mangaview.gson.MangaDeserializer;
+import ml.melun.mangaview.gson.MangaSerializer;
 import ml.melun.mangaview.interfaces.IntegerCallback;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Login;
@@ -844,6 +847,18 @@ public class Utils {
         Arrays.sort(episodeFiles);
         //add as manga
         return Arrays.asList(episodeFiles);
+    }
+
+    public static Gson mangaSerializer(){
+        return new GsonBuilder()
+                .registerTypeAdapter(new TypeToken<Manga>() {}.getType(), new MangaSerializer())
+                .create();
+    }
+
+    public static Gson mangaDeserializer(){
+        return new GsonBuilder()
+                .registerTypeAdapter(new TypeToken<Manga>() {}.getType(), new MangaDeserializer())
+                .create();
     }
 
 }
