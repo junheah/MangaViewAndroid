@@ -15,11 +15,12 @@ public class MangaSerializer implements JsonSerializer<Manga> {
     @Override
     public JsonElement serialize(Manga src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject obj = new Gson().toJsonTree(src).getAsJsonObject();
-        obj.remove("offlinePath");
-        JsonObject file = new JsonObject();
-        file.addProperty("path", src.getOfflinePath().getAbsolutePath());
-        obj.add("offlinePath",file);
-        System.out.println("ppp serial " + obj.toString());
+        if(!src.isOnline()) {
+            obj.remove("offlinePath");
+            JsonObject file = new JsonObject();
+            file.addProperty("path", src.getOfflinePath().getAbsolutePath());
+            obj.add("offlinePath", file);
+        }
         return obj;
     }
 }

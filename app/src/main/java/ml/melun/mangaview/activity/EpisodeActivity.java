@@ -425,7 +425,6 @@ public class EpisodeActivity extends AppCompatActivity {
     public void openViewer(Manga manga, int code){
         manga.setMode(mode);
         Intent viewer = null;
-        System.out.println("pppp open viewer! " + manga.getOfflinePath().getAbsolutePath());
         switch (p.getViewerType()){
             case 0:
                 viewer = new Intent(context, ViewerActivity.class);
@@ -439,7 +438,6 @@ public class EpisodeActivity extends AppCompatActivity {
         }
         viewer.putExtra("manga", mangaSerializer().toJson(manga));
         viewer.putExtra("title", mangaSerializer().toJson(title));
-        System.out.println("ppp title serial " + mangaSerializer().toJson(title));
         viewer.putExtra("recent",true);
         startActivityForResult(viewer, code);
     }

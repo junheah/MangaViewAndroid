@@ -20,7 +20,7 @@ android {
     def date = new Date()
     def formattedDate = date.format('YYMMdd')
     // integer max value is 2147483647
-    def code = formattedDate.toInteger() + 2112000000
+    def code = formattedDate.toInteger() + 2112000000 + 1
     defaultConfig {
         applicationId "ml.melun.mangaview"
         minSdkVersion 17
