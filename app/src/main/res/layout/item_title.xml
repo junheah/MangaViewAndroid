@@ -170,7 +170,7 @@
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <Button
+            <ImageButton
                 android:background="@android:color/darker_gray"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center"
@@ -179,7 +179,7 @@
                 android:layout_width="40dp"
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
-                android:text="이\n어\n보\n기"
+                app:srcCompat="@drawable/play"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="13sp"

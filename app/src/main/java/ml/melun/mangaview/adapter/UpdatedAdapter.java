@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -97,7 +98,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         ImageView thumb;
         CardView card;
         ImageView seen, fav;
-        Button viewEps;
+        ImageButton viewEps;
         TextView author;
         TextView tags;
         View tagContainer;

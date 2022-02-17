@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -213,7 +214,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         TextView tags;
         TextView recommend_c, battery_c, comment_c, bookmark_c;
         TextView baseModeStr;
-        Button resume;
+        ImageButton resume;
         CardView card;
 
         View tagContainer;

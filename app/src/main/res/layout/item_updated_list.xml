@@ -99,7 +99,7 @@
                 app:layout_constraintHeight_min="16sp"
                 app:layout_constraintTop_toBottomOf="@+id/Title" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:background="@android:color/darker_gray"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:id="@+id/epsButton"
@@ -108,7 +108,7 @@
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
                 android:textAlignment="center"
-                android:text="전\n편\n보\n기"
+                app:srcCompat="@drawable/ic_baseline_library_books_24"
                 android:textSize="13sp"
                 android:textColor="@android:color/white"
                 android:visibility="visible"
