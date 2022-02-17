@@ -72,8 +72,14 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Uri uri = Uri.parse(p.getHomeDir());
-                DocumentFile t = DocumentFile.fromTreeUri(context, uri);
-                output.setText("path : " + t.getUri() + "\ncan read : " + t.canRead() + "\ncan write : " + t.canWrite());
+                output.append("current home dir : "+p.getHomeDir()+"\n\n");
+                try {
+                    DocumentFile t = DocumentFile.fromTreeUri(context, uri);
+                    output.append("path : " + t.getUri() + "\ncan read : " + t.canRead() + "\ncan write : " + t.canWrite()+"\n");
+                }catch (Exception e){
+                    if(e.getMessage() != null)
+                        output.append(e.getMessage()+"\n");
+                }
             }
         });
 

@@ -11,9 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.documentfile.provider.DocumentFile;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -33,11 +35,14 @@ import java.io.File;
 import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
+import ml.melun.mangaview.interfaces.StringCallback;
 
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.openDirectory;
+import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 import static ml.melun.mangaview.Utils.readPreferenceFromFile;
 import static ml.melun.mangaview.Utils.showPopup;
+import static ml.melun.mangaview.Utils.showStringInputPopup;
+import static ml.melun.mangaview.Utils.showYesNoPopup;
 import static ml.melun.mangaview.Utils.writePreferenceToFile;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SELECT;
@@ -70,8 +75,13 @@ public class SettingsActivity extends AppCompatActivity {
         s_setHomeDir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    openDirectory(context, null, MODE_FOLDER_SELECT);
+                if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
+                    // Choose a directory using the system's file picker.
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    Uri uri = Uri.parse(p.getHomeDir());
+                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+                    Toast.makeText(context, "다운로드 위치를 선택해 주세요", Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent, MODE_FOLDER_SELECT);
                 }else{
                     Intent intent = new Intent(context, FolderSelectActivity.class);
                     startActivityForResult(intent, MODE_FOLDER_SELECT);
@@ -381,20 +391,38 @@ public class SettingsActivity extends AppCompatActivity {
         this.findViewById(R.id.setting_dataExport).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, FolderSelectActivity.class);
-                intent.putExtra("mode", MODE_FILE_SAVE);
-                intent.putExtra("title", "파일 저장");
-                startActivityForResult(intent, MODE_FILE_SAVE);
+                if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                    Uri uri = Uri.parse(p.getHomeDir());
+                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+                    Toast.makeText(context, "백업 파일을 저장할 폴더를 선택해 주세요", Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent, MODE_FILE_SAVE);
+                }else{
+                    Intent intent = new Intent(context, FolderSelectActivity.class);
+                    intent.putExtra("mode", MODE_FILE_SAVE);
+                    intent.putExtra("title", "파일 저장");
+                    startActivityForResult(intent, MODE_FILE_SAVE);
+                }
             }
         });
 
         this.findViewById(R.id.setting_dataImport).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, FolderSelectActivity.class);
-                intent.putExtra("mode", MODE_FILE_SELECT);
-                intent.putExtra("title", "파일 선택");
-                startActivityForResult(intent, MODE_FILE_SELECT);
+                if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    Uri uri = Uri.parse(p.getHomeDir());
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("application/*");
+                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
+                    Toast.makeText(context, "백업 파일 선택", Toast.LENGTH_SHORT).show();
+                    startActivityForResult(intent, MODE_FILE_SELECT);
+                }else {
+                    Intent intent = new Intent(context, FolderSelectActivity.class);
+                    intent.putExtra("mode", MODE_FILE_SELECT);
+                    intent.putExtra("title", "파일 선택");
+                    startActivityForResult(intent, MODE_FILE_SELECT);
+                }
             }
         });
 
@@ -504,15 +532,75 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (resultCode == Activity.RESULT_OK) {
+        if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                final Uri uri = data.getData();
                 switch (requestCode) {
                     case MODE_FOLDER_SELECT:
-                        Uri uri = null;
-                        if (data != null) uri = data.getData();
                         getContentResolver().takePersistableUriPermission(uri, (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION));
-                        System.out.println(uri.toString());
                         p.setHomeDir(uri.toString());
+                        break;
+                    case MODE_FILE_SAVE:
+                        showStringInputPopup(context, "백업 파일 이름", new StringCallback() {
+                            @Override
+                            public void callback(String s) {
+                                DocumentFile d = DocumentFile.fromTreeUri(context, uri);
+                                if(!s.endsWith(".mvpref")) s += ".mvpref";
+
+                                final DocumentFile target = d.findFile(s);
+                                if(target != null){
+                                    String finalS = s;
+                                    showYesNoPopup(context, "파일이 이미 존재합니다.", "덮어 쓸까요?", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            target.delete();
+                                            if (writePreferenceToFile(context, d.createFile("application", finalS).getUri()))
+                                                Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
+                                            else
+                                                Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
+                                        }
+                                    }, null, null);
+                                } else {
+                                    if (writePreferenceToFile(context, d.createFile("application", s).getUri()))
+                                        Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
+                                    else
+                                        Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }, p.getDarkTheme());
+                        break;
+                    case MODE_FILE_SELECT:
+                        showYesNoPopup(context, "데이터 불러오기", "이 작업은 되돌릴 수 없습니다.\n복원을 진행 하시겠습니까?", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (readPreferenceFromFile(p, context, uri)) {
+                                    setResult(RESULT_NEED_RESTART);
+                                    showPopup(context, "데이터 불러오기", "데이터 불러오기를 성공했습니다. 변경사항을 적용하기 위해 앱을 재시작 합니다.", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            finish();
+                                        }
+                                    }, new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialogInterface) {
+                                            finish();
+                                        }
+                                    });
+                                } else
+                                    Toast.makeText(context, "불러오기 실패", Toast.LENGTH_LONG).show();
+
+                            }
+                        }, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(context,"취소되었습니다", Toast.LENGTH_SHORT).show();
+                            }
+                        }, new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                Toast.makeText(context,"취소되었습니다", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         break;
                 }
             }
@@ -543,7 +631,6 @@ public class SettingsActivity extends AppCompatActivity {
                             Toast.makeText(context, "설정 완료!", Toast.LENGTH_LONG).show();
                             break;
                         case MODE_FILE_SAVE:
-
                             if (writePreferenceToFile(context, new File(path)))
                                 Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
                             else

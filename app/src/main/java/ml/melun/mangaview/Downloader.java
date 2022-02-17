@@ -48,9 +48,9 @@ import ml.melun.mangaview.mangaview.Cloudflare;
 import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.Manga;
-import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 import static ml.melun.mangaview.Utils.filterFolder;
 import static ml.melun.mangaview.Utils.getDefHomeDir;
 
@@ -92,8 +92,7 @@ public class Downloader extends Service {
         serviceContext = this;
         if(titles==null) titles = new ArrayList<>();
         if(selected==null) selected = new ArrayList<>();
-        homeDir = serviceContext.getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir",
-                getDefHomeDir(serviceContext).getAbsolutePath());
+        homeDir = serviceContext.getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("homeDir", "");
         baseUrl = serviceContext.getSharedPreferences("mangaView",Context.MODE_PRIVATE).getString("url", "");
         if(dt==null) dt = new downloadTitle();
         //android O bullshit
@@ -286,10 +285,10 @@ public class Downloader extends Service {
             running = true;
         }
         protected Integer doInBackground(Void... params) {
-            try {
-                File home = null;
-                DocumentFile homed = null;
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            File home = null;
+            DocumentFile homed = null;
+            try{
+                if(Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE){
                     homed = DocumentFile.fromTreeUri(serviceContext, Uri.parse(homeDir));
                     if(homed == null){
                         this.cancel(true);
@@ -302,6 +301,12 @@ public class Downloader extends Service {
                         return 1;
                     }
                 }
+            }catch (Exception e){
+                //home folder not set
+                this.cancel(true);
+                return 4;
+            }
+            try {
                 while (titles.size() > 0) {
                     //reset progress
                     progress = 0;
@@ -321,7 +326,7 @@ public class Downloader extends Service {
                     for (int queueIndex = selectedEps.length()-1; queueIndex >= 0; queueIndex--) {
                         if (isCancelled()) return 0;
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
                             //scoped storage
                             DocumentFile titleDir = homed.findFile(filterFolder(title.getName()));
                             if(titleDir == null) titleDir = homed.createDirectory(filterFolder(title.getName()));
@@ -553,6 +558,9 @@ public class Downloader extends Service {
                     break;
                 case 3:
                     why = "예상치 못한 오류";
+                    break;
+                case 4:
+                    why = "다운로드 위치를 설정해 주세요";
                     break;
             }
             notificationManager.cancel(nid);

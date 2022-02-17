@@ -16,6 +16,7 @@ import org.jsoup.nodes.Element;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
@@ -249,7 +250,7 @@ import androidx.documentfile.provider.DocumentFile;
             if(imgs == null) {
                 imgs = new ArrayList<>();
                 //is offline : read image list
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
                     DocumentFile[] offimgs = DocumentFile.fromTreeUri(context, Uri.parse(offlinePath)).listFiles();
                     Arrays.sort(offimgs, new Comparator<DocumentFile>() {
                         @Override

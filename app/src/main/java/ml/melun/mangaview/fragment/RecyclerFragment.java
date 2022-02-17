@@ -29,7 +29,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +41,7 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static android.app.Activity.RESULT_OK;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 import static ml.melun.mangaview.Utils.deleteRecursive;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.filterFolder;
@@ -194,7 +194,7 @@ public class RecyclerFragment extends Fragment {
         @Override
         protected Integer doInBackground(Void... voids) {
             titles = new ArrayList<>();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
                 //scoped storage
                 Uri uri = Uri.parse(p.getHomeDir());
                 DocumentFile home;
@@ -204,7 +204,7 @@ public class RecyclerFragment extends Fragment {
                     //home not set
                     return null;
                 }
-                if(home.exists() && home.canRead()){
+                if(home != null && home.canRead()){
                     for(DocumentFile f : home.listFiles()){
                         if(f.isDirectory()) {
                             DocumentFile d = f.findFile("title.gson");
@@ -362,7 +362,7 @@ public class RecyclerFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 if(which == DialogInterface.BUTTON_POSITIVE){
                                         //Yes button clicked
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                        if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
                                             DocumentFile f = DocumentFile.fromTreeUri(getContext(), Uri.parse(p.getHomeDir()));
                                             DocumentFile target = f.findFile(title.getName());
                                             if(target != null && target.delete()){

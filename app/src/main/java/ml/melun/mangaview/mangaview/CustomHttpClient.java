@@ -1,8 +1,6 @@
 package ml.melun.mangaview.mangaview;
 
 
-import android.os.Build;
-
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -19,7 +17,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import ml.melun.mangaview.Preference;
 import okhttp3.CipherSuite;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
@@ -28,6 +25,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 
 public class CustomHttpClient {
     public OkHttpClient client;
@@ -36,7 +34,7 @@ public class CustomHttpClient {
     public CustomHttpClient(){
         System.out.println("http client create");
         this.cookies = new HashMap<>();
-        if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if(android.os.Build.VERSION.SDK_INT < CODE_SCOPED_STORAGE) {
             // Necessary because our servers don't have the right cipher suites.
             // https://github.com/square/okhttp/issues/4053
             List<CipherSuite> cipherSuites = new ArrayList<>();

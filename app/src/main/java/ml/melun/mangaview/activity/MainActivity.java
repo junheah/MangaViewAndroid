@@ -66,6 +66,7 @@ import static ml.melun.mangaview.Migrator.MIGRATE_RESULT;
 import static ml.melun.mangaview.Migrator.MIGRATE_START;
 import static ml.melun.mangaview.Migrator.MIGRATE_STOP;
 import static ml.melun.mangaview.Migrator.MIGRATE_SUCCESS;
+import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.showYesNoNeutralPopup;
@@ -327,7 +328,7 @@ public class MainActivity extends AppCompatActivity
         //check for permission
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+            if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE){
                 //doesn't have to do anything
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE},
@@ -339,9 +340,10 @@ public class MainActivity extends AppCompatActivity
 
         // set initial tab
         startTab = p.getStartTab();
-        if(savedInstanceState != null)
-            changeFragment(savedInstanceState.getInt("currentTab", 0));
-        else
+        if(savedInstanceState != null) {
+            int t = savedInstanceState.getInt("currentTab", 0);
+            changeFragment(t>-1 ? t : 0);
+        }else
             changeFragment(startTab);
 
 

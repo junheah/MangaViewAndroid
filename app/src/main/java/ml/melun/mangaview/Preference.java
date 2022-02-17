@@ -73,7 +73,7 @@ public class Preference {
             if(recent==null) recent = new ArrayList<>();
             favorite = gson.fromJson(sharedPref.getString("favorite", ""),new TypeToken<ArrayList<MTitle>>(){}.getType());
             if(favorite==null) favorite = new ArrayList<>();
-            homeDir = sharedPref.getString("homeDir", getDefHomeDir(mcontext).getAbsolutePath());
+            homeDir = sharedPref.getString("homeDir", "");
             prevPageKey = sharedPref.getInt("prevPageKey", -1);
             nextPageKey = sharedPref.getInt("nextPageKey", -1);
             pagebookmark = new JSONObject(sharedPref.getString("bookmark", "{}"));

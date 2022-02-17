@@ -49,6 +49,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +67,7 @@ import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
 import ml.melun.mangaview.interfaces.IntegerCallback;
+import ml.melun.mangaview.interfaces.StringCallback;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.MTitle;
@@ -485,7 +487,8 @@ public class Utils {
 
     private static void showStackTrace(Context context, Exception e){
         StringBuilder sbuilder = new StringBuilder();
-        sbuilder.append(e.getMessage()+"\n");
+        if(e.getMessage() != null)
+            sbuilder.append(e.getMessage()+"\n");
         for(StackTraceElement s : e.getStackTrace()){
             sbuilder.append(s+"\n");
         }
@@ -663,6 +666,19 @@ public class Utils {
         return true;
     }
 
+    public static boolean writePreferenceToFile(Context c, Uri uri){
+        try {
+            OutputStream stream = c.getContentResolver().openOutputStream(uri);
+            stream.write(readPref(c).getBytes());
+            stream.flush();
+            stream.close();
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public static void jsonToPref(Context c, CustomJSONObject data){
         SharedPreferences.Editor editor = c.getSharedPreferences("mangaView", Context.MODE_PRIVATE).edit();
         editor.putString("recent",data.getJSONArray("recent", new JSONArray()).toString());
@@ -693,6 +709,18 @@ public class Utils {
     public static boolean readPreferenceFromFile(Preference p, Context c, File f){
         try {
             CustomJSONObject data = new CustomJSONObject(readFileToString(f));
+            jsonToPref(c, data);
+            p.init(c);
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean readPreferenceFromFile(Preference p, Context c, Uri uri){
+        try {
+            CustomJSONObject data = new CustomJSONObject(readUriToString(c, uri));
             jsonToPref(c, data);
             p.init(c);
         }catch (Exception e){
@@ -840,6 +868,30 @@ public class Utils {
         alert.show();
     }
 
+    public static void showStringInputPopup(Context context, String title, StringCallback callback, boolean dark){
+        AlertDialog.Builder alert;
+        if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
+        else alert = new AlertDialog.Builder(context);
+
+        alert.setTitle(title);
+        final EditText input = new EditText(context);
+        alert.setView(input);
+        alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int button) {
+                //이동 시
+                if(input.getText().length()>0) {
+                    callback.callback(input.getText().toString());
+                }
+            }
+        });
+        alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int button) {
+                //취소 시
+            }
+        });
+        alert.show();
+    }
+
     public static List<File> getOfflineEpisodes(String path){
         System.out.println(path);
         File[] episodeFiles = new File(path).listFiles(new FileFilter() {
@@ -868,17 +920,6 @@ public class Utils {
         return res;
     }
 
-    public static void openDirectory(Context context, Uri uriToLoad, int code) {
-        // Choose a directory using the system's file picker.
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-
-        // Optionally, specify a URI for the directory that should be opened in
-        // the system file picker when it loads.
-        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uriToLoad);
-
-        ((Activity)context).startActivityForResult(intent, code);
-    }
-
     public static String readUriToString(Context context, Uri uri){
         try {
             InputStream in = context.getContentResolver().openInputStream(uri);
@@ -893,5 +934,7 @@ public class Utils {
         }
         return "";
     }
+
+    public static final int CODE_SCOPED_STORAGE = 21;
 
 }
