@@ -53,7 +53,7 @@ repositories {
 
 dependencies {
 //    implementation 'androidx.work:work-runtime-ktx:2.7.0'
-    implementation "androidx.documentfile:documentfile:1.0.1"
+    implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'ch.acra:acra-dialog:5.8.4'
     implementation 'ch.acra:acra-mail:5.8.4'
     implementation 'androidx.appcompat:appcompat:1.4.1'
@@ -68,9 +68,6 @@ dependencies {
         // Excludes the support library because it's already included by Glide.
         transitive = false
     }
-
-    implementation "androidx.multidex:multidex:2.0.1"
-
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'

@@ -67,20 +67,36 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:gravity="bottom|left"
+                android:id="@+id/TitleAuthor"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:minLines="1"
+                android:singleLine="true"
+                android:text="작가"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/TitleTagContainer"
+                app:layout_constraintEnd_toStartOf="@+id/date"
+                app:layout_constraintHeight_min="15sp"
+                app:layout_constraintStart_toEndOf="@+id/Thumb"
+                app:layout_constraintTop_toBottomOf="@+id/Title" />
+
+            <TextView
                 android:id="@+id/date"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_margin="8sp"
-                android:layout_width="0dp"
+                android:gravity="bottom|right"
                 android:maxLines="1"
                 android:minHeight="16sp"
                 android:text="date"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="13sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/TitleTagContainer"
                 app:layout_constraintEnd_toStartOf="@+id/epsButton"
                 app:layout_constraintHeight_min="16sp"
-                app:layout_constraintStart_toEndOf="@+id/Thumb"
                 app:layout_constraintTop_toBottomOf="@+id/Title" />
 
             <Button
@@ -99,6 +115,49 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/TitleTagContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/favIcon"
+                app:layout_constraintStart_toEndOf="@+id/Thumb">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_tag" />
+
+                <TextView
+                    android:id="@+id/TitleBaseMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="만화"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text=" "
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/TitleTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="태그1 태그2 태그3"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ml.melun.mangaview.adapter.UpdatedAdapter;
 import okhttp3.Response;
 
 
 public class UpdatedList {
     Boolean last = false;
-    ArrayList<Manga> result;
+    ArrayList<UpdatedManga> result;
     int page = 1;
     int baseMode;
 
@@ -64,11 +65,16 @@ public class UpdatedList {
 
                         String date = rightInfo.get(1).selectFirst("span").ownText();
 
-                        List<String> tags = Arrays.asList(item.selectFirst("div.post-text").ownText().split(","));
 
-                        Manga tmp = new Manga(id, name, date, baseMode);
+                        String at = item.selectFirst("div.post-text").ownText();
+                        //작가 작가 태그1,태그2,태그3
+                        String author = at.substring(0,at.lastIndexOf(' '));
+
+                        List<String> tags = Arrays.asList(at.substring(at.lastIndexOf(' ')).split(","));
+
+                        UpdatedManga tmp = new UpdatedManga(id, name, date, baseMode,author,tags);
                         tmp.setMode(0);
-                        tmp.setTitle(new Title(name, img, "", new ArrayList<String>(), "", tid, MTitle.base_comic));
+                        tmp.setTitle(new Title(name, img, author, tags, "", tid, MTitle.base_comic));
                         tmp.addThumb(img);
                         result.add(tmp);
                     }catch(Exception e){
@@ -84,7 +90,7 @@ public class UpdatedList {
         }
     }
 
-    public ArrayList<Manga> getResult() {
+    public ArrayList<UpdatedManga> getResult() {
         return result;
     }
     public boolean isLast(){return last;}

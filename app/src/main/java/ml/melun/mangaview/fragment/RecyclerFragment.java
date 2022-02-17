@@ -237,6 +237,8 @@ public class RecyclerFragment extends Fragment {
                 File homeDir = new File(p.getHomeDir());
                 if (homeDir.exists()) {
                     File[] files = homeDir.listFiles();
+                    if(files == null)
+                        return null;
                     for (File f : files) {
                         if (f.isDirectory()) {
                             File data = new File(f, "title.gson");
