@@ -34,7 +34,6 @@ import static ml.melun.mangaview.Utils.REQUEST_LOGIN;
 import static ml.melun.mangaview.Utils.episodeIntent;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.viewerIntent;
-import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 

@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,11 +91,13 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         viewHolder h = (viewHolder) holder;
         h.title.setText(mData.get(position).getName());
         String thumb = mData.get(position).getThumb();
+        h.thumb.setColorFilter(null);
         if(thumb != null && thumb.length()==0)
             h.thumb.setImageResource(android.R.color.transparent);
-        else if(thumb != null && thumb.equals("reload"))
+        else if(thumb != null && thumb.equals("reload")) {
             h.thumb.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_refresh));
-        else if(save)
+            h.thumb.setColorFilter(dark ? Color.WHITE : Color.DKGRAY);
+        }else if(save)
             h.thumb.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
         else
             Glide.with(context).load(thumb).into(h.thumb);

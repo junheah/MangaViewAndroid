@@ -9,12 +9,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.android.flexbox.FlexWrap;
+import com.google.android.flexbox.JustifyContent;
 import com.google.android.material.tabs.TabLayout;
 
 import ml.melun.mangaview.interfaces.MainActivityCallback;
-import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
 import ml.melun.mangaview.Utils;
@@ -24,6 +27,8 @@ import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.adapter.MainWebtoonAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
+import ml.melun.mangaview.ui.NpaFlexboxLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
@@ -132,7 +137,9 @@ public class MainMain extends Fragment{
         //main content
         // 최근 추가된 만화
         mainRecycler = rootView.findViewById(R.id.main_recycler);
-        mainRecycler.setLayoutManager(new NpaLinearLayoutManager(getContext()));
+        NpaFlexboxLayoutManager lm = new NpaFlexboxLayoutManager(getContext());
+        mainRecycler.setLayoutManager(lm);
+
 
         MainAdapter.onItemClick listener = new MainAdapter.onItemClick() {
 
@@ -150,7 +157,7 @@ public class MainMain extends Fragment{
             }
 
             @Override
-            public void clickedTag(String t) {
+            public void clickedGenre(String t) {
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
                 i.putExtra("query",t);
                 i.putExtra("mode",2);
@@ -188,6 +195,11 @@ public class MainMain extends Fragment{
             @Override
             public void clickedSearch(String query) {
                 mainActivityCallback.search(query);
+            }
+
+            @Override
+            public void clickedRetry() {
+                mainWebtoonAdapter.fetch();
             }
         };
 

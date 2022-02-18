@@ -43,7 +43,6 @@
         <item>주간</item>
         <item>격주</item>
         <item>월간</item>
-        <item>격월/비정기</item>
         <item>단편</item>
         <item>단행본</item>
         <item>완결</item>
@@ -51,33 +50,26 @@
     <string-array name="tag_genre">
         <item>17</item>
         <item>BL</item>
-        <item>GL</item>
         <item>SF</item>
         <item>TS</item>
         <item>개그</item>
         <item>게임</item>
-        <item>공포</item>
         <item>도박</item>
         <item>드라마</item>
         <item>라노벨</item>
         <item>러브코미디</item>
-        <item>로맨스</item>
         <item>먹방</item>
-        <item>미스터리</item>
         <item>백합</item>
         <item>붕탁</item>
-        <item>성인</item>
         <item>순정</item>
         <item>스릴러</item>
         <item>스포츠</item>
         <item>시대</item>
         <item>애니화</item>
         <item>액션</item>
-        <item>역사</item>
         <item>음악</item>
         <item>이세계</item>
         <item>일상</item>
-        <item>일상+치유</item>
         <item>전생</item>
         <item>추리</item>
         <item>판타지</item>

@@ -9,18 +9,25 @@ import java.util.ArrayList;
 import java.util.List;
 import okhttp3.Response;
 
-import static ml.melun.mangaview.Utils.getNumberFromString;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 
 public class MainPage {
     List<Manga> recent, favUpdate, onlineRecent;
-    List<Title> ranking;
+    List<RankingTitle> ranking;
+
+    public List<RankingManga> getWeeklyRanking() {
+        return weeklyRanking;
+    }
+
+    List<RankingManga> weeklyRanking;
 
     void fetch(CustomHttpClient client) {
 
         recent = new ArrayList<>();
         ranking = new ArrayList<>();
+        weeklyRanking = new ArrayList<>();
+
         favUpdate = new ArrayList<>();
         onlineRecent = new ArrayList<>();
 
@@ -55,14 +62,24 @@ public class MainPage {
                 recent.add(mtmp);
             }
 
+            int i=1;
             for(Element e : d.select("div.miso-post-gallery").last().select("div.post-row")){
                 id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
                 infos = e.selectFirst("div.img-item");
                 thumb = infos.selectFirst("img").attr("src");
                 name = infos.selectFirst("div.in-subject").ownText();
 
-                ttmp = new Title(name, thumb, "" , null, "", id, base_comic);
-                ranking.add(ttmp);
+                ranking.add(new RankingTitle(name, thumb, "" , null, "", id, base_comic, i++));
+            }
+
+            i=1;
+            for(Element e : d.select("div.miso-post-list").last().select("li.post-row")){
+                infos = e.selectFirst("a");
+                id = Integer.parseInt(infos.attr("href").split("comic/")[1]);
+                name = infos.ownText();
+
+                System.out.println(name);
+                weeklyRanking.add(new RankingManga(id, name, "", base_comic, i++));
             }
 
         }catch(Exception e){
@@ -107,6 +124,29 @@ public class MainPage {
 */
     }
 
+    public class RankingTitle extends Title{
+        int ranking;
+        public RankingTitle(String n, String t, String a, List<String> tg, String r, int id, int baseMode, int ranking) {
+            super(n, t, a, tg, r, id, baseMode);
+            this.ranking = ranking;
+        }
+
+        public int getRanking() {
+            return ranking;
+        }
+    }
+    public class RankingManga extends Manga{
+        int ranking;
+        public RankingManga(int i, String n, String d, int baseMode, int ranking) {
+            super(i, n, d, baseMode);
+            this.ranking = ranking;
+        }
+
+        public int getRanking() {
+            return ranking;
+        }
+    }
+
     void rankingWidgetLiParser(Elements input, List output){
         for(Element e: input){
             String[] tmp_link = e.selectFirst("a").attr("href").split("=");
@@ -131,5 +171,5 @@ public class MainPage {
         return onlineRecent;
     }
 
-    public List<Title> getRanking() { return ranking; }
+    public List<RankingTitle> getRanking() { return ranking; }
 }

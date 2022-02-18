@@ -10,7 +10,6 @@ import java.util.List;
 
 import ml.melun.mangaview.adapter.StripAdapter;
 import ml.melun.mangaview.model.PageItem;
-import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 
 public class StripLayoutManager extends NpaLinearLayoutManager {
     StripAdapter adapter;

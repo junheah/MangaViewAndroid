@@ -1,6 +1,7 @@
 package ml.melun.mangaview.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -10,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,20 +36,18 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     LayoutInflater mInflater, itemInflater;
     MainUpdatedAdapter uadapter;
     onItemClick mainClickListener;
-    MainTagAdapter nadapter, tadapter, radapter;
     boolean dark, loaded = false;
 
-    List<Manga> recent, favUpdate;
-    List<Title> ranking;
+    List<Object> data;
 
-    final static int ADDED = 0;
-    final static int NAME = 1;
-    final static int GENRE = 2;
-    final static int RELEASE = 3;
-    final static int UPDATE = 4;
-    final static int RECENT = 5;
-    final static int RANKING = 6;
+    final static int TITLE = 0;
+    final static int MANGA = 1;
+    final static int TAG = 2;
+    final static int HEADER = 3;
+    final static int UPDATED = 4;
 
+    ButtonHeader addh;
+    Header besth, updh, hish, weekh;
 
     public MainAdapter(Context main) {
         super();
@@ -57,164 +56,134 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.mInflater = LayoutInflater.from(main);
         this.itemInflater = LayoutInflater.from(main);
 
+        data = new ArrayList<>();
+
         uadapter = new MainUpdatedAdapter(main);
-        tadapter = new MainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_genre)), 0);
-        nadapter = new MainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_name)), 1);
-        radapter = new MainTagAdapter(main, Arrays.asList(mainContext.getResources().getStringArray(R.array.tag_release)), 2);
+        addh = new ButtonHeader("최근 추가된 만화", new Runnable() {
+            @Override
+            public void run() {
+                mainClickListener.clickedMoreUpdated();
+            }
+        });
 
+        data.add(addh);
+        data.add(null);
 
-        ranking = new ArrayList<>();
-        recent = new ArrayList<>();
-        favUpdate = new ArrayList<>();
+        updh = new Header("북마크 업데이트");
+        data.add(updh);
+
+        hish = new Header("최근에 본 만화");
+        data.add(hish);
+
+        weekh = new Header("주간 베스트");
+        data.add(weekh);
+
+        besth = new Header("일본만화 베스트");
+        data.add(besth);
+
+        data.add(new Header("이름"));
+        for(String s : mainContext.getResources().getStringArray(R.array.tag_name)){
+            data.add(new NameTag(s));
+        }
+        data.add(new Header("장르"));
+        for(String s : mainContext.getResources().getStringArray(R.array.tag_genre)){
+            data.add(new GenreTag(s));
+        }
+        data.add(new Header("발행"));
+        for(String s : mainContext.getResources().getStringArray(R.array.tag_release)){
+            data.add(new ReleaseTag(s));
+        }
 
         setHasStableIds(true);
-
+        notifyDataSetChanged();
         uadapter.setLoad("URL 업데이트중...");
     }
 
     public void fetch(){
         //fetch main page data
         uadapter.setLoad();
-        new fetchMain().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new MainFetcher().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
     public long getItemId(int position) {
-        return position;
+        if(data.get(position) == null) return -1;
+        return data.get(position).hashCode();
     }
 
 
     @Override
     public int getItemViewType(int position) {
-        int mRECENT = RECENT + favUpdate.size();
-        int mRANKING = RANKING + favUpdate.size() + recent.size();
-        if(position>=0 && position <=4) return position;
-        else if(position == mRECENT) return RECENT;
-        else if(position == mRANKING) return RANKING;
-        else return -1;
+        Object o = data.get(position);
+        if(o == null)
+            return UPDATED;
+        else if(o instanceof Title)
+            return TITLE;
+        else if(o instanceof Manga)
+            return MANGA;
+        else if(o instanceof Header)
+            return HEADER;
+        else if(o instanceof Tag)
+            return TAG;
+        return -1;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.main_tags, parent, false);
+        View v;
         switch (viewType){
-            case ADDED:
-                return new addedHolder(view);
-            case GENRE:
-                return new tagHolder(view);
-            case NAME:
-                return new nameHolder(view);
-            case RELEASE:
-                return new releaseHolder(view);
-            case RANKING:
-            case RECENT:
-            case UPDATE:
-                //return ranking title
-                View rankingTitle = mInflater.inflate(R.layout.main_item_title,parent,false);
-                return new rankingHolder(rankingTitle);
+            case TITLE:
+                v = mInflater.inflate(R.layout.main_item_ranking,parent,false);
+                return new TitleHolder(v);
+            case MANGA:
+                v = mInflater.inflate(R.layout.main_item_ranking,parent,false);
+                return new MangaHolder(v);
+            case HEADER:
+                v = mInflater.inflate(R.layout.item_main_header,parent,false);
+                return new HeaderHolder(v);
+            case UPDATED:
+                v = mInflater.inflate(R.layout.item_main_updated_list, parent, false);
+                return new AddedHolder(v);
+            case TAG:
+                v = mInflater.inflate(R.layout.item_main_tag,parent,false);
+                return new TagHolder(v);
         }
-        //ranking items
-        View rankingItem = mInflater.inflate(R.layout.main_item_ranking,parent,false);
-        return new rankingHolder(rankingItem);
-
+        return null;
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        int RECENT = this.RECENT + favUpdate.size();
-        int RANKING = this.RANKING + favUpdate.size() + recent.size();
-        if(position == ADDED){
-            addedHolder rh = (addedHolder) holder;
-            rh.title.setText("최근 추가된 만화 +");
-
-        }else if(position == GENRE){
-            tagHolder th = (tagHolder) holder;
-            th.title.setText("장르별");
-
-        }else if(position == NAME){
-            nameHolder nh = (nameHolder) holder;
-            nh.title.setText("이름별");
-
-        }else if(position == RELEASE){
-            releaseHolder rlh = (releaseHolder) holder;
-            rlh.title.setText("발행별");
-
-        }else if(position == UPDATE) {
-            rankingHolder rkh2 = (rankingHolder) holder;
-            rkh2.title.setText("북마크 업데이트");
-        }else if(position > UPDATE && position < RECENT){
-            //update item
-            rankingHolder h = (rankingHolder) holder;
-            h.setManga(favUpdate.get(position-UPDATE-1), 0);
-        }else if(position == RECENT){
-            rankingHolder rkh3 = (rankingHolder) holder;
-            rkh3.title.setText("최근에 본 만화");
-        }else if(position > RECENT && position < RANKING){
-            //recent item
-            rankingHolder h = (rankingHolder) holder;
-            h.setManga(recent.get(position-RECENT-1), 0);
-        }else if(position == RANKING) {
-            rankingHolder rkh = (rankingHolder) holder;
-            rkh.title.setText("일본만화 베스트");
-        }else if(position > RANKING){
-            //ranking item
-            rankingHolder h = (rankingHolder) holder;
-            h.setTitleObject(ranking.get(position-RANKING-1), position-RANKING);
+        int t = getItemViewType(position);
+        switch (t){
+            case TITLE:
+                ((TitleHolder)holder).setTitle((Title)data.get(position),0);
+                break;
+            case MANGA:
+                ((MangaHolder) holder).setManga((Manga)data.get(position),0);
+                break;
+            case HEADER:
+                ((HeaderHolder)holder).setHeader((Header)data.get(position));
+                break;
+            case UPDATED:
+                break;
+            case TAG:
+                ((TagHolder) holder).tag.setText(data.get(position).toString());
+                break;
         }
 
     }
 
     @Override
     public int getItemCount() {
-        return 7 + ranking.size() + favUpdate.size() + recent.size();
+        return data.size();
     }
 
-    public void updateRankingWidgets(){
-        int recentSize = recent.size();
-        int updateSize = favUpdate.size();
-        int rankingSize = ranking.size();
-        int RECENT = this.RECENT + updateSize;
-        int RANKING = this.RANKING + updateSize + recentSize;
-        if(updateSize>0){
-            notifyItemChanged(UPDATE+1);
-            if(updateSize>1)
-                notifyItemRangeInserted(UPDATE+2, updateSize-1);
-        }else{
-            favUpdate.add(new Manga(-1,"결과없음","", base_comic));
-            notifyItemChanged(UPDATE+1);
-        }
-
-        if(recentSize>0){
-            notifyItemChanged(RECENT+1);
-            if(recentSize>1)
-                notifyItemRangeInserted(RECENT+2, recentSize-1);
-        }else{
-            recent.add(new Manga(-1,"결과없음","", base_comic));
-            notifyItemChanged(RECENT+1);
-        }
-
-        if(rankingSize>0){
-            notifyItemChanged(RANKING+1);
-            if(rankingSize>1)
-                notifyItemRangeInserted(RANKING+2, rankingSize-1);
-        }else{
-            ranking.add(new Title("결과없음","", "", null, "", -1, base_comic));
-            notifyItemChanged(RANKING+1);
-        }
-
-    }
-
-    public void clearRecyclerPools(){
-
-    }
-
-    class addedHolder extends RecyclerView.ViewHolder{
+    class AddedHolder extends RecyclerView.ViewHolder{
         RecyclerView updatedList;
-        TextView title;
-        public addedHolder(View itemView) {
+        public AddedHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.main_tag_title);
             updatedList = itemView.findViewById(R.id.main_tag);
             LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
             lm.setOrientation(RecyclerView.HORIZONTAL);
@@ -229,27 +198,21 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void refresh() {
                     fetch();
-                }
-            });
-            title.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mainClickListener.clickedMoreUpdated();
+                    mainClickListener.clickedRetry();
                 }
             });
         }
     }
-    class rankingHolder extends RecyclerView.ViewHolder{
-        TextView title;
+    class MangaHolder extends RecyclerView.ViewHolder{
+
+        TextView text;
         CardView card;
         TextView rank;
-        Title titleobj;
-        Manga manga;
         View rankLayout;
 
-        public rankingHolder(View itemView) {
+        public MangaHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.ranking_title);
+            text = itemView.findViewById(R.id.header_title);
             card = itemView.findViewById(R.id.ranking_card);
             rank = itemView.findViewById(R.id.ranking_rank);
             rankLayout = itemView.findViewById(R.id.ranking_rank_layout);
@@ -261,104 +224,165 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         public void setManga(Manga m, int r){
-            manga = m;
-            title.setText(m.getName());
+            text.setText(m.getName());
             card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(manga!=null && manga.getId()>0)
-                        mainClickListener.clickedManga(manga);
+                    if(m!=null && m.getId()>0)
+                        mainClickListener.clickedManga(m);
                 }
             });
 
-            if(r>0){
+            if(m instanceof MainPage.RankingManga){
                 rankLayout.setVisibility(View.VISIBLE);
-                rank.setText(String.valueOf(r));
-            }else{
-                rankLayout.setVisibility(View.GONE);
-            }
-        }
-
-        public void setTitleObject(Title t, int r){
-            titleobj = t;
-            title.setText(t.getName());
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(titleobj!=null && titleobj.getId()>0)
-                        mainClickListener.clickedTitle(titleobj);
-                }
-            });
-
-            if(r>0){
-                rankLayout.setVisibility(View.VISIBLE);
-                rank.setText(String.valueOf(r));
+                rank.setText(String.valueOf(((MainPage.RankingManga)m).getRanking()));
             }else{
                 rankLayout.setVisibility(View.GONE);
             }
         }
     }
+    class HeaderHolder extends RecyclerView.ViewHolder{
+        TextView text;
+        ImageView button;
+        View container;
 
-
-    class tagHolder extends RecyclerView.ViewHolder{
-        RecyclerView tagList;
-        TextView title;
-        public tagHolder(View itemView) {
+        public HeaderHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.main_tag_title);
-            tagList = itemView.findViewById(R.id.main_tag);
-            LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
-            lm.setOrientation(RecyclerView.HORIZONTAL);
-            tagList.setLayoutManager(lm);
-            tagList.setAdapter(tadapter);
-            tadapter.setClickListener(new MainTagAdapter.tagOnclick() {
-                @Override
-                public void onClick(int position, String tag) {
-                    mainClickListener.clickedTag(tag);
-                }
-            });
+            text = itemView.findViewById(R.id.header_title);
+            button = itemView.findViewById(R.id.header_button);
+            container = itemView.findViewById(R.id.header_container);
+            if(dark)
+                this.button.setColorFilter(Color.WHITE);
+            else
+                this.button.setColorFilter(Color.DKGRAY);
         }
-    }
-    class nameHolder extends RecyclerView.ViewHolder{
-        RecyclerView nameList;
-        TextView title;
-        public nameHolder(View itemView) {
-            super(itemView);
-            title = itemView.findViewById(R.id.main_tag_title);
-            nameList = itemView.findViewById(R.id.main_tag);
-            LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
-            lm.setOrientation(RecyclerView.HORIZONTAL);
-            nameList.setLayoutManager(lm);
-            nameList.setAdapter(nadapter);
-            nadapter.setClickListener(new MainTagAdapter.tagOnclick() {
-                @Override
-                public void onClick(int pos, String tag) {
-                    try {
-                        mainClickListener.clickedName(tag);
-                    }catch (Exception e){
 
+        public void setHeader(Header h){
+            this.text.setText(h.header);
+            if(h instanceof ButtonHeader){
+                this.container.setClickable(true);
+                this.button.setVisibility(View.VISIBLE);
+                this.container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((ButtonHeader)h).callback();
                     }
+                });
+            }else{
+                this.container.setClickable(false);
+                this.button.setVisibility(View.GONE);
+            }
+        }
+    }
+    class TitleHolder extends RecyclerView.ViewHolder{
+        TextView text;
+        CardView card;
+        TextView rank;
+        View rankLayout;
+
+        TitleHolder(View itemView) {
+            super(itemView);
+            text = itemView.findViewById(R.id.header_title);
+            card = itemView.findViewById(R.id.ranking_card);
+            rank = itemView.findViewById(R.id.ranking_rank);
+            rankLayout = itemView.findViewById(R.id.ranking_rank_layout);
+            if(card!=null){
+                if(dark) {
+                    card.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
+                }
+            }
+        }
+        public void setTitle(Title t, int r){
+            text.setText(t.getName());
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(t!=null && t.getId()>0)
+                        mainClickListener.clickedTitle(t);
+                }
+            });
+
+            if(t instanceof MainPage.RankingTitle){
+                rankLayout.setVisibility(View.VISIBLE);
+                rank.setText(String.valueOf(((MainPage.RankingTitle)t).getRanking()));
+            }else{
+                rankLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+    class TagHolder extends RecyclerView.ViewHolder{
+        TextView tag;
+        CardView card;
+        public TagHolder(View itemView) {
+            super(itemView);
+            card = itemView.findViewById(R.id.mainTagCard);
+            tag = itemView.findViewById(R.id.main_tag_text);
+
+            if (dark)
+                card.setCardBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
+            else
+                card.setCardBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorBackground));
+
+            card.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Tag t = (Tag) data.get(getAdapterPosition());
+                    if(t instanceof NameTag) mainClickListener.clickedName(t.tag);
+                    else if(t instanceof GenreTag) mainClickListener.clickedGenre(t.tag);
+                    else if(t instanceof ReleaseTag) mainClickListener.clickedRelease(t.tag);
                 }
             });
         }
     }
-    class releaseHolder extends RecyclerView.ViewHolder{
-        RecyclerView releaseList;
-        TextView title;
-        public releaseHolder(View itemView) {
-            super(itemView);
-            LinearLayoutManager lm = new NpaLinearLayoutManager(mainContext);
-            lm.setOrientation(RecyclerView.HORIZONTAL);
-            title = itemView.findViewById(R.id.main_tag_title);
-            releaseList = itemView.findViewById(R.id.main_tag);
-            releaseList.setLayoutManager(lm);
-            releaseList.setAdapter(radapter);
-            radapter.setClickListener(new MainTagAdapter.tagOnclick() {
-                @Override
-                public void onClick(int position, String tag) {
-                    mainClickListener.clickedRelease(tag);
-                }
-            });
+
+    class Tag{
+        public String tag;
+        public Tag(String tag){this.tag=tag;}
+        @NonNull
+        @Override
+        public String toString() {
+            return tag;
+        }
+    }
+    class NameTag extends Tag{
+        public NameTag(String tag) {
+            super(tag);
+        }
+    }
+    class GenreTag extends Tag{
+        public GenreTag(String tag) {
+            super(tag);
+        }
+    }
+    class ReleaseTag extends Tag{
+        public ReleaseTag(String tag) {
+            super(tag);
+        }
+    }
+    class Header{
+        public String header;
+
+        public Header(String header) {
+            this.header = header;
+        }
+    }
+    class ButtonHeader extends Header{
+        public String header;
+        Runnable callback;
+
+        public ButtonHeader(String header, Runnable callback) {
+            super(header);
+            this.header = header;
+            this.callback = callback;
+        }
+
+        public void callback() {
+            callback.run();
+        }
+    }
+    class NoResultManga extends Manga{
+        public NoResultManga() {
+            super(-1, "결과 없음", "", base_comic);
         }
     }
 
@@ -368,16 +392,17 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface onItemClick{
         void clickedManga(Manga m);
-        void clickedTag(String t);
+        void clickedGenre(String t);
         void clickedName(String t);
         void clickedRelease(String t);
         void clickedTitle(Title t);
         void clickedMoreUpdated();
         void captchaCallback();
         void clickedSearch(String query);
+        void clickedRetry();
     }
 
-    private class fetchMain extends AsyncTask<Void, Integer, MainPage> {
+    private class MainFetcher extends AsyncTask<Void, Integer, MainPage> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -395,20 +420,79 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         @Override
-        protected void onPostExecute(MainPage main) {
-            super.onPostExecute(main);
+        protected void onPostExecute(MainPage u) {
+            super.onPostExecute(u);
             //update adapters?
-            if(main.getRecent().size() == 0){
+            if(u.getRecent().size() == 0){
                 // captcha?
                 mainClickListener.captchaCallback();
             }
-            uadapter.setData(main.getRecent());
-            ranking = main.getRanking();
-            recent = main.getOnlineRecent();
-            favUpdate = main.getFavUpdate();
-            updateRankingWidgets();
+            uadapter.setData(u.getRecent());
+
+            for(int i=data.size()-1; i>=0; i--){
+                if(data.get(i) instanceof NoResultManga) {
+                    data.remove(i);
+                    notifyItemRemoved(i);
+                }
+            }
+
+            int i = data.indexOf(weekh);
+            if(i>-1) {
+                if (u.getWeeklyRanking().size() == 0 && !(data.get(i+1) instanceof NoResultManga)){
+                    data.add(++i, new NoResultManga());
+                    notifyItemInserted(i);
+                }
+                else {
+                    for (MainPage.RankingManga m : u.getWeeklyRanking()) {
+                        data.add(++i, m);
+                        notifyItemInserted(i);
+                    }
+                }
+            }
+
+            i = data.indexOf(besth);
+            if(i>-1) {
+                if (u.getRanking().size() == 0){
+                    data.add(++i, new NoResultManga());
+                    notifyItemInserted(i);
+                }
+                else {
+                    for (MainPage.RankingTitle t : u.getRanking()) {
+                        data.add(++i, t);
+                        notifyItemInserted(i);
+                    }
+                }
+            }
+
+            i = data.indexOf(hish);
+            if(i>-1) {
+                if (u.getOnlineRecent().size() == 0){
+                    data.add(++i, new NoResultManga());
+                    notifyItemInserted(i);
+                }
+                else {
+                    for (Manga m : u.getOnlineRecent()) {
+                        data.add(++i, m);
+                        notifyItemInserted(i);
+                    }
+                }
+            }
+
+            i = data.indexOf(updh);
+            if(i>-1){
+                if(u.getFavUpdate().size() == 0){
+                    data.add(++i, new NoResultManga());
+                    notifyItemInserted(i);
+                } else{
+                    for(Manga m : u.getFavUpdate()){
+                        data.add(++i, m);
+                        notifyItemInserted(i);
+                    }
+                }
+            }
         }
     }
 
-
 }
+
+

@@ -54,10 +54,9 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         inflater = LayoutInflater.from(context);
         dataSet = MainPageWebtoon.getBlankDataSet();
         setLoading();
-        setHasStableIds(true);
+        setHasStableIds(false);
         setLoading();
     }
-
 
     public void fetch(){
         new Fetcher().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -78,7 +77,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if(viewType == HEADER){
-            return new HeaderHolder(inflater.inflate(R.layout.main_item_title, parent, false));
+            return new HeaderHolder(inflater.inflate(R.layout.item_main_header, parent, false));
         }else{
             return new ItemHolder(inflater.inflate(R.layout.main_item_ranking, parent, false));
         }
@@ -122,10 +121,6 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 }
             });
-
-
-
-
         }
     }
 
@@ -185,7 +180,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(itemView);
             card = itemView.findViewById(R.id.ranking_card);
             rank = itemView.findViewById(R.id.ranking_rank);
-            content = itemView.findViewById(R.id.ranking_title);
+            content = itemView.findViewById(R.id.header_title);
             if(dark)
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
         }
@@ -195,7 +190,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView title;
         public HeaderHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.ranking_title);
+            title = itemView.findViewById(R.id.header_title);
         }
     }
 
