@@ -455,7 +455,7 @@ public class Utils {
                                         .build();
                                 Map<String,String> headers = new HashMap<>();
                                 headers.put("cookie", "PHPSESSID="+ httpClient.getCookie("PHPSESSID") +";");
-                                Response response = httpClient.post(p.getUrl() + "/bbs/captcha_check.php", requestBody, headers);
+                                Response response = httpClient.post(p.getUrl() + "/bbs/captcha_check.php", requestBody, headers, true);
                                 System.out.println(response.code());
                                 ((Activity)context).runOnUiThread(new Runnable() {
                                     @Override

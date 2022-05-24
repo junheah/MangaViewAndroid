@@ -215,7 +215,7 @@ public class RecyclerFragment extends Fragment {
                                     title.setPath(f.getUri().toString());
                                     if (title.getThumb().length() > 0) {
                                         DocumentFile t = f.findFile(title.getThumb());
-                                        if (t.exists()) title.setThumb(t.getUri().toString());
+                                        if (t != null) title.setThumb(t.getUri().toString());
                                     }
                                     titles.add(title);
                                 } catch (Exception e) {

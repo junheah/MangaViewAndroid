@@ -160,7 +160,6 @@ public class CustomHttpClient {
 
         headers.put("Cookie", cs);
 
-
         Response response = null;
         try {
             Request.Builder builder = new Request.Builder()
