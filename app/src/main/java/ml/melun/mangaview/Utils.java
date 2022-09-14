@@ -430,7 +430,7 @@ public class Utils {
                     ((Activity) context).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Glide.with(context)
+                            Glide.with(img)
                                     .load(b)
                                     .into(img);
                         }

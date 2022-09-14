@@ -149,24 +149,34 @@ public class ViewerActivity2 extends AppCompatActivity {
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         reverse = p.getReverse();
-        frame = this.findViewById(R.id.viewer_image);
         pageBtn = this.findViewById(R.id.viewerBtn1);
         toolbar_toggleBtn = this.findViewById(R.id.toolbar_toggleBtn);
         pageBtn.setText("-/-");
         leftRight = p.getLeftRight();
         spinner = this.findViewById(R.id.toolbar_spinner);
         nextEpisode = this.findViewById(R.id.viewerNextEpisode);
-        frame2 = this.findViewById(R.id.viewer_image2);
+        if(p.getDoublepReverse()){
+            frame = this.findViewById(R.id.viewer_image2);
+            frame2 = this.findViewById(R.id.viewer_image);
+        }else{
+            frame = this.findViewById(R.id.viewer_image);
+            frame2 = this.findViewById(R.id.viewer_image2);
+        }
+
+
+
         nextEpisode.setVisibility(View.GONE);
 
         //initial padding setup
         appbar.setPadding(0, getStatusBarHeight(),0,0);
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
-        Display display  = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        split = size.x > size.y;
+//        Display display  = getWindowManager().getDefaultDisplay();
+//        Point size = new Point();
+//        display.getSize(size);
+//        split = size.x > size.y;
+
+        split = p.getDoublep();
 
 
         ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
@@ -989,20 +999,20 @@ public class ViewerActivity2 extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        //window orientation change
-        Display display  = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        if(imgs != null && viewerBookmark < imgs.size() && (split != size.x > size.y)) {
-            //needs update
-            split = size.x > size.y;
-            refreshImage();
-        }
-        refreshPageControlButton();
-    }
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//        //window orientation change
+//        Display display  = getWindowManager().getDefaultDisplay();
+//        Point size = new Point();
+//        display.getSize(size);
+//        if(imgs != null && viewerBookmark < imgs.size() && (split != size.x > size.y)) {
+//            //needs update
+//            split = size.x > size.y;
+//            refreshImage();
+//        }
+//        refreshPageControlButton();
+//    }
 
     void lockUi(Boolean lock){
         toolbar_toggleBtn.setEnabled(!lock);

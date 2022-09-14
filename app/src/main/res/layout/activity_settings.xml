@@ -152,6 +152,16 @@
                 android:text="뷰어 설정"
                 android:textColor="@android:color/white" />
 
+            <TextView
+                android:background="@android:color/darker_gray"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="공통"
+                android:textColor="@android:color/white" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
@@ -209,6 +219,8 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
@@ -224,7 +236,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_width="0dp"
-                    android:text="페이지 분할시 좌우 순서 변경\n기본 : 우 -&gt; 좌"
+                    android:text="페이지 자동 분할시 좌우 순서 변경\n기본 : 우 -&gt; 좌"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/setting_reverse_switch"
                     app:layout_constraintStart_toStartOf="parent"
@@ -242,6 +254,16 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:background="@android:color/darker_gray"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="터치 뷰어"
+                android:textColor="@android:color/white" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:background="?android:attr/selectableItemBackground"
@@ -261,6 +283,72 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/setting_double"
+                android:layout_height="70dp"
+                android:layout_width="match_parent">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="0dp"
+                    android:text="양면 보기"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/setting_double_switch"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Switch
+                    android:id="@+id/setting_double_switch"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/setting_double_leftright"
+                android:layout_height="70dp"
+                android:layout_width="match_parent">
+
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="0dp"
+                    android:text="양면 보기시 순서 변경\n기본 : 우 -> 좌"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/setting_double_leftright_switch"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Switch
+                    android:id="@+id/setting_double_leftright_switch"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -297,6 +385,16 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:background="@android:color/darker_gray"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:text="컷툰 뷰어"
+                android:textColor="@android:color/white" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/setting_pageRtl"

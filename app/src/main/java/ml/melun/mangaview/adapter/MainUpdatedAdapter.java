@@ -100,7 +100,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }else if(save)
             h.thumb.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
         else
-            Glide.with(context).load(thumb).into(h.thumb);
+            Glide.with(h.thumb).load(thumb).into(h.thumb);
     }
 
 

@@ -171,7 +171,7 @@ public class ViewerActivity extends AppCompatActivity {
             @Override
             public void callback(String data) {
                 zoom_layout.setVisibility(View.VISIBLE);
-                Glide.with(context)
+                Glide.with(zoom_image)
                         .load(data)
                         .placeholder(R.drawable.placeholder)
                         .into(zoom_image);

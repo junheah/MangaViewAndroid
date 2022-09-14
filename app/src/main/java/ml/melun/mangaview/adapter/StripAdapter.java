@@ -268,7 +268,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         PageItem item = ((PageItem)items.get(pos));
         if (autoCut) {
             //set image to holder view
-            Glide.with(mainContext)
+            Glide.with(holder.frame)
                     .asBitmap()
                     .load(item.img)
                     .placeholder(R.drawable.placeholder)
@@ -313,7 +313,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         }
                     });
         } else {
-            Glide.with(mainContext)
+            Glide.with(holder.frame)
                     .asBitmap()
                     .load(item.img)
                     .into(new CustomTarget<Bitmap>() {

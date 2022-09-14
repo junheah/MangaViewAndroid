@@ -192,7 +192,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
 
 
 
-        if(thumb.length()>1 && (!save || forceThumbnail)) Glide.with(mainContext).load(thumb).into(holder.thumb);
+        if(thumb.length()>1 && (!save || forceThumbnail)) Glide.with(holder.thumb).load(thumb).into(holder.thumb);
         else holder.thumb.setImageBitmap(null);
         if(save && !forceThumbnail) holder.thumb.setVisibility(View.GONE);
         if(bookmark>0 && resume) holder.resume.setVisibility(View.VISIBLE);

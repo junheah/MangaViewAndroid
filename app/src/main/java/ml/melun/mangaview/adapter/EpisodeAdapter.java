@@ -115,7 +115,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if(bookmarked) h.h_bookmark_icon.setImageResource(R.drawable.ic_bookmark);
             else h.h_bookmark_icon.setImageResource(R.drawable.ic_bookmark_border);
 
-            if(!save) Glide.with(mainContext)
+            if(!save) Glide.with(h.h_thumb)
                     .load(thumb)
                     .apply(new RequestOptions().dontTransform())
                     .into(h.h_thumb);

@@ -54,7 +54,7 @@ public class CommentsAdapter extends BaseAdapter {
         TextView level = convertView.findViewById(R.id.comment_level);
 
         layout.setPadding(60*c.getIndent(),0,0,0);
-        if(c.getIcon().length()>1 && !save) Glide.with(context).load(c.getIcon()).into(icon);
+        if(c.getIcon().length()>1 && !save) Glide.with(icon).load(c.getIcon()).into(icon);
         else icon.setImageResource(R.drawable.user);
         content.setText(c.getContent());
         timeStamp.setText(c.getTimestamp());

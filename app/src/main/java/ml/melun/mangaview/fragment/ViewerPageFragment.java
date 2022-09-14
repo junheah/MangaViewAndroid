@@ -80,7 +80,7 @@ public class ViewerPageFragment extends Fragment {
 
     void loadImage(ImageView frame, ImageButton refresh){
         String target = image;
-        Glide.with(context)
+        Glide.with(frame)
                 .asBitmap()
                 .load(target)
                 .into(new CustomTarget<Bitmap>() {

@@ -68,7 +68,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         UpdatedManga m = mData.get(position);
         h.text.setText(m.getName());
         h.date.setText(m.getDate());
-        if(m.getThumb().length()>1 && !save) Glide.with(context).load(m.getThumb()).into(h.thumb);
+        if(m.getThumb().length()>1 && !save) Glide.with(h.thumb).load(m.getThumb()).into(h.thumb);
         else h.thumb.setImageBitmap(null);
         if(save) h.thumb.setVisibility(View.GONE);
         if(p.getBookmark(m.getTitle())>0)

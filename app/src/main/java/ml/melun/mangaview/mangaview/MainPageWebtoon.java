@@ -16,10 +16,9 @@ import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class MainPageWebtoon {
     String baseUrl;
-    static final int sr=3;
-    public static final String searchRanking="인기검색어",normalNew="일반연재 최신", adultNew="성인웹툰 최신", gayNew="BL/GL 최신", comicNew="일본만화 최신",
+    public static final String normalNew="일반연재 최신", adultNew="성인웹툰 최신", gayNew="BL/GL 최신", comicNew="일본만화 최신",
             normalBest="일반연재 베스트", adultBest="성인웹툰 베스트", gayBest="BL/GL 베스트", comicBest="일본만화 베스트";
-    static final int nn=5,an=6,gn=7,cn=8,nb=9,ab=10,gb=11,cb=12;
+    static final int nn=4,an=5,gn=6,cn=7,nb=8,ab=9,gb=10,cb=11;
 
     List<Ranking<?>> dataSet;
 
@@ -56,12 +55,6 @@ public class MainPageWebtoon {
             Elements boxes = d.select("div.main-box");
 
             dataSet = new ArrayList<>();
-            Ranking<String> srd = new Ranking<>(searchRanking);
-            for(Element e : boxes.get(sr).select("a")){
-                srd.add(e.ownText());
-            }
-
-            dataSet.add(srd);
 
             parseTitle(normalNew, boxes.get(nn).select("a"), base_webtoon);
             parseTitle(adultNew, boxes.get(an).select("a"), base_webtoon);
@@ -96,6 +89,7 @@ public class MainPageWebtoon {
             }else{
                 name = e.ownText();
             }
+            System.out.println("   " + name);
             idString = e.attr("href");
             idString1 = idString.substring(idString.lastIndexOf('/')+1);
             id = Integer.parseInt(idString1.substring(idString1.lastIndexOf('=')+1));
@@ -107,7 +101,6 @@ public class MainPageWebtoon {
 
     public static List<Ranking<?>> getBlankDataSet(){
         List<Ranking<?>> dataset = new ArrayList<>();
-        dataset.add(new Ranking<>(searchRanking));
         dataset.add(new Ranking<>(normalNew));
         dataset.add(new Ranking<>(adultNew));
         dataset.add(new Ranking<>(gayNew));

@@ -47,6 +47,8 @@ public class Preference {
     float pageControlButtonOffset;
     int prevPageKey, nextPageKey;
     int baseMode;
+    boolean doublep;
+    boolean doublepReverse;
 
     public SharedPreferences getSharedPref(){
         return this.sharedPref;
@@ -90,6 +92,8 @@ public class Preference {
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
             autoUrl = sharedPref.getBoolean("autoUrl", true);
+            doublep = sharedPref.getBoolean("doublep", false);
+            doublepReverse = sharedPref.getBoolean("doublepReverse", false);
             pageControlButtonOffset = sharedPref.getFloat("pageControlButtonOffset", -1);
             baseMode = sharedPref.getInt("baseMode", base_comic);
 //            if(login != null && login.isValid()){
@@ -593,6 +597,26 @@ public class Preference {
     public void setPageControlButtonOffset(float pageControlButtonOffset) {
         this.pageControlButtonOffset = pageControlButtonOffset;
         prefsEditor.putFloat("pageControlButtonOffset", pageControlButtonOffset);
+        prefsEditor.commit();
+    }
+
+    public boolean getDoublep(){
+        return doublep;
+    }
+
+    public boolean getDoublepReverse(){
+        return doublepReverse;
+    }
+
+    public void setDoublep(boolean doublep){
+        this.doublep = doublep;
+        prefsEditor.putBoolean("doublep", doublep);
+        prefsEditor.commit();
+    }
+
+    public void setDoublepReverse(boolean doublepReverse){
+        this.doublepReverse = doublepReverse;
+        prefsEditor.putBoolean("doublepReverse", doublepReverse);
         prefsEditor.commit();
     }
 }

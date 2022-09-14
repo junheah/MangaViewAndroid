@@ -54,9 +54,9 @@ public class SettingsActivity extends AppCompatActivity {
     //데이터 절약 모드 : 외부 이미지 로드 안함
     //
     Context context;
-    ConstraintLayout s_setHomeDir, s_resetHistory, s_dark, s_viewer, s_reverse, s_pageRtl, s_dataSave, s_tab, s_stretch;
+    ConstraintLayout s_setHomeDir, s_resetHistory, s_dark, s_viewer, s_reverse, s_pageRtl, s_dataSave, s_tab, s_stretch, s_double, s_double_reverse;
     Spinner s_tab_spinner, s_viewer_spinner;
-    Switch s_dark_switch, s_reverse_switch, s_pageRtl_switch, s_dataSave_switch, s_stretch_switch;
+    Switch s_dark_switch, s_reverse_switch, s_pageRtl_switch, s_dataSave_switch, s_stretch_switch, s_double_switch, s_double_reverse_switch;
     Boolean dark;
     public static final String prefExtension = ".mvpref";
     public static final int RESULT_NEED_RESTART = 7;
@@ -423,6 +423,38 @@ public class SettingsActivity extends AppCompatActivity {
                     intent.putExtra("title", "파일 선택");
                     startActivityForResult(intent, MODE_FILE_SELECT);
                 }
+            }
+        });
+
+        s_double = this.findViewById(R.id.setting_double);
+        s_double_switch = this.findViewById(R.id.setting_double_switch);
+        s_double_switch.setChecked(p.getDoublep());
+        s_double.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_double_switch.toggle();
+            }
+        });
+        s_double_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setDoublep(isChecked);
+            }
+        });
+
+        s_double_reverse = this.findViewById(R.id.setting_double_leftright);
+        s_double_reverse_switch = this.findViewById(R.id.setting_double_leftright_switch);
+        s_double_reverse_switch.setChecked(p.getDoublepReverse());
+        s_double_reverse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                s_double_reverse_switch.toggle();
+            }
+        });
+        s_double_reverse_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                p.setDoublepReverse(isChecked);
             }
         });
 

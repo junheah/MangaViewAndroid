@@ -34,17 +34,16 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     final static int HEADER = 23;
 
-    final static int SR = 24;
-    final static int NN = 25;
-    final static int AN = 26;
-    final static int GN = 27;
-    final static int CN = 28;
-    final static int NB = 29;
-    final static int AB = 30;
-    final static int GB = 31;
-    final static int CB = 32;
+    final static int NN = 24;
+    final static int AN = 25;
+    final static int GN = 26;
+    final static int CN = 27;
+    final static int NB = 28;
+    final static int AB = 29;
+    final static int GB = 30;
+    final static int CB = 31;
 
-    int[] headers = {0,1,2,3,4,5,6,7,8};
+    int[] headers = {0,1,2,3,4,5,6,7};
 
     public MainWebtoonAdapter(Context context){
         this.context = context;
@@ -96,7 +95,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     break;
                 }
             }
-        }else if(type>=SR && type<=CB){
+        }else if(type<=CB){
             ItemHolder h = (ItemHolder) holder;
             int setIndex = type-24;
             int realPosition = position-(headers[setIndex])-1;
@@ -112,13 +111,8 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             h.card.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(type == SR){
-                        //search
-                        listener.clickedSearch((String)d);
-                    }else{
-                        //title
-                        listener.clickedTitle((Title)d);
-                    }
+                    //title
+                    listener.clickedTitle((Title)d);
                 }
             });
         }

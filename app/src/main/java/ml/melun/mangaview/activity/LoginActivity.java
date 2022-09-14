@@ -297,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void a) {
             super.onPostExecute(a);
-            Glide.with(context).asBitmap().load(image).into(captchaImg);
+            Glide.with(captchaImg).asBitmap().load(image).into(captchaImg);
             showProgress(false);
         }
     }

@@ -135,8 +135,9 @@ public class CustomHttpClient {
 
         Map headers = new HashMap<String, String>();
         headers.put("Cookie", cbuilder.toString());
-        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
-        headers.put("Referer",p.getUrl());
+        System.out.println(cbuilder.toString());
+        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36");
+        //headers.put("Referer",p.getUrl());
 
         return get(p.getUrl()+url, headers);
     }
@@ -163,7 +164,7 @@ public class CustomHttpClient {
         Response response = null;
         try {
             Request.Builder builder = new Request.Builder()
-                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36")
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36")
                     .url(url)
                     .post(body);
 
