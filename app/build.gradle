@@ -85,4 +85,5 @@ dependencies {
     implementation "ch.acra:acra-mail:$acraVersion"
     implementation "ch.acra:acra-dialog:$acraVersion"
 
+    implementation fileTree(include: '*.jar', dir: 'libs')
 }
