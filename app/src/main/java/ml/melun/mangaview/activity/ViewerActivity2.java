@@ -25,6 +25,7 @@ import androidx.core.view.WindowInsetsCompat;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,9 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.samsung.android.sdk.penremote.ButtonEvent;
+import com.samsung.android.sdk.penremote.SpenEvent;
+import com.samsung.android.sdk.penremote.SpenEventListener;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +60,7 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
+import ml.melun.mangaview.spen.SpenHelper;
 import ml.melun.mangaview.ui.CustomSpinner;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
@@ -67,7 +72,7 @@ import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
 
-public class ViewerActivity2 extends AppCompatActivity {
+public class ViewerActivity2 extends AppCompatActivity implements SpenEventListener {
     Boolean dark, toolbarshow=true, reverse, touch=true, stretch, leftRight;
     Context context = this;
     String name;
@@ -103,6 +108,7 @@ public class ViewerActivity2 extends AppCompatActivity {
     boolean split = false;
     boolean dirty = false;
     TextView info;
+    SpenHelper spen;
 
     @Override
     protected void onResume() {
@@ -156,7 +162,8 @@ public class ViewerActivity2 extends AppCompatActivity {
             frame2 = this.findViewById(R.id.viewer_image2);
         }
 
-
+        //spen
+        spen = new SpenHelper(this, this);
 
         nextEpisode.setVisibility(View.GONE);
 
@@ -342,6 +349,20 @@ public class ViewerActivity2 extends AppCompatActivity {
             startActivity(commentActivity);
         });
 
+    }
+
+    //EventListener for Button Unit
+    @Override
+    public void onEvent(SpenEvent ev) {
+        ButtonEvent buttonEvent = new ButtonEvent(ev);
+        switch (buttonEvent.getAction()) {
+            case ButtonEvent.ACTION_DOWN:
+                Log.d("spen", "Spen Button Pressed");
+                break;
+            case ButtonEvent.ACTION_UP:
+                Log.d("spen", "Spen Button Released");
+                break;
+        }
     }
 
     void refreshPageControlButton(){
@@ -939,21 +960,6 @@ public class ViewerActivity2 extends AppCompatActivity {
             refresh();
         }
     }
-
-//    @Override
-//    public void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//        //window orientation change
-//        Display display  = getWindowManager().getDefaultDisplay();
-//        Point size = new Point();
-//        display.getSize(size);
-//        if(imgs != null && viewerBookmark < imgs.size() && (split != size.x > size.y)) {
-//            //needs update
-//            split = size.x > size.y;
-//            refreshImage();
-//        }
-//        refreshPageControlButton();
-//    }
 
     void lockUi(Boolean lock){
         toolbar_toggleBtn.setEnabled(!lock);
