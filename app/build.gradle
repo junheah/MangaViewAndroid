@@ -55,17 +55,17 @@ dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation("com.github.bumptech.glide:glide:4.11.0") {
+
+    implementation("com.github.bumptech.glide:glide:4.14.0") {
         exclude group: "com.android.support"
     }
-    implementation 'com.github.bumptech.glide:annotations:4.11.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
-
-    implementation 'com.github.bumptech.glide:okhttp3-integration:4.11.0'
-    implementation('com.github.bumptech.glide:recyclerview-integration:4.11.0') {
-        // Excludes the support library because it's already included by Glide.
+    implementation 'com.github.bumptech.glide:annotations:4.14.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.0'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.14.0'
+    implementation('com.github.bumptech.glide:recyclerview-integration:4.14.0') {
         transitive = false
     }
+
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.fragment:fragment:1.5.5'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -75,10 +75,10 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.code.gson:gson:2.10'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.omadahealth:swipy:1.2.3@aar'
-    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'com.squareup.okhttp3:okhttp:3.12.2'
     implementation 'org.apache.commons:commons-text:1.7'
     def acraVersion = '5.9.7'
