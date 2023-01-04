@@ -33,10 +33,10 @@ import static ml.melun.mangaview.MainApplication.p;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Manga> mData;
-    private LayoutInflater mInflater;
+    private final List<Manga> mData;
+    private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private Context mainContext;
+    private final Context mainContext;
     boolean favorite = false;
     boolean bookmarked = false;
     TypedValue outValue;
@@ -170,21 +170,18 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             super(itemView);
             episode = itemView.findViewById(R.id.episode);
             date = itemView.findViewById(R.id.date);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(v -> {
 
-                    Manga m = mData.get(getAdapterPosition()-1);
-                    if(m.getId()>-1) {
-                        if (bookmark != -1) {
-                            int pre = bookmark;
-                            notifyItemChanged(pre);
-                        }
-                        bookmark = getAdapterPosition();
-                        notifyItemChanged(bookmark);
+                Manga m = mData.get(getAdapterPosition()-1);
+                if(m.getId()>-1) {
+                    if (bookmark != -1) {
+                        int pre = bookmark;
+                        notifyItemChanged(pre);
                     }
-                    mClickListener.onItemClick(getAdapterPosition()-1, m);
+                    bookmark = getAdapterPosition();
+                    notifyItemChanged(bookmark);
                 }
+                mClickListener.onItemClick(getAdapterPosition()-1, m);
             });
         }
     }
@@ -217,39 +214,21 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             h_recommend_c = itemView.findViewById(R.id.recommendText);
 
 
-            h_bookmark.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //set bookmark
-                    if(login) {
-                        if (!bookmarkSubmitting) {
-                            mClickListener.onBookmarkClick();
-                            bookmarkSubmitting = true;
-                        }
-                    }else{
+            h_bookmark.setOnClickListener(v -> {
+                //set bookmark
+                if(login) {
+                    if (!bookmarkSubmitting) {
                         mClickListener.onBookmarkClick();
-                        bookmarkSubmitting = false;
+                        bookmarkSubmitting = true;
                     }
+                }else{
+                    mClickListener.onBookmarkClick();
+                    bookmarkSubmitting = false;
                 }
             });
-            h_star.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onStarClick();
-                }
-            });
-            h_first.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onFirstClick();
-                }
-            });
-            h_author.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onAuthorClick();
-                }
-            });
+            h_star.setOnClickListener(v -> mClickListener.onStarClick());
+            h_first.setOnClickListener(v -> mClickListener.onFirstClick());
+            h_author.setOnClickListener(v -> mClickListener.onAuthorClick());
             if(ta!=null) {
                 h_tags.setLayoutManager(lm);
                 h_tags.setAdapter(ta);

@@ -1,8 +1,5 @@
 package ml.melun.mangaview.mangaview;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,10 +8,8 @@ import ml.melun.mangaview.Preference;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.internal.http2.Header;
 
 import static java.lang.System.currentTimeMillis;
-import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
 public class Login {

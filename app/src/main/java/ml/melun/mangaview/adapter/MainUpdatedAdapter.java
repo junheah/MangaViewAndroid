@@ -5,8 +5,10 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -31,30 +33,21 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     Context context;
     LayoutInflater mInflater;
     boolean loaded = false;
-    onclick monclick;
+    OnClickCallback monclick;
     boolean dark, save;
+    Resources res;
 
     public MainUpdatedAdapter(Context c) {
         context = c;
         this.mInflater = LayoutInflater.from(c);
         dark = p.getDarkTheme();
         save = p.getDataSave();
+        this.res = context.getResources();
 
         //fetch data with async
         //data initialize
         setHasStableIds(true);
         //setNull();
-    }
-
-    public void setNull(){
-        if(mData != null){
-            mData.clear();
-            loaded = false;
-        }
-        else
-            mData = new ArrayList<>();
-        mData.add(new Manga(0,"","", base_auto));
-        notifyDataSetChanged();
     }
 
     public void setLoad(){
@@ -63,15 +56,17 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void setLoad(String msg){
         if(mData != null){
+            int size = mData.size();
             mData.clear();
             loaded = false;
+            notifyItemRangeRemoved(0,size);
         }
         else
             mData = new ArrayList<>();
         Manga loading = new Manga(0,msg,"", base_auto);
         loading.addThumb("");
         mData.add(loading);
-        notifyDataSetChanged();
+        notifyItemInserted(0);
     }
 
     @Override
@@ -95,10 +90,10 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if(thumb != null && thumb.length()==0)
             h.thumb.setImageResource(android.R.color.transparent);
         else if(thumb != null && thumb.equals("reload")) {
-            h.thumb.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_refresh));
+            h.thumb.setImageDrawable(ResourcesCompat.getDrawable(res, R.drawable.ic_refresh, null));
             h.thumb.setColorFilter(dark ? Color.WHITE : Color.DKGRAY);
         }else if(save)
-            h.thumb.setImageDrawable(context.getResources().getDrawable(R.mipmap.ic_launcher));
+            h.thumb.setImageDrawable(ResourcesCompat.getDrawable(res, R.mipmap.ic_launcher, null));
         else
             Glide.with(h.thumb).load(thumb).into(h.thumb);
     }
@@ -108,7 +103,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemCount() {
         return mData == null ? 0 : mData.size();
     }
-    public interface onclick{
+    public interface OnClickCallback {
         void onclick(Manga m);
         void refresh();
     }
@@ -126,14 +121,11 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             title.setSingleLine(true);
             title.setSelected(true);
             card = itemView.findViewById(R.id.updatedCard);
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(loaded){
-                        monclick.onclick(mData.get(getAdapterPosition()));
-                    }else
-                        monclick.refresh();
-                }
+            card.setOnClickListener(v -> {
+                if(loaded){
+                    monclick.onclick(mData.get(getAdapterPosition()));
+                }else
+                    monclick.refresh();
             });
             if(dark){
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
@@ -141,7 +133,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         }
     }
-    public void setClickListener(onclick o){
+    public void setClickListener(OnClickCallback o){
         this.monclick = o;
     }
 

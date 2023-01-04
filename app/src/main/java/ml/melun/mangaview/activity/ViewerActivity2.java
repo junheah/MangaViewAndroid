@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 
@@ -26,7 +25,6 @@ import androidx.core.view.WindowInsetsCompat;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,12 +133,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         setContentView(R.layout.activity_viewer2);
 
         info = this.findViewById(R.id.viewer2_info);
-        info.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                info.setVisibility(View.GONE);
-            }
-        });
+        info.setOnClickListener(v -> info.setVisibility(View.GONE));
 
         next = this.findViewById(R.id.toolbar_next);
         prev = this.findViewById(R.id.toolbar_previous);
@@ -179,39 +172,28 @@ public class ViewerActivity2 extends AppCompatActivity {
         split = p.getDoublep();
 
 
-        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
-                //This is where you get DisplayCutoutCompat
-                int statusBarHeight = getStatusBarHeight();
-                int ci;
-                if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
-                else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (view, windowInsetsCompat) -> {
+            //This is where you get DisplayCutoutCompat
+            int statusBarHeight = getStatusBarHeight();
+            int ci;
+            if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
+            else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
-                //System.out.println(ci + " : " + statusBarHeight);
-                appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
-                view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
-                return windowInsetsCompat;
-            }
+            //System.out.println(ci + " : " + statusBarHeight);
+            appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
+            view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+            return windowInsetsCompat;
         });
 
-        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        this.findViewById(R.id.backButton).setOnClickListener(view -> finish());
         spinnerAdapter = new CustomSpinnerAdapter(context);
-        spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
-            @Override
-            public void onClick(Manga m, int i) {
-                lockUi(true);
-                spinner.setSelection(m);
-                index = i;
-                manga = m;
-                hideSpinnerDropDown(spinner);
-                loadManga(m);
-            }
+        spinnerAdapter.setListener((m, i) -> {
+            lockUi(true);
+            spinner.setSelection(m);
+            index = i;
+            manga = m;
+            hideSpinnerDropDown(spinner);
+            loadManga(m);
         });
         spinner.setAdapter(spinnerAdapter);
 
@@ -274,123 +256,90 @@ public class ViewerActivity2 extends AppCompatActivity {
             l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
-        nextPageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(touch) nextPage();
-            }
+        nextPageBtn.setOnClickListener(v -> {
+            if(touch) nextPage();
         });
-        prevPageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(touch) prevPage();
+        prevPageBtn.setOnClickListener(v -> {
+            if(touch) prevPage();
+        });
+
+        toolbar_toggleBtn.setOnClickListener(view -> toggleToolbar());
+
+        touchToggleBtn.setOnClickListener(v -> {
+            if(touch) {
+                touch = false;
+                touchToggleBtn.setBackgroundResource(R.drawable.button_bg_on);
+            }
+            else{
+                touch = true;
+                touchToggleBtn.setBackgroundResource(R.drawable.button_bg);
             }
         });
 
-        toolbar_toggleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleToolbar();
-            }
-        });
+        pageBtn.setOnClickListener(v -> {
+            if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
+            else alert = new AlertDialog.Builder(context);
 
-        touchToggleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(touch) {
-                    touch = false;
-                    touchToggleBtn.setBackgroundResource(R.drawable.button_bg_on);
+            alert.setTitle("페이지 선택\n(1~"+imgs.size()+")");
+            final EditText input = new EditText(context);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            input.setRawInputType(Configuration.KEYBOARD_12KEY);
+            alert.setView(input);
+            alert.setPositiveButton("이동", (dialog, button) -> {
+                //이동 시
+                if (input.getText().length() > 0) {
+                    int page = Integer.parseInt(input.getText().toString());
+                    if (page < 1) page = 1;
+                    if (page > imgs.size()) page = imgs.size();
+                    viewerBookmark = page - 1;
+                    refreshImage();
                 }
-                else{
-                    touch = true;
-                    touchToggleBtn.setBackgroundResource(R.drawable.button_bg);
-                }
+            });
+            alert.setNegativeButton("취소", (dialog, button) -> {
+                //취소 시
+            });
+            alert.show();
+        });
+
+        next.setOnClickListener(v -> {
+            if(eps!=null && index>0) {
+                lockUi(true);
+                index--;
+                manga = eps.get(index);
+                id = manga.getId();
+                name = manga.getName();
+                loadManga(manga);
+            }else
+                Toast.makeText(context, "마지막화 입니다", Toast.LENGTH_SHORT).show();
+
+        });
+        prev.setOnClickListener(v -> {
+            if(eps!=null && index<eps.size()-1) {
+                lockUi(true);
+                index++;
+                manga = eps.get(index);
+                id = manga.getId();
+                name = manga.getName();
+                loadManga(manga);
             }
         });
 
-        pageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
-                else alert = new AlertDialog.Builder(context);
-
-                alert.setTitle("페이지 선택\n(1~"+imgs.size()+")");
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                input.setRawInputType(Configuration.KEYBOARD_12KEY);
-                alert.setView(input);
-                alert.setPositiveButton("이동", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int button) {
-                        //이동 시
-                        if(input.getText().length()>0) {
-                            int page = Integer.parseInt(input.getText().toString());
-                            if (page < 1) page = 1;
-                            if (page > imgs.size()) page = imgs.size();
-                            viewerBookmark = page - 1;
-                            refreshImage();
-                        }
-                    }
-                });
-                alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int button) {
-                        //취소 시
-                    }
-                });
-                alert.show();
-            }
-        });
-
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(eps!=null && index>0) {
-                    lockUi(true);
-                    index--;
-                    manga = eps.get(index);
-                    id = manga.getId();
-                    name = manga.getName();
-                    loadManga(manga);
-                }else
-                    Toast.makeText(context, "마지막화 입니다", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-        prev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(eps!=null && index<eps.size()-1) {
-                    lockUi(true);
-                    index++;
-                    manga = eps.get(index);
-                    id = manga.getId();
-                    name = manga.getName();
-                    loadManga(manga);
-                }
-            }
-        });
-
-        View.OnLongClickListener tbToggle = new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //touched = true;
-                toggleToolbar();
-                return true;
-            }
+        View.OnLongClickListener tbToggle = v -> {
+            //touched = true;
+            toggleToolbar();
+            return true;
         };
         nextPageBtn.setOnLongClickListener(tbToggle);
         prevPageBtn.setOnLongClickListener(tbToggle);
 
-        commentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent commentActivity = new Intent(context, CommentsActivity.class);
-                //create gson and put extra
-                Gson gson = new Gson();
-                commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
-                commentActivity.putExtra("bestComments", gson.toJson(manga.getBestComments()));
-                commentActivity.putExtra("id", manga.getId());
-                startActivity(commentActivity);
-            }
+        commentBtn.setOnClickListener(v -> {
+            Intent commentActivity = new Intent(context, CommentsActivity.class);
+            //create gson and put extra
+            Gson gson = new Gson();
+            commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
+            commentActivity.putExtra("bestComments", gson.toJson(manga.getBestComments()));
+            commentActivity.putExtra("id", manga.getId());
+            startActivity(commentActivity);
         });
 
     }
@@ -828,27 +777,19 @@ public class ViewerActivity2 extends AppCompatActivity {
             else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
             pd.setCancelable(false);
-            pd.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                @Override
-                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                    if(keyCode == KeyEvent.KEYCODE_BACK){
-                        loadImages.super.cancel(true);
-                        pd.dismiss();
-                        finish();
-                    }
-                    return true;
+            pd.setOnKeyListener((dialog, keyCode, event) -> {
+                if(keyCode == KeyEvent.KEYCODE_BACK){
+                    loadImages.super.cancel(true);
+                    pd.dismiss();
+                    finish();
                 }
+                return true;
             });
             pd.show();
         }
 
         protected Integer doInBackground(Void... params) {
-            manga.setListener(new Manga.Listener() {
-                @Override
-                public void setMessage(String msg) {
-                    publishProgress(msg);
-                }
-            });
+            manga.setListener(msg -> publishProgress(msg));
             Login login = p.getLogin();
             Map<String, String> cookie = new HashMap<>();
             if(login !=null) {

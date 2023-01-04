@@ -18,10 +18,9 @@ public class LicenseActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
     }
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

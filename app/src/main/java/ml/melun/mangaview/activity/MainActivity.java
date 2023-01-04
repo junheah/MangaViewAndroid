@@ -67,7 +67,6 @@ import static ml.melun.mangaview.Migrator.MIGRATE_START;
 import static ml.melun.mangaview.Migrator.MIGRATE_STOP;
 import static ml.melun.mangaview.Migrator.MIGRATE_SUCCESS;
 import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
-import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.showYesNoNeutralPopup;
 import static ml.melun.mangaview.Utils.writePreferenceToFile;
@@ -183,87 +182,48 @@ public class MainActivity extends AppCompatActivity
                     "저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?" +
                             "\n(데이터 일부가 유실될 수 있습니다. 꼭 백업을 하고 진행해 주세요)",
                     "데이터 백업",
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //proceed
-                            final EditText editText = new EditText(context);
-                            editText.setHint(p.getDefUrl());
+                    (dialogInterface, i) -> {
+                        //proceed
+                        final EditText editText = new EditText(context);
+                        editText.setHint(p.getDefUrl());
 
-                            AlertDialog.Builder builder;
-                            if (new Preference(context).getDarkTheme())
-                                builder = new AlertDialog.Builder(context, R.style.darkDialog);
-                            else builder = new AlertDialog.Builder(context);
-                            builder.setTitle("기록 업데이트")
-                                    .setView(editText)
-                                    .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요.")
-                                    .setPositiveButton("계속", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            String url = editText.getText().toString();
-                                            if (url == null || url.length() < 1)
-                                                url = p.getDefUrl();
+                        AlertDialog.Builder builder;
+                        if (new Preference(context).getDarkTheme())
+                            builder = new AlertDialog.Builder(context, R.style.darkDialog);
+                        else builder = new AlertDialog.Builder(context);
+                        builder.setTitle("기록 업데이트")
+                                .setView(editText)
+                                .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요.")
+                                .setPositiveButton("계속", (dialogInterface15, i13) -> {
+                                    String url = editText.getText().toString();
+                                    if (url == null || url.length() < 1)
+                                        url = p.getDefUrl();
 
-                                            p.setUrl(url);
+                                    p.setUrl(url);
 
-                                            Intent intent = new Intent(getApplicationContext(), Migrator.class);
-                                            intent.setAction(MIGRATE_START);
-                                            if (Build.VERSION.SDK_INT >= 26) {
-                                                startForegroundService(intent);
-                                            } else {
-                                                startService(intent);
-                                            }
-                                            //queue title to service
-                                            Toast.makeText(getApplication(), "작업을 시작합니다.", Toast.LENGTH_LONG).show();
-                                            //restart activity
-                                            finish();
-                                            startActivity(getIntent());
-                                        }
-                                    })
-                                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            finish();
-                                        }
-                                    })
-                                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialogInterface) {
-                                            finish();
-                                        }
-                                    })
-                                    .show();
-                        }
-                    }, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            showPopup(context, "알림", "앱의 데이터를 초기화 하거나 데이터 업데이트를 진행하지 않으면 사용이 불가합니다.", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent12 = new Intent(getApplicationContext(), Migrator.class);
+                                    intent12.setAction(MIGRATE_START);
+                                    if (Build.VERSION.SDK_INT >= 26) {
+                                        startForegroundService(intent12);
+                                    } else {
+                                        startService(intent12);
+                                    }
+                                    //queue title to service
+                                    Toast.makeText(getApplication(), "작업을 시작합니다.", Toast.LENGTH_LONG).show();
+                                    //restart activity
                                     finish();
-                                }
-                            }, new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialogInterface) {
-                                    finish();
-                                }
-                            });
-                        }
-                    }, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //backup
-                            Intent intent = new Intent(context, FolderSelectActivity.class);
-                            intent.putExtra("mode", MODE_FILE_SAVE);
-                            intent.putExtra("title", "백업");
-                            startActivityForResult(intent, MODE_FILE_SAVE);
-                        }
-                    }, new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialogInterface) {
-                            finish();
-                        }
-                    });
+                                    startActivity(getIntent());
+                                })
+                                .setNegativeButton("취소", (dialogInterface14, i12) -> finish())
+                                .setOnCancelListener(dialogInterface13 -> finish())
+                                .show();
+                    }, (dialogInterface, i) -> showPopup(context, "알림", "앱의 데이터를 초기화 하거나 데이터 업데이트를 진행하지 않으면 사용이 불가합니다.", (dialogInterface12, i1) -> finish(), dialogInterface1 -> finish()), (dialogInterface, i) -> {
+                        //backup
+                        Intent intent1 = new Intent(context, FolderSelectActivity.class);
+                        intent1.putExtra("mode", MODE_FILE_SAVE);
+                        intent1.putExtra("title", "백업");
+                        startActivityForResult(intent1, MODE_FILE_SAVE);
+                    }, dialogInterface -> finish());
         }else if(action != null && action.equals(MIGRATE_RESULT)){
             migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
         }else{
@@ -396,56 +356,53 @@ public class MainActivity extends AppCompatActivity
         } else {
             if(currentTab == startTab){
 
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
+                DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
 
-                                //block interactivity
-                                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            //block interactivity
+                            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                                if(Downloader.isRunning()){
-                                    //downloader is running
-                                    //show info prompt
-                                    findViewById(R.id.waiting_panel).setVisibility(View.VISIBLE);
+                            if(Downloader.isRunning()){
+                                //downloader is running
+                                //show info prompt
+                                findViewById(R.id.waiting_panel).setVisibility(View.VISIBLE);
 
-                                    //stop downloader service
-                                    Intent downloader = new Intent(getApplicationContext(),Downloader.class);
-                                    downloader.setAction(Downloader.ACTION_FORCE_STOP);
-                                    if (Build.VERSION.SDK_INT >= 26) {
-                                        startForegroundService(downloader);
-                                    }else{
-                                        startService(downloader);
-                                    }
-
-                                    //broadcast receiver
-                                    BroadcastReceiver statusReceiver = new BroadcastReceiver() {
-                                        @Override
-                                        public void onReceive(Context context, Intent intent) {
-                                            if(intent.getAction().matches(BROADCAST_STOP)){
-                                                //service stopped
-                                                finishAffinity();
-                                                System.runFinalization();
-                                                System.exit(0);
-                                            }
-                                        }
-                                    };
-                                    IntentFilter infil = new IntentFilter();
-                                    infil.addAction(BROADCAST_STOP);
-                                    registerReceiver(statusReceiver, infil);
-
+                                //stop downloader service
+                                Intent downloader = new Intent(getApplicationContext(),Downloader.class);
+                                downloader.setAction(Downloader.ACTION_FORCE_STOP);
+                                if (Build.VERSION.SDK_INT >= 26) {
+                                    startForegroundService(downloader);
                                 }else{
-                                    //kill application
-                                    finishAffinity();
-                                    System.runFinalization();
-                                    System.exit(0);
+                                    startService(downloader);
                                 }
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //No button clicked
-                                break;
-                        }
+
+                                //broadcast receiver
+                                BroadcastReceiver statusReceiver = new BroadcastReceiver() {
+                                    @Override
+                                    public void onReceive(Context context, Intent intent) {
+                                        if(intent.getAction().matches(BROADCAST_STOP)){
+                                            //service stopped
+                                            finishAffinity();
+                                            System.runFinalization();
+                                            System.exit(0);
+                                        }
+                                    }
+                                };
+                                IntentFilter infil = new IntentFilter();
+                                infil.addAction(BROADCAST_STOP);
+                                registerReceiver(statusReceiver, infil);
+
+                            }else{
+                                //kill application
+                                finishAffinity();
+                                System.runFinalization();
+                                System.exit(0);
+                            }
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            break;
                     }
                 };
                 AlertDialog.Builder builder;
@@ -524,24 +481,9 @@ public class MainActivity extends AppCompatActivity
             }else if(id==R.id.nav_kakao){
 
                 View layout = getLayoutInflater().inflate(R.layout.content_kakao_popup, null);
-                layout.findViewById(R.id.kakao_notice).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_notice))));
-                    }
-                });
-                layout.findViewById(R.id.kakao_chat).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_chat))));
-                    }
-                });
-                layout.findViewById(R.id.kakao_direct).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_direct))));
-                    }
-                });
+                layout.findViewById(R.id.kakao_notice).setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_notice)))));
+                layout.findViewById(R.id.kakao_chat).setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_chat)))));
+                layout.findViewById(R.id.kakao_direct).setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_direct)))));
 
                 AlertDialog.Builder builder;
                 if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
@@ -616,14 +558,11 @@ public class MainActivity extends AppCompatActivity
             textView.setText(msg);
             final Button copyBtn = new Button(context);
             copyBtn.setText("결과 복사");
-            copyBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("result", msg);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(context, "클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
-                }
+            copyBtn.setOnClickListener(view -> {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("result", msg);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(context, "클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
             });
             final Button btn = new Button(context);
             btn.setText("닫기");
@@ -638,33 +577,15 @@ public class MainActivity extends AppCompatActivity
             else abuilder = new AlertDialog.Builder(context);
             AlertDialog dialog = abuilder.setTitle("결과")
                     .setView(scrollView)
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialogInterface) {
-                            activityInit(bundle);
-                        }
-                    })
+                    .setOnCancelListener(dialogInterface -> activityInit(bundle))
                     .create();
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    dialog.dismiss();
-                    activityInit(bundle);
-                }
+            btn.setOnClickListener(view -> {
+                dialog.dismiss();
+                activityInit(bundle);
             });
             dialog.show();
         }
         else if(resCode == 1)
-            showPopup(context, "연결 오류", "연결을 확인하고 다시 시도해 주세요.", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                }
-            }, new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialogInterface) {
-                    finish();
-                }
-            });
+            showPopup(context, "연결 오류", "연결을 확인하고 다시 시도해 주세요.", (dialogInterface, i) -> finish(), dialogInterface -> finish());
     }
 }

@@ -1,7 +1,6 @@
 package ml.melun.mangaview.mangaview;
 
 
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -37,8 +34,7 @@ public class CustomHttpClient {
         if(android.os.Build.VERSION.SDK_INT < CODE_SCOPED_STORAGE) {
             // Necessary because our servers don't have the right cipher suites.
             // https://github.com/square/okhttp/issues/4053
-            List<CipherSuite> cipherSuites = new ArrayList<>();
-            cipherSuites.addAll(ConnectionSpec.MODERN_TLS.cipherSuites());
+            List<CipherSuite> cipherSuites = new ArrayList<>(ConnectionSpec.MODERN_TLS.cipherSuites());
             cipherSuites.add(CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA);
             cipherSuites.add(CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA);
 
@@ -81,7 +77,7 @@ public class CustomHttpClient {
 
     public Response get(String url, Map<String, String> headers){
 //        System.out.println(url);
-        Response response = null;
+        Response response;
         try {
             Request.Builder builder = new Request.Builder()
                     .url(url)
@@ -119,9 +115,8 @@ public class CustomHttpClient {
         if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
             customCookie.put("PHPSESSID", p.getLogin().cookie);
         }
-        Map<String,String> cookie = new HashMap<>();
-        cookie.putAll(this.cookies);
-        if(customCookie != null) cookie.putAll(customCookie);
+        Map<String, String> cookie = new HashMap<>(this.cookies);
+        cookie.putAll(customCookie);
 
         StringBuilder cbuilder = new StringBuilder();
         for(String key : cookie.keySet()){
@@ -133,9 +128,8 @@ public class CustomHttpClient {
         if(cbuilder.length()>2)
             cbuilder.delete(cbuilder.length()-2,cbuilder.length());
 
-        Map headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Cookie", cbuilder.toString());
-        System.out.println(cbuilder.toString());
         headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36");
         //headers.put("Referer",p.getUrl());
 
@@ -148,18 +142,18 @@ public class CustomHttpClient {
 
     public Response post(String url, RequestBody body, Map<String,String> headers, boolean localCookies){
 
-        String cs = "";
+        StringBuilder cs = new StringBuilder();
         //get cookies from headers
         if(headers.get("Cookie") != null)
-            cs += headers.get("Cookie");
+            cs.append(headers.get("Cookie"));
 
         // add local cookies
         if(localCookies)
             for(String key : this.cookies.keySet()){
-                cs += key + '=' + this.cookies.get(key) + "; ";
+                cs.append(key).append('=').append(this.cookies.get(key)).append("; ");
             }
 
-        headers.put("Cookie", cs);
+        headers.put("Cookie", cs.toString());
 
         Response response = null;
         try {
@@ -201,12 +195,12 @@ public class CustomHttpClient {
                     new X509TrustManager() {
                         @Override
                         public void checkClientTrusted(java.security.cert.X509Certificate[] chain,
-                                                       String authType) throws CertificateException {
+                                                       String authType){
                         }
 
                         @Override
                         public void checkServerTrusted(java.security.cert.X509Certificate[] chain,
-                                                       String authType) throws CertificateException {
+                                                       String authType){
                         }
 
                         @Override
@@ -224,12 +218,7 @@ public class CustomHttpClient {
 
             return new OkHttpClient.Builder()
                     .sslSocketFactory(sslSocketFactory, (X509TrustManager) trustAllCerts[0])
-                    .hostnameVerifier(new HostnameVerifier() {
-                        @Override
-                        public boolean verify(String hostname, SSLSession session) {
-                            return true;
-                        }
-                    });
+                    .hostnameVerifier((hostname, session) -> true);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

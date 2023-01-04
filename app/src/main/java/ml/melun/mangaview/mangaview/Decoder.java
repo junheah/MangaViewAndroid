@@ -43,11 +43,9 @@ public class Decoder {
             if (id < 554714) order[i][1] = _random(i);
             else order[i][1] = newRandom(i);
         }
-        java.util.Arrays.sort(order, new java.util.Comparator<int[]>() {
-            public int compare(int[] a, int[] b) {
-                //return Double.compare(a[1], b[1]);
-                return a[1] != b[1] ? a[1] - b[1] : a[0] - b[0];
-            }
+        java.util.Arrays.sort(order, (a, b) -> {
+            //return Double.compare(a[1], b[1]);
+            return a[1] != b[1] ? a[1] - b[1] : a[0] - b[0];
         });
         //create new bitmap
         Bitmap output = Bitmap.createBitmap(input.getWidth(), input.getHeight(), Bitmap.Config.ARGB_8888);

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,7 +29,7 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     onclickListener olisten;
     boolean save;
     boolean dark;
-    private LayoutInflater mInflater;
+    private final LayoutInflater mInflater;
 
     public UpdatedAdapter(Context main) {
         super();
@@ -80,11 +79,11 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         else
             h.fav.setVisibility(View.GONE);
 
-        String tags ="";
+        StringBuilder tags = new StringBuilder();
         for (String s :m.getTag()) {
-            tags += s + " ";
+            tags.append(s).append(" ");
         }
-        h.tags.setText(tags);
+        h.tags.setText(tags.toString());
         h.author.setText(m.getAuthor());
     }
 
@@ -119,18 +118,8 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
                 viewEps.setBackgroundColor(ContextCompat.getColor(context, R.color.resumeDark));
             }
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    olisten.onClick(mData.get(getAdapterPosition()));
-                }
-            });
-            viewEps.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    olisten.onEpsClick(mData.get(getAdapterPosition()).getTitle());
-                }
-            });
+            card.setOnClickListener(v -> olisten.onClick(mData.get(getAdapterPosition())));
+            viewEps.setOnClickListener(v -> olisten.onEpsClick(mData.get(getAdapterPosition()).getTitle()));
         }
     }
 

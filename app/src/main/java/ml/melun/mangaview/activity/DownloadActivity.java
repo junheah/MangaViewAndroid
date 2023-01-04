@@ -47,59 +47,44 @@ public class DownloadActivity extends AppCompatActivity {
             title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
             eplist.setLayoutManager(new NpaLinearLayoutManager(this));
             adapter = new SelectEpisodeAdapter(getApplicationContext(),title.getEps());
-            adapter.setClickListener(new SelectEpisodeAdapter.ItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    adapter.select(position);
-                }
-            });
+            adapter.setClickListener((view, position) -> adapter.select(position));
             eplist.setAdapter(adapter);
         }catch (Exception e){
             e.printStackTrace();
         }
         Button dl = findViewById(R.id.dl_btn);
-        dl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(adapter.getSelected(false).length()>0) {
-                    selected = adapter.getSelected(false);
-                    downloadClick();
-                }else{
-                    Toast.makeText(getApplication(),"1개 이상의 화를 선택해 주세요", Toast.LENGTH_SHORT).show();
-                }
+        dl.setOnClickListener(v -> {
+            if(adapter.getSelected(false).length()>0) {
+                selected = adapter.getSelected(false);
+                downloadClick();
+            }else{
+                Toast.makeText(getApplication(),"1개 이상의 화를 선택해 주세요", Toast.LENGTH_SHORT).show();
             }
         });
         Button dlAll = findViewById(R.id.dl_all_btn);
-        dlAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selected = adapter.getSelected(true);
-                downloadClick();
-            }
+        dlAll.setOnClickListener(v -> {
+            selected = adapter.getSelected(true);
+            downloadClick();
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Button selectionMode = findViewById(R.id.dl_mode_btn);
-        selectionMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(singleSelect){
-                    singleSelect = false;
-                    selectionMode.setText("범위 선택 모드");
-                    adapter.setSelectionMode(singleSelect);
-                }else{
-                    singleSelect = true;
-                    selectionMode.setText("단일 선택 모드");
-                    adapter.setSelectionMode(singleSelect);
-                }
+        selectionMode.setOnClickListener(view -> {
+            if(singleSelect){
+                singleSelect = false;
+                selectionMode.setText("범위 선택 모드");
+                adapter.setSelectionMode(singleSelect);
+            }else{
+                singleSelect = true;
+                selectionMode.setText("단일 선택 모드");
+                adapter.setSelectionMode(singleSelect);
             }
         });
     }
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -108,31 +93,28 @@ public class DownloadActivity extends AppCompatActivity {
     private void downloadClick(){
         //download manga
         //ask for confirmation
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        //Yes button clicked
-                        //check if download service is up and running
-                        Intent downloader = new Intent(getApplicationContext(),Downloader.class);
-                        downloader.setAction(Downloader.ACTION_QUEUE);
-                        downloader.putExtra("title", new Gson().toJson(new DownloadTitle(title)));
-                        downloader.putExtra("selected", selected.toString());
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //Yes button clicked
+                    //check if download service is up and running
+                    Intent downloader = new Intent(getApplicationContext(),Downloader.class);
+                    downloader.setAction(Downloader.ACTION_QUEUE);
+                    downloader.putExtra("title", new Gson().toJson(new DownloadTitle(title)));
+                    downloader.putExtra("selected", selected.toString());
 
-                        if (Build.VERSION.SDK_INT >= 26) {
-                            startForegroundService(downloader);
-                        }else{
-                            startService(downloader);
-                        }
-                        //queue title to service
-                        Toast.makeText(getApplication(),"다운로드를 시작합니다.", Toast.LENGTH_LONG).show();
-                        finish();
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        startForegroundService(downloader);
+                    }else{
+                        startService(downloader);
+                    }
+                    //queue title to service
+                    Toast.makeText(getApplication(),"다운로드를 시작합니다.", Toast.LENGTH_LONG).show();
+                    finish();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
             }
         };
         AlertDialog.Builder builder;

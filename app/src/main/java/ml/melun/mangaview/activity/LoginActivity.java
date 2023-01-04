@@ -2,7 +2,6 @@ package ml.melun.mangaview.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,16 +20,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
-
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Login;
@@ -55,7 +47,6 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
     private View accountPanel;
-    private Button logoutBtn;
     Context context;
 
     Login login;
@@ -73,50 +64,36 @@ public class LoginActivity extends AppCompatActivity {
         mCaptchaView = findViewById(R.id.captcha_answer);
         captchaImg = findViewById(R.id.captcha_img);
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
+        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                attemptLogin();
+                return true;
             }
+            return false;
         });
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+        mEmailSignInButton.setOnClickListener(view -> attemptLogin());
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        logoutBtn = findViewById(R.id.logout_button);
+        Button logoutBtn = findViewById(R.id.logout_button);
 
         if(p.getLogin() != null && p.getLogin().isValid()){
             mLoginFormView.setVisibility(View.GONE);
             accountPanel.setVisibility(View.VISIBLE);
-            logoutBtn.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    p.setLogin(null);
-                    httpClient.resetCookie();
-                    mLoginFormView.setVisibility(View.VISIBLE);
-                    accountPanel.setVisibility(View.GONE);
-                    new PreLoginTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
+            logoutBtn.setOnClickListener(view -> {
+                p.setLogin(null);
+                httpClient.resetCookie();
+                mLoginFormView.setVisibility(View.VISIBLE);
+                accountPanel.setVisibility(View.GONE);
+                new PreLoginTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             });
 
-            this.findViewById(R.id.bookmark_list_button).setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent i = new Intent(context, TagSearchActivity.class);
-                    i.putExtra("mode",7);
-                    startActivity(i);
-                }
+            this.findViewById(R.id.bookmark_list_button).setOnClickListener(view -> {
+                Intent i = new Intent(context, TagSearchActivity.class);
+                i.putExtra("mode",7);
+                startActivity(i);
             });
 
             this.findViewById(R.id.bookmark_import_button).setOnClickListener(new OnClickListener() {
@@ -161,19 +138,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-
 
 
     /**
@@ -217,7 +187,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if(TextUtils.isEmpty(answer)){
-            Toast.makeText(context, "자동입력 방지문자를 입력하세요", Toast.LENGTH_SHORT);
+            Toast.makeText(context, "자동입력 방지문자를 입력하세요", Toast.LENGTH_SHORT).show();
             cancel = true;
             focusView = mCaptchaView;
         }
@@ -246,7 +216,6 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * Shows the progress UI and hides the login form.
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in

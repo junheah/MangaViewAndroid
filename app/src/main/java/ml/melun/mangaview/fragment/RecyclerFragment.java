@@ -136,7 +136,7 @@ public class RecyclerFragment extends Fragment {
                 switch (requestCode) {
                     case 1:
                         //favorite result
-                        Boolean favorite_after = data.getBooleanExtra("favorite", true);
+                        boolean favorite_after = data.getBooleanExtra("favorite", true);
                         if (!favorite_after && titleAdapter != null && titleAdapter.getItemCount() > 0)
                             titleAdapter.remove(selectedPosition);
                         break;
@@ -220,12 +220,12 @@ public class RecyclerFragment extends Fragment {
                                     titles.add(title);
                                 } catch (Exception e) {
                                     e.printStackTrace();
-                                    Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                    Title title = new Title(f.getName(), "", "", new ArrayList<>(), "", 0, MTitle.base_auto);
                                     title.setPath(f.getUri().toString());
                                     titles.add(title);
                                 }
                             } else {
-                                Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                Title title = new Title(f.getName(), "", "", new ArrayList<>(), "", 0, MTitle.base_auto);
                                 title.setPath(f.getUri().toString());
                                 titles.add(title);
                             }
@@ -252,13 +252,13 @@ public class RecyclerFragment extends Fragment {
                                     titles.add(title);
                                 } catch (Exception e) {
                                     e.printStackTrace();
-                                    Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                    Title title = new Title(f.getName(), "", "", new ArrayList<>(), "", 0, MTitle.base_auto);
                                     title.setPath(f.getAbsolutePath());
                                     titles.add(title);
                                 }
 
                             } else {
-                                Title title = new Title(f.getName(), "", "", new ArrayList<String>(), "", 0, MTitle.base_auto);
+                                Title title = new Title(f.getName(), "", "", new ArrayList<>(), "", 0, MTitle.base_auto);
                                 title.setPath(f.getAbsolutePath());
                                 titles.add(title);
                             }
@@ -296,10 +296,7 @@ public class RecyclerFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.filter_search) {
-            return true;
-        }
-        return false;
+        return item.getItemId() == R.id.filter_search;
     }
 
     void openViewer(Manga manga, int code){
@@ -341,55 +338,50 @@ public class RecyclerFragment extends Fragment {
         }
 
         //registering popup with OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                switch(item.getItemId()){
-                    case R.id.del:
-                        //delete (only in recent)
+        popup.setOnMenuItemClickListener(item -> {
+            switch(item.getItemId()){
+                case R.id.del:
+                    //delete (only in recent)
+                    titleAdapter.remove(position);
+                    p.removeRecent(position);
+                    break;
+                case R.id.favAdd:
+                case R.id.favDel:
+                    //toggle favorite
+                    p.toggleFavorite(title,0);
+                    if(m==2){
                         titleAdapter.remove(position);
-                        p.removeRecent(position);
-                        break;
-                    case R.id.favAdd:
-                    case R.id.favDel:
-                        //toggle favorite
-                        p.toggleFavorite(title,0);
-                        if(m==2){
-                            titleAdapter.remove(position);
-                        }
-                        break;
-                    case R.id.remove:
-                        //저장된 만화에서 삭제
-                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if(which == DialogInterface.BUTTON_POSITIVE){
-                                        //Yes button clicked
-                                        if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
-                                            DocumentFile f = DocumentFile.fromTreeUri(getContext(), Uri.parse(p.getHomeDir()));
-                                            DocumentFile target = f.findFile(title.getName());
-                                            if(target != null && target.delete()){
-                                                titleAdapter.remove(position);
-                                                Toast.makeText(getContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
-                                            }else showPopup(getContext(), "알림", "삭제를 실패했습니다");
-                                        }else {
-                                            File folder = new File(p.getHomeDir(), filterFolder(title.getName()));
-                                            if (deleteRecursive(folder)) {
-                                                titleAdapter.remove(position);
-                                                Toast.makeText(getContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
-                                            } else showPopup(getContext(), "알림", "삭제를 실패했습니다");
-                                        }
-                                }
+                    }
+                    break;
+                case R.id.remove:
+                    //저장된 만화에서 삭제
+                    DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            //Yes button clicked
+                            if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
+                                DocumentFile f = DocumentFile.fromTreeUri(getContext(), Uri.parse(p.getHomeDir()));
+                                DocumentFile target = f.findFile(title.getName());
+                                if (target != null && target.delete()) {
+                                    titleAdapter.remove(position);
+                                    Toast.makeText(getContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                                } else showPopup(getContext(), "알림", "삭제를 실패했습니다");
+                            } else {
+                                File folder = new File(p.getHomeDir(), filterFolder(title.getName()));
+                                if (deleteRecursive(folder)) {
+                                    titleAdapter.remove(position);
+                                    Toast.makeText(getContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                                } else showPopup(getContext(), "알림", "삭제를 실패했습니다");
                             }
-                        };
-                        AlertDialog.Builder builder;
-                        if(p.getDarkTheme()) builder = new AlertDialog.Builder(getContext(),R.style.darkDialog);
-                        else builder = new AlertDialog.Builder(getContext());
-                        builder.setMessage("정말로 삭제 하시겠습니까?").setPositiveButton("네", dialogClickListener)
-                                .setNegativeButton("아니오", dialogClickListener).show();
-                        break;
-                }
-                return false;
+                        }
+                    };
+                    AlertDialog.Builder builder;
+                    if(p.getDarkTheme()) builder = new AlertDialog.Builder(getContext(),R.style.darkDialog);
+                    else builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("정말로 삭제 하시겠습니까?").setPositiveButton("네", dialogClickListener)
+                            .setNegativeButton("아니오", dialogClickListener).show();
+                    break;
             }
+            return false;
         });
         popup.show(); //showing popup menu
     }

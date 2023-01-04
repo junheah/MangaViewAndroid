@@ -74,35 +74,26 @@ public class MainSearch extends Fragment {
             baseMode.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
         }
 
-        searchBox.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(b){
-                    optionsPanel.setVisibility(View.VISIBLE);
-                }else{
-                    optionsPanel.setVisibility(View.GONE);
-                }
+        searchBox.setOnFocusChangeListener((view, b) -> {
+            if(b){
+                optionsPanel.setVisibility(View.VISIBLE);
+            }else{
+                optionsPanel.setVisibility(View.GONE);
             }
         });
 
-        advSearchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "고급검색 기능 사용 불가", Toast.LENGTH_LONG).show();
+        advSearchBtn.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "고급검색 기능 사용 불가", Toast.LENGTH_LONG).show();
 //                Intent advSearch = new Intent(getContext(), AdvSearchActivity.class);
 //                startActivity(advSearch);
-            }
         });
 
-        searchBox.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction()==KeyEvent.ACTION_DOWN && keyCode ==KeyEvent.KEYCODE_ENTER){
-                    searchSubmit();
-                    return true;
-                }
-                return false;
+        searchBox.setOnKeyListener((v, keyCode, event) -> {
+            if(event.getAction()==KeyEvent.ACTION_DOWN && keyCode ==KeyEvent.KEYCODE_ENTER){
+                searchSubmit();
+                return true;
             }
+            return false;
         });
 
         AdapterView.OnItemSelectedListener mlistener = new AdapterView.OnItemSelectedListener() {
@@ -123,16 +114,13 @@ public class MainSearch extends Fragment {
 
 
 
-        swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                if(search==null) swipe.setRefreshing(false);
-                else {
-                    if (!search.isLast()) {
-                        SearchManga sm = new SearchManga();
-                        sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } else swipe.setRefreshing(false);
-                }
+        swipe.setOnRefreshListener(direction -> {
+            if(search==null) swipe.setRefreshing(false);
+            else {
+                if (!search.isLast()) {
+                    SearchManga sm = new SearchManga();
+                    sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else swipe.setRefreshing(false);
             }
         });
         return rootView;
@@ -198,18 +186,15 @@ public class MainSearch extends Fragment {
                     public void onLongClick(View view, int position) {
                         //none
                         Title title = searchAdapter.getItem(position);
-                        popup(getContext(),view, position, title, 0, new PopupMenu.OnMenuItemClickListener(){
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                switch(item.getItemId()){
-                                    case R.id.favAdd:
-                                    case R.id.favDel:
-                                        //toggle favorite
-                                        p.toggleFavorite(title,0);
-                                        break;
-                                }
-                                return false;
+                        popup(getContext(),view, position, title, 0, item -> {
+                            switch(item.getItemId()){
+                                case R.id.favAdd:
+                                case R.id.favDel:
+                                    //toggle favorite
+                                    p.toggleFavorite(title,0);
+                                    break;
                             }
+                            return false;
                         }, p);
                     }
 

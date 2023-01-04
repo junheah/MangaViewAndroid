@@ -69,7 +69,7 @@ public class MainPage {
                 thumb = infos.selectFirst("img").attr("src");
                 name = infos.selectFirst("div.in-subject").ownText();
 
-                ranking.add(new RankingTitle(name, thumb, "" , null, "", id, base_comic, i++));
+                ranking.add(new RankingTitle(name, thumb, "", null, "", id, base_comic, i++));
             }
 
             i=1;
@@ -124,7 +124,7 @@ public class MainPage {
 */
     }
 
-    public class RankingTitle extends Title{
+    public static class RankingTitle extends Title{
         int ranking;
         public RankingTitle(String n, String t, String a, List<String> tg, String r, int id, int baseMode, int ranking) {
             super(n, t, a, tg, r, id, baseMode);
@@ -135,7 +135,7 @@ public class MainPage {
             return ranking;
         }
     }
-    public class RankingManga extends Manga{
+    public static class RankingManga extends Manga{
         int ranking;
         public RankingManga(int i, String n, String d, int baseMode, int ranking) {
             super(i, n, d, baseMode);

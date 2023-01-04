@@ -1,11 +1,9 @@
 package ml.melun.mangaview.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
 
@@ -13,15 +11,12 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.view.DisplayCutoutCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -30,9 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -43,13 +36,6 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +54,9 @@ import ml.melun.mangaview.model.PageItem;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.getOfflineEpisodes;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
-import static ml.melun.mangaview.Utils.readFileToString;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
-import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
@@ -124,8 +107,6 @@ public class ViewerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
 
-        zoom_layout = this.findViewById(R.id.zoom);
-        zoom_image = this.findViewById(R.id.zoom_image);
         next = this.findViewById(R.id.toolbar_next);
         prev = this.findViewById(R.id.toolbar_previous);
         toolbar = this.findViewById(R.id.viewerToolbar);
@@ -145,40 +126,28 @@ public class ViewerActivity extends AppCompatActivity {
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
 
-        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
-                //This is where you get DisplayCutoutCompat
-                int statusBarHeight = getStatusBarHeight();
-                int ci;
-                if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
-                else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (view, windowInsetsCompat) -> {
+            //This is where you get DisplayCutoutCompat
+            int statusBarHeight = getStatusBarHeight();
+            int ci;
+            if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
+            else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
-                appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
-                view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
-                return windowInsetsCompat;
-            }
+            appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
+            view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+            return windowInsetsCompat;
         });
 
-        this.findViewById(R.id.zoom_x).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                zoom_layout.setVisibility(View.GONE);
-            }
-        });
 
-        zoom = new StringCallback() {
-            @Override
-            public void callback(String data) {
-                zoom_layout.setVisibility(View.VISIBLE);
-                Glide.with(zoom_image)
-                        .load(data)
-                        .placeholder(R.drawable.placeholder)
-                        .into(zoom_image);
+        zoom = data -> {
+            zoom_layout.setVisibility(View.VISIBLE);
+            Glide.with(zoom_image)
+                    .load(data)
+                    .placeholder(R.drawable.placeholder)
+                    .into(zoom_image);
 
-                //todo : 이미지 확대 팝업
+            //todo : 이미지 확대 팝업
 
-            }
         };
 
         infiniteScrollCallback = new InfiniteScrollCallback() {
@@ -188,13 +157,10 @@ public class ViewerActivity extends AppCompatActivity {
                 int i = eps.indexOf(curm);
                 if(i<eps.size()-1) {
                     if(loader != null) loader.cancel(true);
-                    loader = new loadImages(eps.get(i + 1), new LoadMangaCallback() {
-                        @Override
-                        public void post(Manga m) {
-                            if (m.getImgs(context).size() > 0)
-                                stripAdapter.insertManga(m);
-                            callback.prevLoaded(m);
-                        }
+                    loader = new loadImages(eps.get(i + 1), m -> {
+                        if (m.getImgs(context).size() > 0)
+                            stripAdapter.insertManga(m);
+                        callback.prevLoaded(m);
                     },false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i + 1);
@@ -210,13 +176,10 @@ public class ViewerActivity extends AppCompatActivity {
                 int i = eps.indexOf(curm);
                 if(i>0) {
                     if(loader != null) loader.cancel(true);
-                    loader = new loadImages(eps.get(i - 1), new LoadMangaCallback() {
-                        @Override
-                        public void post(Manga m) {
-                            if (m.getImgs(context).size() > 0)
-                                stripAdapter.appendManga(m);
-                            callback.nextLoaded(m);
-                        }
+                    loader = new loadImages(eps.get(i - 1), m -> {
+                        if (m.getImgs(context).size() > 0)
+                            stripAdapter.appendManga(m);
+                        callback.nextLoaded(m);
                     },false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i - 1);
@@ -233,12 +196,7 @@ public class ViewerActivity extends AppCompatActivity {
             }
         };
 
-        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        this.findViewById(R.id.backButton).setOnClickListener(view -> finish());
         //imageZoomHelper = new ImageZoomHelper(this);
 
         try {
@@ -259,15 +217,12 @@ public class ViewerActivity extends AppCompatActivity {
             manager = new StripLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             spinnerAdapter = new CustomSpinnerAdapter(context);
-            spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
-                @Override
-                public void onClick(Manga m, int i) {
-                    lockUi(true);
-                    spinner.setSelection(m);
-                    hideSpinnerDropDown(spinner);
-                    loadManga(m);
+            spinnerAdapter.setListener((m, i) -> {
+                lockUi(true);
+                spinner.setSelection(m);
+                hideSpinnerDropDown(spinner);
+                loadManga(m);
 
-                }
             });
             spinner.setAdapter(spinnerAdapter);
             strip.setLayoutManager(manager);
@@ -297,58 +252,37 @@ public class ViewerActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadManga(manga.nextEp());
-            }
-        });
-        prev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadManga(manga.prevEp());
-            }
-        });
-        cut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleAutoCut();
-            }
-        });
+        next.setOnClickListener(v -> loadManga(manga.nextEp()));
+        prev.setOnClickListener(v -> loadManga(manga.prevEp()));
+        cut.setOnClickListener(v -> toggleAutoCut());
 
-        pageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PageItem current = stripAdapter.getCurrentVisiblePage();
-                AlertDialog.Builder alert;
-                if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
-                else alert = new AlertDialog.Builder(context);
+        pageBtn.setOnClickListener(v -> {
+            PageItem current = stripAdapter.getCurrentVisiblePage();
+            AlertDialog.Builder alert;
+            if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
+            else alert = new AlertDialog.Builder(context);
 
-                alert.setTitle("페이지 선택\n(1~"+current.manga.getImgs(context).size()+")");
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                input.setRawInputType(Configuration.KEYBOARD_12KEY);
-                alert.setView(input);
-                alert.setPositiveButton("이동", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int button) {
-                        //이동 시
-                        if(input.getText().length()>0) {
-                            int page = Integer.parseInt(input.getText().toString());
-                            if (page < 1) page = 1;
-                            if (page > current.manga.getImgs(context).size()) page = current.manga.getImgs(context).size();
-                            manager.scrollToPage(new PageItem(page-1,"",current.manga));
-                            pageBtn.setText(page+"/"+current.manga.getImgs(context).size());
-                        }
-                    }
-                });
+            alert.setTitle("페이지 선택\n(1~"+current.manga.getImgs(context).size()+")");
+            final EditText input = new EditText(context);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            input.setRawInputType(Configuration.KEYBOARD_12KEY);
+            alert.setView(input);
+            alert.setPositiveButton("이동", (dialog, button) -> {
+                //이동 시
+                if (input.getText().length() > 0) {
+                    int page = Integer.parseInt(input.getText().toString());
+                    if (page < 1) page = 1;
+                    if (page > current.manga.getImgs(context).size())
+                        page = current.manga.getImgs(context).size();
+                    manager.scrollToPage(new PageItem(page - 1, "", current.manga));
+                    pageBtn.setText(page + "/" + current.manga.getImgs(context).size());
+                }
+            });
 
-                alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int button) {
-                        //취소 시
-                    }
-                });
-                alert.show();
-            }
+            alert.setNegativeButton("취소", (dialog, button) -> {
+                //취소 시
+            });
+            alert.show();
         });
 
     }
@@ -367,26 +301,13 @@ public class ViewerActivity extends AppCompatActivity {
 
     void loadManga(Manga m){
         if(m == null){
-            showPopup(context, "오류", "만화를 불러 오던중 오류가 발생했습니다.", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ViewerActivity.this.finish();
-                }
-            }, new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    ViewerActivity.this.finish();
-                }
-            });
+            showPopup(context, "오류", "만화를 불러 오던중 오류가 발생했습니다.", (dialog, which) -> ViewerActivity.this.finish(), dialog -> ViewerActivity.this.finish());
         }
         if(stripAdapter!=null) stripAdapter.removeAll();
         if(m.isOnline()) {
-            loadManga(m, new LoadMangaCallback() {
-                @Override
-                public void post(Manga m) {
-                    manga = m;
-                    setManga(m);
-                }
+            loadManga(m, m1 -> {
+                manga = m1;
+                setManga(m1);
             });
         }else{
             //offline
@@ -471,17 +392,14 @@ public class ViewerActivity extends AppCompatActivity {
             if(item != null) {
                 pageBtn.setText(item.index+1 + "/" + item.manga.getImgs(context).size());
                 toolbarTitle.setText(item.manga.getName());
-                commentBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent commentActivity = new Intent(context, CommentsActivity.class);
-                        //create gson and put extra
-                        Gson gson = new Gson();
-                        commentActivity.putExtra("comments", gson.toJson(item.manga.getComments()));
-                        commentActivity.putExtra("bestComments", gson.toJson(item.manga.getBestComments()));
-                        commentActivity.putExtra("id", item.manga.getId());
-                        startActivity(commentActivity);
-                    }
+                commentBtn.setOnClickListener(v -> {
+                    Intent commentActivity = new Intent(context, CommentsActivity.class);
+                    //create gson and put extra
+                    Gson gson = new Gson();
+                    commentActivity.putExtra("comments", gson.toJson(item.manga.getComments()));
+                    commentActivity.putExtra("bestComments", gson.toJson(item.manga.getBestComments()));
+                    commentActivity.putExtra("id", item.manga.getId());
+                    startActivity(commentActivity);
                 });
                 appbar.animate().translationY(0);
                 appbarBottom.animate().translationY(0);
@@ -508,11 +426,9 @@ public class ViewerActivity extends AppCompatActivity {
         stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback, zoom);
         stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
-        stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
-            public void onItemClick() {
-                // show/hide toolbar
-                toggleToolbar();
-            }
+        stripAdapter.setClickListener(() -> {
+            // show/hide toolbar
+            toggleToolbar();
         });
         manager.scrollToPage(page);
     }
@@ -560,12 +476,9 @@ public class ViewerActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             if(lockui) lockUi(true);
-            setOnBackPressed(new Runnable() {
-                @Override
-                public void run(){
-                    loadImages.super.cancel(true);
-                    finish();
-                }
+            setOnBackPressed(() -> {
+                loadImages.super.cancel(true);
+                finish();
             });
         }
 
@@ -626,11 +539,9 @@ public class ViewerActivity extends AppCompatActivity {
 
     public void refreshAdapter(){
         strip.setAdapter(stripAdapter);
-        stripAdapter.setClickListener(new StripAdapter.ItemClickListener() {
-            public void onItemClick() {
-                // show/hide toolbar
-                toggleToolbar();
-            }
+        stripAdapter.setClickListener(() -> {
+            // show/hide toolbar
+            toggleToolbar();
         });
     }
 

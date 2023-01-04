@@ -9,12 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.google.android.flexbox.FlexWrap;
-import com.google.android.flexbox.JustifyContent;
 import com.google.android.material.tabs.TabLayout;
 
 import ml.melun.mangaview.interfaces.MainActivityCallback;
@@ -28,7 +24,6 @@ import ml.melun.mangaview.adapter.MainWebtoonAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 import ml.melun.mangaview.ui.NpaFlexboxLayoutManager;
-import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
@@ -74,16 +69,13 @@ public class MainMain extends Fragment{
     }
 
     public void initializeCallback(){
-        callback = new UrlUpdater.UrlUpdaterCallback() {
-            @Override
-            public void callback(boolean success) {
-                wait = false;
-                if(mainadapter != null && fragmentActive) {
-                    mainadapter.fetch();
-                }
-                if(mainWebtoonAdapter != null && fragmentActive) {
-                    mainWebtoonAdapter.fetch();
-                }
+        callback = success -> {
+            wait = false;
+            if(mainadapter != null && fragmentActive) {
+                mainadapter.fetch();
+            }
+            if(mainWebtoonAdapter != null && fragmentActive) {
+                mainWebtoonAdapter.fetch();
             }
         };
     }

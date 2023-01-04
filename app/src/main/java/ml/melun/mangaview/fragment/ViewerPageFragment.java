@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
@@ -60,20 +59,12 @@ public class ViewerPageFragment extends Fragment {
         if(context != null)
             loadImage(frame, refresh);
 
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(context != null) {
-                    loadImage(frame, refresh);
-                }
+        refresh.setOnClickListener(v -> {
+            if(context != null) {
+                loadImage(frame, refresh);
             }
         });
-        rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                i.onPageClick();
-            }
-        });
+        rootView.setOnClickListener(v -> i.onPageClick());
 
         return rootView;
     }

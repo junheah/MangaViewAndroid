@@ -256,13 +256,10 @@ public class Downloader extends Service {
 
         protected Integer doInBackground(String... urls) {
             String url = urls[0];
-            downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(), "mangaview-update"), new ProgressInterface() {
-                @Override
-                public void publish(int progress) {
-                    if(progress>prevProgress) {
-                        prevProgress = progress;
-                        publishProgress(progress);
-                    }
+            downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(), "mangaview-update"), progress -> {
+                if(progress>prevProgress) {
+                    prevProgress = progress;
+                    publishProgress(progress);
                 }
             });
             return null;
@@ -777,7 +774,6 @@ public class Downloader extends Service {
             notification.setSmallIcon(R.drawable.ic_logo);
         else
             notification.setSmallIcon(R.drawable.notification_logo);
-        ;
         notificationManager.notify(nid, notification.build());
     }
 

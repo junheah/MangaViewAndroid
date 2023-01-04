@@ -34,10 +34,10 @@ import ml.melun.mangaview.model.PageItem;
 
 public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private LayoutInflater mInflater;
-    private Context mainContext;
+    private final LayoutInflater mInflater;
+    private final Context mainContext;
     private StripAdapter.ItemClickListener mClickListener;
-    boolean autoCut = false;
+    boolean autoCut;
     boolean reverse;
     int __seed;
     Decoder d;
@@ -55,7 +55,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
 
-    public class InfoItem{
+    public static class InfoItem{
         public InfoItem(Manga prev, Manga next) {
             if(next == null)
                 this.next = prev.nextEp();
@@ -74,7 +74,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         public Manga next;
         public Manga prev;
-    };
+    }
 
     @Override
     public long getItemId(int position) {
@@ -132,8 +132,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 break;
             }
         }
-        for(int i=size-1; i>=0; i--)
-            items.remove(i);
+        if (size > 0) {
+            items.subList(0, size).clear();
+        }
         count--;
         notifyItemRangeRemoved(0,size);
     }
@@ -147,8 +148,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 break;
             }
         }
-        for(int i=items.size()-1; i>rsize; i--)
-            items.remove(i);
+        if (items.size() > rsize + 1) {
+            items.subList(rsize + 1, items.size()).clear();
+        }
         count--;
         notifyItemRangeRemoved(rsize+1,items.size()-rsize);
     }
@@ -195,12 +197,14 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void removeAll(){
+        int size = items.size();
         items.clear();
-        notifyDataSetChanged();
+        notifyItemRangeRemoved(0, size);
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if(viewType == IMG) {
             View view = mInflater.inflate(R.layout.item_strip, parent, false);
             return new ImgViewHolder(view);
@@ -212,7 +216,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int pos) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int pos) {
         int type = getItemViewType(pos);
         if(type == IMG) {
             ((ImgViewHolder)holder).frame.setImageResource(R.drawable.placeholder);
@@ -274,7 +278,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     .placeholder(R.drawable.placeholder)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
-                        public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                        public void onResourceReady(@NonNull Bitmap bitmap, Transition<? super Bitmap> transition) {
                             bitmap = d.decode(bitmap, width);
                             int width = bitmap.getWidth();
                             int height = bitmap.getHeight();
@@ -403,12 +407,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             super(itemView);
             frame = itemView.findViewById(R.id.frame);
             refresh = itemView.findViewById(R.id.refreshButton);
-            refresh.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //refresh image
-                    notifyItemChanged(getAdapterPosition());
-                }
+            refresh.setOnClickListener(v -> {
+                //refresh image
+                notifyItemChanged(getAdapterPosition());
             });
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);

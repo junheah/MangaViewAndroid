@@ -28,7 +28,6 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -59,12 +58,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         data = new ArrayList<>();
 
         uadapter = new MainUpdatedAdapter(main);
-        addh = new ButtonHeader("최근 추가된 만화", new Runnable() {
-            @Override
-            public void run() {
-                mainClickListener.clickedMoreUpdated();
-            }
-        });
+        addh = new ButtonHeader("최근 추가된 만화", () -> mainClickListener.clickedMoreUpdated());
 
         data.add(addh);
         data.add(null);
@@ -189,7 +183,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             lm.setOrientation(RecyclerView.HORIZONTAL);
             updatedList.setLayoutManager(lm);
             updatedList.setAdapter(uadapter);
-            uadapter.setClickListener(new MainUpdatedAdapter.onclick() {
+            uadapter.setClickListener(new MainUpdatedAdapter.OnClickCallback() {
                 @Override
                 public void onclick(Manga m) {
                     mainClickListener.clickedManga(m);
@@ -225,12 +219,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         public void setManga(Manga m, int r){
             text.setText(m.getName());
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(m!=null && m.getId()>0)
-                        mainClickListener.clickedManga(m);
-                }
+            card.setOnClickListener(v -> {
+                if(m!=null && m.getId()>0)
+                    mainClickListener.clickedManga(m);
             });
 
             if(m instanceof MainPage.RankingManga){
@@ -262,12 +253,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if(h instanceof ButtonHeader){
                 this.container.setClickable(true);
                 this.button.setVisibility(View.VISIBLE);
-                this.container.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ((ButtonHeader)h).callback();
-                    }
-                });
+                this.container.setOnClickListener(view -> ((ButtonHeader)h).callback());
             }else{
                 this.container.setClickable(false);
                 this.button.setVisibility(View.GONE);
@@ -294,12 +280,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
         public void setTitle(Title t, int r){
             text.setText(t.getName());
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(t!=null && t.getId()>0)
-                        mainClickListener.clickedTitle(t);
-                }
+            card.setOnClickListener(v -> {
+                if(t!=null && t.getId()>0)
+                    mainClickListener.clickedTitle(t);
             });
 
             if(t instanceof MainPage.RankingTitle){
@@ -323,19 +306,16 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             else
                 card.setCardBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorBackground));
 
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Tag t = (Tag) data.get(getAdapterPosition());
-                    if(t instanceof NameTag) mainClickListener.clickedName(t.tag);
-                    else if(t instanceof GenreTag) mainClickListener.clickedGenre(t.tag);
-                    else if(t instanceof ReleaseTag) mainClickListener.clickedRelease(t.tag);
-                }
+            card.setOnClickListener(v -> {
+                Tag t = (Tag) data.get(getAdapterPosition());
+                if(t instanceof NameTag) mainClickListener.clickedName(t.tag);
+                else if(t instanceof GenreTag) mainClickListener.clickedGenre(t.tag);
+                else if(t instanceof ReleaseTag) mainClickListener.clickedRelease(t.tag);
             });
         }
     }
 
-    class Tag{
+    static class Tag{
         public String tag;
         public Tag(String tag){this.tag=tag;}
         @NonNull
@@ -359,7 +339,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             super(tag);
         }
     }
-    class Header{
+    static class Header{
         public String header;
 
         public Header(String header) {
@@ -380,7 +360,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             callback.run();
         }
     }
-    class NoResultManga extends Manga{
+    static class NoResultManga extends Manga{
         public NoResultManga() {
             super(-1, "결과 없음", "", base_comic);
         }
@@ -415,8 +395,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if(login!=null && login.isValid()){
                 p.getLogin().buildCookie(cookie);
             }
-            MainPage u = new MainPage(httpClient);
-            return u;
+            return new MainPage(httpClient);
         }
 
         @Override

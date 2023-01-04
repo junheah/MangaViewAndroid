@@ -5,8 +5,6 @@ import android.util.AttributeSet;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.flexbox.FlexboxLayoutManager;
-
 public class NpaLinearLayoutManager extends LinearLayoutManager {
 
     public NpaLinearLayoutManager(Context context, int orientation, boolean reverseLayout) {

@@ -289,28 +289,15 @@ public class EpisodeActivity extends AppCompatActivity {
         if(bookmarkIndex>8) {
             episodeList.scrollToPosition(bookmarkIndex);
         }
-        findViewById(R.id.upfab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                episodeList.scrollToPosition(0);
-            }
-        });
-        findViewById(R.id.downfab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                episodeList.scrollToPosition(episodes.size()); //헤더가 0이기 때문
-            }
+        findViewById(R.id.upfab).setOnClickListener(v -> episodeList.scrollToPosition(0));
+        findViewById(R.id.downfab).setOnClickListener(v -> {
+            episodeList.scrollToPosition(episodes.size()); //헤더가 0이기 때문
         });
         if(bookmarkIndex>-1)
             resumefab.show();
         else
             resumefab.hide();
-        resumefab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openViewer(episodes.get(bookmarkIndex-1),0);
-            }
-        });
+        resumefab.setOnClickListener(v -> openViewer(episodes.get(bookmarkIndex-1),0));
 
         episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
 
@@ -355,14 +342,11 @@ public class EpisodeActivity extends AppCompatActivity {
                     openViewer(episodes.get(episodes.size()-1),0);
             }
         });
-        episodeAdapter.setTagClickListener(new TagAdapter.tagOnclick() {
-            @Override
-            public void onClick(String tag) {
-                Intent i = new Intent(context, TagSearchActivity.class);
-                i.putExtra("query",tag);
-                i.putExtra("mode",2);
-                startActivity(i);
-            }
+        episodeAdapter.setTagClickListener(tag -> {
+            Intent i = new Intent(context, TagSearchActivity.class);
+            i.putExtra("query",tag);
+            i.putExtra("mode",2);
+            startActivity(i);
         });
     }
 

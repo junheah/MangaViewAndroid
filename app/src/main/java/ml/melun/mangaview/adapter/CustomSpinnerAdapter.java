@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
@@ -17,14 +16,12 @@ import ml.melun.mangaview.mangaview.Manga;
 
 public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
 
-    private Context context;
     private List<Manga> data;
     private static LayoutInflater inflater = null;
     private CustomSpinnerListener listener;
     private int selected = -1;
 
     public CustomSpinnerAdapter(Context context) {
-        this.context = context;
         this.selected = -1;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -92,13 +89,10 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
             holder.name.setText(data.get(position).getName());
             holder.name.setSelected(true);
 
-            convertView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(listener != null && selected != position) {
-                        listener.onClick(data.get(position), position);
-                        setSelection(position);
-                    }
+            convertView.setOnClickListener(view -> {
+                if(listener != null && selected != position) {
+                    listener.onClick(data.get(position), position);
+                    setSelection(position);
                 }
             });
 
@@ -113,7 +107,7 @@ public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter 
         this.listener = listener;
     }
 
-    private class ViewHolder {
+    private static class ViewHolder {
         private TextView name;
     }
 

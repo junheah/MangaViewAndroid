@@ -101,14 +101,11 @@ public class TagSearchActivity extends AppCompatActivity {
             updated = new UpdatedList(p.getBaseMode());
             getUpdated gu = new getUpdated();
             gu.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                     if (!updated.isLast()) {
-                        getUpdated gu = new getUpdated();
-                        gu.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } else swipe.setRefreshing(false);
-                }
+            swipe.setOnRefreshListener(direction -> {
+                 if (!updated.isLast()) {
+                    getUpdated gu1 = new getUpdated();
+                    gu1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else swipe.setRefreshing(false);
             });
 
         }else if(mode == 7){
@@ -116,14 +113,11 @@ public class TagSearchActivity extends AppCompatActivity {
             bookmark = new Bookmark();
             getBookmarks gb = new getBookmarks();
             gb.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                    if (!bookmark.isLast()) {
-                        getBookmarks gb = new getBookmarks();
-                        gb.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } else swipe.setRefreshing(false);
-                }
+            swipe.setOnRefreshListener(direction -> {
+                if (bookmark.isLast()) {
+                    getBookmarks gb1 = new getBookmarks();
+                    gb1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else swipe.setRefreshing(false);
             });
 
         }else {
@@ -131,22 +125,18 @@ public class TagSearchActivity extends AppCompatActivity {
             search = new Search(query,mode,baseMode);
             searchManga sm = new searchManga();
             sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                    if (!search.isLast()) {
-                        searchManga sm = new searchManga();
-                        sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } else swipe.setRefreshing(false);
-                }
+            swipe.setOnRefreshListener(direction -> {
+                if (!search.isLast()) {
+                    searchManga sm1 = new searchManga();
+                    sm1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                } else swipe.setRefreshing(false);
             });
         }
     }
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -318,19 +308,17 @@ public class TagSearchActivity extends AppCompatActivity {
 
 
         //registering popup with OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                switch(item.getItemId()){
-                    case R.id.del:
-                        break;
-                    case R.id.favAdd:
-                    case R.id.favDel:
-                        //toggle favorite
-                        p.toggleFavorite(title,0);
-                        break;
-                }
-                return true;
+        popup.setOnMenuItemClickListener(item -> {
+            switch(item.getItemId()){
+                case R.id.del:
+                    break;
+                case R.id.favAdd:
+                case R.id.favDel:
+                    //toggle favorite
+                    p.toggleFavorite(title,0);
+                    break;
             }
+            return true;
         });
         popup.show(); //showing popup menu
     }

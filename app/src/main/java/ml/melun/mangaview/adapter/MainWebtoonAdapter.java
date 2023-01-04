@@ -108,12 +108,9 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 //is title
                 h.content.setText(((Title) d).getName());
             }
-            h.card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    //title
-                    listener.clickedTitle((Title)d);
-                }
+            h.card.setOnClickListener(view -> {
+                //title
+                listener.clickedTitle((Title)d);
             });
         }
     }
@@ -180,7 +177,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    class HeaderHolder extends RecyclerView.ViewHolder{
+    static class HeaderHolder extends RecyclerView.ViewHolder{
         TextView title;
         public HeaderHolder(View itemView) {
             super(itemView);
@@ -196,8 +193,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         @Override
         protected MainPageWebtoon doInBackground(Void... params) {
-            MainPageWebtoon webtoon = new MainPageWebtoon(httpClient);
-            return webtoon;
+            return new MainPageWebtoon(httpClient);
         }
 
         @Override

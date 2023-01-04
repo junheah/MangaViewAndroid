@@ -8,7 +8,6 @@ import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +17,6 @@ import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
-import static ml.melun.mangaview.Utils.getDefHomeDir;
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.isInteger;
@@ -298,7 +296,7 @@ public class Preference {
         int titleId = title.getId();
         if(titleId>0) {
             try {
-                bookmark.put(String.valueOf(title.getBaseMode()+"."+title.getId()), id);
+                bookmark.put(title.getBaseMode() + "." + title.getId(), id);
             } catch (Exception e) {
                 //
             }
@@ -513,7 +511,7 @@ public class Preference {
         }
         String jsonStr = bookmark.toString();
         for(String f : fix){
-            jsonStr = jsonStr.replace(f, String.valueOf(base_comic)+"."+f);
+            jsonStr = jsonStr.replace(f, base_comic +"."+f);
         }
         try {
             this.bookmark = new JSONObject(jsonStr);
@@ -532,7 +530,7 @@ public class Preference {
         }
         jsonStr = pagebookmark.toString();
         for(String f : fix){
-            jsonStr = jsonStr.replace(f, String.valueOf(base_comic)+"."+f);
+            jsonStr = jsonStr.replace(f, base_comic +"."+f);
         }
         try {
             this.pagebookmark = new JSONObject(jsonStr);
