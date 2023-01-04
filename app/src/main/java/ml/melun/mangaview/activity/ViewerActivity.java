@@ -87,9 +87,6 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
-    StringCallback zoom;
-    ConstraintLayout zoom_layout;
-    ImageView zoom_image;
     loadImages loader;
 
 
@@ -134,18 +131,6 @@ public class ViewerActivity extends AppCompatActivity {
             view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
             return windowInsetsCompat;
         });
-
-
-        zoom = data -> {
-            zoom_layout.setVisibility(View.VISIBLE);
-            Glide.with(zoom_image)
-                    .load(data)
-                    .placeholder(R.drawable.placeholder)
-                    .into(zoom_image);
-
-            //todo : 이미지 확대 팝업
-
-        };
 
         infiniteScrollCallback = new InfiniteScrollCallback() {
             @Override
@@ -194,7 +179,6 @@ public class ViewerActivity extends AppCompatActivity {
         };
 
         this.findViewById(R.id.backButton).setOnClickListener(view -> finish());
-        //imageZoomHelper = new ImageZoomHelper(this);
 
         try {
             intent = getIntent();
@@ -438,14 +422,7 @@ public class ViewerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(onBack!=null){
-            onBack.run();
-        }else{
-            if(zoom_layout.getVisibility() == View.VISIBLE)
-                zoom_layout.setVisibility(View.GONE);
-            else
-                super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     Runnable onBack;
