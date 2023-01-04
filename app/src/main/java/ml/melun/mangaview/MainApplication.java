@@ -1,6 +1,5 @@
 package ml.melun.mangaview;
 
-import android.app.Application;
 import android.content.Context;
 
 import androidx.appcompat.app.AppCompatDelegate;

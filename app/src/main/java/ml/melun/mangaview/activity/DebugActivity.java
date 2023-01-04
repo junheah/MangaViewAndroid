@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -22,15 +21,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.jhavar.main.DdosGuardBypass;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.net.HttpCookie;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
@@ -40,7 +33,6 @@ import ml.melun.mangaview.Preference;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
 import ml.melun.mangaview.interfaces.IntegerCallback;
-import ml.melun.mangaview.mangaview.Cloudflare;
 import ml.melun.mangaview.mangaview.Manga;
 import okhttp3.Response;
 
@@ -156,59 +148,6 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
-        this.findViewById(R.id.ddgbTest).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new ddgBypassTest().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
-        });
-
-
-        Button cfBtn = this.findViewById(R.id.debug_cf);
-        cfBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                printLine("cf-scrape start");
-                //유사하렘 1화
-                //String fetchUrl = p.getUrl() + "/bbs/board.php?bo_table=manga&wr_id=1639778";
-                String fetchUrl = p.getUrl();
-
-                new AsyncTask<Void,Void,List<HttpCookie>>(){
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        cfBtn.setEnabled(false);
-                    }
-
-                    @Override
-                    protected List<HttpCookie> doInBackground(Void... voids) {
-                        Cloudflare cf = new Cloudflare(fetchUrl);
-                        return cf.getCookies();
-                    }
-
-                    @Override
-                    protected void onPostExecute(List<HttpCookie> res) {
-                        if(res == null){
-                            printLine("cf-scrape fail");
-                        }else{
-                            printLine("cf-scrape success");
-                            for(HttpCookie item : res){
-                                printLine(item.getName() + " " + item.getValue());
-                            }
-                        }
-                        cfBtn.setEnabled(true);
-                    }
-                }.execute();
-
-            }
-        });
-        cfBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                return false;
-            }
-        });
-
         this.findViewById(R.id.debug_layoutEditor).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -282,34 +221,5 @@ public class DebugActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class ddgBypassTest extends AsyncTask<Void, Void, Integer> {
-        String result = "";
-        protected void onPreExecute() {
-
-        }
-        protected Integer doInBackground(Void... params) {
-            try {
-                Response r = httpClient.get("https://mnmnmnmnm.xyz/", new HashMap<>());
-                if(r.code() == 403) {
-                    DdosGuardBypass ddg = new DdosGuardBypass("https://mnmnmnmnm.xyz/");
-                    ddg.bypass();
-                    result = ddg.get("https://mnmnmnmnm.xyz/");
-                }else
-                    result = "no ddos guard";
-            }catch (Exception e){
-                StringBuilder sbuilder = new StringBuilder();
-                sbuilder.append(e.getMessage()+"\n");
-                for(StackTraceElement s : e.getStackTrace()){
-                    sbuilder.append(s+"\n");
-                }
-                final String error = sbuilder.toString();
-                result = error;
-            }
-            return null;
-        }
-        protected void onPostExecute(Integer r) {
-            printLine(result);
-        }
-    }
 
 }
