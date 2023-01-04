@@ -54,8 +54,6 @@ repositories {
 dependencies {
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'androidx.documentfile:documentfile:1.0.1'
-    implementation 'ch.acra:acra-dialog:5.8.4'
-    implementation 'ch.acra:acra-mail:5.8.4'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation("com.github.bumptech.glide:glide:4.11.0") {
         exclude group: "com.android.support"
@@ -83,4 +81,8 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.2'
     implementation 'org.apache.commons:commons-text:1.7'
+    def acraVersion = '5.9.7'
+    implementation "ch.acra:acra-mail:$acraVersion"
+    implementation "ch.acra:acra-dialog:$acraVersion"
+
 }

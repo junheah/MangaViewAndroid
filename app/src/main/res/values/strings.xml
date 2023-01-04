@@ -79,8 +79,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="acra_dialog_text">MangaView\n\n예상치 못한 오류가 발생했습니다. 오류 보고서를 전송 하시겠습니까?\n(디버깅에 큰 도움이 됩니다.)</string>
-    <string name="acra_dialog_comment"></string>
+    <string name="acra_dialog_text">예상치 못한 오류가 발생했습니다. 오류 보고서를 전송 하시겠습니까?\n(디버깅에 큰 도움이 됩니다.)</string>
 
     <string name="license">
         The following software may be included in this application: bumptech/glide from https://github.com/bumptech/glide
