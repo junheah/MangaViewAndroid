@@ -13,6 +13,7 @@ import org.jsoup.*;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import okhttp3.Response;
 
@@ -37,48 +38,54 @@ import androidx.documentfile.provider.DocumentFile;
     4 = offline - new(moa) (title.gson)
      */
 
-    public class Manga{
-        int baseMode = base_comic;
+public class Manga {
+    int baseMode = base_comic;
 
-        public Manga(int i, String n, String d, int baseMode){
-            id = i;
-            name = n;
-            date = d;
-            this.baseMode = baseMode;
-        }
+    public Manga(int i, String n, String d, int baseMode) {
+        id = i;
+        name = n;
+        date = d;
+        this.baseMode = baseMode;
+    }
 
-        public int getBaseMode(){
-            return this.baseMode;
-        }
-        public int getId() {
-            return id;
-        }
-        public String getName() {
-            return name;
-        }
-    public void addThumb(String src){
+    public int getBaseMode() {
+        return this.baseMode;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void addThumb(String src) {
         thumb = src;
     }
+
     public String getDate() {
         return date;
     }
 
-    public void setImgs(List<String> imgs){
+    public void setImgs(List<String> imgs) {
         this.imgs = imgs;
     }
 
     public String getThumb() {
-        if(thumb == null) return "";
+        if (thumb == null) return "";
         return thumb;
     }
 
-    public int fetch(CustomHttpClient client){
-        return fetch(client, true ,null);
+    public int fetch(CustomHttpClient client) {
+        return fetch(client, true, null);
     }
-    public int fetch(CustomHttpClient client, Map<String,String> cookies){
+
+    public int fetch(CustomHttpClient client, Map<String, String> cookies) {
         return fetch(client, false, cookies);
     }
-    public int fetch(CustomHttpClient client, boolean doLogin, Map<String,String> cookies) {
+
+    public int fetch(CustomHttpClient client, boolean doLogin, Map<String, String> cookies) {
         mode = 0;
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
@@ -86,15 +93,15 @@ import androidx.documentfile.provider.DocumentFile;
         bcomments = new ArrayList<>();
         int tries = 0;
 
-        while(imgs.size()==0 && tries < 2) {
-            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+ id, false, cookies);
+        while (imgs.size() == 0 && tries < 2) {
+            Response r = client.mget('/' + baseModeStr(baseMode) + '/' + id, false, cookies);
             try {
-                if(r.code() == 302 && r.header("location").contains("captcha.php")){
+                if (r.code() == 302 && r.header("location").contains("captcha.php")) {
                     return LOAD_CAPTCHA;
                 }
                 String body = r.body().string();
                 r.close();
-                if(body.contains("Connect Error: Connection timed out")){
+                if (body.contains("Connect Error: Connection timed out")) {
                     //adblock : try again
                     r.close();
                     tries = 0;
@@ -111,53 +118,53 @@ import androidx.documentfile.provider.DocumentFile;
                 int tid = Integer.parseInt(navbar.select("a")
                         .last()
                         .attr("href")
-                        .split(baseModeStr(baseMode) +'/')[1]
+                        .split(baseModeStr(baseMode) + '/')[1]
                         .split("\\?")[0]);
 
-                if(title == null) title = new Title(name, "", "", null, "", tid, baseMode);
+                if (title == null) title = new Title(name, "", "", null, "", tid, baseMode);
 
                 //eps
-                for(Element e :navbar.selectFirst("select").select("option")){
+                for (Element e : navbar.selectFirst("select").select("option")) {
                     String idstr = e.attr("value");
-                    if(idstr!=null && idstr.length()>0)
-                        eps.add(new Manga(Integer.parseInt(idstr),e.ownText(),"", baseMode));
+                    if (idstr.length() > 0)
+                        eps.add(new Manga(Integer.parseInt(idstr), e.ownText(), "", baseMode));
                 }
 
                 //imgs
                 String script = d.select("div.view-padding").get(1).selectFirst("script").data();
                 StringBuilder encodedData = new StringBuilder();
                 encodedData.append('%');
-                for(String line : script.split("\n")){
-                    if(line.contains("html_data+=")){
-                        encodedData.append(line.substring(line.indexOf('\'')+1, line.lastIndexOf('\'')).replaceAll("[.]","%"));
+                for (String line : script.split("\n")) {
+                    if (line.contains("html_data+=")) {
+                        encodedData.append(line.substring(line.indexOf('\'') + 1, line.lastIndexOf('\'')).replaceAll("[.]", "%"));
                     }
                 }
-                if(encodedData.lastIndexOf("%") == encodedData.length()-1)
-                    encodedData.deleteCharAt(encodedData.length()-1);
+                if (encodedData.lastIndexOf("%") == encodedData.length() - 1)
+                    encodedData.deleteCharAt(encodedData.length() - 1);
                 String imgdiv = URLDecoder.decode(encodedData.toString(), "UTF-8");
 
                 Document id = Jsoup.parse(imgdiv);
-                for(Element e : id.select("img")){
+                for (Element e : id.select("img")) {
                     String style = e.attr("style");
-                    if(style == null || style.length()==0) {
+                    if (style.length() == 0) {
                         boolean flag = false;
-                        for(Attribute a : e.attributes()){
-                            if(a.getKey().contains("data")){
+                        for (Attribute a : e.attributes()) {
+                            if (a.getKey().contains("data")) {
                                 String img = a.getValue();
-                                if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
+                                if (!img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
                                     flag = true;
-                                    if(img.startsWith("/"))
-                                        imgs.add(client.getUrl()+img);
+                                    if (img.startsWith("/"))
+                                        imgs.add(client.getUrl() + img);
                                     else
                                         imgs.add(img);
                                 }
                             }
                         }
-                        if(!flag){
+                        if (!flag) {
                             String img = e.attr("src");
-                            if (img != null && !img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
-                                if(img.startsWith("/"))
-                                    imgs.add(client.getUrl()+img);
+                            if (!img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
+                                if (img.startsWith("/"))
+                                    imgs.add(client.getUrl() + img);
                                 else
                                     imgs.add(img);
                             }
@@ -165,73 +172,81 @@ import androidx.documentfile.provider.DocumentFile;
                     }
                 }
 
-
                 //comments
                 Element commentdiv = d.selectFirst("div#viewcomment");
 
-                String user;
-                String icon;
-                String content;
-                String timestamp;
-                int likes;
-                int level;
-                String lvlstr;
-                int indent;
-                String indentstr;
+
                 try {
                     for (Element e : commentdiv.selectFirst("section#bo_vc").select("div.media")) {
                         try {
-                            if (e.id().contains("c_")) {
-                                // is comment
-
-                                //indent
-                                indentstr = e.attr("style");
-                                if (indentstr != null && indentstr.length() > 0)
-                                    indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':') + 1, indentstr.lastIndexOf('p'))) / 64;
-                                else
-                                    indent = 0;
-
-                                //icon
-                                Element icone = e.selectFirst(".media-object");
-                                if (icone.is("img"))
-                                    icon = icone.attr("src");
-                                else
-                                    icon = "";
-
-                                Element header = e.selectFirst("div.media-heading");
-                                Element userSpan = header.selectFirst("span");
-                                user = userSpan.ownText();
-                                if (userSpan.hasClass("guest"))
-                                    level = 0;
-                                else {
-                                    lvlstr = userSpan.selectFirst("img").attr("src");
-                                    level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/') + 1, lvlstr.lastIndexOf('.')));
-                                }
-                                timestamp = header.selectFirst("span.media-info").ownText();
-
-                                Element cbody = e.selectFirst("div.media-content");
-                                content = cbody.ownText();
-                                likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
-                                comments.add(new Comment(user, timestamp, icon, content, indent, likes, level));
-                            }
-                        }catch (Exception e3){
+                            comments.add(parseComment(e));
+                        } catch (Exception e3) {
                             e3.printStackTrace();
                         }
 
                     }
-                }catch (Exception e1){
+                    for (Element e : commentdiv.selectFirst("section#bo_vcb").select("div.media")) {
+                        try {
+                            bcomments.add(parseComment(e));
+                        } catch (Exception e3) {
+                            e3.printStackTrace();
+                        }
+
+                    }
+                } catch (Exception e1) {
                     e1.printStackTrace();
                 }
 
             } catch (Exception e2) {
                 e2.printStackTrace();
             }
-            if(r!=null){
+            if (r != null) {
                 r.close();
             }
             tries++;
         }
         return LOAD_OK;
+    }
+
+    private Comment parseComment(Element e) {
+        String user;
+        String icon;
+        String content;
+        String timestamp;
+        int likes;
+        int level;
+        String lvlstr;
+        int indent;
+        String indentstr;
+        //indent
+        indentstr = e.attr("style");
+        if (indentstr.length() > 0)
+            indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':') + 1, indentstr.lastIndexOf('p'))) / 64;
+        else
+            indent = 0;
+
+        //icon
+        Element icone = e.selectFirst(".media-object");
+        if (icone.is("img"))
+            icon = icone.attr("src");
+        else
+            icon = "";
+
+        Element header = e.selectFirst("div.media-heading");
+        Element userSpan = header.selectFirst("span.member");
+        user = userSpan.ownText();
+        if (userSpan.hasClass("guest"))
+            level = 0;
+        else {
+            lvlstr = userSpan.selectFirst("img").attr("src");
+            level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/') + 1, lvlstr.lastIndexOf('.')));
+        }
+        timestamp = header.selectFirst("span.media-info").ownText();
+
+        Element cbody = e.selectFirst("div.media-content");
+        content = cbody.selectFirst("div:not([class])").ownText();
+        likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
+        return new Comment(user, timestamp, icon, content, indent, likes, level);
     }
 
 
@@ -243,7 +258,7 @@ import androidx.documentfile.provider.DocumentFile;
         return title;
     }
 
-    public List<String> getImgs(Context context){
+    public List<String> getImgs(Context context) {
         if (mode != 0) {
             if (imgs == null) {
                 imgs = new ArrayList<>();
@@ -265,22 +280,27 @@ import androidx.documentfile.provider.DocumentFile;
         }
         return imgs;
     }
-    public List<Comment> getComments(){ return comments; }
 
-    public List<Comment> getBestComments() { return bcomments; }
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public List<Comment> getBestComments() {
+        return bcomments;
+    }
 
     public int getSeed() {
         return seed;
     }
 
-    public String toString(){
+    public String toString() {
         JSONObject tmp = new JSONObject();
         try {
             tmp.put("id", id);
             tmp.put("name", name);
             tmp.put("date", date);
-        }catch (Exception e){
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return tmp.toString();
     }
@@ -291,8 +311,9 @@ import androidx.documentfile.provider.DocumentFile;
 
     @Override
     public boolean equals(Object obj) {
-        return this.id == ((Manga)obj).getId();
+        return this.id == ((Manga) obj).getId();
     }
+
     @Override
     public int hashCode() {
         return id;
@@ -302,34 +323,36 @@ import androidx.documentfile.provider.DocumentFile;
         this.offlinePath = offlinePath;
     }
 
-    public String getOfflinePath(){
+    public String getOfflinePath() {
         return this.offlinePath;
     }
 
-    public void setListener(Listener listener){
+    public void setListener(Listener listener) {
         this.listener = listener;
     }
 
-    public int getMode(){return mode;}
+    public int getMode() {
+        return mode;
+    }
 
-    public void setMode(int mode){
+    public void setMode(int mode) {
         this.mode = mode;
     }
 
-    public String getUrl(){
+    public String getUrl() {
         return "/manga/" + id;
     }
 
-    public boolean useBookmark(){
-        return id>0&&(mode==0||mode==3);
+    public boolean useBookmark() {
+        return id > 0 && (mode == 0 || mode == 3);
     }
 
-    public boolean isOnline(){
-        return id>0&&mode==0;
+    public boolean isOnline() {
+        return id > 0 && mode == 0;
     }
 
-    public Manga nextEp(){
-        if(isOnline()) {
+    public Manga nextEp() {
+        if (isOnline()) {
             if (eps == null || eps.size() == 0) {
                 return null;
             } else {
@@ -337,13 +360,13 @@ import androidx.documentfile.provider.DocumentFile;
                 if (index > 0) return eps.get(index - 1);
                 else return null;
             }
-        }else{
+        } else {
             return nextEp;
         }
     }
 
-    public Manga prevEp(){
-        if(isOnline()) {
+    public Manga prevEp() {
+        if (isOnline()) {
             if (eps == null || eps.size() == 0) {
                 return null;
             } else {
@@ -351,15 +374,16 @@ import androidx.documentfile.provider.DocumentFile;
                 if (index < eps.size() - 1) return eps.get(index + 1);
                 else return null;
             }
-        }else{
+        } else {
             return prevEp;
         }
     }
 
-    public void setPrevEp(Manga m){
+    public void setPrevEp(Manga m) {
         this.prevEp = m;
     }
-    public void setNextEp(Manga m){
+
+    public void setNextEp(Manga m) {
         this.nextEp = m;
     }
 
@@ -377,7 +401,7 @@ import androidx.documentfile.provider.DocumentFile;
     Listener listener;
     Manga nextEp, prevEp;
 
-    public interface Listener{
+    public interface Listener {
         void setMessage(String msg);
     }
 }
