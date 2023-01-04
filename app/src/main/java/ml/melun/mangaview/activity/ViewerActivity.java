@@ -1,7 +1,6 @@
 package ml.melun.mangaview.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -17,9 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
@@ -133,7 +130,7 @@ public class ViewerActivity extends AppCompatActivity {
             if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
             else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
-            appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
+            appbar.setPadding(0, Math.max(ci, statusBarHeight),0,0);
             view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
             return windowInsetsCompat;
         });
@@ -329,7 +326,7 @@ public class ViewerActivity extends AppCompatActivity {
                 showCaptchaPopup(context, p);
                 return;
             }
-            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback, zoom);
+            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback);
 
             refreshAdapter();
             bookmarkRefresh(m);
@@ -423,7 +420,7 @@ public class ViewerActivity extends AppCompatActivity {
             //viewerBookmark *= 2;
         }
         stripAdapter.removeAll();
-        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback, zoom);
+        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback);
         stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(() -> {
@@ -539,10 +536,8 @@ public class ViewerActivity extends AppCompatActivity {
 
     public void refreshAdapter(){
         strip.setAdapter(stripAdapter);
-        stripAdapter.setClickListener(() -> {
-            // show/hide toolbar
-            toggleToolbar();
-        });
+        // show/hide toolbar
+        stripAdapter.setClickListener(this::toggleToolbar);
     }
 
     public void refreshToolbar(Manga m){

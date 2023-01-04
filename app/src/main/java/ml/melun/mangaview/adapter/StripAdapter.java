@@ -44,7 +44,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     int width;
     int count = 0;
     final static int MaxStackSize = 2;
-    StringCallback stringCallback;
     ViewerActivity.InfiniteScrollCallback callback;
     Title title;
 
@@ -156,9 +155,8 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     // data is passed into the constructor
-    public StripAdapter(Context context, Manga manga, Boolean cut, int width, Title title, ViewerActivity.InfiniteScrollCallback callback, StringCallback zoom) {
+    public StripAdapter(Context context, Manga manga, Boolean cut, int width, Title title, ViewerActivity.InfiniteScrollCallback callback) {
         autoCut = cut;
-        this.stringCallback  = zoom;
         this.callback = callback;
         this.mInflater = LayoutInflater.from(context);
         mainContext = context;
@@ -421,9 +419,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         @Override
         public boolean onLongClick(View v) {
-            String url = ((PageItem)items.get(getAdapterPosition())).img;
-            stringCallback.callback(url);
-            return true;
+            return false;
         }
     }
 
@@ -450,10 +446,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public interface ItemClickListener {
         void onItemClick();
-    }
-
-    public interface AdapterInterface{
-        Object getItemAt(int pos);
     }
 
 }
