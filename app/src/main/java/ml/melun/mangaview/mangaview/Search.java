@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import okhttp3.Response;
@@ -84,7 +85,7 @@ public class Search {
                     return fetch(client);
                 }
                 Document d = Jsoup.parse(body);
-                d.outputSettings().charset(Charset.forName("UTF-8"));
+                d.outputSettings().charset(StandardCharsets.UTF_8);
 
                 Elements titles = d.select("div.list-item");
 
@@ -143,7 +144,7 @@ public class Search {
         return result;
     }
 
-    private String query;
+    private final String query;
     Boolean last = false;
     int mode;
     int page = 1;

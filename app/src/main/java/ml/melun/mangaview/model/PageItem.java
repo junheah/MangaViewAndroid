@@ -38,4 +38,4 @@ public class PageItem{
     public int side;
     public String img;
     public Manga manga;
-};
+}

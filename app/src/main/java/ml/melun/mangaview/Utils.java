@@ -20,24 +20,17 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.provider.DocumentsContract;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -57,12 +50,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 import ml.melun.mangaview.activity.CaptchaActivity;
 import ml.melun.mangaview.activity.EpisodeActivity;
 import ml.melun.mangaview.activity.LoginActivity;
-import ml.melun.mangaview.activity.MainActivity;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.activity.ViewerActivity2;
 import ml.melun.mangaview.activity.ViewerActivity3;
@@ -70,20 +61,14 @@ import ml.melun.mangaview.interfaces.IntegerCallback;
 import ml.melun.mangaview.interfaces.StringCallback;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Login;
-import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static java.lang.System.console;
 import static java.lang.System.currentTimeMillis;
 import static ml.melun.mangaview.MainApplication.httpClient;
-import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
 import static ml.melun.mangaview.activity.SettingsActivity.urlSettingPopup;
 
@@ -265,25 +250,14 @@ public class Utils {
         else builder = new AlertDialog.Builder(context);
         builder.setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(force_close) ((Activity)context).finish();
-                    }
+                .setPositiveButton("확인", (dialog, which) -> {
+                    if(force_close) ((Activity)context).finish();
                 })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        if(force_close) ((Activity)context).finish();
-                    }
+                .setOnCancelListener(dialogInterface -> {
+                    if(force_close) ((Activity)context).finish();
                 });
         if(e != null) {
-            builder.setNeutralButton("자세히", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    showStackTrace(context, e);
-                }
-            });
+            builder.setNeutralButton("자세히", (dialog, which) -> showStackTrace(context, e));
         }
         builder.show();
     }
@@ -317,37 +291,16 @@ public class Utils {
                 else builder = new AlertDialog.Builder(context);
                 builder.setTitle(title)
                         .setMessage(content)
-                        .setNeutralButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (force_close) ((Activity) context).finish();
-                            }
+                        .setNeutralButton("확인", (dialogInterface, i) -> {
+                            if (force_close) ((Activity) context).finish();
                         })
-                        .setPositiveButton("CAPTCHA 인증", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startCaptchaActivity(context, code, fragment);
-                            }
-                        })
-                        .setNegativeButton("URL 설정", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                urlSettingPopup(context, p);
-                            }
-                        })
-                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialogInterface) {
-                                if (force_close) ((Activity) context).finish();
-                            }
+                        .setPositiveButton("CAPTCHA 인증", (dialog, which) -> startCaptchaActivity(context, code, fragment))
+                        .setNegativeButton("URL 설정", (dialogInterface, i) -> urlSettingPopup(context, p))
+                        .setOnCancelListener(dialogInterface -> {
+                            if (force_close) ((Activity) context).finish();
                         });
                 if (e != null) {
-                    builder.setNeutralButton("자세히", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            showStackTrace(context, e);
-                        }
-                    });
+                    builder.setNeutralButton("자세히", (dialog, which) -> showStackTrace(context, e));
                 }
                 try {
                     builder.show();
@@ -402,85 +355,56 @@ public class Utils {
         ImageView img = v.findViewById(R.id.toki_captcha_image);
         EditText answer = v.findViewById(R.id.toki_captcha_answer);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String cookie;
-                Response r;
-                int tries = 3;
-                while(tries > 0) {
-                    r = httpClient.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),false);
-                    if(r.code() == 200) {
-                        List<String> setcookie = r.headers("Set-Cookie");
-                        for (String c : setcookie) {
-                            if (c.contains("PHPSESSID=")) {
-                                cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
-                                httpClient.setCookie("PHPSESSID",cookie);
-                            }
+        new Thread(() -> {
+            String cookie;
+            Response r;
+            int tries = 3;
+            while(tries > 0) {
+                r = httpClient.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),false);
+                if(r.code() == 200) {
+                    List<String> setcookie = r.headers("Set-Cookie");
+                    for (String c : setcookie) {
+                        if (c.contains("PHPSESSID=")) {
+                            cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
+                            httpClient.setCookie("PHPSESSID",cookie);
                         }
-                        break;
-                    }else {
-                        r.close();
-                        tries--;
                     }
+                    break;
+                }else {
+                    r.close();
+                    tries--;
                 }
-                r = httpClient.mget("/plugin/kcaptcha/kcaptcha_image.php?t=" + currentTimeMillis(), false);
-                try {
-                    final byte[] b = r.body().bytes();
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Glide.with(img)
-                                    .load(b)
-                                    .into(img);
-                        }
-                    });
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+            }
+            r = httpClient.mget("/plugin/kcaptcha/kcaptcha_image.php?t=" + currentTimeMillis(), false);
+            try {
+                final byte[] b = r.body().bytes();
+                ((Activity) context).runOnUiThread(() -> Glide.with(img)
+                        .load(b)
+                        .into(img));
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }).start();
 
         builder.setTitle(title)
                 .setView(v)
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                RequestBody requestBody = new FormBody.Builder()
-                                        .addEncoded("url", p.getUrl())
-                                        .addEncoded("captcha_key", answer.getText().toString())
-                                        .build();
-                                Map<String,String> headers = new HashMap<>();
-                                headers.put("cookie", "PHPSESSID="+ httpClient.getCookie("PHPSESSID") +";");
-                                Response response = httpClient.post(p.getUrl() + "/bbs/captcha_check.php", requestBody, headers, true);
-                                System.out.println(response.code());
-                                ((Activity)context).runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //restart activity
-                                        ((Activity)context).finish();
-                                        ((Activity)context).startActivity(((Activity)context).getIntent());
-                                    }
-                                });
-                            }
-                        }).start();
-                    }
-                })
-                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                .setPositiveButton("확인", (dialog, which) -> new Thread(() -> {
+                    RequestBody requestBody = new FormBody.Builder()
+                            .addEncoded("url", p.getUrl())
+                            .addEncoded("captcha_key", answer.getText().toString())
+                            .build();
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("cookie", "PHPSESSID=" + httpClient.getCookie("PHPSESSID") + ";");
+                    Response response = httpClient.post(p.getUrl() + "/bbs/captcha_check.php", requestBody, headers, true);
+                    System.out.println(response.code());
+                    ((Activity) context).runOnUiThread(() -> {
+                        //restart activity
                         ((Activity) context).finish();
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        ((Activity) context).finish();
-                    }
-                });
+                        ((Activity) context).startActivity(((Activity) context).getIntent());
+                    });
+                }).start())
+                .setNegativeButton("취소", (dialogInterface, i) -> ((Activity) context).finish())
+                .setOnCancelListener(dialogInterface -> ((Activity) context).finish());
 
         builder.show();
     }
@@ -488,9 +412,9 @@ public class Utils {
     private static void showStackTrace(Context context, Exception e){
         StringBuilder sbuilder = new StringBuilder();
         if(e.getMessage() != null)
-            sbuilder.append(e.getMessage()+"\n");
+            sbuilder.append(e.getMessage()).append("\n");
         for(StackTraceElement s : e.getStackTrace()){
-            sbuilder.append(s+"\n");
+            sbuilder.append(s).append("\n");
         }
         final String error = sbuilder.toString();
         AlertDialog.Builder builder;
@@ -499,28 +423,15 @@ public class Utils {
         else builder = new AlertDialog.Builder(context);
         builder.setTitle(title)
                 .setMessage(error)
-                .setNeutralButton("복사", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("stack_trace", error);
-                        clipboard.setPrimaryClip(clip);
-                        Toast.makeText(context,"클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
-                        ((Activity)context).finish();
-                    }
+                .setNeutralButton("복사", (dialog, which) -> {
+                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("stack_trace", error);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(context,"클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show();
+                    ((Activity)context).finish();
                 })
-                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ((Activity)context).finish();
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        ((Activity)context).finish();
-                    }
-                })
+                .setPositiveButton("확인", (dialog, which) -> ((Activity)context).finish())
+                .setOnCancelListener(dialog -> ((Activity)context).finish())
                 .show();
     }
 
@@ -545,13 +456,13 @@ public class Utils {
 
     static char[] filter = {'/','?','*',':','|','<','>','\\'};
     static public String filterFolder(String input){
-        for(int i=0; i<filter.length;i++) {
-            int index = input.indexOf(filter[i]);
-            while(index>=0) {
-                char tmp[] = input.toCharArray();
+        for (char c : filter) {
+            int index = input.indexOf(c);
+            while (index >= 0) {
+                char[] tmp = input.toCharArray();
                 tmp[index] = ' ';
                 input = String.valueOf(tmp);
-                index = input.indexOf(filter[i]);
+                index = input.indexOf(c);
             }
         }
         return input;
@@ -852,18 +763,14 @@ public class Utils {
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setRawInputType(Configuration.KEYBOARD_12KEY);
         alert.setView(input);
-        alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int button) {
-                //이동 시
-                if(input.getText().length()>0) {
-                    callback.callback(Integer.parseInt(input.getText().toString()));
-                }
+        alert.setPositiveButton("확인", (dialog, button) -> {
+            //이동 시
+            if(input.getText().length()>0) {
+                callback.callback(Integer.parseInt(input.getText().toString()));
             }
         });
-        alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int button) {
-                //취소 시
-            }
+        alert.setNegativeButton("취소", (dialog, button) -> {
+            //취소 시
         });
         alert.show();
     }
@@ -876,30 +783,21 @@ public class Utils {
         alert.setTitle(title);
         final EditText input = new EditText(context);
         alert.setView(input);
-        alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int button) {
-                //이동 시
-                if(input.getText().length()>0) {
-                    callback.callback(input.getText().toString());
-                }
+        alert.setPositiveButton("확인", (dialog, button) -> {
+            //이동 시
+            if(input.getText().length()>0) {
+                callback.callback(input.getText().toString());
             }
         });
-        alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int button) {
-                //취소 시
-            }
+        alert.setNegativeButton("취소", (dialog, button) -> {
+            //취소 시
         });
         alert.show();
     }
 
     public static List<File> getOfflineEpisodes(String path){
         System.out.println(path);
-        File[] episodeFiles = new File(path).listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        });
+        File[] episodeFiles = new File(path).listFiles(pathname -> pathname.isDirectory());
         //sort
         Arrays.sort(episodeFiles);
         //add as manga
@@ -907,12 +805,7 @@ public class Utils {
     }
     public static List<DocumentFile> getOfflineEpisodes(DocumentFile home){
         DocumentFile[] files = home.listFiles();
-        Arrays.sort(files, new Comparator<DocumentFile>() {
-            @Override
-            public int compare(DocumentFile documentFile, DocumentFile t1) {
-                return documentFile.getName().compareTo(t1.getName());
-            }
-        });
+        Arrays.sort(files, (documentFile, t1) -> documentFile.getName().compareTo(t1.getName()));
         List<DocumentFile> res = new ArrayList<>();
         for(DocumentFile f : files){
             if(f.isDirectory()) res.add(f);

@@ -83,8 +83,7 @@ public class MainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
 
-        if(selected[position]) selected[position] = false;
-        else selected[position] = true;
+        selected[position] = !selected[position];
         notifyItemChanged(position);
     }
 
@@ -146,26 +145,21 @@ public class MainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
 
 
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onClick(getAdapterPosition(), tags.get(getAdapterPosition()));
-                }
-            });
+            card.setOnClickListener(v -> mClickListener.onClick(getAdapterPosition(), tags.get(getAdapterPosition())));
         }
     }
     public String getSelectedValues(){
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for(int i=0; i<tags.size(); i++){
             if(selected[i]){
-                if(res.length()>0) res += ','+tags.get(i);
-                else res = tags.get(i);
+                if(res.length()>0) res.append(',').append(tags.get(i));
+                else res = new StringBuilder(tags.get(i));
             }
         }
-        return res;
+        return res.toString();
     }
     public String getSelectedIndex(){
-        String res = "";
+        StringBuilder res = new StringBuilder();
         if(singleSelect) {
             if(selection>-1) return Integer.toString(type==2 ? selection+1 : selection);
             else return "";
@@ -173,11 +167,11 @@ public class MainTagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         for(int i=0; i<tags.size(); i++){
             if(selected[i]){
-                if(res.length()>0) res += ","+ Integer.toString(type==2 ? i+1 : i);
-                else res = Integer.toString(type==2 ? i+1 : i);
+                if(res.length()>0) res.append(",").append(type == 2 ? i + 1 : i);
+                else res = new StringBuilder(Integer.toString(type == 2 ? i + 1 : i));
             }
         }
-        return res;
+        return res.toString();
     }
     public interface tagOnclick{
         void onClick(int position, String value);

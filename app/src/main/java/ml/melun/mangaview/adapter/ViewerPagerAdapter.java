@@ -41,12 +41,7 @@ public class ViewerPagerAdapter extends FragmentStatePagerAdapter
         for(int i = 0; i<imgs.size(); i++){
             String s = imgs.get(i);
 
-            fragments.add(ViewerPageFragment.create(s, new Decoder(m.getSeed(), m.getId()), width, context, new PageInterface() {
-                @Override
-                public void onPageClick() {
-                    itf.onPageClick();
-                }
-            }));
+            fragments.add(ViewerPageFragment.create(s, new Decoder(m.getSeed(), m.getId()), width, context, () -> itf.onPageClick()));
         }
         notifyDataSetChanged();
     }

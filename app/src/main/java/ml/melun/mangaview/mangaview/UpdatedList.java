@@ -5,12 +5,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ml.melun.mangaview.adapter.UpdatedAdapter;
 import okhttp3.Response;
 
 
@@ -79,7 +77,6 @@ public class UpdatedList {
                         result.add(tmp);
                     }catch(Exception e){
                         e.printStackTrace();
-                        continue;
                     }
                 }
                 response.close();

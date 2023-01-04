@@ -6,7 +6,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import okhttp3.Response;
@@ -33,8 +32,7 @@ public class MainPageWebtoon {
             this.baseUrl = r.header("Location");
         }else
             return null;
-        if(r!=null)
-            r.close();
+        r.close();
         return this.baseUrl;
     }
     public void fetch(CustomHttpClient client){

@@ -1,15 +1,9 @@
 package ml.melun.mangaview.mangaview;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import ml.melun.mangaview.Preference;
-import okhttp3.Response;
 
 public class Bookmark {
     List<MTitle> result;
@@ -27,7 +21,7 @@ public class Bookmark {
     }
 
     public boolean isLast() {
-        return last;
+        return !last;
     }
 
     public List<MTitle> getResult(){
@@ -38,7 +32,7 @@ public class Bookmark {
         try {
             Bookmark b = new Bookmark();
             List<MTitle> bookmarks = new ArrayList<>();
-            while (!b.isLast()) {
+            while (b.isLast()) {
                 if (b.fetch(client) == 0)
                     bookmarks.addAll(b.getResult());
                 else

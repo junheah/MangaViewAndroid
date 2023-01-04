@@ -77,47 +77,28 @@ public class AdvSearchActivity extends AppCompatActivity {
         rr.setAdapter(ra);
         tr.setAdapter(ta);
         //clicked name 1
-        na.setClickListener(new MainTagAdapter.tagOnclick() {
-            @Override
-            public void onClick(int position, String value) {
-                na.toggleSelect(position);
-            }
-        });
+        na.setClickListener((position, value) -> na.toggleSelect(position));
         //clicked release 2
-        ra.setClickListener(new MainTagAdapter.tagOnclick() {
-            @Override
-            public void onClick(int position, String value) {
-                ra.toggleSelect(position);
-            }
-        });
+        ra.setClickListener((position, value) -> ra.toggleSelect(position));
         //clicked tag 3
-        ta.setClickListener(new MainTagAdapter.tagOnclick() {
-            @Override
-            public void onClick(int position, String value) {
-                ta.toggleSelect(position);
-            }
-        });
+        ta.setClickListener((position, value) -> ta.toggleSelect(position));
 
         //search submit
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String query = "search_type="+(searchMethod.getSelectedItemPosition()+1)+"&_0="+input.getText()+"&_1="+na.getSelectedIndex()+"&_2="+ra.getSelectedIndex()+"&_3="+ta.getSelectedValues()+"&_4="+sortMethod.getSelectedItemPosition();
-                Intent searchActivity = new Intent(context, TagSearchActivity.class);
-                searchActivity.putExtra("query", query);
-                searchActivity.putExtra("mode", 6);
-                startActivity(searchActivity);
-            }
+        search.setOnClickListener(v -> {
+            String query = "search_type="+(searchMethod.getSelectedItemPosition()+1)+"&_0="+input.getText()+"&_1="+na.getSelectedIndex()+"&_2="+ra.getSelectedIndex()+"&_3="+ta.getSelectedValues()+"&_4="+sortMethod.getSelectedItemPosition();
+            Intent searchActivity = new Intent(context, TagSearchActivity.class);
+            searchActivity.putExtra("query", query);
+            searchActivity.putExtra("mode", 6);
+            startActivity(searchActivity);
         });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

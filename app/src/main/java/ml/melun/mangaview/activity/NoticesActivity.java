@@ -61,12 +61,9 @@ public class NoticesActivity extends AppCompatActivity {
             if(notices.get(i)==null) notices.remove(i);
         }
         progress.setVisibility(View.VISIBLE);
-        swipe.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh(SwipyRefreshLayoutDirection direction) {
-                getNotices gn = new getNotices();
-                gn.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
+        swipe.setOnRefreshListener(direction -> {
+            getNotices gn = new getNotices();
+            gn.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         });
         getNotices gn = new getNotices();
         gn.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -78,10 +75,9 @@ public class NoticesActivity extends AppCompatActivity {
 
 
     public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -97,15 +93,12 @@ public class NoticesActivity extends AppCompatActivity {
                 else
                     list[i] = notices.get(i).getId() + ". " + title;
             }
-            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
+            final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
             //populate listview and set click listener
             this.list.setAdapter(adapter);
-            this.list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                    Notice target = notices.get(position);
-                    showNotice(target);
-                }
+            this.list.setOnItemClickListener((adapterView, view, position, id) -> {
+                Notice target = notices.get(position);
+                showNotice(target);
             });
         }catch (Exception e){
             showPopup(context,"오류",e.getMessage());
@@ -145,14 +138,11 @@ public class NoticesActivity extends AppCompatActivity {
                         else notices.add(n);
                     }
                 }
-                Collections.sort(notices, new Comparator<Notice>() {
-                    @Override
-                    public int compare(Notice n1, Notice n2) {
-                        if(n1.getId() < n2.getId())
-                            return 1;
-                        else
-                            return -1;
-                    }
+                Collections.sort(notices, (n1, n2) -> {
+                    if(n1.getId() < n2.getId())
+                        return 1;
+                    else
+                        return -1;
                 });
             }catch (Exception e){
                 //probably offline

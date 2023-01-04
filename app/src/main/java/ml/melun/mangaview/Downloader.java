@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -44,7 +43,6 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 import ml.melun.mangaview.activity.MainActivity;
-import ml.melun.mangaview.mangaview.Cloudflare;
 import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.Manga;
@@ -52,7 +50,6 @@ import ml.melun.mangaview.mangaview.Manga;
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 import static ml.melun.mangaview.Utils.filterFolder;
-import static ml.melun.mangaview.Utils.getDefHomeDir;
 
 public class Downloader extends Service {
     String homeDir;
@@ -259,13 +256,10 @@ public class Downloader extends Service {
 
         protected Integer doInBackground(String... urls) {
             String url = urls[0];
-            downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(), "mangaview-update"), new ProgressInterface() {
-                @Override
-                public void publish(int progress) {
-                    if(progress>prevProgress) {
-                        prevProgress = progress;
-                        publishProgress(progress);
-                    }
+            downloaded = downloadFile(url, new File(serviceContext.getExternalFilesDir(null).getAbsolutePath(), "mangaview-update"), progress -> {
+                if(progress>prevProgress) {
+                    prevProgress = progress;
+                    publishProgress(progress);
                 }
             });
             return null;
@@ -367,17 +361,7 @@ public class Downloader extends Service {
                             int cf_tries = 3;
                             while (cf_tries > 0) {
                                 target.fetch(httpClient, cookies);
-                                if (target.getImgs(getApplicationContext()).size() == 0) {
-                                    //update cf cookie
-                                    Cloudflare cf = new Cloudflare(baseUrl);
-                                    List<HttpCookie> cookiel = cf.getCookies();
-                                    if (cookiel != null) {
-                                        for (HttpCookie c : cookiel) {
-                                            cookies.put(c.getName(), c.getValue());
-                                        }
-                                    }
-                                } else
-                                    break;
+                                // todo: cf scrape
                                 cf_tries--;
                             }
 
@@ -468,17 +452,6 @@ public class Downloader extends Service {
                             int cf_tries = 3;
                             while (cf_tries > 0) {
                                 target.fetch(httpClient, cookies);
-                                if (target.getImgs(getApplicationContext()).size() == 0) {
-                                    //update cf cookie
-                                    Cloudflare cf = new Cloudflare(baseUrl);
-                                    List<HttpCookie> cookiel = cf.getCookies();
-                                    if (cookiel != null) {
-                                        for (HttpCookie c : cookiel) {
-                                            cookies.put(c.getName(), c.getValue());
-                                        }
-                                    }
-                                } else
-                                    break;
                                 cf_tries--;
                             }
 
@@ -801,7 +774,6 @@ public class Downloader extends Service {
             notification.setSmallIcon(R.drawable.ic_logo);
         else
             notification.setSmallIcon(R.drawable.notification_logo);
-        ;
         notificationManager.notify(nid, notification.build());
     }
 

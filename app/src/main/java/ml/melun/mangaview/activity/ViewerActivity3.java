@@ -25,13 +25,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,31 +120,23 @@ public class ViewerActivity3 extends AppCompatActivity {
         toolbarTitle = this.findViewById(R.id.toolbar_title);
         appbarBottom = this.findViewById(R.id.viewerAppbarBottom);
         cut = this.findViewById(R.id.viewerBtn2);
-        this.findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        this.findViewById(R.id.backButton).setOnClickListener(view -> finish());
 
         //initial padding setup
         appbar.setPadding(0, getStatusBarHeight(),0,0);
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
-        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsetsCompat onApplyWindowInsets(View view, WindowInsetsCompat windowInsetsCompat) {
-                //This is where you get DisplayCutoutCompat
-                int statusBarHeight = getStatusBarHeight();
-                int ci;
-                if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
-                else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (view, windowInsetsCompat) -> {
+            //This is where you get DisplayCutoutCompat
+            int statusBarHeight = getStatusBarHeight();
+            int ci;
+            if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
+            else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
 
-                //System.out.println(ci + " : " + statusBarHeight);
-                appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
-                view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
-                return windowInsetsCompat;
-            }
+            //System.out.println(ci + " : " + statusBarHeight);
+            appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
+            view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+            return windowInsetsCompat;
         });
 
 
@@ -161,29 +151,21 @@ public class ViewerActivity3 extends AppCompatActivity {
         spinner = this.findViewById(R.id.toolbar_spinner);
 
         spinnerAdapter = new CustomSpinnerAdapter(context);
-        spinnerAdapter.setListener(new CustomSpinnerAdapter.CustomSpinnerListener() {
-            @Override
-            public void onClick(Manga m, int i) {
-                lockUi(true);
-                spinner.setSelection(m);
-                manga = m;
-                id = m.getId();
-                index = i;
-                hideSpinnerDropDown(spinner);
-                if(manga.isOnline())
-                    refresh();
-                else
-                    reloadManga();
-            }
+        spinnerAdapter.setListener((m, i) -> {
+            lockUi(true);
+            spinner.setSelection(m);
+            manga = m;
+            id = m.getId();
+            index = i;
+            hideSpinnerDropDown(spinner);
+            if(manga.isOnline())
+                refresh();
+            else
+                reloadManga();
         });
         spinner.setAdapter(spinnerAdapter);
         //adapter
-        pageAdapter = new ViewerPagerAdapter(getSupportFragmentManager(), width, context, new PageInterface() {
-            @Override
-            public void onPageClick() {
-                toggleToolbar();
-            }
-        });
+        pageAdapter = new ViewerPagerAdapter(getSupportFragmentManager(), width, context, () -> toggleToolbar());
         listener = new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -251,85 +233,69 @@ public class ViewerActivity3 extends AppCompatActivity {
             }else {
                 refresh();
             }
-            commentBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent commentActivity = new Intent(context, CommentsActivity.class);
-                    //create gson and put extra
-                    Gson gson = new Gson();
-                    commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
-                    commentActivity.putExtra("bestComments", gson.toJson(manga.getBestComments()));
-                    commentActivity.putExtra("id", manga.getId());
-                    startActivity(commentActivity);
-                }
+            commentBtn.setOnClickListener(v -> {
+                Intent commentActivity = new Intent(context, CommentsActivity.class);
+                //create gson and put extra
+                Gson gson = new Gson();
+                commentActivity.putExtra("comments", gson.toJson(manga.getComments()));
+                commentActivity.putExtra("bestComments", gson.toJson(manga.getBestComments()));
+                commentActivity.putExtra("id", manga.getId());
+                startActivity(commentActivity);
             });
         }catch(Exception e){
             e.printStackTrace();
         }
 
-        pageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder alert;
-                if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
-                else alert = new AlertDialog.Builder(context);
+        pageBtn.setOnClickListener(v -> {
+            AlertDialog.Builder alert;
+            if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
+            else alert = new AlertDialog.Builder(context);
 
-                alert.setTitle("페이지 선택\n(1~"+imgs.size()+")");
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                input.setRawInputType(Configuration.KEYBOARD_12KEY);
-                alert.setView(input);
-                alert.setPositiveButton("이동", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int button) {
-                        //이동 시
-                        if(input.getText().length()>0) {
-                            int page = Integer.parseInt(input.getText().toString());
-                            if (page < 1) page = 1;
-                            if (page > imgs.size()) page = imgs.size();
-                            viewerBookmark = page - 1;
-                            goPage(viewerBookmark, false);
-                            pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
-                        }
-                    }
-                });
-                alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int button) {
-                        //취소 시
-                    }
-                });
-                alert.show();
+            alert.setTitle("페이지 선택\n(1~"+imgs.size()+")");
+            final EditText input = new EditText(context);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            input.setRawInputType(Configuration.KEYBOARD_12KEY);
+            alert.setView(input);
+            alert.setPositiveButton("이동", (dialog, button) -> {
+                //이동 시
+                if (input.getText().length() > 0) {
+                    int page = Integer.parseInt(input.getText().toString());
+                    if (page < 1) page = 1;
+                    if (page > imgs.size()) page = imgs.size();
+                    viewerBookmark = page - 1;
+                    goPage(viewerBookmark, false);
+                    pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
+                }
+            });
+            alert.setNegativeButton("취소", (dialog, button) -> {
+                //취소 시
+            });
+            alert.show();
+        });
+        next.setOnClickListener(v -> {
+            if(eps!=null && index>0) {
+                lockUi(true);
+                index--;
+                manga = eps.get(index);
+                id = manga.getId();
+                name = manga.getName();
+                if(manga.isOnline())
+                    refresh();
+                else
+                    reloadManga();
             }
         });
-        next.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(eps!=null && index>0) {
-                    lockUi(true);
-                    index--;
-                    manga = eps.get(index);
-                    id = manga.getId();
-                    name = manga.getName();
-                    if(manga.isOnline())
-                        refresh();
-                    else
-                        reloadManga();
-                }
-            }
-        });
-        prev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(eps!=null && index<eps.size()-1) {
-                    lockUi(true);
-                    index++;
-                    manga = eps.get(index);
-                    id = manga.getId();
-                    name = manga.getName();
-                    if(manga.isOnline())
-                        refresh();
-                    else
-                        reloadManga();
-                }
+        prev.setOnClickListener(v -> {
+            if(eps!=null && index<eps.size()-1) {
+                lockUi(true);
+                index++;
+                manga = eps.get(index);
+                id = manga.getId();
+                name = manga.getName();
+                if(manga.isOnline())
+                    refresh();
+                else
+                    reloadManga();
             }
         });
     }
@@ -386,28 +352,20 @@ public class ViewerActivity3 extends AppCompatActivity {
             else pd = new ProgressDialog(context);
             pd.setMessage("로드중");
             pd.setCancelable(false);
-            pd.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                @Override
-                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                    if(keyCode == KeyEvent.KEYCODE_BACK){
-                        LoadImages.super.cancel(true);
-                        pd.dismiss();
-                        finish();
-                    }
-                    return true;
+            pd.setOnKeyListener((dialog, keyCode, event) -> {
+                if(keyCode == KeyEvent.KEYCODE_BACK){
+                    LoadImages.super.cancel(true);
+                    pd.dismiss();
+                    finish();
                 }
+                return true;
             });
             pd.show();
         }
 
         @Override
         protected Integer doInBackground(Void... voids) {
-            manga.setListener(new Manga.Listener() {
-                @Override
-                public void setMessage(String msg) {
-                    publishProgress(msg);
-                }
-            });
+            manga.setListener(msg -> publishProgress(msg));
             Login login = p.getLogin();
             Map<String, String> cookie = new HashMap<>();
             if(login !=null) {
@@ -456,9 +414,9 @@ public class ViewerActivity3 extends AppCompatActivity {
 
         }catch (Exception e){
             StackTraceElement[] stack = e.getStackTrace();
-            String message = "";
+            StringBuilder message = new StringBuilder();
             for(StackTraceElement s : stack){
-                message +=s.toString()+'\n';
+                message.append(s.toString()).append('\n');
             }
             Utils.showCaptchaPopup(context, e, p);
         }

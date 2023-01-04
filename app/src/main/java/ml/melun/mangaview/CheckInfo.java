@@ -191,30 +191,21 @@ public class CheckInfo {
 
             builder.setTitle("업데이트")
                     .setMessage(message)
-                    .setPositiveButton("다운로드", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int button) {
-                            Intent downloader = new Intent(context.getApplicationContext(),Downloader.class);
-                            downloader.setAction(Downloader.ACTION_UPDATE);
-                            downloader.putExtra("url", url);
-                            if (Build.VERSION.SDK_INT >= 26) {
-                                context.startForegroundService(downloader);
-                            }else{
-                                context.startService(downloader);
-                            }
-                            Toast.makeText(context,"다운로드를 시작합니다.",Toast.LENGTH_SHORT).show();
+                    .setPositiveButton("다운로드", (dialog, button) -> {
+                        Intent downloader = new Intent(context.getApplicationContext(),Downloader.class);
+                        downloader.setAction(Downloader.ACTION_UPDATE);
+                        downloader.putExtra("url", url);
+                        if (Build.VERSION.SDK_INT >= 26) {
+                            context.startForegroundService(downloader);
+                        }else{
+                            context.startService(downloader);
                         }
+                        Toast.makeText(context,"다운로드를 시작합니다.",Toast.LENGTH_SHORT).show();
                     })
-                    .setNegativeButton("나중에", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int button) {
-                            //do nothing
-                        }
+                    .setNegativeButton("나중에", (dialog, button) -> {
+                        //do nothing
                     })
-                    .setNeutralButton("사이트로 이동", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(page)));
-                        }
-                    })
+                    .setNeutralButton("사이트로 이동", (dialog, which) -> context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(page))))
                     .show();
         }catch (Exception e){
             e.printStackTrace();

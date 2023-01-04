@@ -64,12 +64,7 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             super(itemView);
             card = itemView.findViewById(R.id.tagCard);
             tag = itemView.findViewById(R.id.tag);
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onClick(tags.get(getAdapterPosition()));
-                }
-            });
+            card.setOnClickListener(v -> mClickListener.onClick(tags.get(getAdapterPosition())));
         }
     }
     public interface tagOnclick{

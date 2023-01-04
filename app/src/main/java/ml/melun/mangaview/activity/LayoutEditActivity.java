@@ -58,39 +58,25 @@ public class LayoutEditActivity extends AppCompatActivity {
             }
         });
 
-        this.findViewById(R.id.layout_save).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                p.setPageControlButtonOffset((float)seekBar.getProgress() / (float)seekBar.getMax());
-                p.setLeftRight(leftRight);
-                Toast.makeText(context, "설정 완료", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        this.findViewById(R.id.layout_save).setOnClickListener(view -> {
+            p.setPageControlButtonOffset((float)seekBar.getProgress() / (float)seekBar.getMax());
+            p.setLeftRight(leftRight);
+            Toast.makeText(context, "설정 완료", Toast.LENGTH_SHORT).show();
+            finish();
         });
 
-        this.findViewById(R.id.layout_reset).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                p.setPageControlButtonOffset(-1);
-                p.setLeftRight(false);
-                Toast.makeText(context, "기본값으로 설정됨", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        this.findViewById(R.id.layout_reset).setOnClickListener(view -> {
+            p.setPageControlButtonOffset(-1);
+            p.setLeftRight(false);
+            Toast.makeText(context, "기본값으로 설정됨", Toast.LENGTH_SHORT).show();
+            finish();
         });
 
-        this.findViewById(R.id.layout_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        this.findViewById(R.id.layout_cancel).setOnClickListener(view -> finish());
 
-        this.findViewById(R.id.layout_reverse).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                leftRight = !leftRight;
-                setButtonText();
-            }
+        this.findViewById(R.id.layout_reverse).setOnClickListener(view -> {
+            leftRight = !leftRight;
+            setButtonText();
         });
     }
 

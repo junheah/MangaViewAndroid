@@ -1,9 +1,7 @@
 package ml.melun.mangaview.ui;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.AttributeSet;
-import android.widget.Spinner;
 
 import ml.melun.mangaview.adapter.CustomSpinnerAdapter;
 import ml.melun.mangaview.mangaview.Manga;

@@ -37,16 +37,6 @@ import static ml.melun.mangaview.Utils.writeComment;
 public class CommentsActivity extends AppCompatActivity {
 
     /**
-     * The {@link PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
@@ -93,7 +83,15 @@ public class CommentsActivity extends AppCompatActivity {
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        /**
+         * The {@link PagerAdapter} that will provide
+         * fragments for each of the sections. We use a
+         * {@link FragmentPagerAdapter} derivative, which will keep every
+         * loaded fragment in memory. If this becomes too memory intensive, it
+         * may be best to switch to a
+         * {@link FragmentStatePagerAdapter}.
+         */
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 
 
@@ -129,15 +127,12 @@ public class CommentsActivity extends AppCompatActivity {
         input = this.findViewById(R.id.comment_editText);
         final Login login = p.getLogin();
         if(login != null && login.isValid()){
-            submit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (input.length() > 0) {
-                        submit.setEnabled(false);
-                        input.setEnabled(false);
-                        new submitComment(login, id, input.getText().toString(), p.getUrl())
-                                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    }
+            submit.setOnClickListener(view -> {
+                if (input.length() > 0) {
+                    submit.setEnabled(false);
+                    input.setEnabled(false);
+                    new submitComment(login, id, input.getText().toString(), p.getUrl())
+                            .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
         }

@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
@@ -170,14 +169,14 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         String title = data.getName();
         String thumb = data.getThumb();
         String author = data.getAuthor();
-        String tags ="";
+        StringBuilder tags = new StringBuilder();
         int bookmark = data.getBookmark();
         holder.tagContainer.setVisibility(View.VISIBLE);
         holder.baseModeStr.setText(data.getBaseModeStr());
         for (String s : data.getTags()) {
-            tags += s + " ";
+            tags.append(s).append(" ");
         }
-        holder.tags.setText(tags);
+        holder.tags.setText(tags.toString());
 
         holder.name.setText(title);
         holder.author.setText(author);
@@ -242,25 +241,12 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
                 card.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
                 resume.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.resumeDark));
             }
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onItemClick(getAdapterPosition());
-                }
+            card.setOnClickListener(v -> mClickListener.onItemClick(getAdapterPosition()));
+            card.setOnLongClickListener(v -> {
+                mClickListener.onLongClick(v, getAdapterPosition());
+                return true;
             });
-            card.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    mClickListener.onLongClick(v, getAdapterPosition());
-                    return true;
-                }
-            });
-            resume.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mDataFiltered.get(getAdapterPosition())));
-                }
-            });
+            resume.setOnClickListener(v -> mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mDataFiltered.get(getAdapterPosition()))));
 
 
         }

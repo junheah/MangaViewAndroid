@@ -10,14 +10,12 @@ import org.json.JSONObject;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import ml.melun.mangaview.Preference;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okio.HashingSource;
 
 import static ml.melun.mangaview.Utils.getNumberFromString;
 
@@ -65,7 +63,7 @@ public class Title extends MTitle {
     public int fetchEps(CustomHttpClient client) {
 
         try {
-            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id));
+            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+ id);
             //웹툰의 경우 캡차 있을 수 있음.
             if(r.code() == 302 && r.header("location").contains("captcha.php")){
                 return LOAD_CAPTCHA;
@@ -116,13 +114,17 @@ public class Title extends MTitle {
                 Element e = infos.get(i);
                 try {
                     String type = e.selectFirst("strong").ownText();
-                    if(type.equals("작가")){
-                        author = e.selectFirst("a").ownText();
-                    }else if(type.equals("분류")){
-                        for(Element t: e.select("a"))
-                            tags.add(t.ownText());
-                    }else if(type.equals("발행구분")) {
-                        release = e.selectFirst("a").ownText();
+                    switch (type) {
+                        case "작가":
+                            author = e.selectFirst("a").ownText();
+                            break;
+                        case "분류":
+                            for (Element t : e.select("a"))
+                                tags.add(t.ownText());
+                            break;
+                        case "발행구분":
+                            release = e.selectFirst("a").ownText();
+                            break;
                     }
 
                 }catch (Exception e2){continue;}

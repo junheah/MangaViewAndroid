@@ -13,7 +13,6 @@ import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -31,8 +30,6 @@ import ml.melun.mangaview.mangaview.Login;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.popup;
-import static ml.melun.mangaview.Utils.showCaptchaPopup;
 import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
@@ -40,7 +37,7 @@ public class CaptchaActivity extends AppCompatActivity {
     WebView webView;
     public static final int RESULT_CAPTCHA = 15;
     public static final int REQUEST_CAPTCHA = 32;
-    String domain = "";
+    String domain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,12 +112,7 @@ public class CaptchaActivity extends AppCompatActivity {
 
         webView.setWebViewClient(client);
 
-        webView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return true;
-            }
-        });
+        webView.setOnTouchListener((view, motionEvent) -> true);
 
         Login login = p.getLogin();
         if(login != null && login.getCookie() !=null && login.getCookie().length()>0){
@@ -130,12 +122,9 @@ public class CaptchaActivity extends AppCompatActivity {
 
         webView.loadUrl(purl);
 
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //Do something after 100ms
-                infoText.setVisibility(View.VISIBLE);
-            }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            //Do something after 100ms
+            infoText.setVisibility(View.VISIBLE);
         }, 3000);
 
     }

@@ -23,9 +23,9 @@ import static ml.melun.mangaview.MainApplication.p;
 
 public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Manga> data;
-    private LayoutInflater mInflater;
-    private Context mainContext;
+    private final List<Manga> data;
+    private final LayoutInflater mInflater;
+    private final Context mainContext;
     boolean favorite = false;
     TypedValue outValue;
     boolean[] selected;
@@ -149,12 +149,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
                 date.setTextColor(Color.BLACK);
                 episode.setTextColor(Color.BLACK);
             }
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mClickListener.onItemClick(v,getAdapterPosition());
-                }
-            });
+            itemView.setOnClickListener(v -> mClickListener.onItemClick(v,getAdapterPosition()));
         }
     }
     public void setClickListener(ItemClickListener itemClickListener) {

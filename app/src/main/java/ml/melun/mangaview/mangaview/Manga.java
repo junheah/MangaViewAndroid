@@ -87,7 +87,7 @@ import androidx.documentfile.provider.DocumentFile;
         int tries = 0;
 
         while(imgs.size()==0 && tries < 2) {
-            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+String.valueOf(id), false, cookies);
+            Response r = client.mget('/'+baseModeStr(baseMode)+'/'+ id, false, cookies);
             try {
                 if(r.code() == 302 && r.header("location").contains("captcha.php")){
                     return LOAD_CAPTCHA;
@@ -244,24 +244,17 @@ import androidx.documentfile.provider.DocumentFile;
     }
 
     public List<String> getImgs(Context context){
-        if(mode == 0) {
-            return imgs;
-        }else{
-            if(imgs == null) {
+        if (mode != 0) {
+            if (imgs == null) {
                 imgs = new ArrayList<>();
                 //is offline : read image list
                 if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
                     DocumentFile[] offimgs = DocumentFile.fromTreeUri(context, Uri.parse(offlinePath)).listFiles();
-                    Arrays.sort(offimgs, new Comparator<DocumentFile>() {
-                        @Override
-                        public int compare(DocumentFile documentFile, DocumentFile t1) {
-                            return documentFile.getName().compareTo(t1.getName());
-                        }
-                    });
-                    for(DocumentFile f : offimgs){
+                    Arrays.sort(offimgs, (documentFile, t1) -> documentFile.getName().compareTo(t1.getName()));
+                    for (DocumentFile f : offimgs) {
                         imgs.add(f.getUri().toString());
                     }
-                }else {
+                } else {
                     File[] offimgs = new File(offlinePath).listFiles();
                     Arrays.sort(offimgs);
                     for (File img : offimgs) {
@@ -269,8 +262,8 @@ import androidx.documentfile.provider.DocumentFile;
                     }
                 }
             }
-             return imgs;
         }
+        return imgs;
     }
     public List<Comment> getComments(){ return comments; }
 
@@ -370,7 +363,7 @@ import androidx.documentfile.provider.DocumentFile;
         this.nextEp = m;
     }
 
-    private int id;
+    private final int id;
     String name;
     List<Manga> eps;
     List<String> imgs;

@@ -4,39 +4,22 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.app.Service;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ml.melun.mangaview.activity.MainActivity;
-import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.MainPage;
 import ml.melun.mangaview.mangaview.Search;
@@ -44,7 +27,6 @@ import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
-import static ml.melun.mangaview.Utils.showPopup;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class Migrator extends Service {
@@ -285,7 +267,7 @@ public class Migrator extends Service {
                 builder.append(failed.size());
                 builder.append("개\n");
                 for(String t : failed){
-                    builder.append("\n"+t);
+                    builder.append("\n").append(t);
                 }
                 resultIntent.setAction(MIGRATE_RESULT);
                 resultIntent.putExtra("msg",builder.toString());
