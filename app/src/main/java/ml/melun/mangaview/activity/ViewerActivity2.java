@@ -133,6 +133,12 @@ public class ViewerActivity2 extends AppCompatActivity implements SpenEventListe
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        spen.disconnect(this);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
         super.onCreate(savedInstanceState);
@@ -355,13 +361,9 @@ public class ViewerActivity2 extends AppCompatActivity implements SpenEventListe
     @Override
     public void onEvent(SpenEvent ev) {
         ButtonEvent buttonEvent = new ButtonEvent(ev);
-        switch (buttonEvent.getAction()) {
-            case ButtonEvent.ACTION_DOWN:
-                Log.d("spen", "Spen Button Pressed");
-                break;
-            case ButtonEvent.ACTION_UP:
-                Log.d("spen", "Spen Button Released");
-                break;
+        if(buttonEvent.getAction() == ButtonEvent.ACTION_UP) {
+            // next page
+            nextPage();
         }
     }
 

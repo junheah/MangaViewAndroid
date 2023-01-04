@@ -13,6 +13,7 @@ public class SpenHelper {
   public SpenHelper(Context context, SpenEventListener listener) {
     SpenRemote spenRemote = SpenRemote.getInstance();
     if (!spenRemote.isConnected()) {
+      try{
       spenRemote.connect(
           context,
           new SpenRemote.ConnectionResultCallback() {
@@ -28,6 +29,9 @@ public class SpenHelper {
                 mSpenUnitManager = null;
             }
           });
+      }catch(NoClassDefFoundError e){
+          mSpenUnitManager = null;
+      }
     }
   }
 
