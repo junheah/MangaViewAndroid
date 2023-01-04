@@ -27,6 +27,7 @@ local.properties
 .DS_Store
 build/
 app/build/
+app/release/
 
 *.iml
 *.p12
