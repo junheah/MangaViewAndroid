@@ -1,0 +1,110 @@
+﻿<html>
+    <head>
+        <title>Manga View Android</title>
+        <meta name="description" content="오픈소스 마나토끼 안드로이드 뷰어">
+        <meta name="author" content="junheah">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="web/favicon.png">
+        <link rel="stylesheet" type="text/css" href="web/style.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css">
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-48545626-3"></script>
+        <script data-ad-client="ca-pub-1967308958954015" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-1967308958954015",
+            enable_page_level_ads: true
+          });
+        </script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1967308958954015"
+     crossorigin="anonymous"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-48545626-3');
+        </script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+        var downloadlink = "";
+        var releaselink = "";
+        function GetLatestReleaseInfo() {
+          $.getJSON("https://api.github.com/repos/junheah/MangaViewAndroid/releases/latest").done(function(release) {
+            var asset = release.assets[0];
+            var downloadCount = asset.download_count;
+            var oneHour = 60 * 60 * 1000;
+            var oneDay = 24 * oneHour;
+            var dateDiff = new Date() - new Date(asset.updated_at);
+            var timeAgo;
+            if (dateDiff < oneDay) {
+              timeAgo = (dateDiff / oneHour).toFixed(0) + " 시간 전";
+            } else {
+              timeAgo = (dateDiff / oneDay).toFixed(0) + " 일 전";
+            }
+            releaselink = release.html_url;
+            var releaseInfo = timeAgo + "에 업데이트, " + downloadCount.toLocaleString() +" 회 다운로드 되었습니다.";
+            //$(".download").attr("href", asset.browser_download_url);
+            downloadlink = asset.browser_download_url;
+            $(".release-name").text("apk " +release.name);
+            $(".release-info").text(releaseInfo);
+            $(".changelog").text(release.body);
+            $("div.button-container").fadeIn('slow');
+            $("div.content").fadeIn('slow');
+            $("div.footer").fadeIn('slow');
+          });
+        }
+        window.onload = function() {
+            setTimeout(function (){
+                $("div.title").fadeIn('slow');
+                GetLatestReleaseInfo();
+                var shield = document.createElement('img');
+                shield.src = 'https://img.shields.io/github/downloads/junheah/MangaViewAndroid/total?color=db49de&label=%EC%A0%84%EC%B2%B4%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C&style=for-the-badge';
+                document.getElementById('shield').appendChild(shield);
+
+            }, 800);
+        }
+        </script>
+    </head>
+    <body>
+        <div class="header">
+            <img style="width:100%;max-width:31.5em;padding-top:120px;padding-bottom:80px" src="web/logo.svg"/>
+            <br>
+            <div class="title" style="display:none; width:auto">
+                <h1> Manga View Android </h1>
+                <p> 마나토끼 안드로이드 뷰어 </p>
+                <img style="margin-top: 10;" alt="GitHub All Releases" src="https://img.shields.io/github/downloads/junheah/MangaViewAndroid/total?color=db49de&label=%EC%A0%84%EC%B2%B4%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C&style=for-the-badge">
+            </div>
+            <br>
+            <div class="button-container" style="display:none;width:auto;">
+                <button class="download" onclick="location.href = downloadlink;">
+                    <div class="dlbtn">
+                        <p>다운로드</p>
+                        <p class="release-name"></p>
+                    </div>
+                </button>
+                <br>
+                <button style="margin:0;" onclick="location.href='releases.html';">이전 버전</button>
+                <p class="release-info"></p>
+                <br>
+            </div>
+
+        </div>
+
+        <div class="content" style="display:none;">
+            <!-- put body content here -->
+            <h1> 체인지 로그 </h1>
+            <pre class="changelog"></pre>
+            <br>
+            <button onclick="location.href = releaselink;"> 깃허브 릴리즈 </button>
+            <button onclick="location.href = 'https://github.com/junheah/MangaViewAndroid/';"> 소스코드 </button>
+            <button onclick="location.href = 'https://blog.naver.com/imaginaly';"> 블로그 </button>
+        </div>
+        <div class="footer" style="display:none;">
+            <!-- footer -->
+            <p style="display:inline-block;">powered by</p><a style="display:inline-block;" href="https://github.com/">Github</a>
+        </div>
+    </body>
+</html>

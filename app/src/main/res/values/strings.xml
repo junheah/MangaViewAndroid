@@ -1,0 +1,265 @@
+<resources>
+    <string name="app_name">MangaView</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings2">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="multi_select_list_preference_default_value" />
+
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="acra_dialog_text">예상치 못한 오류가 발생했습니다. 오류 보고서를 전송 하시겠습니까?\n(디버깅에 큰 도움이 됩니다.)</string>
+
+    <string name="license">
+        The following software may be included in this application: bumptech/glide from https://github.com/bumptech/glide
+        \n\n
+        Copyright 2014 Google, Inc. All rights reserved.
+        \n\n
+        Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+        \n\n
+        1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+        \n\n
+        2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
+        in the documentation and/or other materials provided with the distribution.
+        \n\n
+        THIS SOFTWARE IS PROVIDED BY GOOGLE, INC. AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+        THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL GOOGLE,
+        INC. OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+        (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+        BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+        ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        \n\n
+        The views and conclusions contained in the software and documentation are those of the
+        authors and should not be interpreted as representing official policies, either expressed
+        or implied, of Google, Inc.
+        \n\n
+        =====
+        \n\n
+        The following software may be included in this application: google/gson from https://github.com/google/gson
+        \n\n
+        Copyright 2008 Google Inc.
+        \n\n
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+        \n\n
+        http://www.apache.org/licenses/LICENSE-2.0
+        \n\n
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+        \n\n
+        =====
+        \n\n
+        The following software may be included in this application: omadahealth/SwipyRefreshLayout from
+        https://github.com/omadahealth/SwipyRefreshLayout
+        \n\n
+        The MIT License (MIT)
+        \n\n
+        Copyright © 2015 OrangeGangsters
+        \n\n
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        \n\n
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        \n\n
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        \n\n
+        =====
+        \n\n
+        The following software may be included in this application: jsoup from https://jsoup.org/
+        \n\n
+        The MIT License
+        \n\n
+        Copyright © 2009 - 2017 Jonathan Hedley (jonathan@hedley.net)
+        \n\n
+        Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+        and associated documentation files (the "Software"), to deal in the Software without restriction,
+        including without limitation the rights to use, copy, modify, merge, publish, distribute,
+        sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+        is furnished to do so, subject to the following conditions:
+        \n\n
+        The above copyright notice and this permission notice shall be included in all copies or
+        substantial portions of the Software.
+        \n\n
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+        BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+        DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        \n\n
+        =====
+        \n\n
+        The following software may be included in this application: ACRA/acra from https://github.com/ACRA/acra
+        \n\n
+        Licensed under the Apache License, Version 2.0 (the "License");
+        you may not use this file except in compliance with the License.
+        You may obtain a copy of the License at
+        \n\n
+        http://www.apache.org/licenses/LICENSE-2.0
+        \n\n
+        Unless required by applicable law or agreed to in writing, software
+        distributed under the License is distributed on an "AS IS" BASIS,
+        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        See the License for the specific language governing permissions and
+        limitations under the License.
+        \n\n
+        =====
+        \n\n
+        The following software may be included in this application: RaghavJH/ddosguardbypass
+        from https://github.com/RaghavJH/ddosguardbypass
+        \n\n
+        =====
+        \n\n
+        The following software may be included in this application: zhkrb/cloudflare-scrape-Android
+        from https://github.com/zhkrb/cloudflare-scrape-Android
+        \n\n
+        MIT License
+        \n\n
+        Copyright © 2019 zhkrb
+        \n\n
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        \n\n
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        \n\n
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+    </string>
+
+    <string name="first_time_dialog">- 이 앱은 비공식 앱 입니다. (소스 사이트와 관계가 없습니다)
+        \n\n- 앱이 정상적으로 작동하려면 설정 메뉴에서 유효한 URL을 설정해 줘야 합니다.
+        \n\n- 소스 사이트가 작동하지 않을 경우 앱 또한 정상 작동하지 않습니다.
+        \n\n- 이 앱은 오픈소스 입니다. (github.com/junheah/MangaViewAndroid/ 에서 소스코드를 열람할 수 있습니다)
+        \n\n- 이 앱에서는 저작권 문제로 소스 사이트의 주소를 제공하지 않습니다. 페이지 최하단의 칸에 직접 입력해 주세요.
+    </string>
+    <string name="copyright">
+        MangaView는 소스 사이트의 데이터를 더욱 편하게 볼 수 있는 뷰어입니다.
+        개발자는 소스 사이트와 관계가 없으며, 소스 사이트에 어떠한 데이터가 제공되는지 알 수 없습니다. 만약 MangaView에
+        저작권을 위반하거나 불법적인 데이터가 존재한다면, 이는 소스 사이트의 책임입니다. 저작권 관련 문의는
+        소스 사이트로 해주십시오.
+    </string>
+    <string name="eula">MangaView를 사용하며 발생하는 문제에 대한 모든 책임은 사용자에게 있습니다. 동의하지 않을 경우 종료해 주세요.</string>
+    <string name="title_activity_comments">CommentsActivity</string>
+    <string name="title_activity_test">testActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_login">로그인</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <string name="kakao_notice">https://t.me/+AV_-GZqyRyFhNTc9</string>
+    <string name="kakao_chat">https://open.kakao.com/o/gV9pe1ob</string>
+    <string name="kakao_direct">https://open.kakao.com/o/sxm0Blfb</string>
+
+    <string name="prev_page">이전 페이지</string>
+    <string name="next_page">다음 페이지</string>
+
+    <string name="touch_viewer_info">툴바 숨김을 해제하려면\n화면을 길게 누르세요</string>
+
+</resources>

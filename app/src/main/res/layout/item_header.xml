@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="#282828"
+        android:id="@+id/constraintLayout2"
+        android:layout_height="200sp"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/HeaderThumb"
+            android:layout_height="match_parent"
+            android:layout_width="170dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/HeaderTitle"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_width="0dp"
+            android:text="TextView"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/HeaderThumb" />
+
+        <TextView
+            android:background="#8000"
+            android:id="@+id/HeaderRelease"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:padding="4dp"
+            android:text="오이"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="@+id/HeaderThumb"
+            app:layout_constraintTop_toTopOf="@+id/HeaderThumb" />
+
+        <TextView
+            android:background="#8000"
+            android:id="@+id/headerAuthor"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:padding="4dp"
+            android:text="Author"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/HeaderThumb"
+            app:layout_constraintEnd_toEndOf="@+id/HeaderThumb"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:background="#282828"
+        android:id="@+id/HeaderBtnContainer"
+        android:layout_height="45dp"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
+
+        <LinearLayout
+            android:id="@+id/HeaderRecommend"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:paddingEnd="6dp">
+
+            <ImageView
+                android:id="@+id/recommendIcon"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_thumb" />
+
+            <TextView
+                android:id="@+id/recommendText"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="123"
+                android:textColor="@color/thumb" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:background="@drawable/button_bg_light"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/HeaderBookmark"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp">
+
+            <ImageView
+                android:id="@+id/bookmarkIcon"
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_bookmark_border" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:background="@drawable/button_bg_light"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/HeaderFavorite"
+            android:layout_height="match_parent"
+            android:layout_marginStart="3dp"
+            android:layout_width="wrap_content">
+
+            <ImageView
+                android:id="@+id/favoriteIcon"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="9dp"
+                android:layout_marginStart="9dp"
+                android:layout_width="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_favorite_border" />
+
+        </LinearLayout>
+
+        <Button
+            android:background="@drawable/button_bg_light"
+            android:enabled="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:id="@+id/HeaderFirst"
+            android:layout_height="match_parent"
+            android:layout_marginStart="3dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:text="첫화보기"
+            android:textColor="@android:color/white" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:background="#282828"
+        android:id="@+id/tagsContainer"
+        android:layout_gravity="left"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/HeaderBtnContainer" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

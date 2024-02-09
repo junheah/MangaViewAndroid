@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:foreground="?android:attr/selectableItemBackground"
+        android:id="@+id/updatedCard"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="3dp"
+        android:layout_width="match_parent"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="3dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:minHeight="88sp">
+
+            <ImageView
+                android:id="@+id/Thumb"
+                android:layout_height="0dp"
+                android:layout_width="80dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/seenIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_margin="5dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toStartOf="@+id/epsButton"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/ic_history"
+                android:visibility="visible"/>
+            <ImageView
+                android:id="@+id/favIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_margin="5dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toStartOf="@+id/seenIcon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:srcCompat="@drawable/ic_favorite"
+                android:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/Title"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="0dp"
+                android:text="TextView"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toStartOf="@+id/epsButton"
+                app:layout_constraintStart_toEndOf="@+id/Thumb"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/TitleAuthor"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:minLines="1"
+                android:singleLine="true"
+                android:text="작가"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/TitleTagContainer"
+                app:layout_constraintEnd_toStartOf="@+id/date"
+                app:layout_constraintHeight_min="15sp"
+                app:layout_constraintStart_toEndOf="@+id/Thumb"
+                app:layout_constraintTop_toBottomOf="@+id/Title" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_margin="8sp"
+                android:gravity="bottom|right"
+                android:maxLines="1"
+                android:minHeight="16sp"
+                android:text="date"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="13sp"
+                app:layout_constraintBottom_toTopOf="@+id/TitleTagContainer"
+                app:layout_constraintEnd_toStartOf="@+id/epsButton"
+                app:layout_constraintHeight_min="16sp"
+                app:layout_constraintTop_toBottomOf="@+id/Title" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:background="@android:color/darker_gray"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:id="@+id/epsButton"
+                android:layout_height="0dp"
+                android:layout_width="40dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:textAlignment="center"
+                app:srcCompat="@drawable/ic_baseline_library_books_24"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/TitleTagContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/favIcon"
+                app:layout_constraintStart_toEndOf="@+id/Thumb">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_tag" />
+
+                <TextView
+                    android:id="@+id/TitleBaseMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="만화"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text=" "
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/TitleTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="태그1 태그2 태그3"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="11sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

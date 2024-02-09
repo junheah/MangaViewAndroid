@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/debug_up"
+        android:title=""
+        app:showAsAction="always"
+        android:icon="@android:drawable/arrow_up_float"
+        />
+    <item
+        android:id="@+id/debug_down"
+        android:title=""
+        app:showAsAction="always"
+        android:icon="@android:drawable/arrow_down_float"
+        />
+</menu>

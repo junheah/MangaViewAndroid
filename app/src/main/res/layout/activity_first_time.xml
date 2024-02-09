@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:context=".activity.FirstTimeActivity">
+
+    <ScrollView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:srcCompat="@drawable/ic_logo" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="MangaViewAndroid"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:text="이용 안내"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:text="@string/first_time_dialog"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:text="저작권"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:text="@string/copyright"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:text="EULA"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:text="@string/eula"
+                android:textSize="20sp" />
+
+
+            <EditText
+                android:id="@+id/first_def_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:singleLine="true"
+                android:textColor="#FFF"
+                android:maxLines="1"
+                android:hint="기본 주소 입력 (숫자없는 주소)"/>
+
+            <Button
+                android:background="@drawable/button_bg_white"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:id="@+id/eulaAgreeBtn"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:text="동의하고 계속하기" />
+
+            <Button
+                android:background="@drawable/button_bg_white"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:id="@+id/eulaNoUrlBtn"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_width="match_parent"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"
+                android:text="동의하고 기본주소 없이 계속하기" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

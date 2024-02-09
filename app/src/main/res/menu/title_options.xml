@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:visible="false"
+        android:id="@+id/favAdd"
+        android:title="좋아요 추가"/>
+    <item
+        android:visible="false"
+        android:id="@+id/favDel"
+        android:title="좋아요 제거"/>
+    <item
+        android:visible="false"
+        android:id="@+id/del"
+        android:title="제거"/>
+    <item
+        android:visible="false"
+        android:id="@+id/remove"
+        android:title="삭제"/>
+</menu>

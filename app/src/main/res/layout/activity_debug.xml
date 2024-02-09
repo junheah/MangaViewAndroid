@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:context=".activity.DebugActivity">
+
+    <ScrollView
+        android:id="@+id/debug_scroll"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/debug_clear"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="clear output" />
+
+            <Button
+                android:id="@+id/debug_pref"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="sharedpref 보기" />
+
+            <Button
+                android:id="@+id/debug_pref_edit"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="sharedpref 편집" />
+
+            <Button
+                android:id="@+id/debug_webTest"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="웹 테스트" />
+
+            <Button
+                android:id="@+id/debug_loginTest"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="로그인 테스트" />
+
+            <Button
+                android:id="@+id/ddgbTest"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="ddg bypass 테스트" />
+
+            <Button
+                android:id="@+id/debug_eula"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="eula 테스트" />
+
+            <Button
+                android:id="@+id/debug_cf"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="cf scrape 테스트" />
+
+            <Button
+                android:id="@+id/debug_layoutEditor"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="layout editor 테스트" />
+            <Button
+                android:id="@+id/debug_baseMode"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="base mode change" />
+
+            <Button
+                android:id="@+id/debug_idInput"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="open manga with id" />
+
+            <Button
+                android:id="@+id/debug_file_test"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="file write test" />
+
+
+
+            <TextView
+                android:focusable="true"
+                android:id="@+id/debug_out"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:longClickable="true"
+                android:text=""
+                android:textIsSelectable="true" />
+
+            <EditText
+                android:id="@+id/debug_edit"
+                android:inputType="text|textMultiLine"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/debug_save"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="save"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/debug_cancel"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:text="cancel"
+                android:visibility="gone" />
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#d8d8d8</color>
+    <color name="colorAccent">#af56ff</color>
+    <color name="colorRanking">#8d78a0</color>
+    <color name="selected">#e1d3ef</color>
+    <color name="selectedDark">#664a73</color>
+    <color name="resumeDark">#493c4f</color>
+    <color name="colorText">#121212</color>
+    <color name="colorBackground">#ffffff</color>
+
+    <color name="rangeSelected">#4CAF50</color>
+
+
+    <color name="colorDarkBackground">#2c2c2c</color>
+    <color name="nav_enable">#a2a2a2</color>
+    <color name="nav_disable">#565656</color>
+    <color name="colorDarkWindowBackground">#222222</color>
+    <color name="colorDarkItem">#333333</color>
+
+    <color name="thumb">#5997e7</color>
+    <color name="smile">#ee7873</color>
+    <color name="bookmark">#e7c06c</color>
+    <color name="comment">#6a989d</color>
+
+    <color name="favorite">#FF9CCF</color>
+
+
+    <color name="header_darker">#e1d3ef</color>
+</resources>

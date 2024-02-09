@@ -1,0 +1,141 @@
+::-webkit-scrollbar {
+    width: 0px;
+}
+button.download{
+    border: none;
+    font-size: 1.7em;
+    margin: 8px 2px;
+    padding:0;
+    background-color: #d321d3;
+}
+button.download:hover{
+    background-color: #871c87;
+    color: white;
+}
+button{
+    font-family: 'NanumSquare', sans-serif;
+    text-decoration: none;
+    margin-left: 10px;
+    padding:10px;
+    text-align: center;
+    color: white;
+    background: none;
+    border: 2px solid white;
+    -webkit-transition-duration: 0.5s; /* Safari */
+    transition-duration: 0.5s;
+}
+button:hover{
+    background-color: white;
+    color: black;
+}
+p{
+    margin:5px;
+    font-size: 1.1em;
+}
+p.release-info{
+    padding:15px;
+    font-size: 1em;
+}
+p.release-name{
+    font-size: 0.54em;
+}
+div.dlbtn{
+    padding: 10px 40px;
+}
+div.header{
+    text-align: center;
+    align-items: center;
+    width:100%;
+}
+body, html{
+    font-family: 'NanumSquare', sans-serif;
+    background-color: black;
+    color: white;
+    margin:0;
+}
+pre{
+    font-family: 'NanumSquare', sans-serif;
+    font-size: 1em;
+    line-height: 1.5em;
+    margin:20px;
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;    
+}
+a{
+    color:#d321d3;
+    text-decoration: none;
+}
+h1{
+    margin: 2px;
+    font-size: 2.5em;
+}
+div.content{
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    background-color:#181818;
+    text-align: left;
+    margin-top: 80px;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    width:100%;
+}
+div.footer{
+    /* position: fixed; */
+    /* background-color: white; */
+    box-sizing: border-box;
+    width: 100%;
+    margin:0;
+    padding:10px;
+    text-align: center;
+    background-color: #190519;
+    left: 0;
+    top: 0;
+    color: #544054;
+    text-align: center;
+}
+table.table-downloads{
+    text-align: center;
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td{
+    padding:10px;
+    border-bottom: 1px solid #333333;
+}
+@keyframes m {
+  0%   {transform: translateX(-100px)}
+  25%  {transform: translateX(-60px)}
+  50%  {transform: translateX(-30px)}
+  75%  {transform: translateX(-10px);}
+  100% {transform: translateX(0)}
+}
+.m {
+  animation: m 1s linear;
+}
+@keyframes v {
+  0%   {transform: translateX(100px)}
+  25%  {transform: translateX(60px)}
+  50%  {transform: translateX(30px)}
+  75%  {transform: translateX(10px);}
+  100% {transform: translateX(0)}
+}
+.v {
+  animation: v 1s linear;
+}
+div.logo-container{
+    width: 100%;
+    padding-top:120px;
+    padding-bottom:90px;
+    max-width:31.5em;
+}
+svg.logo{
+    width: 100%;
+    height: auto;
+
+}
