@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 
@@ -23,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getGlideUrl;
+
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.activity.ViewerActivity;
 import ml.melun.mangaview.interfaces.StringCallback;
@@ -174,8 +178,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void preloadAll(){
         for(Object o : items) {
             if(o instanceof PageItem) {
+                Object url = ((PageItem) o).manga.isOnline() ? getGlideUrl(((PageItem)o).img) : ((PageItem)o).img;
                 Glide.with(mainContext)
-                        .load(((PageItem)o).img)
+                        .load(url)
                         .preload();
             }
         }
@@ -268,11 +273,12 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     void glideBind(ImgViewHolder holder, int pos){
         PageItem item = ((PageItem)items.get(pos));
+        Object url = item.manga.isOnline() ? getGlideUrl(item.img) : item.img;
         if (autoCut) {
             //set image to holder view
             Glide.with(holder.frame)
                     .asBitmap()
-                    .load(item.img)
+                    .load(url)
                     .placeholder(R.drawable.placeholder)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
@@ -317,7 +323,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else {
             Glide.with(holder.frame)
                     .asBitmap()
-                    .load(item.img)
+                    .load(url)
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {

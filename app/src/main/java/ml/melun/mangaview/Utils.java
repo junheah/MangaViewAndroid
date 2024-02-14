@@ -30,6 +30,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -69,6 +71,7 @@ import okhttp3.Response;
 
 import static java.lang.System.currentTimeMillis;
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
 import static ml.melun.mangaview.activity.SettingsActivity.urlSettingPopup;
 
@@ -407,6 +410,13 @@ public class Utils {
                 .setOnCancelListener(dialogInterface -> ((Activity) context).finish());
 
         builder.show();
+    }
+
+    public static GlideUrl getGlideUrl(String image){
+        GlideUrl url = new GlideUrl(image, new LazyHeaders.Builder()
+                .addHeader("Referer", p.getUrl())
+                .build());
+        return url;
     }
 
     private static void showStackTrace(Context context, Exception e){

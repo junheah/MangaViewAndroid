@@ -15,6 +15,8 @@ import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.google.android.material.appbar.AppBarLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -56,10 +58,12 @@ import ml.melun.mangaview.mangaview.Decoder;
 import ml.melun.mangaview.mangaview.Login;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
+import ml.melun.mangaview.model.PageItem;
 import ml.melun.mangaview.ui.CustomSpinner;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getGlideUrl;
 import static ml.melun.mangaview.Utils.getScreenSize;
 import static ml.melun.mangaview.Utils.hideSpinnerDropDown;
 import static ml.melun.mangaview.Utils.showCaptchaPopup;
@@ -396,7 +400,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark++;
             try {
-                String image = imgs.get(viewerBookmark);
+                Object image = manga.isOnline() ? getGlideUrl(imgs.get(viewerBookmark)) : imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -462,7 +466,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                 frame2.setImageResource(R.drawable.placeholder);
                 //오른쪽 부터 로드
                 try {
-                    String image = imgs.get(viewerBookmark);
+                    Object image = manga.isOnline() ? getGlideUrl(imgs.get(viewerBookmark)) : imgs.get(viewerBookmark);
                     //placeholder
                     Glide.with(context)
                             .asBitmap()
@@ -485,7 +489,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                                         type = 1;
                                         if(viewerBookmark > 0){
                                             //이전 페이지 로드하고 landscape 인지 확인, portrait일 경우에만 보여주기
-                                            String image2 = imgs.get(viewerBookmark-1);
+                                            Object image2 = manga.isOnline() ? getGlideUrl(imgs.get(viewerBookmark-1)) : imgs.get(viewerBookmark-1);
                                             Glide.with(context)
                                                     .asBitmap()
                                                     .load(image2)
@@ -544,7 +548,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             //has to check if twopage
             viewerBookmark--;
             try {
-                String image = imgs.get(viewerBookmark);
+                Object image = manga.isOnline() ? getGlideUrl(imgs.get(viewerBookmark)) : imgs.get(viewerBookmark);
 
                 //placeholder
                 frame.setImageResource(R.drawable.placeholder);
@@ -604,7 +608,7 @@ public class ViewerActivity2 extends AppCompatActivity {
         if(split) frame2.setImageResource(R.drawable.placeholder);
         //refreshbtn.setVisibility(View.VISIBLE);
         try {
-            String image = imgs.get(viewerBookmark);
+            Object image = manga.isOnline() ? getGlideUrl(imgs.get(viewerBookmark)) : imgs.get(viewerBookmark);
             //placeholder
             //frame.setImageResource(R.drawable.placeholder);
             Glide.with(context)
@@ -646,7 +650,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                                     type = 1;
                                     if(viewerBookmark+1 < imgs.size()) {
                                         //다음 페이지 로드하고 landscape 인지 확인, portrait일 경우에만 보여주기
-                                        String image2 = imgs.get(viewerBookmark + 1);
+                                        Object image2 = manga.isOnline() ? getGlideUrl(imgs.get(viewerBookmark + 1)) : imgs.get(viewerBookmark + 1);
                                         frame2.setImageResource(R.drawable.placeholder);
                                         Glide.with(context)
                                                 .asBitmap()
@@ -689,7 +693,7 @@ public class ViewerActivity2 extends AppCompatActivity {
 
     void preload(){
         if(viewerBookmark<imgs.size()-1) {
-            String image = imgs.get(viewerBookmark+1);
+            Object image = manga.isOnline() ? getGlideUrl(imgs.get(viewerBookmark+1)) : imgs.get(viewerBookmark+1);
             Glide.with(context)
                     .asBitmap()
                     .load(image)

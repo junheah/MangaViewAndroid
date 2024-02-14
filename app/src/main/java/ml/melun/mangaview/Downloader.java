@@ -48,6 +48,7 @@ import ml.melun.mangaview.mangaview.DownloadTitle;
 import ml.melun.mangaview.mangaview.Manga;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 import static ml.melun.mangaview.Utils.filterFolder;
 
@@ -548,6 +549,7 @@ public class Downloader extends Service {
             URL url = new URL(urlStr);
             if (url.getProtocol().toLowerCase().equals("https")) {
                 HttpsURLConnection init = (HttpsURLConnection) url.openConnection();
+                init.setRequestProperty("Referer", p.getUrl());
                 int responseCode = init.getResponseCode();
                 if (responseCode >= 300 && responseCode < 400) {
                     url = new URL(init.getHeaderField("location"));
@@ -556,6 +558,7 @@ public class Downloader extends Service {
                 }
             } else {
                 HttpURLConnection init = (HttpURLConnection) url.openConnection();
+                init.setRequestProperty("Referer", p.getUrl());
                 int responseCode = init.getResponseCode();
                 if (responseCode >= 300 && responseCode < 400) {
                     url = new URL(init.getHeaderField("location"));
@@ -565,6 +568,7 @@ public class Downloader extends Service {
             }
             //String fileType = url.toString().substring(url.toString().lastIndexOf('.') + 1);
             URLConnection connection = url.openConnection();
+            connection.setRequestProperty("Referer", p.getUrl());
 
 
             // manatoki gives image files as document
@@ -599,6 +603,8 @@ public class Downloader extends Service {
             URL url = new URL(urlStr);
             if (url.getProtocol().toLowerCase().equals("https")) {
                 HttpsURLConnection init = (HttpsURLConnection) url.openConnection();
+                init.setRequestProperty("Referer", p.getUrl());
+
                 int responseCode = init.getResponseCode();
                 if (responseCode >= 300 && responseCode < 400) {
                     url = new URL(init.getHeaderField("location"));
@@ -607,6 +613,7 @@ public class Downloader extends Service {
                 }
             } else {
                 HttpURLConnection init = (HttpURLConnection) url.openConnection();
+                init.setRequestProperty("Referer", p.getUrl());
                 int responseCode = init.getResponseCode();
                 if (responseCode >= 300 && responseCode < 400) {
                     url = new URL(init.getHeaderField("location"));
@@ -616,6 +623,7 @@ public class Downloader extends Service {
             }
             //String fileType = url.toString().substring(url.toString().lastIndexOf('.') + 1);
             URLConnection connection = url.openConnection();
+            connection.setRequestProperty("Referer", p.getUrl());
 
             //load image as bitmap
             InputStream in = connection.getInputStream();
