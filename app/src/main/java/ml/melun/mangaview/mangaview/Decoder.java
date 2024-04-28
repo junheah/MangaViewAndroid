@@ -1,7 +1,11 @@
 package ml.melun.mangaview.mangaview;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import static ml.melun.mangaview.Utils.getSample;
 
@@ -34,8 +38,21 @@ public class Decoder {
         input = getSample(input,width);
         return decode(input);
     }
+    public Bitmap downSample(final Bitmap input, int maxBytes) {
+        if(input.getByteCount() > maxBytes) {
+            Float ratio = (maxBytes*1.0f/input.getByteCount());
+            return downSize(input, ratio);
+        }
+        return input;
+    }
+    public Bitmap downSize(final Bitmap input, Float ratio) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        Bitmap bitmap = Bitmap.createScaledBitmap(input, ((Float)(input.getWidth()*ratio)).intValue(), ((Float)(input.getHeight()*ratio)).intValue(), true);
+        return bitmap;
+    }
 
     public Bitmap decode(Bitmap input){
+        input = downSample(input, 100000000);
         if(view_cnt==0) return input;
         int[][] order = new int[cx*cy][2];
         for (int i = 0; i < cx*cy; i++) {
@@ -49,6 +66,7 @@ public class Decoder {
         });
         //create new bitmap
         Bitmap output = Bitmap.createBitmap(input.getWidth(), input.getHeight(), Bitmap.Config.ARGB_8888);
+
         Canvas canvas = new Canvas(output);
 
         int row_w = input.getWidth() / cx;
