@@ -45,7 +45,12 @@ public class CaptchaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Context context = this;
         setContentView(R.layout.activity_captcha);
+
         String purl = p.getUrl();
+
+        Intent intent = getIntent();
+        String path = intent.getStringExtra("url");
+        String url = purl + (path == null ? "" : path);
 
         TextView infoText = this.findViewById(R.id.infoText);
         try {
@@ -84,35 +89,36 @@ public class CaptchaActivity extends AppCompatActivity {
 
             @Override
             public void onLoadResource(WebView view, String url) {
-                System.out.println(url);
-                if(url.contains("bootstrap") || url.contains("jquery")){
-                    // read cookies and finish
-                    try {
-                        String cookieStr = cookiem.getCookie(purl);
-                        if(cookieStr != null && cookieStr.length() >0) {
-                            for (String s : cookieStr.split("; ")) {
-                                String k = s.substring(0, s.indexOf("="));
-                                String v = s.substring(s.indexOf("=") + 1);
-                                //System.out.println(k + " : " + v);
-                                httpClient.setCookie(k, v);
-                            }
-                        }
-                        Intent resultIntent = new Intent();
-                        setResult(RESULT_CAPTCHA, resultIntent);
-                        finish();
-                    }catch (Exception e){
-                        Utils.showErrorPopup(context, "인증 도중 오류가 발생했습니다. 네트워크 연결 상태를 확인해주세요.", e, true);
-                    }
 
-                } else {
-                    super.onLoadResource(view, url);
-                }
+                System.out.println("ppponload"+url);super.onLoadResource(view, url);
+//                if(url.contains("bootstrap") || url.contains("jquery")){
+//                    // read cookies and finish
+//                    try {
+//                        String cookieStr = cookiem.getCookie(purl);
+//                        if(cookieStr != null && cookieStr.length() >0) {
+//                            for (String s : cookieStr.split("; ")) {
+//                                String k = s.substring(0, s.indexOf("="));
+//                                String v = s.substring(s.indexOf("=") + 1);
+//                                //System.out.println(k + " : " + v);
+//                                httpClient.setCookie(k, v);
+//                            }
+//                        }
+//                        Intent resultIntent = new Intent();
+//                        setResult(RESULT_CAPTCHA, resultIntent);
+////                        finish();
+//                    }catch (Exception e){
+//                        Utils.showErrorPopup(context, "인증 도중 오류가 발생했습니다. 네트워크 연결 상태를 확인해주세요.", e, true);
+//                    }
+//
+//                } else {
+//                    super.onLoadResource(view, url);
+//                }
             }
         };
 
         webView.setWebViewClient(client);
 
-        webView.setOnTouchListener((view, motionEvent) -> true);
+//        webView.setOnTouchListener((view, motionEvent) -> true);
 
         Login login = p.getLogin();
         if(login != null && login.getCookie() !=null && login.getCookie().length()>0){
@@ -120,7 +126,8 @@ public class CaptchaActivity extends AppCompatActivity {
             cookiem.setCookie(purl, login.getCookie(true));
         }
 
-        webView.loadUrl(purl);
+        System.out.println("ppppopen " + url);
+        webView.loadUrl(url);
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             //Do something after 100ms

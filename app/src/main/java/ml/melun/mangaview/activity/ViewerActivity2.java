@@ -527,7 +527,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                             });
                 }catch(Exception e) {
                     e.printStackTrace();
-                    Utils.showCaptchaPopup(context, e, p);
+                    Utils.showCaptchaPopup(manga.getUrl(), context, e, p);
                 }
                 //일단 왼쪽거 냅두다가, 오른쪽이 landscape일 경우, GONE 처리
             }
@@ -687,7 +687,7 @@ public class ViewerActivity2 extends AppCompatActivity {
                     });
         }catch(Exception e) {
             e.printStackTrace();
-            Utils.showCaptchaPopup(context, e, p);
+            Utils.showCaptchaPopup(manga.getUrl(), context, e, p);
         }
     }
 
@@ -849,7 +849,7 @@ public class ViewerActivity2 extends AppCompatActivity {
             lockUi(false);
             imgs = manga.getImgs(context);
             if(imgs == null || imgs.size()==0) {
-                showCaptchaPopup(context, p);
+                showCaptchaPopup(manga.getUrl(), context, p);
                 return;
             }
             d = new Decoder(manga.getSeed(), manga.getId());

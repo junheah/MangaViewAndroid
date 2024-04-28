@@ -340,7 +340,7 @@ public class Manga {
     }
 
     public String getUrl() {
-        return "/manga/" + id;
+        return '/' + baseModeStr(baseMode) + '/' + id;
     }
 
     public boolean useBookmark() {

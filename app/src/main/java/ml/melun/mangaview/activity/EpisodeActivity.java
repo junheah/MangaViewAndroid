@@ -392,7 +392,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 showTokiCaptchaPopup(context, p);
                 return;
             }else if(episodes == null || episodes.size()==0){
-                showCaptchaPopup(context, p);
+                showCaptchaPopup(title.getUrl(), context, p);
                 return;
             }else {
                 afterLoad();
