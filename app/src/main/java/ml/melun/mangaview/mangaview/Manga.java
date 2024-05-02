@@ -94,7 +94,7 @@ public class Manga {
         int tries = 0;
 
         while (imgs.size() == 0 && tries < 2) {
-            Response r = client.mget('/' + baseModeStr(baseMode) + '/' + id, false, cookies);
+            Response r = client.mget(  baseModeStr(baseMode) + '/' + id, false, cookies);
             try {
                 if (r.code() == 302 && r.header("location").contains("captcha.php")) {
                     return LOAD_CAPTCHA;
@@ -109,6 +109,8 @@ public class Manga {
                 }
 
                 Document d = Jsoup.parse(body);
+
+                System.out.println(body);
 
                 //name
                 name = d.selectFirst("div.toon-title").ownText();
@@ -340,7 +342,7 @@ public class Manga {
     }
 
     public String getUrl() {
-        return "/manga/" + id;
+        return '/' + baseModeStr(baseMode) + '/' + id;
     }
 
     public boolean useBookmark() {

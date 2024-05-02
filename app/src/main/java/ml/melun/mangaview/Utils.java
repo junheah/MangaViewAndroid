@@ -276,7 +276,7 @@ public class Utils {
 
 
 
-    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Fragment fragment, Preference p){
+    public static void showCaptchaPopup(String url, Context context, int code, Exception e, boolean force_close, Fragment fragment, Preference p){
         if(context != null) {
             if (!checkConnection(context)) {
                 //no internet
@@ -284,7 +284,7 @@ public class Utils {
                 Toast.makeText(context, "네트워크 연결이 없습니다.", Toast.LENGTH_LONG).show();
                 if (force_close) ((Activity) context).finish();
             } else if (captchaCount == 0) {
-                startCaptchaActivity(context, code, fragment);
+                startCaptchaActivity(context, code, fragment, url);
             } else {
                 AlertDialog.Builder builder;
                 String title = "오류";
@@ -297,7 +297,7 @@ public class Utils {
                         .setNeutralButton("확인", (dialogInterface, i) -> {
                             if (force_close) ((Activity) context).finish();
                         })
-                        .setPositiveButton("CAPTCHA 인증", (dialog, which) -> startCaptchaActivity(context, code, fragment))
+                        .setPositiveButton("CAPTCHA 인증", (dialog, which) -> startCaptchaActivity(context, code, fragment, url))
                         .setNegativeButton("URL 설정", (dialogInterface, i) -> urlSettingPopup(context, p))
                         .setOnCancelListener(dialogInterface -> {
                             if (force_close) ((Activity) context).finish();
@@ -315,6 +315,16 @@ public class Utils {
         }
     }
 
+    static void startCaptchaActivity(Context context, int code, Fragment fragment, String url){
+        Intent captchaIntent = new Intent(context, CaptchaActivity.class);
+        System.out.println("ppppsend " + url);
+        captchaIntent.putExtra("url", url);
+        if(fragment == null)
+            ((Activity)context).startActivityForResult(captchaIntent, code);
+        else
+            fragment.startActivityForResult(captchaIntent, code);
+    }
+
     static void startCaptchaActivity(Context context, int code, Fragment fragment){
         Intent captchaIntent = new Intent(context, CaptchaActivity.class);
         if(fragment == null)
@@ -323,29 +333,39 @@ public class Utils {
             fragment.startActivityForResult(captchaIntent, code);
     }
 
-    public static void showCaptchaPopup(Context context, int code, Exception e, boolean force_close, Preference p) {
-        showCaptchaPopup(context,code,e,force_close,null, p);
+    public static void showCaptchaPopup(String url, Context context, int code, Exception e, boolean force_close, Preference p) {
+        showCaptchaPopup(url, context,code,e,force_close,null, p);
     }
 
-    public static void showCaptchaPopup(Context context, Exception e, Preference p) {
+    public static void showCaptchaPopup(String url, Context context, Exception e, Preference p) {
         // viewer call
-        showCaptchaPopup(context, REQUEST_CAPTCHA, e, true, p);
+        showCaptchaPopup(url, context, REQUEST_CAPTCHA, e, true, p);
     }
 
-    public static void showCaptchaPopup(Context context, int code, Preference p){
+    public static void showCaptchaPopup(String url, Context context, int code, Preference p){
         // menu call
-        showCaptchaPopup(context, code, null, false, p);
+        showCaptchaPopup(url, context, code, null, false, p);
+    }
+
+    public static void showCaptchaPopup(String url, Context context, int code, Fragment fragment, Preference p){
+        // menu call
+        showCaptchaPopup(url, context, code, null, false, fragment, p);
     }
 
     public static void showCaptchaPopup(Context context, int code, Fragment fragment, Preference p){
         // menu call
-        showCaptchaPopup(context, code, null, false, fragment, p);
+        showCaptchaPopup(null, context, code, null, false, fragment, p);
     }
 
+    public static void showCaptchaPopup(String url, Context context, Preference p){
+        // viewer call
+        showCaptchaPopup(url, context, 0, null, true, p);
+    }
     public static void showCaptchaPopup(Context context, Preference p){
         // viewer call
-        showCaptchaPopup(context, 0, null, true, p);
+        showCaptchaPopup(null, context, 0, null, true, p);
     }
+
 
     public static void showTokiCaptchaPopup(Context context, Preference p){
         AlertDialog.Builder builder;

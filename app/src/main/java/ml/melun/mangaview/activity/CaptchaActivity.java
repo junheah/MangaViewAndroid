@@ -13,6 +13,7 @@ import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.Utils;
@@ -45,7 +47,12 @@ public class CaptchaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Context context = this;
         setContentView(R.layout.activity_captcha);
+
         String purl = p.getUrl();
+
+        Intent intent = getIntent();
+        String path = intent.getStringExtra("url");
+        String url = purl + (path == null ? "" : path);
 
         TextView infoText = this.findViewById(R.id.infoText);
         try {
@@ -62,19 +69,12 @@ public class CaptchaActivity extends AppCompatActivity {
         webView = this.findViewById(R.id.captchaWebView);
 
         WebSettings settings = webView.getSettings();
-        settings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         CookieManager cookiem = CookieManager.getInstance();
-        cookiem.removeAllCookie();
+        cookiem.removeAllCookies(null);
 
         WebViewClient client = new WebViewClient() {
-
-            @Nullable
-            @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                return null;
-            }
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
@@ -82,9 +82,16 @@ public class CaptchaActivity extends AppCompatActivity {
                 showPopup(context, "오류", "연결에 실패했습니다. URL을 확인해 주세요");
             }
 
+            @Nullable
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                httpClient.agent = request.getRequestHeaders().get("User-Agent");
+                return super.shouldInterceptRequest(view, request);
+            }
+
             @Override
             public void onLoadResource(WebView view, String url) {
-                System.out.println(url);
+
                 if(url.contains("bootstrap") || url.contains("jquery")){
                     // read cookies and finish
                     try {
@@ -93,7 +100,6 @@ public class CaptchaActivity extends AppCompatActivity {
                             for (String s : cookieStr.split("; ")) {
                                 String k = s.substring(0, s.indexOf("="));
                                 String v = s.substring(s.indexOf("=") + 1);
-                                //System.out.println(k + " : " + v);
                                 httpClient.setCookie(k, v);
                             }
                         }
@@ -104,23 +110,22 @@ public class CaptchaActivity extends AppCompatActivity {
                         Utils.showErrorPopup(context, "인증 도중 오류가 발생했습니다. 네트워크 연결 상태를 확인해주세요.", e, true);
                     }
 
-                } else {
-                    super.onLoadResource(view, url);
                 }
+                super.onLoadResource(view, url);
             }
         };
 
         webView.setWebViewClient(client);
 
-        webView.setOnTouchListener((view, motionEvent) -> true);
+//        webView.setOnTouchListener((view, motionEvent) -> true);
 
-        Login login = p.getLogin();
-        if(login != null && login.getCookie() !=null && login.getCookie().length()>0){
-            //session exists
-            cookiem.setCookie(purl, login.getCookie(true));
-        }
+//        Login login = p.getLogin();
+//        if(login != null && login.getCookie() !=null && login.getCookie().length()>0){
+//            //session exists
+//            cookiem.setCookie(purl, login.getCookie(true));
+//        }
 
-        webView.loadUrl(purl);
+        webView.loadUrl(url);
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             //Do something after 100ms

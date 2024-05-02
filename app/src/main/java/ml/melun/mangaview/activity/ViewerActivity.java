@@ -307,7 +307,7 @@ public class ViewerActivity extends AppCompatActivity {
         try {
             lockUi(false);
             if(m.getImgs(context) == null || m.getImgs(context).size()==0) {
-                showCaptchaPopup(context, p);
+                showCaptchaPopup(m.getUrl(), context, p);
                 return;
             }
             stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback);
@@ -318,7 +318,7 @@ public class ViewerActivity extends AppCompatActivity {
             updateIntent(m);
 
         }catch (Exception e){
-            Utils.showCaptchaPopup(context, e, p);
+            Utils.showCaptchaPopup(m.getUrl(), context, e, p);
             e.printStackTrace();
         }
     }

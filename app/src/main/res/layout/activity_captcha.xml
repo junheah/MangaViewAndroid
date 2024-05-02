@@ -9,10 +9,10 @@
 
     <WebView
         android:id="@+id/captchaWebView"
-        android:layout_height="match_parent"
         android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/captchaText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -30,19 +30,20 @@
         android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        />
 
     <ProgressBar
+        android:background="#80000000"
         android:id="@+id/progressBar"
         android:indeterminate="true"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/captchaText"
+        app:layout_constraintBottom_toBottomOf="parent"
         style="?android:attr/progressBarStyleHorizontal" />
 
     <TextView
@@ -53,12 +54,14 @@
         android:padding="10dp"
         android:visibility="gone"
         android:layout_margin="40dp"
+        android:clickable="false"
+        android:focusable="false"
         android:text="정상적인 웹 페이지가 나올 때까지 자동으로 종료되지 않을 경우, CAPTCHA 문제가 아니므로 다른 방법(URL 변경, 앱 재시작)을 시도해 보세요."
         android:textAlignment="center"
-        android:textColor="#FFFFFF"
-        android:textSize="15sp"
+        android:textColor="#80FFFFFF"
+        android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
+        app:layout_constraintBottom_toTopOf="@+id/captchaText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

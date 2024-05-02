@@ -17,6 +17,7 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getNumberFromString;
 
 
@@ -38,6 +39,10 @@ public class Title extends MTitle {
 
     public Title(String n, String t, String a, List<String> tg, String r, int id, int baseMode) {
         super(n, id, t, a, tg, r, baseMode);
+    }
+
+    public String getUrl(){
+        return '/'+baseModeStr(baseMode)+'/'+ id;
     }
 
 
