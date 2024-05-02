@@ -307,7 +307,6 @@ public class ViewerActivity extends AppCompatActivity {
         try {
             lockUi(false);
             if(m.getImgs(context) == null || m.getImgs(context).size()==0) {
-                System.out.println("ppp"+m.getUrl());
                 showCaptchaPopup(m.getUrl(), context, p);
                 return;
             }

@@ -27,6 +27,7 @@ import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 public class CustomHttpClient {
     public OkHttpClient client;
     Map<String, String> cookies;
+    public String agent = "Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36";
 
     public CustomHttpClient(){
         System.out.println("http client create");
@@ -112,11 +113,13 @@ public class CustomHttpClient {
     public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
         if(customCookie==null)
             customCookie = new HashMap<>();
-        if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
-            customCookie.put("PHPSESSID", p.getLogin().cookie);
-        }
+//        if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
+//            customCookie.put("PHPSESSID", p.getLogin().cookie);
+//        }
         Map<String, String> cookie = new HashMap<>(this.cookies);
         cookie.putAll(customCookie);
+
+
 
         StringBuilder cbuilder = new StringBuilder();
         for(String key : cookie.keySet()){
@@ -128,10 +131,12 @@ public class CustomHttpClient {
         if(cbuilder.length()>2)
             cbuilder.delete(cbuilder.length()-2,cbuilder.length());
 
+        System.out.println("ppppcookie: "+cbuilder.toString());
+
         Map<String, String> headers = new HashMap<>();
         headers.put("Cookie", cbuilder.toString());
-        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36");
-        //headers.put("Referer",p.getUrl());
+        headers.put("User-Agent", agent);
+        headers.put("Referer",p.getUrl());
 
         return get(p.getUrl()+url, headers);
     }
