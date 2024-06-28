@@ -247,7 +247,9 @@ public class Manga {
 
         Element cbody = e.selectFirst("div.media-content");
         content = cbody.selectFirst("div:not([class])").ownText();
-        likes = Integer.parseInt(cbody.selectFirst("div.cmt-good-btn").selectFirst("span").ownText());
+
+        Elements cspans = cbody.selectFirst("div.cmt-good-btn").select("span");
+        likes = Integer.parseInt(cspans.get(cspans.size() - 1).ownText());
         return new Comment(user, timestamp, icon, content, indent, likes, level);
     }
 
