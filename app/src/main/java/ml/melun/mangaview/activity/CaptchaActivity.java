@@ -36,6 +36,7 @@ import static ml.melun.mangaview.Utils.showErrorPopup;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class CaptchaActivity extends AppCompatActivity {
+
     WebView webView;
     public static final int RESULT_CAPTCHA = 15;
     public static final int REQUEST_CAPTCHA = 32;
@@ -58,11 +59,11 @@ public class CaptchaActivity extends AppCompatActivity {
         try {
             URL u = new URL(purl);
             domain = u.getHost();
-        }catch (MalformedURLException e){
+        } catch (MalformedURLException e) {
             showErrorPopup(context, "URL 형식이 올바르지 않습니다.", e, true);
         }
 
-        if(purl.contains("http://")){
+        if (purl.contains("http://")) {
             showErrorPopup(context, "ip 주소 혹은 잘못된 주소를 사용중입니다. 자동 URL 설정을 사용하거나, 주소를 다시 입력해 주세요", null, false);
         }
 
@@ -92,11 +93,11 @@ public class CaptchaActivity extends AppCompatActivity {
             @Override
             public void onLoadResource(WebView view, String url) {
 
-                if(url.contains("bootstrap") || url.contains("jquery")){
+                if (url.contains("bootstrap") || url.contains("jquery")) {
                     // read cookies and finish
                     try {
                         String cookieStr = cookiem.getCookie(purl);
-                        if(cookieStr != null && cookieStr.length() >0) {
+                        if (cookieStr != null && cookieStr.length() > 0) {
                             for (String s : cookieStr.split("; ")) {
                                 String k = s.substring(0, s.indexOf("="));
                                 String v = s.substring(s.indexOf("=") + 1);
@@ -106,7 +107,7 @@ public class CaptchaActivity extends AppCompatActivity {
                         Intent resultIntent = new Intent();
                         setResult(RESULT_CAPTCHA, resultIntent);
                         finish();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Utils.showErrorPopup(context, "인증 도중 오류가 발생했습니다. 네트워크 연결 상태를 확인해주세요.", e, true);
                     }
 
@@ -118,13 +119,11 @@ public class CaptchaActivity extends AppCompatActivity {
         webView.setWebViewClient(client);
 
 //        webView.setOnTouchListener((view, motionEvent) -> true);
-
 //        Login login = p.getLogin();
 //        if(login != null && login.getCookie() !=null && login.getCookie().length()>0){
 //            //session exists
 //            cookiem.setCookie(purl, login.getCookie(true));
 //        }
-
         webView.loadUrl(url);
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {

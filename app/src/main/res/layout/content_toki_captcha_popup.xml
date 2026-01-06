@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,11 +9,11 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:id="@+id/toki_captcha_image"/>
+        android:id="@+id/toki_captcha_image" />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/toki_captcha_answer"/>
+        android:id="@+id/toki_captcha_answer" />
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

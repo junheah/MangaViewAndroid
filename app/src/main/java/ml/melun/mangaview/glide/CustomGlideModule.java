@@ -20,6 +20,7 @@ import okhttp3.OkHttpClient;
 
 @GlideModule
 public class CustomGlideModule extends AppGlideModule {
+
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
         System.out.println("glide module create");

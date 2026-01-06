@@ -22,7 +22,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-
 import com.bumptech.glide.Glide;
 
 import ml.melun.mangaview.R;
@@ -53,7 +52,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
+        if (p.getDarkTheme()) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -79,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
         Button logoutBtn = findViewById(R.id.logout_button);
 
-        if(p.getLogin() != null && p.getLogin().isValid()){
+        if (p.getLogin() != null && p.getLogin().isValid()) {
             mLoginFormView.setVisibility(View.GONE);
             accountPanel.setVisibility(View.VISIBLE);
             logoutBtn.setOnClickListener(view -> {
@@ -92,20 +93,24 @@ public class LoginActivity extends AppCompatActivity {
 
             this.findViewById(R.id.bookmark_list_button).setOnClickListener(view -> {
                 Intent i = new Intent(context, TagSearchActivity.class);
-                i.putExtra("mode",7);
+                i.putExtra("mode", 7);
                 startActivity(i);
             });
 
             this.findViewById(R.id.bookmark_import_button).setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new AsyncTask<Void, Void, Integer>(){
+                    new AsyncTask<Void, Void, Integer>() {
                         ProgressDialog pd;
+
                         @Override
                         protected void onPreExecute() {
                             super.onPreExecute();
-                            if(p.getDarkTheme()) pd = new ProgressDialog(context, R.style.darkDialog);
-                            else pd = new ProgressDialog(context);
+                            if (p.getDarkTheme()) {
+                                pd = new ProgressDialog(context, R.style.darkDialog); 
+                            }else {
+                                pd = new ProgressDialog(context);
+                            }
                             pd.setMessage("불러오는중");
                             pd.setCancelable(false);
                             pd.show();
@@ -117,10 +122,11 @@ public class LoginActivity extends AppCompatActivity {
                             if (pd.isShowing()) {
                                 pd.dismiss();
                             }
-                            if(integer == 0)
-                                Toast.makeText(context, "작업을 성공적으로 완료했습니다.", Toast.LENGTH_LONG).show();
-                            else
+                            if (integer == 0) {
+                                Toast.makeText(context, "작업을 성공적으로 완료했습니다.", Toast.LENGTH_LONG).show(); 
+                            }else {
                                 Toast.makeText(context, "작업을 실패했습니다.", Toast.LENGTH_LONG).show();
+                            }
                         }
 
                         @Override
@@ -130,21 +136,19 @@ public class LoginActivity extends AppCompatActivity {
                     }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             });
-        }else{
+        } else {
             new PreLoginTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
-
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -186,7 +190,7 @@ public class LoginActivity extends AppCompatActivity {
             cancel = true;
         }
 
-        if(TextUtils.isEmpty(answer)){
+        if (TextUtils.isEmpty(answer)) {
             Toast.makeText(context, "자동입력 방지문자를 입력하세요", Toast.LENGTH_SHORT).show();
             cancel = true;
             focusView = mCaptchaView;
@@ -226,20 +230,20 @@ public class LoginActivity extends AppCompatActivity {
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             mLoginFormView.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                        }
+                    });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mProgressView.animate().setDuration(shortAnimTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                        }
+                    });
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
@@ -248,8 +252,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public class PreLoginTask extends AsyncTask<Void, Void, Void>{
+    public class PreLoginTask extends AsyncTask<Void, Void, Void> {
+
         byte[] image;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -271,13 +277,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+
         String answer;
+
         UserLoginTask(String email, String password, String answer) {
             login.set(email, password);
             this.answer = answer;
@@ -296,7 +303,7 @@ public class LoginActivity extends AppCompatActivity {
             if (success) {
                 //save login credentials
                 p.setLogin(login);
-                Toast.makeText(context,"로그인 성공",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show();
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -311,4 +318,3 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 }
-

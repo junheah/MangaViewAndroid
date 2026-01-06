@@ -29,16 +29,16 @@ import android.os.Build;
 
 import androidx.documentfile.provider.DocumentFile;
 
-    /*
+/*
     mode:
     0 = online
     1 = offline - old
     2 = offline - old(moa) (title.data)
     3 = offline - latest(toki) (title.gson)
     4 = offline - new(moa) (title.gson)
-     */
-
+ */
 public class Manga {
+
     int baseMode = base_comic;
 
     public Manga(int i, String n, String d, int baseMode) {
@@ -73,7 +73,9 @@ public class Manga {
     }
 
     public String getThumb() {
-        if (thumb == null) return "";
+        if (thumb == null) {
+            return "";
+        }
         return thumb;
     }
 
@@ -94,7 +96,7 @@ public class Manga {
         int tries = 0;
 
         while (imgs.size() == 0 && tries < 2) {
-            Response r = client.mget(  baseModeStr(baseMode) + '/' + id, false, cookies);
+            Response r = client.mget(baseModeStr(baseMode) + '/' + id, false, cookies);
             try {
                 if (r.code() == 302 && r.header("location").contains("captcha.php")) {
                     return LOAD_CAPTCHA;
@@ -123,13 +125,16 @@ public class Manga {
                         .split(baseModeStr(baseMode) + '/')[1]
                         .split("\\?")[0]);
 
-                if (title == null) title = new Title(name, "", "", null, "", tid, baseMode);
+                if (title == null) {
+                    title = new Title(name, "", "", null, "", tid, baseMode);
+                }
 
                 //eps
                 for (Element e : navbar.selectFirst("select").select("option")) {
                     String idstr = e.attr("value");
-                    if (idstr.length() > 0)
+                    if (idstr.length() > 0) {
                         eps.add(new Manga(Integer.parseInt(idstr), e.ownText(), "", baseMode));
+                    }
                 }
 
                 //imgs
@@ -141,8 +146,9 @@ public class Manga {
                         encodedData.append(line.substring(line.indexOf('\'') + 1, line.lastIndexOf('\'')).replaceAll("[.]", "%"));
                     }
                 }
-                if (encodedData.lastIndexOf("%") == encodedData.length() - 1)
+                if (encodedData.lastIndexOf("%") == encodedData.length() - 1) {
                     encodedData.deleteCharAt(encodedData.length() - 1);
+                }
                 String imgdiv = URLDecoder.decode(encodedData.toString(), "UTF-8");
 
                 Document id = Jsoup.parse(imgdiv);
@@ -155,20 +161,22 @@ public class Manga {
                                 String img = a.getValue();
                                 if (!img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
                                     flag = true;
-                                    if (img.startsWith("/"))
-                                        imgs.add(client.getUrl() + img);
-                                    else
+                                    if (img.startsWith("/")) {
+                                        imgs.add(client.getUrl() + img); 
+                                    }else {
                                         imgs.add(img);
+                                    }
                                 }
                             }
                         }
                         if (!flag) {
                             String img = e.attr("src");
                             if (!img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
-                                if (img.startsWith("/"))
-                                    imgs.add(client.getUrl() + img);
-                                else
+                                if (img.startsWith("/")) {
+                                    imgs.add(client.getUrl() + img); 
+                                }else {
                                     imgs.add(img);
+                                }
                             }
                         }
                     }
@@ -176,7 +184,6 @@ public class Manga {
 
                 //comments
                 Element commentdiv = d.selectFirst("div#viewcomment");
-
 
                 try {
                     for (Element e : commentdiv.selectFirst("section#bo_vc").select("div.media")) {
@@ -222,24 +229,26 @@ public class Manga {
         String indentstr;
         //indent
         indentstr = e.attr("style");
-        if (indentstr.length() > 0)
-            indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':') + 1, indentstr.lastIndexOf('p'))) / 64;
-        else
+        if (indentstr.length() > 0) {
+            indent = Integer.parseInt(indentstr.substring(indentstr.lastIndexOf(':') + 1, indentstr.lastIndexOf('p'))) / 64; 
+        }else {
             indent = 0;
+        }
 
         //icon
         Element icone = e.selectFirst(".media-object");
-        if (icone.is("img"))
-            icon = icone.attr("src");
-        else
+        if (icone.is("img")) {
+            icon = icone.attr("src"); 
+        }else {
             icon = "";
+        }
 
         Element header = e.selectFirst("div.media-heading");
         Element userSpan = header.selectFirst("span.member");
         user = userSpan.ownText();
-        if (userSpan.hasClass("guest"))
-            level = 0;
-        else {
+        if (userSpan.hasClass("guest")) {
+            level = 0; 
+        }else {
             lvlstr = userSpan.selectFirst("img").attr("src");
             level = Integer.parseInt(lvlstr.substring(lvlstr.lastIndexOf('/') + 1, lvlstr.lastIndexOf('.')));
         }
@@ -252,7 +261,6 @@ public class Manga {
         likes = Integer.parseInt(cspans.get(cspans.size() - 1).ownText());
         return new Comment(user, timestamp, icon, content, indent, likes, level);
     }
-
 
     public List<Manga> getEps() {
         return eps;
@@ -361,8 +369,11 @@ public class Manga {
                 return null;
             } else {
                 int index = eps.indexOf(this);
-                if (index > 0) return eps.get(index - 1);
-                else return null;
+                if (index > 0) {
+                    return eps.get(index - 1); 
+                }else {
+                    return null;
+                }
             }
         } else {
             return nextEp;
@@ -375,8 +386,11 @@ public class Manga {
                 return null;
             } else {
                 int index = eps.indexOf(this);
-                if (index < eps.size() - 1) return eps.get(index + 1);
-                else return null;
+                if (index < eps.size() - 1) {
+                    return eps.get(index + 1); 
+                }else {
+                    return null;
+                }
             }
         } else {
             return prevEp;
@@ -406,7 +420,7 @@ public class Manga {
     Manga nextEp, prevEp;
 
     public interface Listener {
+
         void setMessage(String msg);
     }
 }
-

@@ -14,12 +14,12 @@
         android:textSize="15sp"
         android:textColor="#FFF"
         android:text="이전화"
-        android:id="@+id/prevEpInfo"/>
+        android:id="@+id/prevEpInfo" />
     <ProgressBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/infoLoading"
-        android:indeterminate="true"/>
+        android:indeterminate="true" />
 
 
     <TextView
@@ -31,7 +31,7 @@
         android:text="다음화"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="50dp"
-        android:id="@+id/nextEpInfo"/>
+        android:id="@+id/nextEpInfo" />
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

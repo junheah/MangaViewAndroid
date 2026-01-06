@@ -17,7 +17,8 @@ public class LicenseActivity extends AppCompatActivity {
         ab.setTitle("오픈소스 라이선스");
         ab.setDisplayHomeAsUpEnabled(true);
     }
-    public boolean onOptionsItemSelected(MenuItem item){
+
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;

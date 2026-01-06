@@ -32,7 +32,7 @@ import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
-public class MainMain extends Fragment{
+public class MainMain extends Fragment {
 
     RecyclerView mainRecycler;
     MainAdapter mainadapter;
@@ -47,48 +47,46 @@ public class MainMain extends Fragment{
 
     boolean fragmentActive = false;
 
-    public void setWait(Boolean wait){
+    public void setWait(Boolean wait) {
         this.wait = wait;
     }
 
-
-    public static MainMain newInstance(){
+    public static MainMain newInstance() {
         MainMain frag = new MainMain();
         frag.initializeCallback();
         return frag;
     }
 
-    public MainMain(){
+    public MainMain() {
 
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mainActivityCallback = (MainActivity)getActivity();
+        this.mainActivityCallback = (MainActivity) getActivity();
     }
 
-    public void initializeCallback(){
+    public void initializeCallback() {
         callback = success -> {
             wait = false;
-            if(mainadapter != null && fragmentActive) {
+            if (mainadapter != null && fragmentActive) {
                 mainadapter.fetch();
             }
-            if(mainWebtoonAdapter != null && fragmentActive) {
+            if (mainWebtoonAdapter != null && fragmentActive) {
                 mainWebtoonAdapter.fetch();
             }
         };
     }
 
-    public UrlUpdater.UrlUpdaterCallback getCallback(){
+    public UrlUpdater.UrlUpdaterCallback getCallback() {
         return callback;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_main , container, false);
-
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.content_main, container, false);
 
         TabLayout tabLayout = rootView.findViewById(R.id.mainTab);
 
@@ -97,18 +95,19 @@ public class MainMain extends Fragment{
         tabLayout.addTab(comicTab);
         tabLayout.addTab(webtoonTab);
 
-        if(p.getBaseMode() == base_comic)
-            comicTab.select();
-        else
+        if (p.getBaseMode() == base_comic) {
+            comicTab.select(); 
+        }else {
             webtoonTab.select();
+        }
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if(tab.getPosition() == COMIC_TAB){
+                if (tab.getPosition() == COMIC_TAB) {
                     mainRecycler.setAdapter(mainadapter);
                     p.setBaseMode(base_comic);
-                }else if(tab.getPosition() == WEBTOON_TAB){
+                } else if (tab.getPosition() == WEBTOON_TAB) {
                     mainRecycler.setAdapter(mainWebtoonAdapter);
                     p.setBaseMode(base_webtoon);
                 }
@@ -132,7 +131,6 @@ public class MainMain extends Fragment{
         NpaFlexboxLayoutManager lm = new NpaFlexboxLayoutManager(getContext());
         mainRecycler.setLayoutManager(lm);
 
-
         MainAdapter.onItemClick listener = new MainAdapter.onItemClick() {
 
             @Override
@@ -145,37 +143,37 @@ public class MainMain extends Fragment{
                 //mget title from manga m and start intent for manga m
                 //getTitleFromManga intentStarter = new getTitleFromManga();
                 //intentStarter.execute(m);
-                openViewer(getContext(), m,-1);
+                openViewer(getContext(), m, -1);
             }
 
             @Override
             public void clickedGenre(String t) {
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
-                i.putExtra("query",t);
-                i.putExtra("mode",2);
+                i.putExtra("query", t);
+                i.putExtra("mode", 2);
                 startActivity(i);
             }
 
             @Override
             public void clickedName(String t) {
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
-                i.putExtra("query",t);
-                i.putExtra("mode",3);
+                i.putExtra("query", t);
+                i.putExtra("mode", 3);
                 startActivity(i);
             }
 
             @Override
             public void clickedRelease(String t) {
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
-                i.putExtra("query",t);
-                i.putExtra("mode",4);
+                i.putExtra("query", t);
+                i.putExtra("mode", 4);
                 startActivity(i);
             }
 
             @Override
             public void clickedMoreUpdated() {
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
-                i.putExtra("mode",5);
+                i.putExtra("mode", 5);
                 startActivity(i);
             }
 
@@ -201,12 +199,13 @@ public class MainMain extends Fragment{
         mainWebtoonAdapter = new MainWebtoonAdapter(getContext());
         mainWebtoonAdapter.setListener(listener);
 
-        if(p.getBaseMode() == base_comic)
-            mainRecycler.setAdapter(mainadapter);
-        else
+        if (p.getBaseMode() == base_comic) {
+            mainRecycler.setAdapter(mainadapter); 
+        }else {
             mainRecycler.setAdapter(mainWebtoonAdapter);
+        }
 
-        if(!wait) {
+        if (!wait) {
             mainadapter.fetch();
             mainWebtoonAdapter.fetch();
         }
@@ -228,7 +227,8 @@ public class MainMain extends Fragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_CAPTCHA && mainadapter!=null)
+        if (resultCode == RESULT_CAPTCHA && mainadapter != null) {
             mainadapter.fetch();
+        }
     }
 }

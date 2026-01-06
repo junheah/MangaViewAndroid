@@ -1,4 +1,5 @@
 package ml.melun.mangaview.adapter;
+
 import android.content.Context;
 import androidx.core.content.ContextCompat;
 import androidx.cardview.widget.CardView;
@@ -43,15 +44,17 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     public TitleAdapter(Context context) {
         init(context);
     }
+
     public TitleAdapter(Context context, boolean online) {
         init(context);
         forceThumbnail = !online;
     }
 
-    public void setForceThumbnail(boolean b){
+    public void setForceThumbnail(boolean b) {
         this.forceThumbnail = b;
     }
-    void init(Context context){
+
+    void init(Context context) {
         p = new Preference(context);
         dark = p.getDarkTheme();
         save = p.getDataSave();
@@ -63,15 +66,16 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
                 String query = charSequence.toString();
-                if(query.isEmpty() || query.length() == 0){
+                if (query.isEmpty() || query.length() == 0) {
                     mDataFiltered = mData;
                     searching = false;
-                }else{
+                } else {
                     searching = true;
                     ArrayList<Title> filtered = new ArrayList<>();
-                    for(Title t : mData){
-                        if(t.getName().toLowerCase().contains(query.toLowerCase()) || t.getAuthor().toLowerCase().contains(query.toLowerCase()))
+                    for (Title t : mData) {
+                        if (t.getName().toLowerCase().contains(query.toLowerCase()) || t.getAuthor().toLowerCase().contains(query.toLowerCase())) {
                             filtered.add(t);
+                        }
                     }
                     mDataFiltered = filtered;
                 }
@@ -88,17 +92,16 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         };
     }
 
-
     @Override
     public long getItemId(int position) {
         return position;
     }
 
-    public void removeAll(){
+    public void removeAll() {
         int originSize = mData.size();
         mData.clear();
         mDataFiltered.clear();
-        notifyItemRangeRemoved(0,originSize);
+        notifyItemRangeRemoved(0, originSize);
     }
 
     @Override
@@ -107,42 +110,41 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-    public void addData(List<?> t){
+    public void addData(List<?> t) {
         int oSize = mData.size();
-        for(Object d:t){
-            if(d instanceof Title){
-                ((Title) d).setBookmark(p.getBookmark((Title)d));
-                mData.add((Title)d);
-            } else if(d instanceof MTitle){
-                Title d2 = new Title((MTitle)d);
+        for (Object d : t) {
+            if (d instanceof Title) {
+                ((Title) d).setBookmark(p.getBookmark((Title) d));
+                mData.add((Title) d);
+            } else if (d instanceof MTitle) {
+                Title d2 = new Title((MTitle) d);
                 d2.setBookmark(p.getBookmark((MTitle) d));
                 mData.add(d2);
             }
         }
         mDataFiltered = mData;
-        notifyItemRangeInserted(oSize,t.size());
+        notifyItemRangeInserted(oSize, t.size());
     }
 
-    public void setData(List<?> t){
+    public void setData(List<?> t) {
         clearData();
         addData(t);
     }
 
-    public void clearData(){
+    public void clearData() {
         mData.clear();
         mDataFiltered.clear();
         notifyDataSetChanged();
     }
 
-
-    public void moveItemToTop(int from){
-        if(!searching) {
+    public void moveItemToTop(int from) {
+        if (!searching) {
             mData.add(0, mData.get(from));
             mData.remove(from + 1);
             for (int i = from; i > 0; i--) {
                 notifyItemMoved(i, i - 1);
             }
-        }else{
+        } else {
             Title t = mDataFiltered.get(from);
             int index = mData.indexOf(t);
             mData.add(0, mData.get(index));
@@ -150,11 +152,11 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         }
     }
 
-    public void remove(int pos){
-        if(!searching) {
+    public void remove(int pos) {
+        if (!searching) {
             mData.remove(pos);
             notifyItemRemoved(pos);
-        }else{
+        } else {
             Title t = mDataFiltered.get(pos);
             int index = mData.indexOf(t);
             mData.remove(index);
@@ -181,32 +183,40 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
         holder.name.setText(title);
         holder.author.setText(author);
 
-        if(data.hasCounter()){
+        if (data.hasCounter()) {
             holder.counterContainer.setVisibility(View.VISIBLE);
             holder.recommend_c.setText(String.valueOf(data.getRecommend_c()));
-        }else{
+        } else {
             //no counter
             holder.counterContainer.setVisibility(View.GONE);
         }
 
-
-
-        if(thumb.length()>1 && (!save || forceThumbnail)) Glide.with(holder.thumb).load(thumb).into(holder.thumb);
-        else holder.thumb.setImageBitmap(null);
-        if(save && !forceThumbnail) holder.thumb.setVisibility(View.GONE);
-        if(bookmark>0 && resume) holder.resume.setVisibility(View.VISIBLE);
-        else holder.resume.setVisibility(View.GONE);
+        if (thumb.length() > 1 && (!save || forceThumbnail)) {
+            Glide.with(holder.thumb).load(thumb).into(holder.thumb); 
+        }else {
+            holder.thumb.setImageBitmap(null);
+        }
+        if (save && !forceThumbnail) {
+            holder.thumb.setVisibility(View.GONE);
+        }
+        if (bookmark > 0 && resume) {
+            holder.resume.setVisibility(View.VISIBLE); 
+        }else {
+            holder.resume.setVisibility(View.GONE);
+        }
 
     }
 
     @Override
     public int getItemCount() {
-        if(mDataFiltered != null)
+        if (mDataFiltered != null) {
             return mDataFiltered.size();
+        }
         return 0;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView name;
         ImageView thumb, fav;
         TextView author;
@@ -223,7 +233,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             super(itemView);
             name = itemView.findViewById(R.id.Title);
             thumb = itemView.findViewById(R.id.Thumb);
-            author =itemView.findViewById(R.id.TitleAuthor);
+            author = itemView.findViewById(R.id.TitleAuthor);
             tags = itemView.findViewById(R.id.TitleTag);
             card = itemView.findViewById(R.id.titleCard);
             resume = itemView.findViewById(R.id.epsButton);
@@ -236,8 +246,7 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             tagContainer = itemView.findViewById(R.id.TitleTagContainer);
             counterContainer = itemView.findViewById(R.id.TitleCounterContainer);
 
-
-            if(dark){
+            if (dark) {
                 card.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.colorDarkBackground));
                 resume.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.resumeDark));
             }
@@ -248,13 +257,13 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
             });
             resume.setOnClickListener(v -> mClickListener.onResumeClick(getAdapterPosition(), p.getBookmark(mDataFiltered.get(getAdapterPosition()))));
 
-
         }
     }
 
-    public void setResume(boolean resume){
+    public void setResume(boolean resume) {
         this.resume = resume;
     }
+
     public Title getItem(int index) {
         return mDataFiltered.get(index);
     }
@@ -264,15 +273,15 @@ public class TitleAdapter extends RecyclerView.Adapter<TitleAdapter.ViewHolder> 
     }
 
     public interface ItemClickListener {
+
         void onItemClick(int position);
+
         void onLongClick(View view, int position);
+
         void onResumeClick(int position, int id);
     }
 
-
-
     // filter
-
     @Override
     public Filter getFilter() {
         return filter;

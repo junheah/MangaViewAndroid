@@ -38,6 +38,7 @@ import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
 public class TagSearchActivity extends AppCompatActivity {
+
     RecyclerView searchResult;
     int mode;
     String query;
@@ -51,10 +52,11 @@ public class TagSearchActivity extends AppCompatActivity {
     Bookmark bookmark;
     int baseMode;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
+        if (p.getDarkTheme()) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_search);
         context = this;
@@ -64,19 +66,19 @@ public class TagSearchActivity extends AppCompatActivity {
         searchResult.setLayoutManager(lm);
         Intent i = getIntent();
         query = i.getStringExtra("query");
-        mode = i.getIntExtra("mode",0);
+        mode = i.getIntExtra("mode", 0);
         swipe = this.findViewById(R.id.tagSearchSwipe);
         baseMode = i.getIntExtra("baseMode", base_comic);
 
         ActionBar ab = getSupportActionBar();
-        switch(mode){
+        switch (mode) {
             case 0:
                 break;
             case 1:
-                ab.setTitle("작가: "+query);
+                ab.setTitle("작가: " + query);
                 break;
             case 2:
-                ab.setTitle("태그: "+query);
+                ab.setTitle("태그: " + query);
                 break;
             case 3:
             case 4:
@@ -96,19 +98,21 @@ public class TagSearchActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
         swipe.setRefreshing(true);
 
-        if(mode == 5) {
+        if (mode == 5) {
             uadapter = new UpdatedAdapter(context);
             updated = new UpdatedList(p.getBaseMode());
             getUpdated gu = new getUpdated();
             gu.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             swipe.setOnRefreshListener(direction -> {
-                 if (!updated.isLast()) {
+                if (!updated.isLast()) {
                     getUpdated gu1 = new getUpdated();
                     gu1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                } else swipe.setRefreshing(false);
+                } else {
+                    swipe.setRefreshing(false);
+                }
             });
 
-        }else if(mode == 7){
+        } else if (mode == 7) {
             adapter = new TitleAdapter(context);
             bookmark = new Bookmark();
             getBookmarks gb = new getBookmarks();
@@ -117,23 +121,28 @@ public class TagSearchActivity extends AppCompatActivity {
                 if (bookmark.isLast()) {
                     getBookmarks gb1 = new getBookmarks();
                     gb1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                } else swipe.setRefreshing(false);
+                } else {
+                    swipe.setRefreshing(false);
+                }
             });
 
-        }else {
+        } else {
             adapter = new TitleAdapter(context);
-            search = new Search(query,mode,baseMode);
+            search = new Search(query, mode, baseMode);
             searchManga sm = new searchManga();
             sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             swipe.setOnRefreshListener(direction -> {
                 if (!search.isLast()) {
                     searchManga sm1 = new searchManga();
                     sm1.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                } else swipe.setRefreshing(false);
+                } else {
+                    swipe.setRefreshing(false);
+                }
             });
         }
     }
-    public boolean onOptionsItemSelected(MenuItem item){
+
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
@@ -141,8 +150,8 @@ public class TagSearchActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private class getBookmarks extends AsyncTask<Void, Void, Integer> {
 
-    private class getBookmarks extends AsyncTask<Void, Void, Integer>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -151,17 +160,17 @@ public class TagSearchActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
-            if(integer != 0){
+            if (integer != 0) {
                 showCaptchaPopup(context, p);
             }
-            if(adapter.getItemCount()==0) {
+            if (adapter.getItemCount() == 0) {
                 adapter.addData(bookmark.getResult());
                 searchResult.setAdapter(adapter);
                 adapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
                     public void onResumeClick(int position, int id) {
-                        Intent viewer = viewerIntent(context, new Manga(id,"","",adapter.getItem(position).getBaseMode()));
-                        viewer.putExtra("online",true);
+                        Intent viewer = viewerIntent(context, new Manga(id, "", "", adapter.getItem(position).getBaseMode()));
+                        viewer.putExtra("online", true);
                         startActivity(viewer);
                     }
 
@@ -179,13 +188,13 @@ public class TagSearchActivity extends AppCompatActivity {
                         popup(view, position, adapter.getItem(position), 0);
                     }
                 });
-            }else{
+            } else {
                 adapter.addData(bookmark.getResult());
             }
 
-            if(adapter.getItemCount()>0) {
+            if (adapter.getItemCount() > 0) {
                 noresult.setVisibility(View.GONE);
-            }else{
+            } else {
                 noresult.setVisibility(View.VISIBLE);
             }
             swipe.setRefreshing(false);
@@ -197,28 +206,30 @@ public class TagSearchActivity extends AppCompatActivity {
         }
     }
 
+    private class searchManga extends AsyncTask<String, String, Integer> {
 
-    private class searchManga extends AsyncTask<String,String,Integer> {
-        protected void onPreExecute(){
+        protected void onPreExecute() {
             super.onPreExecute();
         }
-        protected Integer doInBackground(String... params){
+
+        protected Integer doInBackground(String... params) {
             return search.fetch(httpClient);
         }
+
         @Override
-        protected void onPostExecute(Integer res){
+        protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(res != 0){
+            if (res != 0) {
                 showCaptchaPopup(context, p);
             }
-            if(adapter.getItemCount()==0) {
+            if (adapter.getItemCount() == 0) {
                 adapter.addData(search.getResult());
                 searchResult.setAdapter(adapter);
                 adapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
                     public void onResumeClick(int position, int id) {
-                        Intent viewer = viewerIntent(context, new Manga(id,"","", search.getBaseMode()));
-                        viewer.putExtra("online",true);
+                        Intent viewer = viewerIntent(context, new Manga(id, "", "", search.getBaseMode()));
+                        viewer.putExtra("online", true);
                         startActivity(viewer);
                     }
 
@@ -236,35 +247,38 @@ public class TagSearchActivity extends AppCompatActivity {
                         popup(view, position, adapter.getItem(position), 0);
                     }
                 });
-            }else{
+            } else {
                 adapter.addData(search.getResult());
             }
 
-            if(adapter.getItemCount()>0) {
+            if (adapter.getItemCount() > 0) {
                 noresult.setVisibility(View.GONE);
-            }else{
+            } else {
                 noresult.setVisibility(View.VISIBLE);
             }
             swipe.setRefreshing(false);
         }
     }
 
-    private class getUpdated extends AsyncTask<String,String,String> {
-        protected void onPreExecute(){
+    private class getUpdated extends AsyncTask<String, String, String> {
+
+        protected void onPreExecute() {
             super.onPreExecute();
         }
-        protected String doInBackground(String... params){
+
+        protected String doInBackground(String... params) {
             updated.fetch(httpClient);
             return null;
         }
+
         @Override
-        protected void onPostExecute(String res){
+        protected void onPostExecute(String res) {
             super.onPostExecute(res);
-            if(updated.getResult().size() == 0 && uadapter.getItemCount() == 0){
+            if (updated.getResult().size() == 0 && uadapter.getItemCount() == 0) {
                 //error
                 showCaptchaPopup(context, p);
             }
-            if(uadapter.getItemCount()==0) {
+            if (uadapter.getItemCount() == 0) {
                 uadapter.addData(updated.getResult());
                 searchResult.setAdapter(uadapter);
                 uadapter.setOnClickListener(new UpdatedAdapter.onclickListener() {
@@ -280,22 +294,23 @@ public class TagSearchActivity extends AppCompatActivity {
                         //open viewer
                         Intent viewer = viewerIntent(context, m);
                         viewer.putExtra("online", true);
-                        startActivityForResult(viewer,0);
+                        startActivityForResult(viewer, 0);
                     }
                 });
-            }else{
+            } else {
                 uadapter.addData(updated.getResult());
             }
 
-            if(uadapter.getItemCount()>0) {
+            if (uadapter.getItemCount() > 0) {
                 noresult.setVisibility(View.GONE);
-            }else{
+            } else {
                 noresult.setVisibility(View.VISIBLE);
             }
             swipe.setRefreshing(false);
         }
     }
-    void popup(View view, final int position, final Title title, final int m){
+
+    void popup(View view, final int position, final Title title, final int m) {
         PopupMenu popup = new PopupMenu(TagSearchActivity.this, view);
         //Inflating the Popup using xml file
         popup.getMenuInflater()
@@ -303,19 +318,21 @@ public class TagSearchActivity extends AppCompatActivity {
         popup.getMenu().removeItem(R.id.del);
         popup.getMenu().findItem(R.id.favAdd).setVisible(true);
         popup.getMenu().findItem(R.id.favDel).setVisible(true);
-        if(p.findFavorite(title)>-1) popup.getMenu().removeItem(R.id.favAdd);
-        else popup.getMenu().removeItem(R.id.favDel);
-
+        if (p.findFavorite(title) > -1) {
+            popup.getMenu().removeItem(R.id.favAdd); 
+        }else {
+            popup.getMenu().removeItem(R.id.favDel);
+        }
 
         //registering popup with OnMenuItemClickListener
         popup.setOnMenuItemClickListener(item -> {
-            switch(item.getItemId()){
+            switch (item.getItemId()) {
                 case R.id.del:
                     break;
                 case R.id.favAdd:
                 case R.id.favDel:
                     //toggle favorite
-                    p.toggleFavorite(title,0);
+                    p.toggleFavorite(title, 0);
                     break;
             }
             return true;
@@ -326,12 +343,12 @@ public class TagSearchActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_LOGIN){
+        if (requestCode == REQUEST_LOGIN) {
             //login
             finish();
             startActivity(getIntent());
         }
-        if(resultCode == RESULT_CAPTCHA){
+        if (resultCode == RESULT_CAPTCHA) {
             //captcha
             finish();
             startActivity(getIntent());

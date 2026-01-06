@@ -12,6 +12,7 @@ import ml.melun.mangaview.adapter.StripAdapter;
 import ml.melun.mangaview.model.PageItem;
 
 public class StripLayoutManager extends NpaLinearLayoutManager {
+
     StripAdapter adapter;
 
     public StripLayoutManager(Context context) {
@@ -26,7 +27,6 @@ public class StripLayoutManager extends NpaLinearLayoutManager {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-
     @Override
     public void onAttachedToWindow(RecyclerView view) {
         super.onAttachedToWindow(view);
@@ -38,18 +38,17 @@ public class StripLayoutManager extends NpaLinearLayoutManager {
         super.onAdapterChanged(oldAdapter, newAdapter);
         adapter = (StripAdapter) newAdapter;
     }
-    
-    public void scrollToPage(PageItem page){
+
+    public void scrollToPage(PageItem page) {
         List<Object> items = adapter.getItems();
-        for(int i=0; i<items.size(); i++){
+        for (int i = 0; i < items.size(); i++) {
             Object item = items.get(i);
-            if(item instanceof PageItem){
-                if(((PageItem)item).equals(page))
+            if (item instanceof PageItem) {
+                if (((PageItem) item).equals(page)) {
                     scrollToPosition(i);
+                }
             }
         }
     }
-
-
 
 }

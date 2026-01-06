@@ -55,6 +55,7 @@ import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
 
 public class ViewerActivity3 extends AppCompatActivity {
+
     List<String> imgs;
     Manga manga;
     Context context;
@@ -83,12 +84,14 @@ public class ViewerActivity3 extends AppCompatActivity {
     CustomSpinner spinner;
     CustomSpinnerAdapter spinnerAdapter;
 
-
     @Override
     protected void onResume() {
         super.onResume();
-        if(toolbarshow) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        if (toolbarshow) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE); 
+        }else {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
     }
 
     @Override
@@ -96,6 +99,7 @@ public class ViewerActivity3 extends AppCompatActivity {
         outState.putString("manga", new Gson().toJson(manga));
         super.onSaveInstanceState(outState);
     }
+
     public int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -108,7 +112,9 @@ public class ViewerActivity3 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
-        if(dark) setTheme(R.style.AppThemeDarkNoTitle);
+        if (dark) {
+            setTheme(R.style.AppThemeDarkNoTitle);
+        }
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_viewer3);
@@ -123,22 +129,24 @@ public class ViewerActivity3 extends AppCompatActivity {
         this.findViewById(R.id.backButton).setOnClickListener(view -> finish());
 
         //initial padding setup
-        appbar.setPadding(0, getStatusBarHeight(),0,0);
+        appbar.setPadding(0, getStatusBarHeight(), 0, 0);
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
         ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (view, windowInsetsCompat) -> {
             //This is where you get DisplayCutoutCompat
             int statusBarHeight = getStatusBarHeight();
             int ci;
-            if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
-            else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+            if (windowInsetsCompat.getDisplayCutout() == null) {
+                ci = 0; 
+            }else {
+                ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+            }
 
             //System.out.println(ci + " : " + statusBarHeight);
-            appbar.setPadding(0,ci > statusBarHeight ? ci : statusBarHeight,0,0);
-            view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+            appbar.setPadding(0, ci > statusBarHeight ? ci : statusBarHeight, 0, 0);
+            view.setPadding(windowInsetsCompat.getStableInsetLeft(), 0, windowInsetsCompat.getStableInsetRight(), windowInsetsCompat.getStableInsetBottom());
             return windowInsetsCompat;
         });
-
 
         cut.setText("자동 분할");
         cut.setVisibility(View.GONE);
@@ -158,10 +166,11 @@ public class ViewerActivity3 extends AppCompatActivity {
             id = m.getId();
             index = i;
             hideSpinnerDropDown(spinner);
-            if(manga.isOnline())
-                refresh();
-            else
+            if (manga.isOnline()) {
+                refresh(); 
+            }else {
                 reloadManga();
+            }
         });
         spinner.setAdapter(spinnerAdapter);
         //adapter
@@ -171,21 +180,24 @@ public class ViewerActivity3 extends AppCompatActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 int pageSize = pageAdapter.getCount();
                 int pos = p.getPageRtl() ? pageSize - position - 1 : position;
-                if(viewerBookmark != pos) {
+                if (viewerBookmark != pos) {
                     viewerBookmark = pos;
                     pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
-                    if(manga.useBookmark()) {
+                    if (manga.useBookmark()) {
                         if (viewerBookmark == pageSize - 1 || viewerBookmark == 0) {
                             p.removeViewerBookmark(manga);
-                        } else p.setViewerBookmark(manga, viewerBookmark);
+                        } else {
+                            p.setViewerBookmark(manga, viewerBookmark);
+                        }
                     }
 
                     boolean lastPage = viewerBookmark == pageSize - 1;
                     boolean firstPage = viewerBookmark == 0;
-                    if (toolbarshow && !lastPage)
+                    if (toolbarshow && !lastPage) {
+                        toggleToolbar(); 
+                    }else if (lastPage && !toolbarshow) {
                         toggleToolbar();
-                    else if (lastPage && !toolbarshow)
-                        toggleToolbar();
+                    }
                 }
             }
 
@@ -204,33 +216,36 @@ public class ViewerActivity3 extends AppCompatActivity {
             intent = getIntent();
             title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
             }.getType());
-            if(savedInstanceState == null) {
+            if (savedInstanceState == null) {
                 manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
-            }else{
+            } else {
                 manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }
 
-            if(title == null)
+            if (title == null) {
                 title = manga.getTitle();
+            }
 
             name = manga.getName();
             id = manga.getId();
 
             toolbarTitle.setText(name);
-            if(manga.useBookmark()) viewerBookmark = p.getViewerBookmark(manga);
+            if (manga.useBookmark()) {
+                viewerBookmark = p.getViewerBookmark(manga);
+            }
 
-            if(manga.useBookmark()){
+            if (manga.useBookmark()) {
                 result = new Intent();
                 result.putExtra("id", id);
-                setResult(RESULT_OK,result);
+                setResult(RESULT_OK, result);
             }
-            if(!manga.isOnline()){
+            if (!manga.isOnline()) {
                 //load local imgs
                 commentBtn.setVisibility(View.GONE);
                 reloadManga();
-            }else {
+            } else {
                 refresh();
             }
             commentBtn.setOnClickListener(v -> {
@@ -242,16 +257,19 @@ public class ViewerActivity3 extends AppCompatActivity {
                 commentActivity.putExtra("id", manga.getId());
                 startActivity(commentActivity);
             });
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         pageBtn.setOnClickListener(v -> {
             AlertDialog.Builder alert;
-            if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
-            else alert = new AlertDialog.Builder(context);
+            if (dark) {
+                alert = new AlertDialog.Builder(context, R.style.darkDialog); 
+            }else {
+                alert = new AlertDialog.Builder(context);
+            }
 
-            alert.setTitle("페이지 선택\n(1~"+imgs.size()+")");
+            alert.setTitle("페이지 선택\n(1~" + imgs.size() + ")");
             final EditText input = new EditText(context);
             input.setInputType(InputType.TYPE_CLASS_NUMBER);
             input.setRawInputType(Configuration.KEYBOARD_12KEY);
@@ -260,8 +278,12 @@ public class ViewerActivity3 extends AppCompatActivity {
                 //이동 시
                 if (input.getText().length() > 0) {
                     int page = Integer.parseInt(input.getText().toString());
-                    if (page < 1) page = 1;
-                    if (page > imgs.size()) page = imgs.size();
+                    if (page < 1) {
+                        page = 1;
+                    }
+                    if (page > imgs.size()) {
+                        page = imgs.size();
+                    }
                     viewerBookmark = page - 1;
                     goPage(viewerBookmark, false);
                     pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
@@ -273,87 +295,95 @@ public class ViewerActivity3 extends AppCompatActivity {
             alert.show();
         });
         next.setOnClickListener(v -> {
-            if(eps!=null && index>0) {
+            if (eps != null && index > 0) {
                 lockUi(true);
                 index--;
                 manga = eps.get(index);
                 id = manga.getId();
                 name = manga.getName();
-                if(manga.isOnline())
-                    refresh();
-                else
+                if (manga.isOnline()) {
+                    refresh(); 
+                }else {
                     reloadManga();
+                }
             }
         });
         prev.setOnClickListener(v -> {
-            if(eps!=null && index<eps.size()-1) {
+            if (eps != null && index < eps.size() - 1) {
                 lockUi(true);
                 index++;
                 manga = eps.get(index);
                 id = manga.getId();
                 name = manga.getName();
-                if(manga.isOnline())
-                    refresh();
-                else
+                if (manga.isOnline()) {
+                    refresh(); 
+                }else {
                     reloadManga();
+                }
             }
         });
     }
 
-    void refresh(){
+    void refresh() {
         captchaChecked = false;
         new LoadImages().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
-        if(keyCode == p.getNextPageKey()){
-            if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark<pageAdapter.getCount()-1)
-                goPage(viewerBookmark+1, false);
+        if (keyCode == p.getNextPageKey()) {
+            if (event.getAction() == KeyEvent.ACTION_UP && viewerBookmark < pageAdapter.getCount() - 1) {
+                goPage(viewerBookmark + 1, false);
+            }
             return true;
-        }else if(keyCode == p.getPrevPageKey()){
-            if(event.getAction() == KeyEvent.ACTION_UP && viewerBookmark>0)
-                goPage(viewerBookmark-1, false);
+        } else if (keyCode == p.getPrevPageKey()) {
+            if (event.getAction() == KeyEvent.ACTION_UP && viewerBookmark > 0) {
+                goPage(viewerBookmark - 1, false);
+            }
             return true;
         }
         return super.dispatchKeyEvent(event);
     }
 
-    public void toggleToolbar(){
+    public void toggleToolbar() {
 
         //attrs = getWindow().getAttributes();
-        if(toolbarshow){
+        if (toolbarshow) {
             appbar.animate().translationY(-appbar.getHeight());
             appbarBottom.animate().translationY(+appbarBottom.getHeight());
-            toolbarshow=false;
+            toolbarshow = false;
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        }
-        else {
-            pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
+        } else {
+            pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
             appbar.animate().translationY(0);
             appbarBottom.animate().translationY(0);
-            toolbarshow=true;
+            toolbarshow = true;
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
         }
         //getWindow().setAttributes(attrs);
     }
 
-    private class LoadImages extends AsyncTask<Void, String, Integer>{
+    private class LoadImages extends AsyncTask<Void, String, Integer> {
+
         ProgressDialog pd;
+
         protected void onProgressUpdate(String... values) {
             pd.setMessage(values[0]);
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(dark) pd = new ProgressDialog(context, R.style.darkDialog);
-            else pd = new ProgressDialog(context);
+            if (dark) {
+                pd = new ProgressDialog(context, R.style.darkDialog); 
+            }else {
+                pd = new ProgressDialog(context);
+            }
             pd.setMessage("로드중");
             pd.setCancelable(false);
             pd.setOnKeyListener((dialog, keyCode, event) -> {
-                if(keyCode == KeyEvent.KEYCODE_BACK){
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
                     LoadImages.super.cancel(true);
                     pd.dismiss();
                     finish();
@@ -368,29 +398,32 @@ public class ViewerActivity3 extends AppCompatActivity {
             manga.setListener(msg -> publishProgress(msg));
             Login login = p.getLogin();
             Map<String, String> cookie = new HashMap<>();
-            if(login !=null) {
+            if (login != null) {
                 String php = p.getLogin().getCookie();
                 login.buildCookie(cookie);
-                cookie.put("last_wr_id",String.valueOf(id));
-                cookie.put("last_percent",String.valueOf(1));
-                cookie.put("last_page",String.valueOf(0));
+                cookie.put("last_wr_id", String.valueOf(id));
+                cookie.put("last_percent", String.valueOf(1));
+                cookie.put("last_page", String.valueOf(0));
             }
             int res = manga.fetch(httpClient);
-            if(title == null)
+            if (title == null) {
                 title = manga.getTitle();
+            }
             return res;
         }
 
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(res == LOAD_CAPTCHA){
+            if (res == LOAD_CAPTCHA) {
                 //캡차 처리 팝업
                 showTokiCaptchaPopup(context, p);
                 return;
             }
             reloadManga();
-            if(pd.isShowing()) pd.dismiss();
+            if (pd.isShowing()) {
+                pd.dismiss();
+            }
         }
     }
 
@@ -398,11 +431,11 @@ public class ViewerActivity3 extends AppCompatActivity {
         viewPager.setCurrentItem(p.getPageRtl() ? pageAdapter.getCount() - item - 1 : item, smoothScroll);
     }
 
-    public void reloadManga(){
+    public void reloadManga() {
         try {
             lockUi(false);
             imgs = manga.getImgs(context);
-            if(imgs == null || imgs.size()==0) {
+            if (imgs == null || imgs.size() == 0) {
                 showCaptchaPopup(manga.getUrl(), context, p);
                 return;
             }
@@ -412,46 +445,47 @@ public class ViewerActivity3 extends AppCompatActivity {
             updateIntent();
             viewPager.addOnPageChangeListener(listener);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             StackTraceElement[] stack = e.getStackTrace();
             StringBuilder message = new StringBuilder();
-            for(StackTraceElement s : stack){
+            for (StackTraceElement s : stack) {
                 message.append(s.toString()).append('\n');
             }
             Utils.showCaptchaPopup(manga.getUrl(), context, e, p);
         }
     }
 
-    public void bookmarkRefresh(){
-        if(manga.useBookmark()) {
+    public void bookmarkRefresh() {
+        if (manga.useBookmark()) {
             viewerBookmark = p.getViewerBookmark(manga);
             p.addRecent(title);
             p.setBookmark(title, id);
-        }else
+        } else {
             viewerBookmark = 0;
+        }
         goPage(viewerBookmark, false);
     }
 
-    public void updateIntent(){
+    public void updateIntent() {
         result = new Intent();
         result.putExtra("id", id);
         setResult(RESULT_OK, result);
     }
 
-    public void refreshAdapter(){
+    public void refreshAdapter() {
         //adapter
         viewPager.removeOnPageChangeListener(listener);
         pageAdapter.setManga(manga);
         viewPager.setAdapter(pageAdapter);
     }
 
-    public void refreshToolbar(){
+    public void refreshToolbar() {
         eps = manga.getEps();
-        if(eps == null || eps.size() == 0){
+        if (eps == null || eps.size() == 0) {
             eps = title.getEps();
         }
-        for(int i=0; i<eps.size(); i++){
-            if(eps.get(i).equals(manga)){
+        for (int i = 0; i < eps.size(); i++) {
+            if (eps.get(i).equals(manga)) {
                 index = i;
                 break;
             }
@@ -465,27 +499,25 @@ public class ViewerActivity3 extends AppCompatActivity {
         toolbarTitle.setSingleLine(true);
         toolbarTitle.setSelected(true);
 
-        if(index==0){
+        if (index == 0) {
             next.setEnabled(false);
             next.setColorFilter(Color.BLACK);
-        }
-        else {
+        } else {
             next.setEnabled(true);
             next.setColorFilter(null);
         }
-        if(index==eps.size()-1) {
+        if (index == eps.size() - 1) {
             prev.setEnabled(false);
             prev.setColorFilter(Color.BLACK);
-        }
-        else {
+        } else {
             prev.setEnabled(true);
             prev.setColorFilter(null);
             prev.setColorFilter(null);
         }
-        pageBtn.setText(viewerBookmark+1+"/"+imgs.size());
+        pageBtn.setText(viewerBookmark + 1 + "/" + imgs.size());
     }
 
-    void lockUi(boolean lock){
+    void lockUi(boolean lock) {
         commentBtn.setEnabled(!lock);
         next.setEnabled(!lock);
         prev.setEnabled(!lock);

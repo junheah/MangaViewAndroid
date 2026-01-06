@@ -10,8 +10,8 @@ import java.util.Map;
 /*
 getters return default value instead of throwing exceptions
  */
-
 public class CustomJSONObject extends JSONObject {
+
     public CustomJSONObject() {
         super();
     }
@@ -32,68 +32,66 @@ public class CustomJSONObject extends JSONObject {
         super(copyFrom, names);
     }
 
-
-
-    public Object get(String name, Object def){
+    public Object get(String name, Object def) {
         try {
             return super.get(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }
 
-    public boolean getBoolean(String name, boolean def){
+    public boolean getBoolean(String name, boolean def) {
         try {
             return super.getBoolean(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }
 
-    public double getDouble(String name, double def){
+    public double getDouble(String name, double def) {
         try {
             return super.getDouble(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }
 
-    public int getInt(String name, int def){
+    public int getInt(String name, int def) {
         try {
             return super.getInt(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }
 
-    public long getLong(String name, long def){
+    public long getLong(String name, long def) {
         try {
             return super.getLong(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }
 
-    public String getString(String name, String def){
+    public String getString(String name, String def) {
         try {
             return super.getString(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }
 
-    public JSONArray getJSONArray(String name, JSONArray def){
+    public JSONArray getJSONArray(String name, JSONArray def) {
         try {
             return super.getJSONArray(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }
 
-    public JSONObject getJSONObject(String name, JSONObject def){
+    public JSONObject getJSONObject(String name, JSONObject def) {
         try {
             return super.getJSONObject(name);
-        }catch (JSONException e){
+        } catch (JSONException e) {
             return def;
         }
     }

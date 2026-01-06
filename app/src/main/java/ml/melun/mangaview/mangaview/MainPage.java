@@ -11,8 +11,8 @@ import okhttp3.Response;
 
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 
-
 public class MainPage {
+
     List<Manga> recent, favUpdate, onlineRecent;
     List<RankingTitle> ranking;
 
@@ -31,10 +31,10 @@ public class MainPage {
         favUpdate = new ArrayList<>();
         onlineRecent = new ArrayList<>();
 
-        try{
-            Response r = client.mget("",true,null);
+        try {
+            Response r = client.mget("", true, null);
             String body = r.body().string();
-            if(body.contains("Connect Error: Connection timed out")){
+            if (body.contains("Connect Error: Connection timed out")) {
                 //adblock : try again
                 r.close();
                 fetch(client);
@@ -51,7 +51,7 @@ public class MainPage {
             Element infos;
             Title ttmp;
 
-            for(Element e : d.selectFirst("div.miso-post-gallery").select("div.post-row")){
+            for (Element e : d.selectFirst("div.miso-post-gallery").select("div.post-row")) {
                 id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
                 infos = e.selectFirst("div.img-item");
                 thumb = infos.selectFirst("img").attr("src");
@@ -62,8 +62,8 @@ public class MainPage {
                 recent.add(mtmp);
             }
 
-            int i=1;
-            for(Element e : d.select("div.miso-post-gallery").last().select("div.post-row")){
+            int i = 1;
+            for (Element e : d.select("div.miso-post-gallery").last().select("div.post-row")) {
                 id = Integer.parseInt(e.selectFirst("a").attr("href").split("comic/")[1]);
                 infos = e.selectFirst("div.img-item");
                 thumb = infos.selectFirst("img").attr("src");
@@ -72,8 +72,8 @@ public class MainPage {
                 ranking.add(new RankingTitle(name, thumb, "", null, "", id, base_comic, i++));
             }
 
-            i=1;
-            for(Element e : d.select("div.miso-post-list").last().select("li.post-row")){
+            i = 1;
+            for (Element e : d.select("div.miso-post-list").last().select("li.post-row")) {
                 infos = e.selectFirst("a");
                 id = Integer.parseInt(infos.attr("href").split("comic/")[1]);
                 name = infos.ownText();
@@ -82,11 +82,11 @@ public class MainPage {
                 weeklyRanking.add(new RankingManga(id, name, "", base_comic, i++));
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-/*
+        /*
         try{
             Response response = client.mget("");
             Document doc = Jsoup.parse(response.body().string());
@@ -121,11 +121,13 @@ public class MainPage {
         }catch (Exception e){
             e.printStackTrace();
         }
-*/
+         */
     }
 
-    public static class RankingTitle extends Title{
+    public static class RankingTitle extends Title {
+
         int ranking;
+
         public RankingTitle(String n, String t, String a, List<String> tg, String r, int id, int baseMode, int ranking) {
             super(n, t, a, tg, r, id, baseMode);
             this.ranking = ranking;
@@ -135,8 +137,11 @@ public class MainPage {
             return ranking;
         }
     }
-    public static class RankingManga extends Manga{
+
+    public static class RankingManga extends Manga {
+
         int ranking;
+
         public RankingManga(int i, String n, String d, int baseMode, int ranking) {
             super(i, n, d, baseMode);
             this.ranking = ranking;
@@ -147,14 +152,15 @@ public class MainPage {
         }
     }
 
-    void rankingWidgetLiParser(Elements input, List output){
-        for(Element e: input){
+    void rankingWidgetLiParser(Elements input, List output) {
+        for (Element e : input) {
             String[] tmp_link = e.selectFirst("a").attr("href").split("=");
-            int tmp_id = Integer.parseInt(tmp_link[tmp_link.length-1]);
+            int tmp_id = Integer.parseInt(tmp_link[tmp_link.length - 1]);
             String tmp_title = e.selectFirst("div.subject").ownText();
-            output.add(new Manga(tmp_id, tmp_title,"", base_comic));
+            output.add(new Manga(tmp_id, tmp_title, "", base_comic));
         }
     }
+
     public MainPage(CustomHttpClient client) {
         fetch(client);
     }
@@ -171,5 +177,7 @@ public class MainPage {
         return onlineRecent;
     }
 
-    public List<RankingTitle> getRanking() { return ranking; }
+    public List<RankingTitle> getRanking() {
+        return ranking;
+    }
 }

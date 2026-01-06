@@ -11,15 +11,19 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.adapter.CommentsAdapter;
 
 public class CommentsTabFragment extends Fragment {
+
     CommentsAdapter madapter;
+
     public CommentsTabFragment() {
     }
-    public void setAdapter(CommentsAdapter adapter){
+
+    public void setAdapter(CommentsAdapter adapter) {
         madapter = adapter;
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_test, container, false);
         ListView list = rootView.findViewById(R.id.section_list);
         list.setAdapter(madapter);

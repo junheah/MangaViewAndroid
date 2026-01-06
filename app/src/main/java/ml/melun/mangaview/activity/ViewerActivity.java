@@ -29,7 +29,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -81,7 +80,7 @@ public class ViewerActivity extends AppCompatActivity {
     boolean dark;
     Intent result;
     ImageButton commentBtn;
-    int width=0;
+    int width = 0;
     Intent intent;
     boolean captchaChecked = false;
     CustomSpinner spinner;
@@ -89,12 +88,12 @@ public class ViewerActivity extends AppCompatActivity {
     InfiniteScrollCallback infiniteScrollCallback;
     loadImages loader;
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("manga", new Gson().toJson(manga));
         super.onSaveInstanceState(outState);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
@@ -116,19 +115,21 @@ public class ViewerActivity extends AppCompatActivity {
         width = getScreenSize(getWindowManager().getDefaultDisplay());
 
         //initial padding setup
-        appbar.setPadding(0, getStatusBarHeight(),0,0);
+        appbar.setPadding(0, getStatusBarHeight(), 0, 0);
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
-
 
         ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (view, windowInsetsCompat) -> {
             //This is where you get DisplayCutoutCompat
             int statusBarHeight = getStatusBarHeight();
             int ci;
-            if(windowInsetsCompat.getDisplayCutout() == null) ci = 0;
-            else ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+            if (windowInsetsCompat.getDisplayCutout() == null) {
+                ci = 0; 
+            }else {
+                ci = windowInsetsCompat.getDisplayCutout().getSafeInsetTop();
+            }
 
-            appbar.setPadding(0, Math.max(ci, statusBarHeight),0,0);
-            view.setPadding(windowInsetsCompat.getStableInsetLeft(),0,windowInsetsCompat.getStableInsetRight(),windowInsetsCompat.getStableInsetBottom());
+            appbar.setPadding(0, Math.max(ci, statusBarHeight), 0, 0);
+            view.setPadding(windowInsetsCompat.getStableInsetLeft(), 0, windowInsetsCompat.getStableInsetRight(), windowInsetsCompat.getStableInsetBottom());
             return windowInsetsCompat;
         });
 
@@ -137,16 +138,19 @@ public class ViewerActivity extends AppCompatActivity {
             public Manga prevEp(InfiniteLoadCallback callback, Manga curm) {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
-                if(i<eps.size()-1) {
-                    if(loader != null) loader.cancel(true);
+                if (i < eps.size() - 1) {
+                    if (loader != null) {
+                        loader.cancel(true);
+                    }
                     loader = new loadImages(eps.get(i + 1), m -> {
-                        if (m.getImgs(context).size() > 0)
+                        if (m.getImgs(context).size() > 0) {
                             stripAdapter.insertManga(m);
+                        }
                         callback.prevLoaded(m);
-                    },false);
+                    }, false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i + 1);
-                }else{
+                } else {
                     callback.prevLoaded(null);
                     return null;
                 }
@@ -156,16 +160,19 @@ public class ViewerActivity extends AppCompatActivity {
             public Manga nextEp(InfiniteLoadCallback callback, Manga curm) {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
-                if(i>0) {
-                    if(loader != null) loader.cancel(true);
+                if (i > 0) {
+                    if (loader != null) {
+                        loader.cancel(true);
+                    }
                     loader = new loadImages(eps.get(i - 1), m -> {
-                        if (m.getImgs(context).size() > 0)
+                        if (m.getImgs(context).size() > 0) {
                             stripAdapter.appendManga(m);
+                        }
                         callback.nextLoaded(m);
-                    },false);
+                    }, false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i - 1);
-                }else{
+                } else {
                     callback.nextLoaded(null);
                     return null;
                 }
@@ -184,10 +191,10 @@ public class ViewerActivity extends AppCompatActivity {
             intent = getIntent();
             title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
             }.getType());
-            if(savedInstanceState == null) {
+            if (savedInstanceState == null) {
                 manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
-            }else{
+            } else {
                 manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
                 }.getType());
             }
@@ -208,28 +215,28 @@ public class ViewerActivity extends AppCompatActivity {
             spinner.setAdapter(spinnerAdapter);
             strip.setLayoutManager(manager);
 
-            if(intent.getBooleanExtra("recent",false)){
+            if (intent.getBooleanExtra("recent", false)) {
                 Intent resultIntent = new Intent();
-                setResult(RESULT_OK,resultIntent);
+                setResult(RESULT_OK, resultIntent);
             }
 
-            if(!manga.isOnline()){
+            if (!manga.isOnline()) {
                 commentBtn.setVisibility(View.GONE);
             }
-            
+
             loadManga(manga);
             //strip.setItemAnimator(null);
             strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if(strip.getLayoutManager().getItemCount()>0 && newState == RecyclerView.SCROLL_STATE_DRAGGING && toolbarshow) {
+                    if (strip.getLayoutManager().getItemCount() > 0 && newState == RecyclerView.SCROLL_STATE_DRAGGING && toolbarshow) {
                         toggleToolbar();
                     }
                 }
             });
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -240,10 +247,13 @@ public class ViewerActivity extends AppCompatActivity {
         pageBtn.setOnClickListener(v -> {
             PageItem current = stripAdapter.getCurrentVisiblePage();
             AlertDialog.Builder alert;
-            if(dark) alert = new AlertDialog.Builder(context,R.style.darkDialog);
-            else alert = new AlertDialog.Builder(context);
+            if (dark) {
+                alert = new AlertDialog.Builder(context, R.style.darkDialog); 
+            }else {
+                alert = new AlertDialog.Builder(context);
+            }
 
-            alert.setTitle("페이지 선택\n(1~"+current.manga.getImgs(context).size()+")");
+            alert.setTitle("페이지 선택\n(1~" + current.manga.getImgs(context).size() + ")");
             final EditText input = new EditText(context);
             input.setInputType(InputType.TYPE_CLASS_NUMBER);
             input.setRawInputType(Configuration.KEYBOARD_12KEY);
@@ -252,9 +262,12 @@ public class ViewerActivity extends AppCompatActivity {
                 //이동 시
                 if (input.getText().length() > 0) {
                     int page = Integer.parseInt(input.getText().toString());
-                    if (page < 1) page = 1;
-                    if (page > current.manga.getImgs(context).size())
+                    if (page < 1) {
+                        page = 1;
+                    }
+                    if (page > current.manga.getImgs(context).size()) {
                         page = current.manga.getImgs(context).size();
+                    }
                     manager.scrollToPage(new PageItem(page - 1, "", current.manga));
                     pageBtn.setText(page + "/" + current.manga.getImgs(context).size());
                 }
@@ -268,29 +281,31 @@ public class ViewerActivity extends AppCompatActivity {
 
     }
 
-    void refresh(){
+    void refresh() {
         loadManga(manga);
     }
 
-    void loadManga(Manga m, LoadMangaCallback callback){
-        if(m!=null) {
+    void loadManga(Manga m, LoadMangaCallback callback) {
+        if (m != null) {
             this.manga = m;
-            loadImages l = new loadImages(m, callback,true);
+            loadImages l = new loadImages(m, callback, true);
             l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
-    void loadManga(Manga m){
-        if(m == null){
+    void loadManga(Manga m) {
+        if (m == null) {
             showPopup(context, "오류", "만화를 불러 오던중 오류가 발생했습니다.", (dialog, which) -> ViewerActivity.this.finish(), dialog -> ViewerActivity.this.finish());
         }
-        if(stripAdapter!=null) stripAdapter.removeAll();
-        if(m.isOnline()) {
+        if (stripAdapter != null) {
+            stripAdapter.removeAll();
+        }
+        if (m.isOnline()) {
             loadManga(m, m1 -> {
                 manga = m1;
                 setManga(m1);
             });
-        }else{
+        } else {
             //offline
             eps = title.getEps();
 //            for(int i=0; i<eps.size(); i++){
@@ -302,47 +317,48 @@ public class ViewerActivity extends AppCompatActivity {
         }
     }
 
-
-    public void setManga(Manga m){
+    public void setManga(Manga m) {
         try {
             lockUi(false);
-            if(m.getImgs(context) == null || m.getImgs(context).size()==0) {
+            if (m.getImgs(context) == null || m.getImgs(context).size() == 0) {
                 showCaptchaPopup(m.getUrl(), context, p);
                 return;
             }
-            stripAdapter = new StripAdapter(context, m, autoCut, width,title, infiniteScrollCallback);
+            stripAdapter = new StripAdapter(context, m, autoCut, width, title, infiniteScrollCallback);
 
             refreshAdapter();
             bookmarkRefresh(m);
             refreshToolbar(m);
             updateIntent(m);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             Utils.showCaptchaPopup(m.getUrl(), context, e, p);
             e.printStackTrace();
         }
     }
 
-
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
-        if(keyCode == p.getPrevPageKey() || keyCode == p.getNextPageKey()) {
+        if (keyCode == p.getPrevPageKey() || keyCode == p.getNextPageKey()) {
             int index = manager.findFirstVisibleItemPosition();
             if (keyCode == p.getNextPageKey()) {
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    manager.scrollToPosition(index+1);
+                    manager.scrollToPosition(index + 1);
                 }
             } else if (keyCode == p.getPrevPageKey()) {
                 if (event.getAction() == KeyEvent.ACTION_UP) {
-                    manager.scrollToPosition(index-1);
+                    manager.scrollToPosition(index - 1);
                 }
             }
-            if(toolbarshow) toggleToolbar();
+            if (toolbarshow) {
+                toggleToolbar();
+            }
             return true;
         }
         return super.dispatchKeyEvent(event);
     }
+
     public int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -352,26 +368,27 @@ public class ViewerActivity extends AppCompatActivity {
         return result;
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
-        if(toolbarshow) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-    }
-
-    public void toggleToolbar(){
-        //attrs = getWindow().getAttributes();
-        if(toolbarshow){
-            appbar.animate().translationY(-appbar.getHeight());
-            appbarBottom.animate().translationY(+appbarBottom.getHeight());
-            toolbarshow=false;
+        if (toolbarshow) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE); 
+        }else {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         }
-        else {
+    }
+
+    public void toggleToolbar() {
+        //attrs = getWindow().getAttributes();
+        if (toolbarshow) {
+            appbar.animate().translationY(-appbar.getHeight());
+            appbarBottom.animate().translationY(+appbarBottom.getHeight());
+            toolbarshow = false;
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        } else {
             PageItem item = stripAdapter.getCurrentVisiblePage();
-            if(item != null) {
-                pageBtn.setText(item.index+1 + "/" + item.manga.getImgs(context).size());
+            if (item != null) {
+                pageBtn.setText(item.index + 1 + "/" + item.manga.getImgs(context).size());
                 toolbarTitle.setText(item.manga.getName());
                 commentBtn.setOnClickListener(v -> {
                     Intent commentActivity = new Intent(context, CommentsActivity.class);
@@ -392,19 +409,19 @@ public class ViewerActivity extends AppCompatActivity {
         //getWindow().setAttributes(attrs);
     }
 
-    public void toggleAutoCut(){
+    public void toggleAutoCut() {
         PageItem page = stripAdapter.getCurrentVisiblePage();
-        if(autoCut){
+        if (autoCut) {
             autoCut = false;
             cut.setBackgroundResource(R.drawable.button_bg);
             //viewerBookmark /= 2;
-        } else{
+        } else {
             autoCut = true;
             cut.setBackgroundResource(R.drawable.button_bg_on);
             //viewerBookmark *= 2;
         }
         stripAdapter.removeAll();
-        stripAdapter = new StripAdapter(context, page.manga, autoCut, width,title, infiniteScrollCallback);
+        stripAdapter = new StripAdapter(context, page.manga, autoCut, width, title, infiniteScrollCallback);
         stripAdapter.preloadAll();
         strip.setAdapter(stripAdapter);
         stripAdapter.setClickListener(() -> {
@@ -414,12 +431,9 @@ public class ViewerActivity extends AppCompatActivity {
         manager.scrollToPage(page);
     }
 
-
 //    public boolean dispatchTouchEvent(MotionEvent ev) {
 //        return imageZoomHelper.onDispatchTouchEvent(ev) || super.dispatchTouchEvent(ev);
 //    }
-
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -427,21 +441,21 @@ public class ViewerActivity extends AppCompatActivity {
 
     Runnable onBack;
 
-    void setOnBackPressed(Runnable onBackPressed){
+    void setOnBackPressed(Runnable onBackPressed) {
         this.onBack = onBackPressed;
     }
-    void resetOnBackPressed(){
+
+    void resetOnBackPressed() {
         this.onBack = null;
     }
 
+    private class loadImages extends AsyncTask<Void, String, Integer> {
 
-
-    private class loadImages extends AsyncTask<Void,String,Integer> {
         boolean lockui;
         LoadMangaCallback callback;
         Manga m;
 
-        public loadImages(Manga m, LoadMangaCallback callback, boolean lockui){
+        public loadImages(Manga m, LoadMangaCallback callback, boolean lockui) {
             this.lockui = lockui;
             this.m = m;
             this.callback = callback;
@@ -449,7 +463,9 @@ public class ViewerActivity extends AppCompatActivity {
 
         protected void onPreExecute() {
             super.onPreExecute();
-            if(lockui) lockUi(true);
+            if (lockui) {
+                lockUi(true);
+            }
             setOnBackPressed(() -> {
                 loadImages.super.cancel(true);
                 finish();
@@ -457,7 +473,7 @@ public class ViewerActivity extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... params) {
-            if(m.isOnline()) {
+            if (m.isOnline()) {
                 Login login = p.getLogin();
                 Map<String, String> cookie = new HashMap<>();
                 if (login != null) {
@@ -465,62 +481,69 @@ public class ViewerActivity extends AppCompatActivity {
                     login.buildCookie(cookie);
                 }
                 return m.fetch(httpClient);
-            }else{
+            } else {
                 return LOAD_OK;
             }
         }
 
         @Override
         protected void onPostExecute(Integer res) {
-            if(res == LOAD_CAPTCHA){
+            if (res == LOAD_CAPTCHA) {
                 //캡차 처리 팝업
                 showTokiCaptchaPopup(context, p);
                 return;
             }
 
-            if(lockui) lockUi(false);
-            if (title == null)
+            if (lockui) {
+                lockUi(false);
+            }
+            if (title == null) {
                 title = m.getTitle();
+            }
             super.onPostExecute(res);
             resetOnBackPressed();
             callback.post(m);
         }
     }
 
-    public void bookmarkRefresh(Manga m){
-        if(m.useBookmark()) {
+    public void bookmarkRefresh(Manga m) {
+        if (m.useBookmark()) {
             PageItem page = new PageItem(p.getViewerBookmark(m), "", m);
             if (page.index > -1) {
                 manager.scrollToPage(page);
             }
             if (m.useBookmark()) {
                 // if manga is online or has title.gson
-                if (title == null) title = m.getTitle();
+                if (title == null) {
+                    title = m.getTitle();
+                }
                 p.addRecent(title);
-                if (m!=null && m.getId()>0) p.setBookmark(title, m.getId());
+                if (m != null && m.getId() > 0) {
+                    p.setBookmark(title, m.getId());
+                }
             }
-        }else{
-            manager.scrollToPage(new PageItem(0,"",m));
+        } else {
+            manager.scrollToPage(new PageItem(0, "", m));
         }
     }
 
-    public void updateIntent(Manga m){
+    public void updateIntent(Manga m) {
         this.manga = m;
         result = new Intent();
         result.putExtra("id", m.getId());
         setResult(RESULT_OK, result);
     }
 
-    public void refreshAdapter(){
+    public void refreshAdapter() {
         strip.setAdapter(stripAdapter);
         // show/hide toolbar
         stripAdapter.setClickListener(this::toggleToolbar);
     }
 
-    public void refreshToolbar(Manga m){
+    public void refreshToolbar(Manga m) {
         //spinner
         eps = m.getEps();
-        if(eps == null || eps.size() == 0){
+        if (eps == null || eps.size() == 0) {
             //backup plan
             eps = title.getEps();
         }
@@ -531,25 +554,24 @@ public class ViewerActivity extends AppCompatActivity {
         toolbarTitle.setText(m.getName());
         toolbarTitle.setSelected(true);
 
-        if(m.nextEp() == null){
+        if (m.nextEp() == null) {
             next.setEnabled(false);
             next.setColorFilter(Color.BLACK);
-        }
-        else {
+        } else {
             next.setEnabled(true);
             next.setColorFilter(null);
         }
-        if(m.prevEp() == null) {
+        if (m.prevEp() == null) {
             prev.setEnabled(false);
             prev.setColorFilter(Color.BLACK);
-        }
-        else {
+        } else {
             prev.setEnabled(true);
             prev.setColorFilter(null);
         }
         PageItem page = stripAdapter.getCurrentVisiblePage();
-        if(page!=null)
-            pageBtn.setText(page.index+1+"/"+page.manga.getImgs(context).size());
+        if (page != null) {
+            pageBtn.setText(page.index + 1 + "/" + page.manga.getImgs(context).size());
+        }
     }
 
     @Override
@@ -557,7 +579,7 @@ public class ViewerActivity extends AppCompatActivity {
         return super.onMenuOpened(featureId, menu);
     }
 
-    void lockUi(boolean lock){
+    void lockUi(boolean lock) {
         commentBtn.setEnabled(!lock);
         next.setEnabled(!lock);
         prev.setEnabled(!lock);
@@ -575,16 +597,24 @@ public class ViewerActivity extends AppCompatActivity {
         }
     }
 
-    public interface InfiniteScrollCallback{
+    public interface InfiniteScrollCallback {
+
         Manga nextEp(InfiniteLoadCallback callback, Manga curm);
+
         Manga prevEp(InfiniteLoadCallback callback, Manga curm);
+
         void updateInfo(Manga m);
     }
+
     public interface LoadMangaCallback {
+
         void post(Manga m);
     }
-    public interface InfiniteLoadCallback{
+
+    public interface InfiniteLoadCallback {
+
         void prevLoaded(Manga m);
+
         void nextLoaded(Manga m);
     }
 

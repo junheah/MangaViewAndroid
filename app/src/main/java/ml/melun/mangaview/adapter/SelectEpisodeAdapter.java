@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.data = list;
         outValue = new TypedValue();
         selected = new boolean[list.size()];
-        Arrays.fill(selected,Boolean.FALSE);
+        Arrays.fill(selected, Boolean.FALSE);
         dark = p.getDarkTheme();
         mainContext.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         setHasStableIds(true);
@@ -68,16 +67,19 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
             h.episode.setText(m.getName());
             h.date.setText(m.getDate());
             if (selected[position]) {
-                if(dark) h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark));
-                else h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
+                if (dark) {
+                    h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selectedDark)); 
+                }else {
+                    h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.selected));
+                }
             } else {
                 h.itemView.setBackgroundColor(Color.TRANSPARENT);
             }
 
-            if(position == rs || position == re){
+            if (position == rs || position == re) {
                 h.itemView.setBackgroundColor(ContextCompat.getColor(mainContext, R.color.rangeSelected));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -88,29 +90,30 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         return data.size();
     }
 
-    public void select(int position){
-        if(single) {
+    public void select(int position) {
+        if (single) {
             selected[position] = !selected[position];
             notifyItemChanged(position);
-        }else{
+        } else {
             //range start
-            if(rs == -1 && re == -1){
+            if (rs == -1 && re == -1) {
                 rs = position;
-            }
-            //selected pos = range start
-            else if(position == rs){
+            } //selected pos = range start
+            else if (position == rs) {
                 rs = -1;
                 re = -1;
-            }
-            //range end
-            else if(rs != -1 && re == -1){
+            } //range end
+            else if (rs != -1 && re == -1) {
                 re = position;
-                while(rs != re){
+                while (rs != re) {
                     selected[rs] = !selected[rs];
                     notifyItemChanged(rs);
 
-                    if(rs>re) rs--;
-                    else rs++;
+                    if (rs > re) {
+                        rs--; 
+                    }else {
+                        rs++;
+                    }
                 }
                 selected[rs] = !selected[rs];
                 notifyItemChanged(rs);
@@ -124,7 +127,7 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public void setSelectionMode(boolean single){
+    public void setSelectionMode(boolean single) {
         this.single = single;
         int tmps = rs;
         int tmpe = re;
@@ -135,36 +138,43 @@ public class SelectEpisodeAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView episode, date;
+
         ViewHolder(View itemView) {
             super(itemView);
             episode = itemView.findViewById(R.id.episode);
             date = itemView.findViewById(R.id.date);
-            if(dark){
+            if (dark) {
                 date.setTextColor(Color.WHITE);
                 episode.setTextColor(Color.WHITE);
-            }
-            else{
+            } else {
                 date.setTextColor(Color.BLACK);
                 episode.setTextColor(Color.BLACK);
             }
-            itemView.setOnClickListener(v -> mClickListener.onItemClick(v,getAdapterPosition()));
+            itemView.setOnClickListener(v -> mClickListener.onItemClick(v, getAdapterPosition()));
         }
     }
+
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
-    public JSONArray getSelected(boolean all){
+
+    public JSONArray getSelected(boolean all) {
         JSONArray tmp = new JSONArray();
-        for(int i=0; i<selected.length;i++){
-            if(selected[i]) tmp.put(i);
-            else if(all) tmp.put(i);
+        for (int i = 0; i < selected.length; i++) {
+            if (selected[i]) {
+                tmp.put(i); 
+            }else if (all) {
+                tmp.put(i);
+            }
         }
         return tmp;
     }
 
     public interface ItemClickListener {
+
         void onItemClick(View view, int position);
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 import ml.melun.mangaview.R;
 import static ml.melun.mangaview.MainApplication.p;
 
-public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     Context mcontext;
     List<String> tags;
@@ -53,13 +53,15 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return tags.size();
     }
 
-    public void setClickListener(tagOnclick t){
+    public void setClickListener(tagOnclick t) {
         this.mClickListener = t;
     }
 
-    class tagHolder extends RecyclerView.ViewHolder{
+    class tagHolder extends RecyclerView.ViewHolder {
+
         TextView tag;
         CardView card;
+
         public tagHolder(View itemView) {
             super(itemView);
             card = itemView.findViewById(R.id.tagCard);
@@ -67,9 +69,9 @@ public class TagAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             card.setOnClickListener(v -> mClickListener.onClick(tags.get(getAdapterPosition())));
         }
     }
-    public interface tagOnclick{
+
+    public interface tagOnclick {
+
         void onClick(String tag);
     }
 }
-
-

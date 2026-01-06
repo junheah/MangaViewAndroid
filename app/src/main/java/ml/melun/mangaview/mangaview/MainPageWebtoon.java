@@ -14,35 +14,42 @@ import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class MainPageWebtoon {
+
     String baseUrl;
-    public static final String normalNew="일반연재 최신", adultNew="성인웹툰 최신", gayNew="BL/GL 최신", comicNew="일본만화 최신",
-            normalBest="일반연재 베스트", adultBest="성인웹툰 베스트", gayBest="BL/GL 베스트", comicBest="일본만화 베스트";
-    static final int nn=4,an=5,gn=6,cn=7,nb=8,ab=9,gb=10,cb=11;
+    public static final String normalNew = "일반연재 최신", adultNew = "성인웹툰 최신", gayNew = "BL/GL 최신", comicNew = "일본만화 최신",
+            normalBest = "일반연재 베스트", adultBest = "성인웹툰 베스트", gayBest = "BL/GL 베스트", comicBest = "일본만화 베스트";
+    static final int nn = 4, an = 5, gn = 6, cn = 7, nb = 8, ab = 9, gb = 10, cb = 11;
 
     List<Ranking<?>> dataSet;
 
-    public MainPageWebtoon(CustomHttpClient client){
+    public MainPageWebtoon(CustomHttpClient client) {
         fetch(client);
     }
 
-    public String getUrl(CustomHttpClient client){
+    public String getUrl(CustomHttpClient client) {
         Response r = client.mget("/site.php?id=1");
-        if(r==null) return null;
-        if(r.code() == 302){
-            this.baseUrl = r.header("Location");
-        }else
+        if (r == null) {
             return null;
+        }
+        if (r.code() == 302) {
+            this.baseUrl = r.header("Location");
+        } else {
+            return null;
+        }
         r.close();
         return this.baseUrl;
     }
-    public void fetch(CustomHttpClient client){
-        if(baseUrl == null || baseUrl.length()==0)
-            if(getUrl(client)==null)
+
+    public void fetch(CustomHttpClient client) {
+        if (baseUrl == null || baseUrl.length() == 0) {
+            if (getUrl(client) == null) {
                 return;
+            }
+        }
         try {
             Response r = client.get(baseUrl, null);
             String body = r.body().string();
-            if(body.contains("Connect Error: Connection timed out")){
+            if (body.contains("Connect Error: Connection timed out")) {
                 //adblock : try again
                 r.close();
                 fetch(client);
@@ -63,41 +70,39 @@ public class MainPageWebtoon {
             parseTitle(gayBest, boxes.get(gb).select("a"), base_webtoon);
             parseTitle(comicBest, boxes.get(cb).select("a"), base_comic);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-
     }
 
-    public List<Ranking<?>> getDataSet(){
+    public List<Ranking<?>> getDataSet() {
         return this.dataSet;
     }
 
-
-    public void parseTitle(String title, Elements es, int baseMode){
+    public void parseTitle(String title, Elements es, int baseMode) {
         Ranking<Title> ranking = new Ranking<>(title);
         Title tmp;
-        String idString,idString1,name;
+        String idString, idString1, name;
         int id;
-        for(Element e : es){
+        for (Element e : es) {
             Element img = e.selectFirst("div.in-subject");
-            if(img!=null){
+            if (img != null) {
                 name = img.ownText();
-            }else{
+            } else {
                 name = e.ownText();
             }
             System.out.println("   " + name);
             idString = e.attr("href");
-            idString1 = idString.substring(idString.lastIndexOf('/')+1);
-            id = Integer.parseInt(idString1.substring(idString1.lastIndexOf('=')+1));
+            idString1 = idString.substring(idString.lastIndexOf('/') + 1);
+            id = Integer.parseInt(idString1.substring(idString1.lastIndexOf('=') + 1));
             tmp = new Title(name, "", "", null, "", id, baseMode);
             ranking.add(tmp);
         }
         dataSet.add(ranking);
     }
 
-    public static List<Ranking<?>> getBlankDataSet(){
+    public static List<Ranking<?>> getBlankDataSet() {
         List<Ranking<?>> dataset = new ArrayList<>();
         dataset.add(new Ranking<>(normalNew));
         dataset.add(new Ranking<>(adultNew));
@@ -109,7 +114,5 @@ public class MainPageWebtoon {
         dataset.add(new Ranking<>(gayBest));
         return dataset;
     }
-
-
 
 }

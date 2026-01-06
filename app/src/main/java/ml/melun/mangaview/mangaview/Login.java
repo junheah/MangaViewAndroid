@@ -13,34 +13,35 @@ import static java.lang.System.currentTimeMillis;
 import static ml.melun.mangaview.MainApplication.p;
 
 public class Login {
+
     private String user;
     private String pass;
     String cookie = "";
     long currentTime = 0;
 
-    public Login(){
+    public Login() {
     }
 
-    public void set(String id, String pass){
+    public void set(String id, String pass) {
         this.user = id;
         this.pass = pass;
     }
 
-    public byte[] prepare(CustomHttpClient client, Preference p){
+    public byte[] prepare(CustomHttpClient client, Preference p) {
         Response r;
         int tries = 3;
-        while(tries > 0) {
-            r = client.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),false);
-            if(r.code() == 200) {
+        while (tries > 0) {
+            r = client.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(), false);
+            if (r.code() == 200) {
                 List<String> setcookie = r.headers("Set-Cookie");
                 for (String c : setcookie) {
                     if (c.contains("PHPSESSID=")) {
                         cookie = c.substring(c.indexOf("=") + 1, c.indexOf(";"));
-                        client.setCookie("PHPSESSID",cookie);
+                        client.setCookie("PHPSESSID", cookie);
                     }
                 }
                 break;
-            }else {
+            } else {
                 r.close();
                 tries--;
             }
@@ -49,54 +50,56 @@ public class Login {
         r = client.mget("/plugin/kcaptcha/kcaptcha_image.php?t=" + currentTime, false);
         try {
             return r.body().bytes();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public Boolean submit(CustomHttpClient client, String answer){
-        try{
+    public Boolean submit(CustomHttpClient client, String answer) {
+        try {
             RequestBody requestBody = new FormBody.Builder()
                     .addEncoded("auto_login", "on")
-                    .addEncoded("mb_id",user)
-                    .addEncoded("mb_password",pass)
+                    .addEncoded("mb_id", user)
+                    .addEncoded("mb_password", pass)
                     .addEncoded("captcha_key", answer)
                     .build();
-            Map<String,String> headers = new HashMap<>();
-            headers.put("Cookie", "PHPSESSID="+cookie+";");
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Cookie", "PHPSESSID=" + cookie + ";");
 
             Response response = client.post(p.getUrl() + "/bbs/login_check.php", requestBody, headers);
             int responseCode = response.code();
 
-            if(responseCode == 302) {
+            if (responseCode == 302) {
                 //follow redirect
                 Map<String, String> cookies = new HashMap<>();
                 cookies.put("PHPSESSID", cookie);
-                client.mget("/?captcha_key="+answer+"&auto_login=on",false, cookies);
+                client.mget("/?captcha_key=" + answer + "&auto_login=on", false, cookies);
                 response.close();
                 return true;
-            }
-            else{
+            } else {
                 response.close();
                 return false;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
-    public void buildCookie(Map<String,String> map){
+
+    public void buildCookie(Map<String, String> map) {
         //java always passes by reference
         map.put("PHPSESSID", cookie);
     }
 
-    public boolean isValid(){
-        return cookie !=null && cookie.length()>0;
+    public boolean isValid() {
+        return cookie != null && cookie.length() > 0;
     }
 
-    public String getCookie(Boolean format){
-        if(format) return "PHPSESSID=" +cookie +';';
+    public String getCookie(Boolean format) {
+        if (format) {
+            return "PHPSESSID=" + cookie + ';';
+        }
         return cookie;
     }
 

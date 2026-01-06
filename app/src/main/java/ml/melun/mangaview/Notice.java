@@ -1,10 +1,11 @@
 package ml.melun.mangaview;
 
-public class Notice{
+public class Notice {
+
     int id = -1;
     String title, date, content;
 
-    Notice(int id, String title, String date, String content){
+    Notice(int id, String title, String date, String content) {
         this.id = id;
         this.title = title;
         this.date = date;
@@ -13,7 +14,7 @@ public class Notice{
 
     @Override
     public boolean equals(Object obj) {
-        return this.id == ((Notice)obj).getId();
+        return this.id == ((Notice) obj).getId();
     }
 
     @Override

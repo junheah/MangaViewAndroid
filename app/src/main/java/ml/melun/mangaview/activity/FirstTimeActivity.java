@@ -43,7 +43,6 @@ public class FirstTimeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_first_time);
         input = this.findViewById(R.id.first_def_url);
 
-
         pd = new ProgressDialog(context, R.style.darkDialog);
         pd.setMessage("url 확인중...");
         pd.setCancelable(false);
@@ -52,28 +51,29 @@ public class FirstTimeActivity extends AppCompatActivity {
         this.findViewById(R.id.eulaAgreeBtn).setOnClickListener(view -> {
             pd.show();
             String defurl = input.getText().toString();
-            if(defurl.length() == 0){
+            if (defurl.length() == 0) {
                 urlError("기본주소를 입력해 주세요.");
-            }else if(containsDigit(defurl)) {
+            } else if (containsDigit(defurl)) {
                 urlError("기본주소는 숫자를 포함하지 않은 주소입니다.");
-            }else if(!defurl.contains("https://")) {
+            } else if (!defurl.contains("https://")) {
                 urlError("기본주소는 https 프로토콜을 사용해야 합니다.");
-            }else{
+            } else {
                 //check url
                 new UrlUpdater(context, true, success -> {
-                    if(pd.isShowing())
+                    if (pd.isShowing()) {
                         pd.dismiss();
-                    if(success){
+                    }
+                    if (success) {
                         p.setDefUrl(defurl);
                         p.setAutoUrl(true);
                         long time = System.currentTimeMillis();
                         p.getSharedPref().edit().putLong("eula2", time).apply();
                         // not a migrator
                         p.getSharedPref().edit().putBoolean("manamoa", false).apply();
-                        Toast.makeText(context, new SimpleDateFormat("yyyy MM dd HH:mm:ss").format(time) + " 부로 EULA에 동의했습니다.",Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, new SimpleDateFormat("yyyy MM dd HH:mm:ss").format(time) + " 부로 EULA에 동의했습니다.", Toast.LENGTH_LONG).show();
                         setResult(RESULT_EULA_AGREE);
                         finish();
-                    }else{
+                    } else {
                         urlError("주소 업데이트에 실패했습니다.");
                     }
                 }, defurl).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -88,26 +88,27 @@ public class FirstTimeActivity extends AppCompatActivity {
                     p.getSharedPref().edit().putLong("eula2", time).apply();
                     // not a migrator
                     p.getSharedPref().edit().putBoolean("manamoa", false).apply();
-                    Toast.makeText(context, new SimpleDateFormat("yyyy MM dd HH:mm:ss").format(time) + " 부로 EULA에 동의했습니다.",Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, new SimpleDateFormat("yyyy MM dd HH:mm:ss").format(time) + " 부로 EULA에 동의했습니다.", Toast.LENGTH_LONG).show();
                     setResult(RESULT_EULA_AGREE);
                     finish();
-                },null, null));
+                }, null, null));
     }
 
-    public boolean containsDigit(String s){
-        for(char c : s.toCharArray()) {
-            if(Character.isDigit(c)) {
+    public boolean containsDigit(String s) {
+        for (char c : s.toCharArray()) {
+            if (Character.isDigit(c)) {
                 return true;
             }
         }
         return false;
     }
 
-    private void urlError(String text){
+    private void urlError(String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
         input.requestFocus();
-        if(pd.isShowing())
+        if (pd.isShowing()) {
             pd.dismiss();
+        }
     }
 
     @Override

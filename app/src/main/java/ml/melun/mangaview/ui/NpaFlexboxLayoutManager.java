@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import com.google.android.flexbox.FlexboxLayoutManager;
 
 public class NpaFlexboxLayoutManager extends FlexboxLayoutManager {
+
     public NpaFlexboxLayoutManager(Context context) {
         super(context);
     }

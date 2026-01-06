@@ -3,17 +3,17 @@
     <item
         android:visible="false"
         android:id="@+id/favAdd"
-        android:title="좋아요 추가"/>
+        android:title="좋아요 추가" />
     <item
         android:visible="false"
         android:id="@+id/favDel"
-        android:title="좋아요 제거"/>
+        android:title="좋아요 제거" />
     <item
         android:visible="false"
         android:id="@+id/del"
-        android:title="제거"/>
+        android:title="제거" />
     <item
         android:visible="false"
         android:id="@+id/remove"
-        android:title="삭제"/>
+        android:title="삭제" />
 </menu>

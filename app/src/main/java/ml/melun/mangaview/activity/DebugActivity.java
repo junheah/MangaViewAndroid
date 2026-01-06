@@ -38,6 +38,7 @@ import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class DebugActivity extends AppCompatActivity {
+
     TextView output;
     Context context;
     ScrollView scroll;
@@ -46,19 +47,20 @@ public class DebugActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debug);
-        Button pref =this.findViewById(R.id.debug_pref);
+        Button pref = this.findViewById(R.id.debug_pref);
         output = this.findViewById(R.id.debug_out);
         context = this;
 
         this.findViewById(R.id.debug_file_test).setOnClickListener(view -> {
             Uri uri = Uri.parse(p.getHomeDir());
-            output.append("current home dir : "+p.getHomeDir()+"\n\n");
+            output.append("current home dir : " + p.getHomeDir() + "\n\n");
             try {
                 DocumentFile t = DocumentFile.fromTreeUri(context, uri);
-                output.append("path : " + t.getUri() + "\ncan read : " + t.canRead() + "\ncan write : " + t.canWrite()+"\n");
-            }catch (Exception e){
-                if(e.getMessage() != null)
-                    output.append(e.getMessage()+"\n");
+                output.append("path : " + t.getUri() + "\ncan read : " + t.canRead() + "\ncan write : " + t.canWrite() + "\n");
+            } catch (Exception e) {
+                if (e.getMessage() != null) {
+                    output.append(e.getMessage() + "\n");
+                }
             }
         });
 
@@ -97,17 +99,15 @@ public class DebugActivity extends AppCompatActivity {
 
         this.findViewById(R.id.debug_eula).setOnClickListener(view -> startActivity(new Intent(context, FirstTimeActivity.class)));
 
-
-
         this.findViewById(R.id.debug_loginTest).setOnClickListener(view -> startActivity(new Intent(context, LoginActivity.class)));
 
         this.findViewById(R.id.debug_layoutEditor).setOnClickListener(view -> startActivity(new Intent(context, LayoutEditActivity.class)));
 
         this.findViewById(R.id.debug_baseMode).setOnClickListener(view -> {
-            if(p.getBaseMode() == base_comic) {
+            if (p.getBaseMode() == base_comic) {
                 p.setBaseMode(base_webtoon);
                 Toast.makeText(context, "webtoon", Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 p.setBaseMode(base_comic);
                 Toast.makeText(context, "comic", Toast.LENGTH_SHORT).show();
             }
@@ -119,28 +119,27 @@ public class DebugActivity extends AppCompatActivity {
                 Intent viewer = viewerIntent(context, new Manga(i, "", "", base_auto));
                 viewer.putExtra("online", true);
                 ((Activity) context).startActivity(viewer);
-            },false);
+            }, false);
         });
 
     }
 
-    void writeToPref(Editable edit){
+    void writeToPref(Editable edit) {
         try {
             SharedPreferences sharedPref = this.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
             CustomJSONObject data = new CustomJSONObject(edit.toString());
             Utils.jsonToPref(this, data);
             // reload preference
             p.init(this);
-        }catch (Exception e){
-            showPopup(context,"오류",e.getMessage());
+        } catch (Exception e) {
+            showPopup(context, "오류", e.getMessage());
             e.printStackTrace();
         }
     }
 
 //    String filter(String input){return input.replaceAll("(?<!\\\\)\\\\(?!\\\\)", "");}
-
-    private void printLine(String text){
-        output.append(System.currentTimeMillis() + " : " +text + "\n");
+    private void printLine(String text) {
+        output.append(System.currentTimeMillis() + " : " + text + "\n");
     }
 
     @Override
@@ -154,11 +153,10 @@ public class DebugActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.debug_up) {
             scroll.fullScroll(View.FOCUS_UP);
-        }else if (id == R.id.debug_down){
+        } else if (id == R.id.debug_down) {
             scroll.fullScroll(View.FOCUS_DOWN);
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 }

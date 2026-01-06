@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
@@ -85,7 +86,7 @@
                 android:singleLine="true"
                 android:textColor="#FFF"
                 android:maxLines="1"
-                android:hint="기본 주소 입력 (숫자없는 주소)"/>
+                android:hint="기본 주소 입력 (숫자없는 주소)" />
 
             <Button
                 android:background="@drawable/button_bg_white"

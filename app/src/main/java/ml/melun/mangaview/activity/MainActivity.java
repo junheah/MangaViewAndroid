@@ -74,9 +74,6 @@ import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
 
-
-
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainActivityCallback {
 
@@ -92,7 +89,6 @@ public class MainActivity extends AppCompatActivity
     View progressView;
     private static final int FIRST_TIME_ACTIVITY = 9;
 
-
     Fragment[] fragments = new Fragment[3];
 
     FrameLayout content;
@@ -105,11 +101,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void search(String query) {
-        ((MainSearch)fragments[1]).setSearch(query);
+        ((MainSearch) fragments[1]).setSearch(query);
         changeFragment(1);
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,21 +111,26 @@ public class MainActivity extends AppCompatActivity
         fragments[1] = new MainSearch();
         fragments[2] = new RecyclerFragment();
         dark = p.getDarkTheme();
-        if (dark) setTheme(R.style.AppThemeDarkNoTitle);
-        else setTheme(R.style.AppTheme_NoActionBar);
+        if (dark) {
+            setTheme(R.style.AppThemeDarkNoTitle); 
+        }else {
+            setTheme(R.style.AppTheme_NoActionBar);
+        }
         super.onCreate(savedInstanceState);
         context = this;
         Intent intent = getIntent();
         String action = intent.getAction();
 
-
         //check prefs
-        if (p.getSharedPref().getLong("eula2", -1)<0) {
+        if (p.getSharedPref().getLong("eula2", -1) < 0) {
             startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
         } else if (Migrator.running) {
             ProgressDialog mpd;
-            if (p.getDarkTheme()) mpd = new ProgressDialog(context, R.style.darkDialog);
-            else mpd = new ProgressDialog(context);
+            if (p.getDarkTheme()) {
+                mpd = new ProgressDialog(context, R.style.darkDialog); 
+            }else {
+                mpd = new ProgressDialog(context);
+            }
             mpd.setMessage("기록 업데이트중..");
             mpd.setCancelable(false);
             mpd.show();
@@ -179,8 +178,8 @@ public class MainActivity extends AppCompatActivity
             //popup to fix preferences
             System.out.println("preference needs update");
             showYesNoNeutralPopup(context, "기록 업데이트 필요",
-                    "저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?" +
-                            "\n(데이터 일부가 유실될 수 있습니다. 꼭 백업을 하고 진행해 주세요)",
+                    "저장된 데이터에서 더이상 지원되지 않는 이전 형식이 발견되었습니다. 정상적인 사용을 위해 업데이트가 필요합니다. 데이터를 업데이트 하시겠습니까?"
+                    + "\n(데이터 일부가 유실될 수 있습니다. 꼭 백업을 하고 진행해 주세요)",
                     "데이터 백업",
                     (dialogInterface, i) -> {
                         //proceed
@@ -188,16 +187,19 @@ public class MainActivity extends AppCompatActivity
                         editText.setHint(p.getDefUrl());
 
                         AlertDialog.Builder builder;
-                        if (new Preference(context).getDarkTheme())
-                            builder = new AlertDialog.Builder(context, R.style.darkDialog);
-                        else builder = new AlertDialog.Builder(context);
+                        if (new Preference(context).getDarkTheme()) {
+                            builder = new AlertDialog.Builder(context, R.style.darkDialog); 
+                        }else {
+                            builder = new AlertDialog.Builder(context);
+                        }
                         builder.setTitle("기록 업데이트")
                                 .setView(editText)
                                 .setMessage("이 작업은 되돌릴수 없습니다. 계속 하려면 유효한 주소를 입력해 주세요.")
                                 .setPositiveButton("계속", (dialogInterface15, i13) -> {
                                     String url = editText.getText().toString();
-                                    if (url == null || url.length() < 1)
+                                    if (url == null || url.length() < 1) {
                                         url = p.getDefUrl();
+                                    }
 
                                     p.setUrl(url);
 
@@ -224,22 +226,22 @@ public class MainActivity extends AppCompatActivity
                         intent1.putExtra("title", "백업");
                         startActivityForResult(intent1, MODE_FILE_SAVE);
                     }, dialogInterface -> finish());
-        }else if(action != null && action.equals(MIGRATE_RESULT)){
+        } else if (action != null && action.equals(MIGRATE_RESULT)) {
             migratorEndPopup(savedInstanceState, 0, intent.getStringExtra("msg"));
-        }else{
+        } else {
             activityInit(savedInstanceState);
-       }
+        }
     }
 
-    private void activityInit(Bundle savedInstanceState){
+    private void activityInit(Bundle savedInstanceState) {
         p.check2();
         setContentView(R.layout.activity_main);
         progressView = this.findViewById(R.id.progress_panel);
 
         // url updater
-        if(p.getAutoUrl()) {
-            ((MainMain)fragments[0]).setWait(true);
-            new UrlUpdater(context, false, ((MainMain)fragments[0]).getCallback(), p.getDefUrl()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (p.getAutoUrl()) {
+            ((MainMain) fragments[0]).setWait(true);
+            new UrlUpdater(context, false, ((MainMain) fragments[0]).getCallback(), p.getDefUrl()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -254,19 +256,19 @@ public class MainActivity extends AppCompatActivity
         //nav_drawer color scheme
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        if(dark) {
+        if (dark) {
             int[][] states = new int[][]{
-                    new int[]{-android.R.attr.state_enabled}, // disabled
-                    new int[]{android.R.attr.state_enabled}, // enabled
-                    new int[]{-android.R.attr.state_checked}, // unchecked
-                    new int[]{android.R.attr.state_pressed}  // pressed
+                new int[]{-android.R.attr.state_enabled}, // disabled
+                new int[]{android.R.attr.state_enabled}, // enabled
+                new int[]{-android.R.attr.state_checked}, // unchecked
+                new int[]{android.R.attr.state_pressed} // pressed
             };
 
             int[] colors = new int[]{
-                    Color.parseColor("#565656"),
-                    Color.parseColor("#a2a2a2"),
-                    Color.WHITE,
-                    Color.WHITE
+                Color.parseColor("#565656"),
+                Color.parseColor("#a2a2a2"),
+                Color.WHITE,
+                Color.WHITE
             };
             ColorStateList colorStateList = new ColorStateList(states, colors);
             navigationView.setItemTextColor(colorStateList);
@@ -277,21 +279,21 @@ public class MainActivity extends AppCompatActivity
         // get app version
         versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
         int version = 0;
-        try{
+        try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             version = pInfo.versionCode;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        versionItem.setTitle("v."+version);
+        versionItem.setTitle("v." + version);
 
         //check for permission
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE){
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            if (Build.VERSION.SDK_INT >= CODE_SCOPED_STORAGE) {
                 //doesn't have to do anything
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE},
+                requestPermissions(new String[]{READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE},
                         PERMISSION_CODE);
             }
         }
@@ -300,40 +302,37 @@ public class MainActivity extends AppCompatActivity
 
         // set initial tab
         startTab = p.getStartTab();
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             int t = savedInstanceState.getInt("currentTab", 0);
-            changeFragment(t>-1 ? t : 0);
-        }else
+            changeFragment(t > -1 ? t : 0);
+        } else {
             changeFragment(startTab);
-
-
+        }
 
         // savedInstanceState
-
-
         //check for update, notices
-        new CheckInfo(context,httpClient, true).all(false);
+        new CheckInfo(context, httpClient, true).all(false);
 
     }
 
-    public int getTabId(int i){
-        switch(i){
+    public int getTabId(int i) {
+        switch (i) {
             case 0:
-                return(R.id.nav_main);
+                return (R.id.nav_main);
             case 1:
-                return(R.id.nav_search);
+                return (R.id.nav_search);
             case 2:
-                return(R.id.nav_recent);
+                return (R.id.nav_recent);
             case 3:
-                return(R.id.nav_favorite);
+                return (R.id.nav_favorite);
             case 4:
-                return(R.id.nav_download);
+                return (R.id.nav_download);
         }
         return 0;
     }
 
-    public int getFragmentIndex(int i){
-        switch(i){
+    public int getFragmentIndex(int i) {
+        switch (i) {
             case R.id.nav_main:
                 return 0;
             case R.id.nav_search:
@@ -354,26 +353,26 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(currentTab == startTab){
+            if (currentTab == startTab) {
 
                 DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                    switch (which){
+                    switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
 
                             //block interactivity
                             getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                            if(Downloader.isRunning()){
+                            if (Downloader.isRunning()) {
                                 //downloader is running
                                 //show info prompt
                                 findViewById(R.id.waiting_panel).setVisibility(View.VISIBLE);
 
                                 //stop downloader service
-                                Intent downloader = new Intent(getApplicationContext(),Downloader.class);
+                                Intent downloader = new Intent(getApplicationContext(), Downloader.class);
                                 downloader.setAction(Downloader.ACTION_FORCE_STOP);
                                 if (Build.VERSION.SDK_INT >= 26) {
                                     startForegroundService(downloader);
-                                }else{
+                                } else {
                                     startService(downloader);
                                 }
 
@@ -381,7 +380,7 @@ public class MainActivity extends AppCompatActivity
                                 BroadcastReceiver statusReceiver = new BroadcastReceiver() {
                                     @Override
                                     public void onReceive(Context context, Intent intent) {
-                                        if(intent.getAction().matches(BROADCAST_STOP)){
+                                        if (intent.getAction().matches(BROADCAST_STOP)) {
                                             //service stopped
                                             finishAffinity();
                                             System.runFinalization();
@@ -393,7 +392,7 @@ public class MainActivity extends AppCompatActivity
                                 infil.addAction(BROADCAST_STOP);
                                 registerReceiver(statusReceiver, infil);
 
-                            }else{
+                            } else {
                                 //kill application
                                 finishAffinity();
                                 System.runFinalization();
@@ -406,13 +405,16 @@ public class MainActivity extends AppCompatActivity
                     }
                 };
                 AlertDialog.Builder builder;
-                if(dark) builder = new AlertDialog.Builder(this,R.style.darkDialog);
-                else builder = new AlertDialog.Builder(this);
-                builder.setMessage(Downloader.isRunning()  ? "다운로드가 진행중입니다. 정말로 종료 하시겠습니까?" : "정말로 종료 하시겠습니까?")
+                if (dark) {
+                    builder = new AlertDialog.Builder(this, R.style.darkDialog); 
+                }else {
+                    builder = new AlertDialog.Builder(this);
+                }
+                builder.setMessage(Downloader.isRunning() ? "다운로드가 진행중입니다. 정말로 종료 하시겠습니까?" : "정말로 종료 하시겠습니까?")
                         .setPositiveButton("네", dialogClickListener)
                         .setNegativeButton("아니오", dialogClickListener)
                         .show();
-            }else{
+            } else {
                 changeFragment(startTab);
                 navigationView.getMenu().getItem(startTab).setChecked(true);
                 toolbar.setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
@@ -436,7 +438,7 @@ public class MainActivity extends AppCompatActivity
             Intent settingIntent = new Intent(context, SettingsActivity.class);
             startActivityForResult(settingIntent, 0);
             return true;
-        }else if(id == R.id.action_debug){
+        } else if (id == R.id.action_debug) {
             Intent debug = new Intent(context, DebugActivity.class);
             startActivity(debug);
             return true;
@@ -444,16 +446,16 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    boolean changeFragment(int index){
+    boolean changeFragment(int index) {
         boolean change = !(currentTab >= 2 && index >= 2);
-        int fragmentI = index>2 ? 2 : index;
+        int fragmentI = index > 2 ? 2 : index;
         boolean res = false;
-        if(index>-1 && index != currentTab){
+        if (index > -1 && index != currentTab) {
             currentTab = index;
-            if(index >= 2){
-                ((RecyclerFragment)fragments[2]).changeMode(getTabId(index));
+            if (index >= 2) {
+                ((RecyclerFragment) fragments[2]).changeMode(getTabId(index));
             }
-            if(change) {
+            if (change) {
                 getSupportFragmentManager().beginTransaction().replace(R.id.contentHolder, (Fragment) fragments[fragmentI]).commit();
             }
             res = true;
@@ -463,7 +465,6 @@ public class MainActivity extends AppCompatActivity
         return res;
     }
 
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -471,14 +472,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         if (!changeFragment(getFragmentIndex(id))) {
             //don't refresh views
-            if(id==R.id.nav_update) {
+            if (id == R.id.nav_update) {
                 //check update
-                new CheckInfo(context,httpClient,false).all(true);
-            }else if(id==R.id.nav_notice){
+                new CheckInfo(context, httpClient, false).all(true);
+            } else if (id == R.id.nav_notice) {
                 Intent noticesIntent = new Intent(context, NoticesActivity.class);
                 startActivity(noticesIntent);
                 return true;
-            }else if(id==R.id.nav_kakao){
+            } else if (id == R.id.nav_kakao) {
 
                 View layout = getLayoutInflater().inflate(R.layout.content_kakao_popup, null);
                 layout.findViewById(R.id.kakao_notice).setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_notice)))));
@@ -486,22 +487,25 @@ public class MainActivity extends AppCompatActivity
                 layout.findViewById(R.id.kakao_direct).setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.kakao_direct)))));
 
                 AlertDialog.Builder builder;
-                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
-                else builder = new AlertDialog.Builder(context);
+                if (dark) {
+                    builder = new AlertDialog.Builder(context, R.style.darkDialog); 
+                }else {
+                    builder = new AlertDialog.Builder(context);
+                }
                 builder.setTitle("오픈 카톡 참가")
                         .setView(layout)
                         .show();
 
 //                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://open.kakao.com/o/gL4yY57"));
 //                startActivity(browserIntent);
-            }else if(id==R.id.nav_settings){
+            } else if (id == R.id.nav_settings) {
                 Intent settingIntent = new Intent(context, SettingsActivity.class);
                 startActivityForResult(settingIntent, 0);
                 return true;
-            }else if(id==R.id.nav_donate){
+            } else if (id == R.id.nav_donate) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://junheah.github.io/donate"));
                 startActivity(browserIntent);
-            }else if(id==R.id.nav_account){
+            } else if (id == R.id.nav_account) {
                 startActivity(new Intent(context, LoginActivity.class));
                 return true;
             }
@@ -518,39 +522,44 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == FIRST_TIME_ACTIVITY){
-            if(resultCode == RESULT_EULA_AGREE) {
+        if (requestCode == FIRST_TIME_ACTIVITY) {
+            if (resultCode == RESULT_EULA_AGREE) {
                 activityInit(null);
-            }else
+            } else {
                 finish();
+            }
             return;
-        }else if(requestCode == MODE_FILE_SAVE){
+        } else if (requestCode == MODE_FILE_SAVE) {
             String path = null;
-            if(data!=null)
+            if (data != null) {
                 path = data.getStringExtra("path");
-            if(path != null){
-                if(writePreferenceToFile(context, new File(path))) {
+            }
+            if (path != null) {
+                if (writePreferenceToFile(context, new File(path))) {
                     Toast.makeText(context, "백업 완료!", Toast.LENGTH_LONG).show();
-                }else Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
-            }else Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(context, "백업 실패", Toast.LENGTH_LONG).show();
+            }
 
             finish();
             startActivity(getIntent());
         }
-        if(resultCode == RESULT_NEED_RESTART){
+        if (resultCode == RESULT_NEED_RESTART) {
             Intent intent = getIntent();
             finish();
             startActivity(intent);
         }
     }
 
-    public void hideProgressPanel(){
+    public void hideProgressPanel() {
         progressView.setVisibility(View.GONE);
     }
 
-
-    private void migratorEndPopup(Bundle bundle, int resCode, String msg){
-        if(resCode==0) {
+    private void migratorEndPopup(Bundle bundle, int resCode, String msg) {
+        if (resCode == 0) {
             final ScrollView scrollView = new ScrollView(context);
             final LinearLayout linearLayout = new LinearLayout(context);
             linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -572,9 +581,11 @@ public class MainActivity extends AppCompatActivity
             scrollView.addView(linearLayout);
 
             AlertDialog.Builder abuilder;
-            if (new Preference(context).getDarkTheme())
-                abuilder = new AlertDialog.Builder(context, R.style.darkDialog);
-            else abuilder = new AlertDialog.Builder(context);
+            if (new Preference(context).getDarkTheme()) {
+                abuilder = new AlertDialog.Builder(context, R.style.darkDialog); 
+            }else {
+                abuilder = new AlertDialog.Builder(context);
+            }
             AlertDialog dialog = abuilder.setTitle("결과")
                     .setView(scrollView)
                     .setOnCancelListener(dialogInterface -> activityInit(bundle))
@@ -584,8 +595,8 @@ public class MainActivity extends AppCompatActivity
                 activityInit(bundle);
             });
             dialog.show();
-        }
-        else if(resCode == 1)
+        } else if (resCode == 1) {
             showPopup(context, "연결 오류", "연결을 확인하고 다시 시도해 주세요.", (dialogInterface, i) -> finish(), dialogInterface -> finish());
+        }
     }
 }

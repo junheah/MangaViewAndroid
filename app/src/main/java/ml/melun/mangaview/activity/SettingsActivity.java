@@ -67,7 +67,9 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
 
-        if(dark) setTheme(R.style.AppThemeDark);
+        if (dark) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         context = this;
@@ -80,7 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
                 intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
                 Toast.makeText(context, "다운로드 위치를 선택해 주세요", Toast.LENGTH_SHORT).show();
                 startActivityForResult(intent, MODE_FOLDER_SELECT);
-            }else{
+            } else {
                 Intent intent = new Intent(context, FolderSelectActivity.class);
                 startActivityForResult(intent, MODE_FOLDER_SELECT);
             }
@@ -112,8 +114,11 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             };
             AlertDialog.Builder builder;
-            if(dark) builder = new AlertDialog.Builder(context, R.style.darkDialog);
-            else builder = new AlertDialog.Builder(context);
+            if (dark) {
+                builder = new AlertDialog.Builder(context, R.style.darkDialog); 
+            }else {
+                builder = new AlertDialog.Builder(context);
+            }
             builder.setMessage("최근 본 만화, 북마크 및 모든 만화 열람 기록이 사라집니다. 계속 하시겠습니까?\n(좋아요, 저장한 만화 제외)").setPositiveButton("네", dialogClickListener)
                     .setNegativeButton("아니오", dialogClickListener).show();
         });
@@ -121,6 +126,7 @@ public class SettingsActivity extends AppCompatActivity {
             int prevKeyCode;
             int nextKeyCode;
             InputCallback inputCallback = null;
+
             @Override
             public void onClick(View view) {
                 prevKeyCode = p.getPrevPageKey();
@@ -132,33 +138,37 @@ public class SettingsActivity extends AppCompatActivity {
                 TextView ptext = v.findViewById(R.id.key_prev_text);
                 TextView ntext = v.findViewById(R.id.key_next_text);
 
-                if(prevKeyCode == -1)
-                    ptext.setText("-");
-                else
+                if (prevKeyCode == -1) {
+                    ptext.setText("-"); 
+                }else {
                     ptext.setText(KeyEvent.keyCodeToString(prevKeyCode));
-                if(nextKeyCode == -1)
-                    ntext.setText("-");
-                else
+                }
+                if (nextKeyCode == -1) {
+                    ntext.setText("-"); 
+                }else {
                     ntext.setText(KeyEvent.keyCodeToString(nextKeyCode));
+                }
 
                 pbtnClear = view14 -> {
-                    if(prevKeyCode == -1)
-                        ptext.setText("-");
-                    else
+                    if (prevKeyCode == -1) {
+                        ptext.setText("-"); 
+                    }else {
                         ptext.setText(KeyEvent.keyCodeToString(prevKeyCode));
+                    }
                     inputCallback = null;
                     view14.setOnClickListener(pbtnSet);
                 };
                 nbtnClear = view13 -> {
-                    if(nextKeyCode == -1)
-                        ntext.setText("-");
-                    else
+                    if (nextKeyCode == -1) {
+                        ntext.setText("-"); 
+                    }else {
                         ntext.setText(KeyEvent.keyCodeToString(nextKeyCode));
+                    }
                     inputCallback = null;
                     view13.setOnClickListener(nbtnSet);
                 };
                 pbtnSet = view12 -> {
-                    if(inputCallback == null) {
+                    if (inputCallback == null) {
                         view12.setOnClickListener(pbtnClear);
                         ptext.setText("키를 입력해 주세요");
                         inputCallback = event -> {
@@ -170,7 +180,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 };
                 nbtnSet = view1 -> {
-                    if(inputCallback == null) {
+                    if (inputCallback == null) {
                         view1.setOnClickListener(nbtnClear);
                         ntext.setText("키를 입력해 주세요");
                         inputCallback = event -> {
@@ -186,13 +196,16 @@ public class SettingsActivity extends AppCompatActivity {
                 nbtn.setOnClickListener(nbtnSet);
 
                 AlertDialog.Builder builder;
-                if(dark) builder = new AlertDialog.Builder(context,R.style.darkDialog);
-                else builder = new AlertDialog.Builder(context);
+                if (dark) {
+                    builder = new AlertDialog.Builder(context, R.style.darkDialog); 
+                }else {
+                    builder = new AlertDialog.Builder(context);
+                }
                 builder.setTitle("단축키 설정")
                         .setView(v)
                         .setOnKeyListener((dialogInterface, i, keyEvent) -> {
-                            if(inputCallback != null){
-                                if(keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+                            if (inputCallback != null) {
+                                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                                     inputCallback.onKeyEvent(keyEvent);
                                     inputCallback = null;
                                 }
@@ -222,13 +235,18 @@ public class SettingsActivity extends AppCompatActivity {
         s_dark.setOnClickListener(v -> s_dark_switch.toggle());
         s_dark_switch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             p.setDarkTheme(isChecked);
-            if(isChecked != dark) setResult(RESULT_NEED_RESTART);
-            else setResult(RESULT_CANCELED);
+            if (isChecked != dark) {
+                setResult(RESULT_NEED_RESTART); 
+            }else {
+                setResult(RESULT_CANCELED);
+            }
         });
 
         s_viewer = this.findViewById(R.id.setting_viewer);
         s_viewer_spinner = this.findViewById(R.id.setting_viewer_spinner);
-        if(dark) s_viewer_spinner.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        if (dark) {
+            s_viewer_spinner.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        }
         s_viewer_spinner.setSelection(p.getViewerType());
         s_viewer_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -261,7 +279,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         s_tab = this.findViewById(R.id.setting_startTab);
         s_tab_spinner = this.findViewById(R.id.setting_startTab_spinner);
-        if(dark) s_tab_spinner.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        if (dark) {
+            s_tab_spinner.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
+        }
         s_tab_spinner.setSelection(p.getStartTab());
         s_tab_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -275,12 +295,10 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-
         this.findViewById(R.id.setting_license).setOnClickListener(v -> {
-            Intent l = new Intent(context,LicenseActivity.class);
+            Intent l = new Intent(context, LicenseActivity.class);
             startActivity(l);
         });
-
 
         this.findViewById(R.id.setting_url).setOnClickListener(v -> urlSettingPopup(context, p));
 
@@ -299,7 +317,7 @@ public class SettingsActivity extends AppCompatActivity {
                 intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
                 Toast.makeText(context, "백업 파일을 저장할 폴더를 선택해 주세요", Toast.LENGTH_SHORT).show();
                 startActivityForResult(intent, MODE_FILE_SAVE);
-            }else{
+            } else {
                 Intent intent = new Intent(context, FolderSelectActivity.class);
                 intent.putExtra("mode", MODE_FILE_SAVE);
                 intent.putExtra("title", "파일 저장");
@@ -316,7 +334,7 @@ public class SettingsActivity extends AppCompatActivity {
                 intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri);
                 Toast.makeText(context, "백업 파일 선택", Toast.LENGTH_SHORT).show();
                 startActivityForResult(intent, MODE_FILE_SELECT);
-            }else {
+            } else {
                 Intent intent = new Intent(context, FolderSelectActivity.class);
                 intent.putExtra("mode", MODE_FILE_SELECT);
                 intent.putExtra("title", "파일 선택");
@@ -338,13 +356,13 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    public static void urlSettingPopup(Context context, Preference p){
+    public static void urlSettingPopup(Context context, Preference p) {
         final LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         final LinearLayout switch_layout = new LinearLayout(context);
         switch_layout.setOrientation(LinearLayout.HORIZONTAL);
         switch_layout.setGravity(Gravity.RIGHT);
-        switch_layout.setPadding(0,0,10,0);
+        switch_layout.setPadding(0, 0, 10, 0);
         final TextView definputtext = new TextView(context);
         final EditText definput = new EditText(context);
         final TextView inputtext = new TextView(context);
@@ -365,11 +383,11 @@ public class SettingsActivity extends AppCompatActivity {
         layout.addView(switch_layout);
 
         toggle.setOnCheckedChangeListener((compoundButton, b) -> {
-            if(b){
+            if (b) {
                 definput.setEnabled(true);
                 input.setEnabled(false);
                 input.setText("...");
-            }else{
+            } else {
                 definput.setEnabled(false);
                 input.setEnabled(true);
                 input.setText(p.getUrl());
@@ -377,11 +395,11 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         toggle.setChecked(p.getAutoUrl());
-        if(toggle.isChecked()){
+        if (toggle.isChecked()) {
             definput.setEnabled(true);
             input.setEnabled(false);
             input.setText("...");
-        }else{
+        } else {
             definput.setEnabled(false);
             input.setEnabled(true);
             input.setText(p.getUrl());
@@ -393,26 +411,31 @@ public class SettingsActivity extends AppCompatActivity {
         definput.setHint(p.getDefUrl());
 
         AlertDialog.Builder builder;
-        if(p.getDarkTheme()) builder = new AlertDialog.Builder(context,R.style.darkDialog);
-        else builder = new AlertDialog.Builder(context);
+        if (p.getDarkTheme()) {
+            builder = new AlertDialog.Builder(context, R.style.darkDialog); 
+        }else {
+            builder = new AlertDialog.Builder(context);
+        }
         builder.setTitle("URL 설정")
                 .setView(layout)
                 .setPositiveButton("설정", (dialog, button) -> {
-                    if(toggle.isChecked()){
+                    if (toggle.isChecked()) {
                         // 자동 설정
-                        if(definput.getText().length()>0)
-                            p.setDefUrl(definput.getText().toString());
-                        else
+                        if (definput.getText().length() > 0) {
+                            p.setDefUrl(definput.getText().toString()); 
+                        }else {
                             p.setDefUrl(definput.getHint().toString());
+                        }
                         p.setAutoUrl(true);
                         new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    }else {
+                    } else {
                         // 수동 설정
                         p.setAutoUrl(false);
-                        if (input.getText().length() > 0)
-                            p.setUrl(input.getText().toString());
-                        else
+                        if (input.getText().length() > 0) {
+                            p.setUrl(input.getText().toString()); 
+                        }else {
                             p.setUrl(input.getHint().toString());
+                        }
                     }
                 })
                 .setNegativeButton("취소", (dialog, button) -> {
@@ -421,8 +444,7 @@ public class SettingsActivity extends AppCompatActivity {
                 .show();
     }
 
-
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
@@ -445,23 +467,27 @@ public class SettingsActivity extends AppCompatActivity {
                     case MODE_FILE_SAVE:
                         showStringInputPopup(context, "백업 파일 이름", s -> {
                             DocumentFile d = DocumentFile.fromTreeUri(context, uri);
-                            if(!s.endsWith(".mvpref")) s += ".mvpref";
+                            if (!s.endsWith(".mvpref")) {
+                                s += ".mvpref";
+                            }
 
                             final DocumentFile target = d.findFile(s);
-                            if(target != null){
+                            if (target != null) {
                                 String finalS = s;
                                 showYesNoPopup(context, "파일이 이미 존재합니다.", "덮어 쓸까요?", (dialogInterface, i) -> {
                                     target.delete();
-                                    if (writePreferenceToFile(context, d.createFile("application", finalS).getUri()))
-                                        Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
-                                    else
+                                    if (writePreferenceToFile(context, d.createFile("application", finalS).getUri())) {
+                                        Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show(); 
+                                    }else {
                                         Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
+                                    }
                                 }, null, null);
                             } else {
-                                if (writePreferenceToFile(context, d.createFile("application", s).getUri()))
-                                    Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
-                                else
+                                if (writePreferenceToFile(context, d.createFile("application", s).getUri())) {
+                                    Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show(); 
+                                }else {
                                     Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
+                                }
                             }
                         }, p.getDarkTheme());
                         break;
@@ -470,14 +496,15 @@ public class SettingsActivity extends AppCompatActivity {
                             if (readPreferenceFromFile(p, context, uri)) {
                                 setResult(RESULT_NEED_RESTART);
                                 showPopup(context, "데이터 불러오기", "데이터 불러오기를 성공했습니다. 변경사항을 적용하기 위해 앱을 재시작 합니다.", (dialogInterface12, i1) -> finish(), dialogInterface1 -> finish());
-                            } else
+                            } else {
                                 Toast.makeText(context, "불러오기 실패", Toast.LENGTH_LONG).show();
+                            }
 
-                        }, (dialogInterface, i) -> Toast.makeText(context,"취소되었습니다", Toast.LENGTH_SHORT).show(), dialogInterface -> Toast.makeText(context,"취소되었습니다", Toast.LENGTH_SHORT).show());
+                        }, (dialogInterface, i) -> Toast.makeText(context, "취소되었습니다", Toast.LENGTH_SHORT).show(), dialogInterface -> Toast.makeText(context, "취소되었습니다", Toast.LENGTH_SHORT).show());
                         break;
                 }
             }
-        }else {
+        } else {
             if (data != null) {
                 String path = data.getStringExtra("path");
                 if (path != null) {
@@ -486,18 +513,20 @@ public class SettingsActivity extends AppCompatActivity {
                             if (readPreferenceFromFile(p, context, new File(path))) {
                                 setResult(RESULT_NEED_RESTART);
                                 showPopup(context, "데이터 불러오기", "데이터 불러오기를 성공했습니다. 변경사항을 적용하기 위해 앱을 재시작 합니다.", (dialogInterface, i) -> finish(), dialogInterface -> finish());
-                            } else
+                            } else {
                                 Toast.makeText(context, "불러오기 실패", Toast.LENGTH_LONG).show();
+                            }
                             break;
                         case MODE_FOLDER_SELECT:
                             p.setHomeDir(path);
                             Toast.makeText(context, "설정 완료!", Toast.LENGTH_LONG).show();
                             break;
                         case MODE_FILE_SAVE:
-                            if (writePreferenceToFile(context, new File(path)))
-                                Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show();
-                            else
+                            if (writePreferenceToFile(context, new File(path))) {
+                                Toast.makeText(context, "내보내기 완료!", Toast.LENGTH_LONG).show(); 
+                            }else {
                                 Toast.makeText(context, "내보내기 실패", Toast.LENGTH_LONG).show();
+                            }
 
                             break;
                     }
@@ -507,7 +536,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
-    private interface InputCallback{
+    private interface InputCallback {
+
         void onKeyEvent(KeyEvent event);
     }
 }

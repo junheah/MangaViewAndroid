@@ -24,6 +24,7 @@ import ml.melun.mangaview.mangaview.UpdatedManga;
 import static ml.melun.mangaview.MainApplication.p;
 
 public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
     Context context;
     ArrayList<UpdatedManga> mData;
     onclickListener olisten;
@@ -45,15 +46,16 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return position;
     }
 
-    public void addData(ArrayList<UpdatedManga> data){
+    public void addData(ArrayList<UpdatedManga> data) {
         int oSize = mData.size();
         mData.addAll(data);
-        notifyItemRangeInserted(oSize,data.size());
+        notifyItemRangeInserted(oSize, data.size());
     }
 
-    public void setOnClickListener(onclickListener click){
+    public void setOnClickListener(onclickListener click) {
         olisten = click;
     }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -67,20 +69,27 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         UpdatedManga m = mData.get(position);
         h.text.setText(m.getName());
         h.date.setText(m.getDate());
-        if(m.getThumb().length()>1 && !save) Glide.with(h.thumb).load(m.getThumb()).into(h.thumb);
-        else h.thumb.setImageBitmap(null);
-        if(save) h.thumb.setVisibility(View.GONE);
-        if(p.getBookmark(m.getTitle())>0)
-            h.seen.setVisibility(View.VISIBLE);
-        else
+        if (m.getThumb().length() > 1 && !save) {
+            Glide.with(h.thumb).load(m.getThumb()).into(h.thumb); 
+        }else {
+            h.thumb.setImageBitmap(null);
+        }
+        if (save) {
+            h.thumb.setVisibility(View.GONE);
+        }
+        if (p.getBookmark(m.getTitle()) > 0) {
+            h.seen.setVisibility(View.VISIBLE); 
+        }else {
             h.seen.setVisibility(View.GONE);
-        if(p.findFavorite(m.getTitle())>-1)
-            h.fav.setVisibility(View.VISIBLE);
-        else
+        }
+        if (p.findFavorite(m.getTitle()) > -1) {
+            h.fav.setVisibility(View.VISIBLE); 
+        }else {
             h.fav.setVisibility(View.GONE);
+        }
 
         StringBuilder tags = new StringBuilder();
-        for (String s :m.getTag()) {
+        for (String s : m.getTag()) {
             tags.append(s).append(" ");
         }
         h.tags.setText(tags.toString());
@@ -92,7 +101,8 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return mData.size();
     }
 
-    class viewHolder extends RecyclerView.ViewHolder{
+    class viewHolder extends RecyclerView.ViewHolder {
+
         TextView text, date;
         ImageView thumb;
         CardView card;
@@ -111,10 +121,10 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             viewEps = itemView.findViewById(R.id.epsButton);
             seen = itemView.findViewById(R.id.seenIcon);
             fav = itemView.findViewById(R.id.favIcon);
-            author =itemView.findViewById(R.id.TitleAuthor);
+            author = itemView.findViewById(R.id.TitleAuthor);
             tags = itemView.findViewById(R.id.TitleTag);
             tagContainer = itemView.findViewById(R.id.TitleTagContainer);
-            if(dark){
+            if (dark) {
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
                 viewEps.setBackgroundColor(ContextCompat.getColor(context, R.color.resumeDark));
             }
@@ -124,7 +134,9 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public interface onclickListener {
+
         void onClick(Manga m);
+
         void onEpsClick(Title t);
     }
 }

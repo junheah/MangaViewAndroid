@@ -29,6 +29,7 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.mangaview.MTitle.base_auto;
 
 public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
     List<Manga> mData;
     Context context;
     LayoutInflater mInflater;
@@ -50,20 +51,20 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         //setNull();
     }
 
-    public void setLoad(){
+    public void setLoad() {
         setLoad("로드중...");
     }
 
-    public void setLoad(String msg){
-        if(mData != null){
+    public void setLoad(String msg) {
+        if (mData != null) {
             int size = mData.size();
             mData.clear();
             loaded = false;
-            notifyItemRangeRemoved(0,size);
-        }
-        else
+            notifyItemRangeRemoved(0, size);
+        } else {
             mData = new ArrayList<>();
-        Manga loading = new Manga(0,msg,"", base_auto);
+        }
+        Manga loading = new Manga(0, msg, "", base_auto);
         loading.addThumb("");
         mData.add(loading);
         notifyItemInserted(0);
@@ -87,31 +88,36 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         h.title.setText(mData.get(position).getName());
         String thumb = mData.get(position).getThumb();
         h.thumb.setColorFilter(null);
-        if(thumb != null && thumb.length()==0)
-            h.thumb.setImageResource(android.R.color.transparent);
-        else if(thumb != null && thumb.equals("reload")) {
+        if (thumb != null && thumb.length() == 0) {
+            h.thumb.setImageResource(android.R.color.transparent); 
+        }else if (thumb != null && thumb.equals("reload")) {
             h.thumb.setImageDrawable(ResourcesCompat.getDrawable(res, R.drawable.ic_refresh, null));
             h.thumb.setColorFilter(dark ? Color.WHITE : Color.DKGRAY);
-        }else if(save)
-            h.thumb.setImageDrawable(ResourcesCompat.getDrawable(res, R.mipmap.ic_launcher, null));
-        else
+        } else if (save) {
+            h.thumb.setImageDrawable(ResourcesCompat.getDrawable(res, R.mipmap.ic_launcher, null)); 
+        }else {
             Glide.with(h.thumb).load(thumb).into(h.thumb);
+        }
     }
-
 
     @Override
     public int getItemCount() {
         return mData == null ? 0 : mData.size();
     }
+
     public interface OnClickCallback {
+
         void onclick(Manga m);
+
         void refresh();
     }
 
-    class viewHolder extends RecyclerView.ViewHolder{
+    class viewHolder extends RecyclerView.ViewHolder {
+
         ImageView thumb;
         TextView title;
         CardView card;
+
         public viewHolder(View itemView) {
             super(itemView);
             thumb = itemView.findViewById(R.id.main_new_thumb);
@@ -122,30 +128,32 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             title.setSelected(true);
             card = itemView.findViewById(R.id.updatedCard);
             card.setOnClickListener(v -> {
-                if(loaded){
+                if (loaded) {
                     monclick.onclick(mData.get(getAdapterPosition()));
-                }else
+                } else {
                     monclick.refresh();
+                }
             });
-            if(dark){
+            if (dark) {
                 card.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDarkBackground));
             }
 
         }
     }
-    public void setClickListener(OnClickCallback o){
+
+    public void setClickListener(OnClickCallback o) {
         this.monclick = o;
     }
 
-    public void setData(List<Manga> data){
+    public void setData(List<Manga> data) {
         mData = data;
-        if(mData.size()==0){
-            Manga none = new Manga(0,"결과 없음","", base_auto);
+        if (mData.size() == 0) {
+            Manga none = new Manga(0, "결과 없음", "", base_auto);
             none.addThumb("reload");
             mData.add(none);
             notifyItemChanged(0);
             loaded = false;
-        }else {
+        } else {
             notifyItemChanged(0);
             notifyItemRangeInserted(1, mData.size() - 1);
             loaded = true;

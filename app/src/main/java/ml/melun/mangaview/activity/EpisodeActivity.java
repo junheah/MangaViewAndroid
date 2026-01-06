@@ -48,8 +48,8 @@ import static ml.melun.mangaview.Utils.showTokiCaptchaPopup;
 import static ml.melun.mangaview.activity.CaptchaActivity.RESULT_CAPTCHA;
 import static ml.melun.mangaview.mangaview.Title.LOAD_CAPTCHA;
 
-
 public class EpisodeActivity extends AppCompatActivity {
+
     //global variables
     Title title;
     EpisodeAdapter episodeAdapter;
@@ -61,7 +61,7 @@ public class EpisodeActivity extends AppCompatActivity {
     int bookmarkId = -1;
     int bookmarkIndex = -1;
     List<Manga> episodes;
-    boolean dark, online=true;
+    boolean dark, online = true;
     Intent viewer;
     ActionBar actionBar;
     String homeDir;
@@ -71,8 +71,7 @@ public class EpisodeActivity extends AppCompatActivity {
     boolean loaded = false;
     LinearLayoutCompat fab_container;
 
-
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -89,25 +88,27 @@ public class EpisodeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode== RESULT_OK){
+        if (resultCode == RESULT_OK) {
             int newid = data.getIntExtra("id", -1);
-            if(newid>0 && newid!=bookmarkId){
+            if (newid > 0 && newid != bookmarkId) {
                 bookmarkId = newid;
                 //find index of bookmark;
-                if(episodes != null)
-                    for(int i=0; i< episodes.size(); i++){
-                        if(episodes.get(i).getId()==bookmarkId){
-                            bookmarkIndex = i+1;
+                if (episodes != null) {
+                    for (int i = 0; i < episodes.size(); i++) {
+                        if (episodes.get(i).getId() == bookmarkId) {
+                            bookmarkIndex = i + 1;
                             episodeAdapter.setBookmark(bookmarkIndex);
                             break;
                         }
                     }
+                }
             }
-            if(bookmarkId>-1)
-                resumefab.show();
-            else
+            if (bookmarkId > -1) {
+                resumefab.show(); 
+            }else {
                 resumefab.hide();
-        }else if(resultCode == RESULT_CAPTCHA){
+            }
+        } else if (resultCode == RESULT_CAPTCHA) {
             //captcha Checked
             finish();
             startActivity(getIntent());
@@ -117,17 +118,21 @@ public class EpisodeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dark = p.getDarkTheme();
-        if(dark) setTheme(R.style.AppThemeDarkNoTitle);
+        if (dark) {
+            setTheme(R.style.AppThemeDarkNoTitle);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_episode);
         Intent intent = getIntent();
-        title = new Gson().fromJson(intent.getStringExtra("title"),new TypeToken<Title>(){}.getType());
+        title = new Gson().fromJson(intent.getStringExtra("title"), new TypeToken<Title>() {
+        }.getType());
         online = intent.getBooleanExtra("online", true);
-        if(title.useBookmark())
+        if (title.useBookmark()) {
             bookmarkId = p.getBookmark(title);
-        position = intent.getIntExtra("position",0);
-        favoriteResult = intent.getBooleanExtra("favorite",false);
-        recentResult = intent.getBooleanExtra("recent",false);
+        }
+        position = intent.getIntExtra("position", 0);
+        favoriteResult = intent.getBooleanExtra("favorite", false);
+        recentResult = intent.getBooleanExtra("recent", false);
         episodeList = this.findViewById(R.id.EpisodeList);
         progress = this.findViewById(R.id.progress);
         episodeList.setLayoutManager(new NpaLinearLayoutManager(this));
@@ -136,26 +141,25 @@ public class EpisodeActivity extends AppCompatActivity {
         fab_container = findViewById(R.id.fab_container);
 
         ((SimpleItemAnimator) episodeList.getItemAnimator()).setSupportsChangeAnimations(false);
-        if(recentResult){
+        if (recentResult) {
             Intent resultIntent = new Intent();
-            setResult(RESULT_OK,resultIntent);
+            setResult(RESULT_OK, resultIntent);
         }
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
-        if(actionBar!=null){
+        if (actionBar != null) {
             actionBar.setTitle(title.getName());
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        if(online) {
+        if (online) {
             mode = 0;
             fab_container.setVisibility(View.GONE);
             getEpisodes g = new getEpisodes();
             g.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }else{
+        } else {
             //offline title
             //initialize eps list
             episodes = new ArrayList<>();
@@ -165,7 +169,7 @@ public class EpisodeActivity extends AppCompatActivity {
                 //scoped storage
                 DocumentFile titleDir = DocumentFile.fromTreeUri(context, Uri.parse(title.getPath()));
                 DocumentFile data = titleDir.findFile("title.gson");
-                if(data!=null){
+                if (data != null) {
                     mode = 3;
                     if (!title.useBookmark()) {
                         // is migrated
@@ -175,7 +179,7 @@ public class EpisodeActivity extends AppCompatActivity {
                     }
 
                     episodes = title.getEps();
-                    for(DocumentFile f : getOfflineEpisodes(titleDir)){
+                    for (DocumentFile f : getOfflineEpisodes(titleDir)) {
                         String name = f.getName();
                         try {
                             int index = episodes.indexOf(new Manga(Integer.parseInt(name.substring(name.lastIndexOf('.') + 1)), "", "", title.getBaseMode()));
@@ -188,20 +192,23 @@ public class EpisodeActivity extends AppCompatActivity {
                         }
                     }
                     //for loop to remove non-existing episodes
-                    if (episodes != null)
+                    if (episodes != null) {
                         for (int i = episodes.size() - 1; i >= 0; i--) {
-                            if (episodes.get(i).getOfflinePath() == null) episodes.remove(i);
+                            if (episodes.get(i).getOfflinePath() == null) {
+                                episodes.remove(i);
+                            }
                         }
+                    }
 
-                }else{
+                } else {
                     mode = 1;
-                    for(DocumentFile f : getOfflineEpisodes(titleDir)){
+                    for (DocumentFile f : getOfflineEpisodes(titleDir)) {
                         Manga m = new Manga(-1, f.getName(), "", title.getBaseMode());
                         m.setMode(mode);
                         m.setOfflinePath(f.toString());
                     }
                 }
-            }else {
+            } else {
 
                 //read ids and folder names
                 File titleDir = new File(title.getPath());
@@ -231,10 +238,13 @@ public class EpisodeActivity extends AppCompatActivity {
                         }
                     }
                     //for loop to remove non-existing episodes
-                    if (episodes != null)
+                    if (episodes != null) {
                         for (int i = episodes.size() - 1; i >= 0; i--) {
-                            if (episodes.get(i).getOfflinePath() == null) episodes.remove(i);
+                            if (episodes.get(i).getOfflinePath() == null) {
+                                episodes.remove(i);
+                            }
                         }
+                    }
 
                 } else {
                     mode = 1;
@@ -266,46 +276,47 @@ public class EpisodeActivity extends AppCompatActivity {
 //            }
 //        }
 //    }
-
-    public void afterLoad(){
+    public void afterLoad() {
         //find bookmark
         actionBar = getSupportActionBar();
-        if(actionBar!=null){
+        if (actionBar != null) {
             actionBar.setTitle(title.getName());
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        if(bookmarkId>-1){
-            if(episodes != null)
-                for(int i=0; i< episodes.size(); i++){
-                    if(episodes.get(i).getId()==bookmarkId){
-                        bookmarkIndex=i+1;
+        if (bookmarkId > -1) {
+            if (episodes != null) {
+                for (int i = 0; i < episodes.size(); i++) {
+                    if (episodes.get(i).getId() == bookmarkId) {
+                        bookmarkIndex = i + 1;
                         episodeAdapter.setBookmark(bookmarkIndex);
                         break;
                     }
                 }
+            }
         }
-        episodeAdapter.setFavorite(p.findFavorite(title)>-1);
+        episodeAdapter.setFavorite(p.findFavorite(title) > -1);
         episodeList.setAdapter(episodeAdapter);
-        if(bookmarkIndex>8) {
+        if (bookmarkIndex > 8) {
             episodeList.scrollToPosition(bookmarkIndex);
         }
         findViewById(R.id.upfab).setOnClickListener(v -> episodeList.scrollToPosition(0));
         findViewById(R.id.downfab).setOnClickListener(v -> {
             episodeList.scrollToPosition(episodes.size()); //헤더가 0이기 때문
         });
-        if(bookmarkIndex>-1)
-            resumefab.show();
-        else
+        if (bookmarkIndex > -1) {
+            resumefab.show(); 
+        }else {
             resumefab.hide();
-        resumefab.setOnClickListener(v -> openViewer(episodes.get(bookmarkIndex-1),0));
+        }
+        resumefab.setOnClickListener(v -> openViewer(episodes.get(bookmarkIndex - 1), 0));
 
         episodeAdapter.setClickListener(new EpisodeAdapter.ItemClickListener() {
 
             @Override
             public void onBookmarkClick() {
-                if(mode == 0 && p.getLogin() != null && p.getLogin().isValid()) {
+                if (mode == 0 && p.getLogin() != null && p.getLogin().isValid()) {
                     new ToggleBookmark().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }else {
+                } else {
                     Toast.makeText(context, "로그인이 필요한 기능입니다.", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -313,44 +324,47 @@ public class EpisodeActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position, Manga selected) {
                 //add local images to manga
-                openViewer(selected,0);
+                openViewer(selected, 0);
             }
+
             @Override
-            public void onStarClick(){
+            public void onStarClick() {
                 //star click handler
                 episodeAdapter.setFavorite(p.toggleFavorite(title, position));
-                if(favoriteResult){
+                if (favoriteResult) {
                     Intent resultIntent = new Intent();
-                    resultIntent.putExtra("favorite", p.findFavorite(title)>-1);
+                    resultIntent.putExtra("favorite", p.findFavorite(title) > -1);
                     setResult(RESULT_OK, resultIntent);
                 }
             }
 
             @Override
             public void onAuthorClick() {
-                if(title.getAuthor().length()>0){
+                if (title.getAuthor().length() > 0) {
                     Intent i = new Intent(context, TagSearchActivity.class);
-                    i.putExtra("query",title.getAuthor());
-                    i.putExtra("mode",1);
+                    i.putExtra("query", title.getAuthor());
+                    i.putExtra("mode", 1);
                     startActivity(i);
                 }
             }
 
             @Override
-            public void onFirstClick(){
-                if(episodes != null && episodes.size()>0)
-                    openViewer(episodes.get(episodes.size()-1),0);
+            public void onFirstClick() {
+                if (episodes != null && episodes.size() > 0) {
+                    openViewer(episodes.get(episodes.size() - 1), 0);
+                }
             }
         });
         episodeAdapter.setTagClickListener(tag -> {
             Intent i = new Intent(context, TagSearchActivity.class);
-            i.putExtra("query",tag);
-            i.putExtra("mode",2);
+            i.putExtra("query", tag);
+            i.putExtra("mode", 2);
             startActivity(i);
         });
     }
 
     private class ToggleBookmark extends AsyncTask<Void, Void, Boolean> {
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -365,13 +379,14 @@ public class EpisodeActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
             episodeAdapter.toggleBookmark(success);
-            if(!success){
+            if (!success) {
                 requestLogin(context, p);
             }
         }
     }
 
-    private class getEpisodes extends AsyncTask<Void,Void,Integer> {
+    private class getEpisodes extends AsyncTask<Void, Void, Integer> {
+
         protected void onPreExecute() {
             super.onPreExecute();
             progress.setVisibility(View.VISIBLE);
@@ -387,14 +402,14 @@ public class EpisodeActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer res) {
             super.onPostExecute(res);
-            if(res == LOAD_CAPTCHA){
+            if (res == LOAD_CAPTCHA) {
                 //캡차 처리 팝업
                 showTokiCaptchaPopup(context, p);
                 return;
-            }else if(episodes == null || episodes.size()==0){
+            } else if (episodes == null || episodes.size() == 0) {
                 showCaptchaPopup(title.getUrl(), context, p);
                 return;
-            }else {
+            } else {
                 afterLoad();
                 p.addRecent(title);
                 p.updateRecentData(title);
@@ -406,10 +421,10 @@ public class EpisodeActivity extends AppCompatActivity {
         }
     }
 
-    public void openViewer(Manga manga, int code){
+    public void openViewer(Manga manga, int code) {
         manga.setMode(mode);
         Intent viewer = null;
-        switch (p.getViewerType()){
+        switch (p.getViewerType()) {
             case 0:
                 viewer = new Intent(context, ViewerActivity.class);
                 break;
@@ -422,7 +437,7 @@ public class EpisodeActivity extends AppCompatActivity {
         }
         viewer.putExtra("manga", new Gson().toJson(manga));
         viewer.putExtra("title", new Gson().toJson(title));
-        viewer.putExtra("recent",true);
+        viewer.putExtra("recent", true);
         startActivityForResult(viewer, code);
     }
 
@@ -430,10 +445,10 @@ public class EpisodeActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
-        if(loaded)
+        if (loaded) {
             inflater.inflate(R.menu.episode_menu, menu);
+        }
         return true;
     }
-
 
 }

@@ -22,7 +22,8 @@ import ml.melun.mangaview.adapter.MainTagAdapter;
 import static ml.melun.mangaview.MainApplication.p;
 
 public class AdvSearchActivity extends AppCompatActivity {
-    List<String> tags,names,releases;
+
+    List<String> tags, names, releases;
     MainTagAdapter ta, ra, na;
     Context context;
     RecyclerView tr, rr, nr;
@@ -34,7 +35,9 @@ public class AdvSearchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
+        if (p.getDarkTheme()) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adv_search);
         context = this;
@@ -44,7 +47,7 @@ public class AdvSearchActivity extends AppCompatActivity {
         search = this.findViewById(R.id.advSearch);
         input = this.findViewById(R.id.searchInput);
 
-        if(p.getDarkTheme()) {
+        if (p.getDarkTheme()) {
             searchMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
             sortMethod.setPopupBackgroundResource(R.color.colorDarkWindowBackground);
         }
@@ -68,7 +71,7 @@ public class AdvSearchActivity extends AppCompatActivity {
         names = Arrays.asList(getResources().getStringArray(R.array.tag_name));
         releases = Arrays.asList(getResources().getStringArray(R.array.tag_release));
         tags = Arrays.asList(getResources().getStringArray(R.array.tag_genre));
-        na = new MainTagAdapter(context, names,1);
+        na = new MainTagAdapter(context, names, 1);
         //na.setSingleSelect(true);
         ra = new MainTagAdapter(context, releases, 2);
         ta = new MainTagAdapter(context, tags, 0);
@@ -85,7 +88,7 @@ public class AdvSearchActivity extends AppCompatActivity {
 
         //search submit
         search.setOnClickListener(v -> {
-            String query = "search_type="+(searchMethod.getSelectedItemPosition()+1)+"&_0="+input.getText()+"&_1="+na.getSelectedIndex()+"&_2="+ra.getSelectedIndex()+"&_3="+ta.getSelectedValues()+"&_4="+sortMethod.getSelectedItemPosition();
+            String query = "search_type=" + (searchMethod.getSelectedItemPosition() + 1) + "&_0=" + input.getText() + "&_1=" + na.getSelectedIndex() + "&_2=" + ra.getSelectedIndex() + "&_3=" + ta.getSelectedValues() + "&_4=" + sortMethod.getSelectedItemPosition();
             Intent searchActivity = new Intent(context, TagSearchActivity.class);
             searchActivity.putExtra("query", query);
             searchActivity.putExtra("mode", 6);
@@ -95,7 +98,7 @@ public class AdvSearchActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;

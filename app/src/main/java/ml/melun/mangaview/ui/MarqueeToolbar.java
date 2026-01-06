@@ -1,5 +1,6 @@
 // https://gist.github.com/InsanityOnABun/95c0757f2f527cc50e39
 package ml.melun.mangaview.ui;
+
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -44,6 +45,7 @@ public class MarqueeToolbar extends Toolbar {
     }
 
     boolean reflected = false;
+
     private boolean reflectTitle() {
         try {
             Field field = Toolbar.class.getDeclaredField("mTitleTextView");
@@ -65,7 +67,8 @@ public class MarqueeToolbar extends Toolbar {
     }
 
     public void selectTitle() {
-        if (title != null)
+        if (title != null) {
             title.setSelected(true);
+        }
     }
 }

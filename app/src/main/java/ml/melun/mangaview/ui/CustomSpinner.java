@@ -27,12 +27,11 @@ public class CustomSpinner extends androidx.appcompat.widget.AppCompatSpinner {
 
     public void setSelection(Manga m) {
         CustomSpinnerAdapter adapter = (CustomSpinnerAdapter) getAdapter();
-        for(int i=0; i<adapter.getCount(); i++){
-            if(m.equals((Manga)adapter.getItem(i))) {
+        for (int i = 0; i < adapter.getCount(); i++) {
+            if (m.equals((Manga) adapter.getItem(i))) {
                 setSelection(i, true);
             }
         }
     }
-
 
 }

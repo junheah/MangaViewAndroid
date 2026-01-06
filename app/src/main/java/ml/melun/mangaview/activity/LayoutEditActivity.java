@@ -17,6 +17,7 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getScreenWidth;
 
 public class LayoutEditActivity extends AppCompatActivity {
+
     Button left;
     Button right;
     boolean leftRight;
@@ -25,7 +26,9 @@ public class LayoutEditActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(p.getDarkTheme()) setTheme(R.style.AppThemeDark);
+        if (p.getDarkTheme()) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_layout_edit);
 
@@ -59,7 +62,7 @@ public class LayoutEditActivity extends AppCompatActivity {
         });
 
         this.findViewById(R.id.layout_save).setOnClickListener(view -> {
-            p.setPageControlButtonOffset((float)seekBar.getProgress() / (float)seekBar.getMax());
+            p.setPageControlButtonOffset((float) seekBar.getProgress() / (float) seekBar.getMax());
             p.setLeftRight(leftRight);
             Toast.makeText(context, "설정 완료", Toast.LENGTH_SHORT).show();
             finish();
@@ -80,26 +83,26 @@ public class LayoutEditActivity extends AppCompatActivity {
         });
     }
 
-    private void refreshSeekbar(){
+    private void refreshSeekbar() {
         // set seekbar max to current screen width
         int max = getScreenWidth(getWindowManager().getDefaultDisplay());
         seekBar.setMax(max);
 
         // set button width to saved value
         float percentage = p.getPageControlButtonOffset();
-        if(percentage != -1){
-            params.width = (int)((float)max * percentage);
+        if (percentage != -1) {
+            params.width = (int) ((float) max * percentage);
             left.setLayoutParams(params);
         }
         // set seekbar progress to current button width
         seekBar.setProgress(params.width);
     }
 
-    private void setButtonText(){
-        if(leftRight){
+    private void setButtonText() {
+        if (leftRight) {
             left.setText(R.string.next_page);
             right.setText(R.string.prev_page);
-        }else{
+        } else {
             right.setText(R.string.next_page);
             left.setText(R.string.prev_page);
         }

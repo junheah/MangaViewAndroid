@@ -33,6 +33,7 @@ import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.Utils.showPopup;
 
 public class NoticesActivity extends AppCompatActivity {
+
     Boolean dark;
     Context context;
     List<Notice> notices;
@@ -40,9 +41,12 @@ public class NoticesActivity extends AppCompatActivity {
     ListView list;
     SwipyRefreshLayout swipe;
     ProgressBar progress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(dark = new Preference(this).getDarkTheme())setTheme(R.style.AppThemeDark);
+        if (dark = new Preference(this).getDarkTheme()) {
+            setTheme(R.style.AppThemeDark);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notices);
         ActionBar actionBar = getSupportActionBar();
@@ -52,13 +56,18 @@ public class NoticesActivity extends AppCompatActivity {
         swipe = this.findViewById(R.id.noticeSwipe);
         list = this.findViewById(R.id.noticeList);
         progress = this.findViewById(R.id.progress);
-        if(actionBar!=null) actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         //reset old notices sharedpref
-        sharedPref.edit().putString("notices","").commit();
-        notices = new Gson().fromJson(sharedPref.getString("notice", "[]"), new TypeToken<List<Notice>>(){}.getType());
+        sharedPref.edit().putString("notices", "").commit();
+        notices = new Gson().fromJson(sharedPref.getString("notice", "[]"), new TypeToken<List<Notice>>() {
+        }.getType());
         //check notices for null object
-        for(int i=notices.size()-1; i>=0;i--){
-            if(notices.get(i)==null) notices.remove(i);
+        for (int i = notices.size() - 1; i >= 0; i--) {
+            if (notices.get(i) == null) {
+                notices.remove(i);
+            }
         }
         progress.setVisibility(View.VISIBLE);
         swipe.setOnRefreshListener(direction -> {
@@ -69,12 +78,11 @@ public class NoticesActivity extends AppCompatActivity {
         gn.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    void showNotice(Notice notice){
-        showPopup(context,notice.getTitle(),notice.getDate()+"\n\n"+notice.getContent());
+    void showNotice(Notice notice) {
+        showPopup(context, notice.getTitle(), notice.getDate() + "\n\n" + notice.getContent());
     }
 
-
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
@@ -82,16 +90,17 @@ public class NoticesActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void populate(){
+    void populate() {
         //save notice titles to array
-        try{
+        try {
             String[] list = new String[notices.size()];
-            for(int i=0;i<notices.size();i++){
+            for (int i = 0; i < notices.size(); i++) {
                 String title = notices.get(i).getTitle();
-                if(title == null)
-                    list[i] = "";
-                else
+                if (title == null) {
+                    list[i] = ""; 
+                }else {
                     list[i] = notices.get(i).getId() + ". " + title;
+                }
             }
             final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, list);
             //populate listview and set click listener
@@ -100,8 +109,8 @@ public class NoticesActivity extends AppCompatActivity {
                 Notice target = notices.get(position);
                 showNotice(target);
             });
-        }catch (Exception e){
-            showPopup(context,"오류",e.getMessage());
+        } catch (Exception e) {
+            showPopup(context, "오류", e.getMessage());
             e.printStackTrace();
         }
         //create arrayAdapter
@@ -109,18 +118,22 @@ public class NoticesActivity extends AppCompatActivity {
     }
 
     private class getNotices extends AsyncTask<Void, Void, Integer> {
+
         List<Notice> loaded;
+
         protected void onPreExecute() {
             super.onPreExecute();
             sharedPref.edit().putLong("lastNoticeTime", System.currentTimeMillis()).commit();
         }
+
         protected Integer doInBackground(Void... params) {
             //mget all notices
             try {
                 Response response = httpClient.get("https://raw.githubusercontent.com/junheah/MangaViewAndroid/master/etc/notices.json", new HashMap<>());
                 String rawdata = response.body().string();
                 response.close();
-                loaded = new Gson().fromJson(rawdata, new TypeToken<List<Notice>>(){}.getType());
+                loaded = new Gson().fromJson(rawdata, new TypeToken<List<Notice>>() {
+                }.getType());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -131,20 +144,24 @@ public class NoticesActivity extends AppCompatActivity {
         protected void onPostExecute(Integer integer) {
             super.onPostExecute(integer);
             try {
-                for(Notice n: loaded){
-                    if(n!=null){
+                for (Notice n : loaded) {
+                    if (n != null) {
                         int index = notices.indexOf(n);
-                        if(index>-1) notices.set(index, n);
-                        else notices.add(n);
+                        if (index > -1) {
+                            notices.set(index, n); 
+                        }else {
+                            notices.add(n);
+                        }
                     }
                 }
                 Collections.sort(notices, (n1, n2) -> {
-                    if(n1.getId() < n2.getId())
-                        return 1;
-                    else
+                    if (n1.getId() < n2.getId()) {
+                        return 1; 
+                    }else {
                         return -1;
+                    }
                 });
-            }catch (Exception e){
+            } catch (Exception e) {
                 //probably offline
             }
             sharedPref.edit().putString("notice", new Gson().toJson(notices)).commit();
