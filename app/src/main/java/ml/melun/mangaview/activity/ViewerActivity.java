@@ -690,8 +690,10 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         int loadedPosition = stripAdapter.findLastPagePosition(target);
         if(loadedPosition != RecyclerView.NO_POSITION) {
-            if(jumpToEpisode)
+            if(jumpToEpisode) {
                 manager.scrollToPosition(loadedPosition);
+                clearProgrammaticPreviousJumpBookmark(target);
+            }
             return;
         }
         if(previousEpisodeBoundaryLoading)
@@ -712,8 +714,10 @@ public class ViewerActivity extends AppCompatActivity {
                     return;
                 strip.post(() -> {
                     int position = stripAdapter.findLastPagePosition(m);
-                    if(shouldJump && position != RecyclerView.NO_POSITION)
+                    if(shouldJump && position != RecyclerView.NO_POSITION) {
                         manager.scrollToPosition(position);
+                        clearProgrammaticPreviousJumpBookmark(m);
+                    }
                 });
             }
 
@@ -721,6 +725,15 @@ public class ViewerActivity extends AppCompatActivity {
             public void nextLoaded(Manga m) {
             }
         }, page.manga);
+    }
+
+    private void clearProgrammaticPreviousJumpBookmark(Manga m) {
+        if(m == null || strip == null)
+            return;
+        strip.postDelayed(() -> {
+            if(!isFinishing())
+                p.removeViewerBookmark(m);
+        }, 250);
     }
 
     private void attachNextEpisode(boolean jumpToEpisode) {
