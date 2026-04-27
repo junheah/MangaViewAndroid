@@ -56,6 +56,10 @@ public class MainPageWebtoon {
         fetch(client);
     }
 
+    public MainPageWebtoon(int baseMode){
+        this.baseMode = baseMode;
+    }
+
     public String getUrl(CustomHttpClient client){
         this.baseUrl = client.getUrl(baseMode);
         return this.baseUrl;
@@ -83,6 +87,10 @@ public class MainPageWebtoon {
     }
 
     private String[][] getSections(){
+        return getSections(baseMode);
+    }
+
+    public static String[][] getSections(int baseMode){
         if(baseMode == base_comic)
             return COMIC_SECTIONS;
         return SECTIONS;
@@ -353,7 +361,7 @@ public class MainPageWebtoon {
 
     public static List<Ranking<?>> getBlankDataSet(int baseMode){
         List<Ranking<?>> dataset = new ArrayList<>();
-        String[][] sections = baseMode == base_comic ? COMIC_SECTIONS : SECTIONS;
+        String[][] sections = getSections(baseMode);
         for(String[] section : sections)
             dataset.add(new Ranking<>(section[0]));
         return dataset;

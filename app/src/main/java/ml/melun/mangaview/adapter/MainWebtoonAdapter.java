@@ -23,7 +23,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.MainPageWebtoon;
@@ -50,6 +55,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     List<Object> rows;
     MainAdapter.onItemClick listener;
     int baseMode;
+    Fetcher fetcher;
 
     public MainWebtoonAdapter(Context context){
         this(context, base_webtoon);
@@ -67,7 +73,10 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void fetch(){
-        new Fetcher().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if(fetcher != null)
+            fetcher.cancel(true);
+        fetcher = new Fetcher();
+        fetcher.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void setLoading(){
@@ -120,10 +129,12 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private List<Object> buildRows(List<Ranking<?>> sections, boolean includeEmpty) {
         List<Object> result = new ArrayList<>();
+        List<Object> contentRows = new ArrayList<>();
         String lastGroup = "";
-        result.add(new CategoryPanel());
-        if(sections == null)
+        if(sections == null) {
+            result.add(new CategoryPanel());
             return result;
+        }
         for(Ranking<?> section : sections) {
             if(section == null)
                 continue;
@@ -131,10 +142,17 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 continue;
             SectionName name = parseSectionName(section.getName());
             if(!name.group.equals(lastGroup)) {
-                result.add(name.group);
+                contentRows.add(name.group);
                 lastGroup = name.group;
             }
-            result.add(section);
+            contentRows.add(section);
+        }
+        if(!includeEmpty && contentRows.size() > 0) {
+            result.addAll(contentRows);
+            result.add(new CategoryPanel());
+        } else {
+            result.add(new CategoryPanel());
+            result.addAll(contentRows);
         }
         return result;
     }
@@ -160,6 +178,16 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     static class CategoryPanel {
+    }
+
+    private static class SectionResult {
+        int index;
+        Ranking<?> ranking;
+
+        SectionResult(int index, Ranking<?> ranking) {
+            this.index = index;
+            this.ranking = ranking;
+        }
     }
 
     class CategoryHolder extends RecyclerView.ViewHolder {
@@ -417,35 +445,88 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    private class Fetcher extends AsyncTask<Void, Integer, MainPageWebtoon> {
+    private class Fetcher extends AsyncTask<Void, SectionResult, Boolean> {
         @Override
-        protected MainPageWebtoon doInBackground(Void... params) {
-            return new MainPageWebtoon(httpClient, baseMode);
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dataSet = MainPageWebtoon.getBlankDataSet(baseMode);
+            rows = buildRows(dataSet, false);
+            notifyDataSetChanged();
         }
 
         @Override
-        protected void onPostExecute(MainPageWebtoon main) {
-            super.onPostExecute(main);
-            dataSet = main.getDataSet();
-            if(dataSet == null)
-                dataSet = MainPageWebtoon.getBlankDataSet(baseMode);
+        protected Boolean doInBackground(Void... params) {
+            String[][] sections = MainPageWebtoon.getSections(baseMode);
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(4, sections.length));
+            ExecutorCompletionService<SectionResult> completion = new ExecutorCompletionService<>(executor);
+            MainPageWebtoon parser = new MainPageWebtoon(baseMode);
+            int submitted = 0;
+            int loaded = 0;
 
-            boolean hasAnyResult = false;
-            for(Ranking<?> r : dataSet)
-                if(r != null && r.size() > 0) {
-                    hasAnyResult = true;
-                    break;
+            try {
+                for(int i = 0; i < sections.length; i++) {
+                    final int index = i;
+                    final String[] section = sections[i];
+                    completion.submit(() -> new SectionResult(index,
+                            parser.parseWolfTitle(httpClient, section[0], section[1], baseMode)));
+                    submitted++;
                 }
 
+                for(int i = 0; i < submitted && !isCancelled(); i++) {
+                    Future<SectionResult> future = completion.take();
+                    SectionResult result = future.get();
+                    if(result != null && result.ranking != null) {
+                        if(result.ranking.size() > 0)
+                            loaded++;
+                        publishProgress(result);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                executor.shutdownNow();
+            }
+            return loaded > 0;
+        }
+
+        @Override
+        protected void onProgressUpdate(SectionResult... values) {
+            super.onProgressUpdate(values);
+            if(values == null || values.length == 0 || values[0] == null || isCancelled())
+                return;
+            SectionResult result = values[0];
+            if(result.index < 0)
+                return;
+            if(dataSet == null)
+                dataSet = MainPageWebtoon.getBlankDataSet(baseMode);
+            if(result.index < dataSet.size())
+                dataSet.set(result.index, result.ranking);
+            else
+                dataSet.add(result.ranking);
+            if(result.ranking == null || result.ranking.size() == 0)
+                return;
+            preloadThumbnails(Collections.singletonList(result.ranking));
+            rows = buildRows(dataSet, false);
+            notifyDataSetChanged();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean hasAnyResult) {
+            super.onPostExecute(hasAnyResult);
+            fetcher = null;
             if(!hasAnyResult) {
                 if(listener != null)
                     listener.captchaCallback();
                 return;
             }
-
-            preloadThumbnails(dataSet);
             rows = buildRows(dataSet, false);
             notifyDataSetChanged();
+        }
+
+        @Override
+        protected void onCancelled(Boolean result) {
+            super.onCancelled(result);
+            fetcher = null;
         }
     }
 }
