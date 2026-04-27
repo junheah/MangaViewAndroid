@@ -131,7 +131,9 @@ public class Search {
     private int fetchWebtoon(CustomHttpClient client) {
         try {
             ArrayList<Title> webtoonResults = new ArrayList<>();
-            if(mode == 2) {
+            if(mode == 8) {
+                appendWebtoonResults(client, webtoonResults, query, 0);
+            } else if(mode == 2) {
                 appendWebtoonResults(client, webtoonResults, "/ing?type1=genre&type2=" + percentEncode(query, Charset.forName("EUC-KR")) + "&o=n", 80);
                 appendWebtoonResults(client, webtoonResults, "/end?type1=genre&type2=" + percentEncode(query, Charset.forName("EUC-KR")) + "&o=n", 80);
             } else if(mode == 4) {

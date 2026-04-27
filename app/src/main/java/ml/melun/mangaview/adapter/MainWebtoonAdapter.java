@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +40,6 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private static final int GROUP = 23;
     private static final int SECTION = 24;
     private static final int CATEGORY = 25;
-    private static final String[] STATUS_FILTERS = {"연재", "완결"};
-    private static final String[] GENRE_FILTERS = {"액션", "로맨스", "판타지", "무협", "드라마", "BL", "성인"};
 
     Context context;
     boolean dark;
@@ -175,27 +174,14 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
 
         void bind() {
+            statusFilters.setVisibility(View.GONE);
+            genreFilters.setVisibility(View.GONE);
             filterSections.removeAllViews();
-            if(baseMode == base_comic) {
-                statusFilters.setVisibility(View.GONE);
-                genreFilters.setVisibility(View.GONE);
-                bindComicFilters();
-                return;
-            }
-            statusFilters.setVisibility(View.VISIBLE);
-            genreFilters.setVisibility(View.VISIBLE);
-            bindFilterRow(statusFilters, STATUS_FILTERS, label -> {
-                if(listener != null)
-                    listener.clickedRelease(label);
-            });
-            bindFilterRow(genreFilters, GENRE_FILTERS, label -> {
-                if(listener != null)
-                    listener.clickedGenre(label);
-            });
+            bindFilters(baseMode == base_comic ? MainPageWebtoon.COMIC_FILTER_GROUPS : MainPageWebtoon.WEBTOON_FILTER_GROUPS);
         }
 
-        void bindComicFilters() {
-            for(String[] group : MainPageWebtoon.COMIC_FILTER_GROUPS) {
+        void bindFilters(String[][] groups) {
+            for(String[] group : groups) {
                 if(group.length == 0)
                     continue;
                 SectionName groupName = parseSectionName(group[0]);
@@ -228,12 +214,6 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     used += width;
                 }
             }
-        }
-
-        void bindFilterRow(ViewGroup container, String[] labels, FilterClick click) {
-            container.removeAllViews();
-            for(String label : labels)
-                container.addView(createFilterChip(label, click));
         }
 
         TextView createFilterChip(String label, FilterClick click) {
@@ -300,6 +280,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             manager.setOrientation(RecyclerView.HORIZONTAL);
             list.setLayoutManager(manager);
             list.setNestedScrollingEnabled(false);
+            list.setItemViewCacheSize(12);
         }
 
         void bind(Ranking<?> section) {
@@ -342,10 +323,18 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             Glide.with(holder.thumb).clear(holder.thumb);
             String thumb = title.getThumb();
-            if(save || thumb == null || thumb.length() == 0)
+            if(save || thumb == null || thumb.length() == 0) {
                 holder.thumb.setImageResource(R.mipmap.ic_launcher);
-            else
-                Glide.with(holder.thumb).load(thumb).placeholder(R.mipmap.ic_launcher).into(holder.thumb);
+            } else {
+                Glide.with(holder.thumb)
+                        .load(thumb)
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                        .override(dp(180), dp(220))
+                        .thumbnail(0.25f)
+                        .dontAnimate()
+                        .placeholder(R.mipmap.ic_launcher)
+                        .into(holder.thumb);
+            }
 
             holder.card.setOnClickListener(v -> {
                 if(listener != null)
@@ -376,6 +365,30 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
+    private void preloadThumbnails(List<Ranking<?>> sections) {
+        if(save || sections == null)
+            return;
+        int count = 0;
+        for(Ranking<?> section : sections) {
+            if(section == null)
+                continue;
+            for(Object item : section) {
+                if(!(item instanceof Title))
+                    continue;
+                String thumb = ((Title) item).getThumb();
+                if(thumb == null || thumb.length() == 0)
+                    continue;
+                Glide.with(context)
+                        .load(thumb)
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                        .override(dp(180), dp(220))
+                        .preload();
+                if(++count >= 24)
+                    return;
+            }
+        }
+    }
+
     private class Fetcher extends AsyncTask<Void, Integer, MainPageWebtoon> {
         @Override
         protected MainPageWebtoon doInBackground(Void... params) {
@@ -402,6 +415,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 return;
             }
 
+            preloadThumbnails(dataSet);
             rows = buildRows(dataSet, false);
             notifyDataSetChanged();
         }
