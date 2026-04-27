@@ -88,6 +88,7 @@ public class ViewerActivity extends AppCompatActivity {
     CustomSpinnerAdapter spinnerAdapter;
     InfiniteScrollCallback infiniteScrollCallback;
     loadImages loader;
+    prefetchImages nextPrefetcher;
 
 
     @Override
@@ -157,14 +158,22 @@ public class ViewerActivity extends AppCompatActivity {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
                 if(i>0) {
+                    Manga target = eps.get(i - 1);
+                    if(hasLoadedImages(target)) {
+                        stripAdapter.appendManga(target);
+                        callback.nextLoaded(target);
+                        prefetchNextEpisode(target);
+                        return target;
+                    }
                     if(loader != null) loader.cancel(true);
-                    loader = new loadImages(eps.get(i - 1), m -> {
+                    loader = new loadImages(target, m -> {
                         if (m.getImgs(context).size() > 0)
                             stripAdapter.appendManga(m);
                         callback.nextLoaded(m);
+                        prefetchNextEpisode(m);
                     },false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    return eps.get(i - 1);
+                    return target;
                 }else{
                     callback.nextLoaded(null);
                     return null;
@@ -293,10 +302,14 @@ public class ViewerActivity extends AppCompatActivity {
         }
         if(stripAdapter!=null) stripAdapter.removeAll();
         if(m.isOnline()) {
-            loadManga(m, m1 -> {
-                manga = m1;
-                setManga(m1);
-            });
+            if(hasLoadedImages(m)) {
+                setManga(m);
+            } else {
+                loadManga(m, m1 -> {
+                    manga = m1;
+                    setManga(m1);
+                });
+            }
         }else{
             //offline
             eps = title.getEps();
@@ -323,6 +336,7 @@ public class ViewerActivity extends AppCompatActivity {
             bookmarkRefresh(m);
             refreshToolbar(m);
             updateIntent(m);
+            prefetchNextEpisode(m);
 
         }catch (Exception e){
             Utils.showCaptchaPopup(m.getUrl(), context, e, p);
@@ -514,6 +528,37 @@ public class ViewerActivity extends AppCompatActivity {
         }
     }
 
+    private class prefetchImages extends AsyncTask<Void, Void, Integer> {
+        Manga target;
+
+        prefetchImages(Manga target) {
+            this.target = target;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            if(target == null || !target.isOnline() || hasLoadedImages(target))
+                return LOAD_OK;
+            return target.fetch(httpClient);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(nextPrefetcher == this)
+                nextPrefetcher = null;
+            if(isCancelled() || isFinishing() || result == LOAD_CAPTCHA || !hasLoadedImages(target))
+                return;
+            preloadFirstPages(target);
+        }
+
+        @Override
+        protected void onCancelled(Integer result) {
+            super.onCancelled(result);
+            if(nextPrefetcher == this)
+                nextPrefetcher = null;
+        }
+    }
+
     public void bookmarkRefresh(Manga m){
         if(m.useBookmark()) {
             PageItem page = new PageItem(p.getViewerBookmark(m), "", m);
@@ -579,6 +624,40 @@ public class ViewerActivity extends AppCompatActivity {
             pageBtn.setText(page.index+1+"/"+page.manga.getImgs(context).size());
     }
 
+    private void prefetchNextEpisode(Manga current) {
+        if(current == null || !current.isOnline() || eps == null)
+            return;
+        int index = eps.indexOf(current);
+        if(index <= 0)
+            return;
+        Manga target = eps.get(index - 1);
+        if(hasLoadedImages(target))
+            return;
+        if(nextPrefetcher != null)
+            nextPrefetcher.cancel(true);
+        nextPrefetcher = new prefetchImages(target);
+        nextPrefetcher.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    private boolean hasLoadedImages(Manga target) {
+        try {
+            return target != null && target.getImgs(context) != null && target.getImgs(context).size() > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private void preloadFirstPages(Manga target) {
+        if(target == null || !target.isOnline())
+            return;
+        List<String> images = target.getImgs(context);
+        int limit = Math.min(4, images.size());
+        for(int i = 0; i < limit; i++)
+            Glide.with(context)
+                    .load(Utils.getGlideUrl(images.get(i), target.getBaseMode()))
+                    .preload();
+    }
+
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
         return super.onMenuOpened(featureId, menu);
@@ -606,6 +685,8 @@ public class ViewerActivity extends AppCompatActivity {
     protected void onDestroy() {
         if(loader != null)
             loader.cancel(true);
+        if(nextPrefetcher != null)
+            nextPrefetcher.cancel(true);
         super.onDestroy();
     }
 

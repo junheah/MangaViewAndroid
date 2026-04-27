@@ -260,6 +260,20 @@ public class MainMain extends Fragment{
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(mainComicAdapter != null)
+            mainComicAdapter.cancelFetch();
+        if(mainWebtoonAdapter != null)
+            mainWebtoonAdapter.cancelFetch();
+        mainRecycler = null;
+        mainComicAdapter = null;
+        mainWebtoonAdapter = null;
+        comicFetched = false;
+        webtoonFetched = false;
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_CAPTCHA) {

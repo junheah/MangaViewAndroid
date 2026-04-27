@@ -79,6 +79,13 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         fetcher.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    public void cancelFetch() {
+        if(fetcher != null) {
+            fetcher.cancel(true);
+            fetcher = null;
+        }
+    }
+
     public void setLoading(){
         dataSet = MainPageWebtoon.getBlankDataSet(baseMode);
         rows = buildRows(dataSet, true);
