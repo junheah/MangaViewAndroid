@@ -50,11 +50,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     int count = 0;
     final static int MaxStackSize = 2;
     private static final int PRELOAD_AHEAD_COUNT = 3;
-    private static final int PREVIOUS_EPISODE_ATTACH_THRESHOLD = 2;
     private static final int NEXT_EPISODE_ATTACH_THRESHOLD = 3;
     ViewerActivity.InfiniteScrollCallback callback;
     Title title;
-    private final Set<Integer> previousAttachRequested = new HashSet<>();
     private final Set<Integer> nextAttachRequested = new HashSet<>();
 
     List<Object> items;
@@ -468,24 +466,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else if(type == INFO){
             needUpdate = true;
         }
-    }
-
-    private void requestPreviousEpisodeAfterStart(PageItem item) {
-        if(callback == null || item == null || item.side != PageItem.FIRST || !item.manga.isOnline())
-            return;
-        if(item.index > PREVIOUS_EPISODE_ATTACH_THRESHOLD)
-            return;
-        if(item.manga.prevEp() == null || !previousAttachRequested.add(item.manga.getId()))
-            return;
-        callback.prevEp(new ViewerActivity.InfiniteLoadCallback() {
-            @Override
-            public void prevLoaded(Manga m) {
-            }
-
-            @Override
-            public void nextLoaded(Manga m) {
-            }
-        }, item.manga);
     }
 
     private void requestNextEpisodeBeforeEnd(PageItem item) {

@@ -96,9 +96,10 @@ public class ViewerActivity extends AppCompatActivity {
     boolean previousEpisodeBoundaryJumpPending = false;
     boolean nextEpisodeBoundaryJumpPending = false;
     private static final int NEXT_EPISODE_PRELOAD_LIMIT = 12;
-    private static final int PREVIOUS_EPISODE_PULL_THRESHOLD_DP = 72;
+    private static final int PREVIOUS_EPISODE_PULL_THRESHOLD_DP = 36;
     float topPullStartY = 0;
     boolean topPullTriggered = false;
+    boolean topPullEligible = false;
 
 
     @Override
@@ -258,9 +259,17 @@ public class ViewerActivity extends AppCompatActivity {
                     loadEpisodeAtBoundaryIfNeeded();
                 }
             });
-            strip.setOnTouchListener((view, event) -> {
-                handlePreviousEpisodePull(event);
-                return false;
+            strip.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
+                @Override
+                public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
+                    handlePreviousEpisodePull(event);
+                    return false;
+                }
+
+                @Override
+                public void onTouchEvent(RecyclerView rv, MotionEvent event) {
+                    handlePreviousEpisodePull(event);
+                }
             });
 
         }catch(Exception e){
@@ -633,14 +642,18 @@ public class ViewerActivity extends AppCompatActivity {
             case MotionEvent.ACTION_DOWN:
                 topPullStartY = event.getY();
                 topPullTriggered = false;
+                topPullEligible = isAtViewerTop();
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(topPullTriggered || previousEpisodeBoundaryLoading)
                     return;
-                if(!isAtViewerTop()) {
+                if(!topPullEligible && isAtViewerTop()) {
+                    topPullEligible = true;
                     topPullStartY = event.getY();
                     return;
                 }
+                if(!topPullEligible)
+                    return;
                 float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
                 if(event.getY() - topPullStartY >= threshold) {
                     topPullTriggered = true;
@@ -650,6 +663,7 @@ public class ViewerActivity extends AppCompatActivity {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 topPullTriggered = false;
+                topPullEligible = false;
                 break;
         }
     }
