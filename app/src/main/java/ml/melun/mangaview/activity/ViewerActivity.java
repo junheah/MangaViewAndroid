@@ -142,7 +142,7 @@ public class ViewerActivity extends AppCompatActivity {
                     if(loader != null) loader.cancel(true);
                     loader = new loadImages(eps.get(i + 1), m -> {
                         if (m.getImgs(context).size() > 0)
-                            stripAdapter.insertManga(m);
+                            insertMangaWhenIdle(m);
                         callback.prevLoaded(m);
                     },false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -160,7 +160,7 @@ public class ViewerActivity extends AppCompatActivity {
                 if(i>0) {
                     Manga target = eps.get(i - 1);
                     if(hasLoadedImages(target)) {
-                        stripAdapter.appendManga(target);
+                        appendMangaWhenIdle(target);
                         callback.nextLoaded(target);
                         prefetchNextEpisode(target);
                         return target;
@@ -168,7 +168,7 @@ public class ViewerActivity extends AppCompatActivity {
                     if(loader != null) loader.cancel(true);
                     loader = new loadImages(target, m -> {
                         if (m.getImgs(context).size() > 0)
-                            stripAdapter.appendManga(m);
+                            appendMangaWhenIdle(m);
                         callback.nextLoaded(m);
                         prefetchNextEpisode(m);
                     },false);
@@ -656,6 +656,24 @@ public class ViewerActivity extends AppCompatActivity {
             Glide.with(context)
                     .load(Utils.getGlideUrl(images.get(i), target.getBaseMode()))
                     .preload();
+    }
+
+    private void appendMangaWhenIdle(Manga target) {
+        if(target == null || strip == null)
+            return;
+        strip.post(() -> {
+            if(stripAdapter != null && !isFinishing())
+                stripAdapter.appendManga(target);
+        });
+    }
+
+    private void insertMangaWhenIdle(Manga target) {
+        if(target == null || strip == null)
+            return;
+        strip.post(() -> {
+            if(stripAdapter != null && !isFinishing())
+                stripAdapter.insertManga(target);
+        });
     }
 
     @Override
