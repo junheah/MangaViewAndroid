@@ -52,7 +52,13 @@ public class CaptchaActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String path = intent.getStringExtra("url");
-        String url = purl + (path == null ? "" : path);
+        String url;
+        if(path == null)
+            url = purl;
+        else if(path.startsWith("http://") || path.startsWith("https://"))
+            url = path;
+        else
+            url = purl + path;
 
         TextView infoText = this.findViewById(R.id.infoText);
         try {
@@ -72,6 +78,9 @@ public class CaptchaActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         CookieManager cookiem = CookieManager.getInstance();
+        cookiem.setAcceptCookie(true);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+            cookiem.setAcceptThirdPartyCookies(webView, true);
         cookiem.removeAllCookies(null);
 
         WebViewClient client = new WebViewClient() {
@@ -79,6 +88,8 @@ public class CaptchaActivity extends AppCompatActivity {
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
                 //super.onReceivedError(view, request, error);
+                if(request != null && !request.isForMainFrame())
+                    return;
                 showPopup(context, "오류", "연결에 실패했습니다. URL을 확인해 주세요");
             }
 
@@ -91,6 +102,8 @@ public class CaptchaActivity extends AppCompatActivity {
 
             @Override
             public void onLoadResource(WebView view, String url) {
+                if(readCookiesAndFinish(cookiem, purl))
+                    return;
 
                 if(url.contains("bootstrap") || url.contains("jquery")){
                     // read cookies and finish
@@ -113,6 +126,13 @@ public class CaptchaActivity extends AppCompatActivity {
                 }
                 super.onLoadResource(view, url);
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                if(readCookiesAndFinish(cookiem, purl))
+                    return;
+                super.onPageFinished(view, url);
+            }
         };
 
         webView.setWebViewClient(client);
@@ -127,11 +147,38 @@ public class CaptchaActivity extends AppCompatActivity {
 
         webView.loadUrl(url);
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            //Do something after 100ms
-            infoText.setVisibility(View.VISIBLE);
-        }, 3000);
+        infoText.setVisibility(View.GONE);
 
+    }
+
+    private boolean readCookiesAndFinish(CookieManager cookiem, String purl){
+        try {
+            String cookieStr = cookiem.getCookie(purl);
+            if(cookieStr == null || cookieStr.length() == 0)
+                return false;
+
+            boolean hasClearance = false;
+            for (String s : cookieStr.split("; ")) {
+                int eq = s.indexOf("=");
+                if(eq <= 0)
+                    continue;
+                String k = s.substring(0, eq);
+                String v = s.substring(eq + 1);
+                httpClient.setCookie(k, v);
+                if("cf_clearance".equals(k))
+                    hasClearance = true;
+            }
+
+            if(hasClearance) {
+                Intent resultIntent = new Intent();
+                setResult(RESULT_CAPTCHA, resultIntent);
+                finish();
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override

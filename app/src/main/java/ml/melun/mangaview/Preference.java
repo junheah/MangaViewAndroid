@@ -20,6 +20,8 @@ import ml.melun.mangaview.mangaview.Title;
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.Title.isInteger;
+import static ml.melun.mangaview.mangaview.CustomHttpClient.DEFAULT_COMIC_URL;
+import static ml.melun.mangaview.mangaview.CustomHttpClient.WEBTOON_URL;
 
 public class Preference {
     SharedPreferences sharedPref;
@@ -37,6 +39,7 @@ public class Preference {
     boolean dataSave;
     int startTab;
     String url;
+    String webtoonUrl;
     boolean stretch;
     boolean leftRight;
     Login login;
@@ -84,8 +87,9 @@ public class Preference {
             pageRtl = sharedPref.getBoolean("pageRtl",false);
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
-            defUrl = sharedPref.getString("defUrl", "설정되지 않음");
-            url = sharedPref.getString("url", "");
+            defUrl = sharedPref.getString("defUrl", DEFAULT_COMIC_URL);
+            url = sharedPref.getString("url", DEFAULT_COMIC_URL);
+            webtoonUrl = sharedPref.getString("webtoonUrl", WEBTOON_URL);
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
@@ -164,6 +168,16 @@ public class Preference {
     public void setUrl(String url) {
         this.url = url;
         prefsEditor.putString("url", url);
+        prefsEditor.commit();
+    }
+
+    public String getWebtoonUrl() {
+        return webtoonUrl;
+    }
+
+    public void setWebtoonUrl(String webtoonUrl) {
+        this.webtoonUrl = webtoonUrl;
+        prefsEditor.putString("webtoonUrl", webtoonUrl);
         prefsEditor.commit();
     }
 

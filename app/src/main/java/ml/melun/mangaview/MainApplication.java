@@ -43,7 +43,7 @@ public class MainApplication extends MultiDexApplication {
     public void onCreate() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         p = new Preference(this);
-        httpClient = new CustomHttpClient();
+        httpClient = new CustomHttpClient(this);
         super.onCreate();
     }
 }

@@ -63,6 +63,7 @@ import ml.melun.mangaview.interfaces.IntegerCallback;
 import ml.melun.mangaview.interfaces.StringCallback;
 import ml.melun.mangaview.mangaview.CustomHttpClient;
 import ml.melun.mangaview.mangaview.Login;
+import ml.melun.mangaview.mangaview.MTitle;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 import okhttp3.FormBody;
@@ -317,6 +318,8 @@ public class Utils {
 
     static void startCaptchaActivity(Context context, int code, Fragment fragment, String url){
         Intent captchaIntent = new Intent(context, CaptchaActivity.class);
+        if(url != null && url.startsWith("/"))
+            url = httpClient.getUrl(url) + url;
         System.out.println("ppppsend " + url);
         captchaIntent.putExtra("url", url);
         if(fragment == null)
@@ -383,7 +386,7 @@ public class Utils {
             Response r;
             int tries = 3;
             while(tries > 0) {
-                r = httpClient.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),false);
+                r = httpClient.post(p.getUrl() + "/plugin/kcaptcha/kcaptcha_session.php", new FormBody.Builder().build(), new HashMap<>(),true);
                 if(r.code() == 200) {
                     List<String> setcookie = r.headers("Set-Cookie");
                     for (String c : setcookie) {
@@ -433,8 +436,11 @@ public class Utils {
     }
 
     public static GlideUrl getGlideUrl(String image){
+        String referer = image != null && image.contains(CustomHttpClient.WEBTOON_URL)
+                ? httpClient.getUrl(MTitle.base_webtoon)
+                : httpClient.getUrl(MTitle.base_comic);
         GlideUrl url = new GlideUrl(image, new LazyHeaders.Builder()
-                .addHeader("Referer", p.getUrl())
+                .addHeader("Referer", referer)
                 .build());
         return url;
     }
