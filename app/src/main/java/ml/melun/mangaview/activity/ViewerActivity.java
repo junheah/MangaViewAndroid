@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -95,6 +96,9 @@ public class ViewerActivity extends AppCompatActivity {
     boolean previousEpisodeBoundaryJumpPending = false;
     boolean nextEpisodeBoundaryJumpPending = false;
     private static final int NEXT_EPISODE_PRELOAD_LIMIT = 12;
+    private static final int PREVIOUS_EPISODE_PULL_THRESHOLD_DP = 72;
+    float topPullStartY = 0;
+    boolean topPullTriggered = false;
 
 
     @Override
@@ -253,6 +257,10 @@ public class ViewerActivity extends AppCompatActivity {
                     super.onScrolled(recyclerView, dx, dy);
                     loadEpisodeAtBoundaryIfNeeded();
                 }
+            });
+            strip.setOnTouchListener((view, event) -> {
+                handlePreviousEpisodePull(event);
+                return false;
             });
 
         }catch(Exception e){
@@ -612,12 +620,44 @@ public class ViewerActivity extends AppCompatActivity {
         int first = manager.findFirstVisibleItemPosition();
         int last = manager.findLastVisibleItemPosition();
         int total = manager.getItemCount();
-        if(first <= 1 || !strip.canScrollVertically(-1))
-            attachPreviousEpisode(true);
         if(last >= total - 12)
             attachNextEpisode(false);
         if(last >= total - 2 || !strip.canScrollVertically(1))
             attachNextEpisode(true);
+    }
+
+    private void handlePreviousEpisodePull(MotionEvent event) {
+        if(strip == null || manager == null || stripAdapter == null)
+            return;
+        switch(event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                topPullStartY = event.getY();
+                topPullTriggered = false;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if(topPullTriggered || previousEpisodeBoundaryLoading)
+                    return;
+                if(!isAtViewerTop()) {
+                    topPullStartY = event.getY();
+                    return;
+                }
+                float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
+                if(event.getY() - topPullStartY >= threshold) {
+                    topPullTriggered = true;
+                    attachPreviousEpisode(true);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                topPullTriggered = false;
+                break;
+        }
+    }
+
+    private boolean isAtViewerTop() {
+        return manager != null
+                && strip != null
+                && manager.findFirstVisibleItemPosition() <= 1;
     }
 
     private void attachPreviousEpisode(boolean jumpToEpisode) {
