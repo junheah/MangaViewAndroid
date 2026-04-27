@@ -224,6 +224,7 @@ public class CustomHttpClient {
                 || path.startsWith("/end")
                 || path.startsWith("/list?toon=")
                 || path.startsWith("/view?toon=")
+                || path.startsWith("/search.html")
                 || path.contains("bo_table=webtoon");
     }
 

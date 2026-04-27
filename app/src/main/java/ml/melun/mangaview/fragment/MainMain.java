@@ -153,6 +153,7 @@ public class MainMain extends Fragment{
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
                 i.putExtra("query",t);
                 i.putExtra("mode",2);
+                i.putExtra("baseMode", p.getBaseMode());
                 startActivity(i);
             }
 
@@ -161,6 +162,7 @@ public class MainMain extends Fragment{
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
                 i.putExtra("query",t);
                 i.putExtra("mode",3);
+                i.putExtra("baseMode", p.getBaseMode());
                 startActivity(i);
             }
 
@@ -169,6 +171,7 @@ public class MainMain extends Fragment{
                 Intent i = new Intent(getContext(), TagSearchActivity.class);
                 i.putExtra("query",t);
                 i.putExtra("mode",4);
+                i.putExtra("baseMode", p.getBaseMode());
                 startActivity(i);
             }
 

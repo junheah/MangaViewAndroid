@@ -33,17 +33,9 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     MainAdapter.onItemClick listener;
 
     final static int HEADER = 23;
+    final static int ITEM_BASE = 24;
 
-    final static int NN = 24;
-    final static int AN = 25;
-    final static int GN = 26;
-    final static int CN = 27;
-    final static int NB = 28;
-    final static int AB = 29;
-    final static int GB = 30;
-    final static int CB = 31;
-
-    int[] headers = {0,1,2,3,4,5,6,7};
+    int[] headers = new int[0];
 
     public MainWebtoonAdapter(Context context){
         this.context = context;
@@ -89,15 +81,12 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return;
         if(type == HEADER){
             HeaderHolder h = (HeaderHolder) holder;
-            for(int i=0; i<headers.length; i++){
-                if(headers[i] == position) {
-                    h.title.setText(dataSet.get(i).getName());
-                    break;
-                }
-            }
-        }else if(type<=CB){
+            int sectionIndex = sectionIndexForHeader(position);
+            if(sectionIndex > -1)
+                h.title.setText(dataSet.get(sectionIndex).getName());
+        }else{
             ItemHolder h = (ItemHolder) holder;
-            int setIndex = type-24;
+            int setIndex = type - ITEM_BASE;
             int realPosition = position-(headers[setIndex])-1;
             Object d = dataSet.get(setIndex).get(realPosition);
             h.rank.setText(String.valueOf(realPosition+1));
@@ -122,6 +111,14 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void refreshHeaders(){
+        if(dataSet == null) {
+            headers = new int[0];
+            return;
+        }
+        if(headers.length != dataSet.size())
+            headers = new int[dataSet.size()];
+        if(headers.length == 0)
+            return;
         headers[0] = 0;
         for(int i=1; i<dataSet.size(); i++){
             headers[i]=headers[i-1]+dataSet.get(i-1).size()+1;
@@ -130,21 +127,25 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        //first header
-        if(position == 0)
-            return HEADER;
         refreshHeaders();
-        //last items
-        if(position>headers[headers.length-1]){
-            return headers.length+24-1;
-        }
-        for(int i=1; i<headers.length; i++){
+        if(headers.length == 0)
+            return HEADER;
+        for(int i=0; i<headers.length; i++){
             if(position == headers[i])
                 return HEADER;
-            else if(position>headers[i-1] && position<headers[i])
-                return i+23;
+            int nextHeader = i + 1 < headers.length ? headers[i + 1] : getItemCount();
+            if(position > headers[i] && position < nextHeader)
+                return ITEM_BASE + i;
         }
 
+        return -1;
+    }
+
+    private int sectionIndexForHeader(int position) {
+        refreshHeaders();
+        for(int i=0; i<headers.length; i++)
+            if(headers[i] == position)
+                return i;
         return -1;
     }
 
