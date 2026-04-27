@@ -23,7 +23,7 @@ import ml.melun.mangaview.adapter.MainAdapter;
 import ml.melun.mangaview.adapter.MainWebtoonAdapter;
 import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
-import ml.melun.mangaview.ui.NpaFlexboxLayoutManager;
+import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.episodeIntent;
@@ -131,7 +131,7 @@ public class MainMain extends Fragment{
         //main content
         // 최근 추가된 만화
         mainRecycler = rootView.findViewById(R.id.main_recycler);
-        NpaFlexboxLayoutManager lm = new NpaFlexboxLayoutManager(getContext());
+        NpaLinearLayoutManager lm = new NpaLinearLayoutManager(getContext());
         mainRecycler.setLayoutManager(lm);
 
 
