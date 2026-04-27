@@ -101,6 +101,12 @@ public class ViewerActivity extends AppCompatActivity {
     boolean topPullTriggered = false;
     boolean topPullEligible = false;
     boolean topPullInProgress = false;
+    int previousPullDistancePx = 0;
+    float bottomPullStartY = 0;
+    boolean bottomPullTriggered = false;
+    boolean bottomPullEligible = false;
+    boolean bottomPullInProgress = false;
+    int nextPullDistancePx = 0;
     int previousBoundaryRequestedFromId = -1;
     boolean previousEpisodePositioning = false;
 
@@ -275,6 +281,7 @@ public class ViewerActivity extends AppCompatActivity {
             });
             strip.setOnTouchListener((view, event) -> {
                 handlePreviousEpisodePull(event);
+                handleNextEpisodePull(event);
                 return false;
             });
 
@@ -661,8 +668,11 @@ public class ViewerActivity extends AppCompatActivity {
                 topPullTriggered = false;
                 topPullEligible = isAtViewerTop();
                 topPullInProgress = true;
+                previousPullDistancePx = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
+                if(topPullEligible || isAtViewerTop())
+                    previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
                 if(topPullTriggered || previousEpisodeBoundaryLoading)
                     return;
                 if(!topPullEligible && isAtViewerTop()) {
@@ -682,11 +692,58 @@ public class ViewerActivity extends AppCompatActivity {
                 boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
                 boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop)
                         && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
+                if(topPullEligible || isAtViewerTop())
+                    previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
                 if(shouldLoadPrevious)
                     attachPreviousEpisode(true);
+                break;
+        }
+    }
+
+    private void handleNextEpisodePull(MotionEvent event) {
+        if(strip == null || manager == null || stripAdapter == null)
+            return;
+        switch(event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                bottomPullStartY = event.getY();
+                bottomPullTriggered = false;
+                bottomPullEligible = isAtViewerBottom();
+                bottomPullInProgress = true;
+                nextPullDistancePx = 0;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if(bottomPullEligible || isAtViewerBottom())
+                    nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
+                if(bottomPullTriggered || nextEpisodeBoundaryLoading)
+                    return;
+                if(!bottomPullEligible && isAtViewerBottom()) {
+                    bottomPullEligible = true;
+                    bottomPullStartY = event.getY();
+                }
+                if(!bottomPullEligible)
+                    return;
+                float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
+                if(bottomPullStartY - event.getY() >= threshold) {
+                    bottomPullTriggered = true;
+                    attachNextEpisode(false);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                float releaseThreshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
+                boolean releasePulledFromBottom = bottomPullStartY - event.getY() >= releaseThreshold && isAtViewerBottom();
+                boolean shouldLoadNext = (bottomPullTriggered || releasePulledFromBottom)
+                        && !nextEpisodeBoundaryLoading && !previousEpisodePositioning;
+                if(bottomPullEligible || isAtViewerBottom())
+                    nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
+                bottomPullInProgress = false;
+                bottomPullTriggered = false;
+                bottomPullEligible = false;
+                if(shouldLoadNext)
+                    attachNextEpisode(true);
                 break;
         }
     }
@@ -706,6 +763,26 @@ public class ViewerActivity extends AppCompatActivity {
             return false;
         View firstPage = manager.findViewByPosition(firstPagePosition);
         return firstPage != null && firstPage.getTop() >= 0;
+    }
+
+    private boolean isAtViewerBottom() {
+        if(strip == null)
+            return false;
+        if(!strip.canScrollVertically(1))
+            return true;
+        if(stripAdapter == null || manager == null)
+            return false;
+        PageItem page = stripAdapter.getCurrentVisiblePage();
+        if(page == null || page.manga == null)
+            return false;
+        List<String> images = page.manga.getImgs(context);
+        if(images == null || page.index != images.size() - 1)
+            return false;
+        int lastPagePosition = stripAdapter.findLastPagePosition(page.manga);
+        if(lastPagePosition == RecyclerView.NO_POSITION)
+            return false;
+        View lastPage = manager.findViewByPosition(lastPagePosition);
+        return lastPage != null && lastPage.getBottom() <= strip.getHeight();
     }
 
     private void attachPreviousEpisode(boolean jumpToEpisode) {
@@ -873,8 +950,10 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         strip.post(() -> {
             if(stripAdapter != null && !isFinishing()) {
-                if(!stripAdapter.hasMangaLoaded(target))
+                if(!stripAdapter.hasMangaLoaded(target)) {
                     stripAdapter.appendManga(target);
+                    applyPendingBoundaryScroll(false);
+                }
                 if(afterAppend != null)
                     afterAppend.run();
             }
@@ -886,11 +965,27 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         strip.post(() -> {
             if(stripAdapter != null && !isFinishing()) {
-                if(!stripAdapter.hasMangaLoaded(target))
+                if(!stripAdapter.hasMangaLoaded(target)) {
                     stripAdapter.insertManga(target);
+                    applyPendingBoundaryScroll(true);
+                }
                 if(afterInsert != null)
                     afterInsert.run();
             }
+        });
+    }
+
+    private void applyPendingBoundaryScroll(boolean previous) {
+        if(strip == null)
+            return;
+        int distance = previous ? previousPullDistancePx : nextPullDistancePx;
+        previousPullDistancePx = 0;
+        nextPullDistancePx = 0;
+        if(distance <= 0)
+            return;
+        strip.post(() -> {
+            if(!isFinishing())
+                strip.scrollBy(0, previous ? -distance : distance);
         });
     }
 
