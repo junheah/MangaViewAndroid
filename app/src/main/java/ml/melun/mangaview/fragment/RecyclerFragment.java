@@ -300,8 +300,15 @@ public class RecyclerFragment extends Fragment {
     }
 
     void openViewer(Manga manga, int code){
+        Title title = selectedPosition > -1 ? titleAdapter.getItem(selectedPosition) : null;
+        manga.setMode(0);
+        if(title != null)
+            manga.setTitle(title);
         Intent viewer = viewerIntent(getContext(),manga);
+        if(title != null)
+            viewer.putExtra("title", new Gson().toJson(title));
         viewer.putExtra("online",true);
+        viewer.putExtra("recent", mode == R.id.nav_recent);
         startActivityForResult(viewer, code);
     }
 
