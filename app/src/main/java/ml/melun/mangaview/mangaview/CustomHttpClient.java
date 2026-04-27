@@ -35,8 +35,10 @@ public class CustomHttpClient {
     public static final String DEFAULT_COMIC_URL = "https://wfwf449.com/cm";
     public static final String WEBTOON_URL = "https://wfwf449.com";
     private static final long WFWF_DOMAIN_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000L;
+    private static final long COOKIE_SYNC_INTERVAL_MS = 30 * 1000L;
     public OkHttpClient client;
     Map<String, String> cookies;
+    Map<String, Long> cookieSyncAt;
     private Context context;
     public String agent = "Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36";
 
@@ -44,6 +46,7 @@ public class CustomHttpClient {
         System.out.println("http client create");
         this.context = context.getApplicationContext();
         this.cookies = new HashMap<>();
+        this.cookieSyncAt = new HashMap<>();
         loadSavedCookies();
         try {
             this.agent = WebSettings.getDefaultUserAgent(this.context);
@@ -87,20 +90,35 @@ public class CustomHttpClient {
     }
     public synchronized void resetCookie(){
         this.cookies = new HashMap<>();
+        this.cookieSyncAt = new HashMap<>();
         persistCookies();
     }
 
     public synchronized void syncCookiesFromWebView(String url){
         try {
+            long now = System.currentTimeMillis();
+            Long lastSync = cookieSyncAt.get(url);
+            if(lastSync != null && now - lastSync < COOKIE_SYNC_INTERVAL_MS)
+                return;
+            cookieSyncAt.put(url, now);
+
             String cookieStr = CookieManager.getInstance().getCookie(url);
             if(cookieStr == null || cookieStr.length() == 0)
                 return;
+            boolean changed = false;
             for(String s : cookieStr.split("; ")){
                 int eq = s.indexOf("=");
                 if(eq <= 0)
                     continue;
-                setCookie(s.substring(0, eq), s.substring(eq + 1));
+                String key = s.substring(0, eq);
+                String value = s.substring(eq + 1);
+                if(!value.equals(cookies.get(key))) {
+                    cookies.put(key, value);
+                    changed = true;
+                }
             }
+            if(changed)
+                persistCookies();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -137,6 +155,7 @@ public class CustomHttpClient {
     private synchronized void storeResponseCookies(Response response){
         if(response == null)
             return;
+        boolean changed = false;
         for(String c : response.headers("Set-Cookie")){
             int eq = c.indexOf("=");
             int semi = c.indexOf(";");
@@ -144,8 +163,15 @@ public class CustomHttpClient {
                 continue;
             if(semi < 0)
                 semi = c.length();
-            setCookie(c.substring(0, eq), c.substring(eq + 1, semi));
+            String key = c.substring(0, eq);
+            String value = c.substring(eq + 1, semi);
+            if(!value.equals(cookies.get(key))) {
+                cookies.put(key, value);
+                changed = true;
+            }
         }
+        if(changed)
+            persistCookies();
     }
 
     public synchronized String getCookie(String k){
@@ -178,7 +204,7 @@ public class CustomHttpClient {
         return ensureWfwfDomain(true);
     }
 
-    private boolean ensureWfwfDomain(boolean force) {
+    private synchronized boolean ensureWfwfDomain(boolean force) {
         try {
             String webtoonUrl = getWebtoonUrl();
             String root = WfwfDomainResolver.toRoot(webtoonUrl);

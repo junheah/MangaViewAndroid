@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,9 +22,15 @@ public class WfwfDomainResolver {
         if(current <= 0)
             current = DEFAULT_NUMBER;
 
+        OkHttpClient probeClient = client.newBuilder()
+                .connectTimeout(3, TimeUnit.SECONDS)
+                .readTimeout(4, TimeUnit.SECONDS)
+                .callTimeout(5, TimeUnit.SECONDS)
+                .build();
+
         for(int number : candidates(current)) {
             String root = "https://wfwf" + number + ".com";
-            if(isAlive(client, root, headers))
+            if(isAlive(probeClient, root, headers))
                 return root;
         }
         return null;
