@@ -7,8 +7,13 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import okhttp3.Response;
 
@@ -17,32 +22,35 @@ import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 public class MainPageWebtoon {
     String baseUrl;
 
-    public static final String ING_RECENT = "연재 - 최신";
-    public static final String ING_MONDAY = "연재 - 월요";
-    public static final String ING_ACTION = "연재 - 액션";
-    public static final String ING_ROMANCE = "연재 - 로맨스";
-    public static final String ING_FANTASY = "연재 - 판타지";
-    public static final String ING_ADULT = "연재 - 성인";
-    public static final String END_RECENT = "완결 - 최신";
-    public static final String END_ACTION = "완결 - 액션";
-    public static final String END_ROMANCE = "완결 - 로맨스";
-    public static final String END_FANTASY = "완결 - 판타지";
-    public static final String END_MARTIAL = "완결 - 무협";
-    public static final String END_ADULT = "완결 - 성인";
+    public static final String ING_RECENT = "연재|최신 업데이트";
+    public static final String ING_ACTION = "연재|액션";
+    public static final String ING_ROMANCE = "연재|로맨스";
+    public static final String ING_FANTASY = "연재|판타지";
+    public static final String ING_MARTIAL = "연재|무협";
+    public static final String ING_DRAMA = "연재|드라마";
+    public static final String ING_BL = "연재|BL";
+    public static final String ING_ADULT = "연재|성인";
+    public static final String END_RECENT = "완결|최신 업데이트";
+    public static final String END_ACTION = "완결|액션";
+    public static final String END_ROMANCE = "완결|로맨스";
+    public static final String END_FANTASY = "완결|판타지";
+    public static final String END_MARTIAL = "완결|무협";
+    public static final String END_DRAMA = "완결|드라마";
+    public static final String END_ADULT = "완결|성인";
+
+    private static final int MAIN_SECTION_LIMIT = 10;
 
     private static final String[][] SECTIONS = {
             {ING_RECENT, "/ing?type1=day&type2=recent&o=n"},
-            {ING_MONDAY, "/ing?type1=day&type2=mon&o=n"},
-            {ING_ACTION, "/ing?type1=genre&type2=액션&o=n"},
-            {ING_ROMANCE, "/ing?type1=genre&type2=로맨스&o=n"},
-            {ING_FANTASY, "/ing?type1=genre&type2=판타지&o=n"},
-            {ING_ADULT, "/ing?type1=genre&type2=성인&o=n"},
+            {ING_ACTION, genrePath("/ing", "액션")},
+            {ING_ROMANCE, genrePath("/ing", "로맨스")},
+            {ING_FANTASY, genrePath("/ing", "판타지")},
+            {ING_MARTIAL, genrePath("/ing", "무협")},
             {END_RECENT, "/end?type1=day&type2=recent&o=n"},
-            {END_ACTION, "/end?type1=genre&type2=액션&o=n"},
-            {END_ROMANCE, "/end?type1=genre&type2=로맨스&o=n"},
-            {END_FANTASY, "/end?type1=genre&type2=판타지&o=n"},
-            {END_MARTIAL, "/end?type1=genre&type2=무협&o=n"},
-            {END_ADULT, "/end?type1=genre&type2=성인&o=n"}
+            {END_ACTION, genrePath("/end", "액션")},
+            {END_ROMANCE, genrePath("/end", "로맨스")},
+            {END_FANTASY, genrePath("/end", "판타지")},
+            {END_MARTIAL, genrePath("/end", "무협")}
     };
 
     List<Ranking<?>> dataSet;
@@ -62,26 +70,50 @@ public class MainPageWebtoon {
                 return;
         try {
             dataSet = new ArrayList<>();
-            for(String[] section : SECTIONS)
-                parseWolfTitle(client, section[0], section[1], base_webtoon);
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(4, SECTIONS.length));
+            List<Future<Ranking<?>>> futures = new ArrayList<>();
+            for(String[] section : SECTIONS) {
+                Callable<Ranking<?>> task = () -> parseWolfTitle(client, section[0], section[1], base_webtoon);
+                futures.add(executor.submit(task));
+            }
+            for(Future<Ranking<?>> future : futures)
+                dataSet.add(future.get());
+            executor.shutdown();
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public void parseWolfTitle(CustomHttpClient client, String title, String path, int baseMode){
+    public Ranking<Title> parseWolfTitle(CustomHttpClient client, String title, String path, int baseMode){
         Ranking<Title> ranking = new Ranking<>(title);
         try{
             Response r = client.mget(path);
             String body = r.body().string();
             r.close();
             Document d = Jsoup.parse(body);
-            for(Title webtoon : parseWolfTitles(d, baseMode, 20))
+            for(Title webtoon : parseWolfTitles(d, baseMode, MAIN_SECTION_LIMIT))
                 ranking.add(webtoon);
         }catch (Exception e){
             e.printStackTrace();
         }
-        dataSet.add(ranking);
+        return ranking;
+    }
+
+    private static String genrePath(String statusPath, String genre) {
+        return statusPath + "?type1=genre&type2=" + percentEncode(genre, Charset.forName("EUC-KR")) + "&o=n";
+    }
+
+    private static String percentEncode(String value, Charset charset) {
+        byte[] bytes = value.getBytes(charset);
+        StringBuilder encoded = new StringBuilder();
+        for(byte b : bytes) {
+            int c = b & 0xff;
+            if((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.' || c == '~')
+                encoded.append((char)c);
+            else
+                encoded.append('%').append(String.format("%02X", c));
+        }
+        return encoded.toString();
     }
 
     public static ArrayList<Title> parseWolfTitles(Document d, int baseMode, int limit){

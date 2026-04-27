@@ -80,16 +80,16 @@ public class CustomHttpClient {
         //this.client = new OkHttpClient.Builder().build();
     }
 
-    public void setCookie(String k, String v){
+    public synchronized void setCookie(String k, String v){
         cookies.put(k, v);
         persistCookies();
     }
-    public void resetCookie(){
+    public synchronized void resetCookie(){
         this.cookies = new HashMap<>();
         persistCookies();
     }
 
-    public void syncCookiesFromWebView(String url){
+    public synchronized void syncCookiesFromWebView(String url){
         try {
             String cookieStr = CookieManager.getInstance().getCookie(url);
             if(cookieStr == null || cookieStr.length() == 0)
@@ -105,7 +105,7 @@ public class CustomHttpClient {
         }
     }
 
-    private void loadSavedCookies(){
+    private synchronized void loadSavedCookies(){
         try {
             SharedPreferences pref = context.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
             String saved = pref.getString("httpCookies", "{}");
@@ -119,7 +119,7 @@ public class CustomHttpClient {
         }
     }
 
-    private void persistCookies(){
+    private synchronized void persistCookies(){
         try {
             JSONObject obj = new JSONObject();
             for(String k : cookies.keySet())
@@ -133,7 +133,7 @@ public class CustomHttpClient {
         }
     }
 
-    private void storeResponseCookies(Response response){
+    private synchronized void storeResponseCookies(Response response){
         if(response == null)
             return;
         for(String c : response.headers("Set-Cookie")){
@@ -147,7 +147,7 @@ public class CustomHttpClient {
         }
     }
 
-    public String getCookie(String k){
+    public synchronized String getCookie(String k){
         return cookies.get(k);
     }
 
@@ -243,7 +243,10 @@ public class CustomHttpClient {
 //        }
         String baseUrl = getBaseUrl(url);
         syncCookiesFromWebView(baseUrl);
-        Map<String, String> cookie = new HashMap<>(this.cookies);
+        Map<String, String> cookie;
+        synchronized (this) {
+            cookie = new HashMap<>(this.cookies);
+        }
         cookie.putAll(customCookie);
 
         StringBuilder cbuilder = new StringBuilder();
@@ -284,8 +287,10 @@ public class CustomHttpClient {
 
         // add local cookies
         if(localCookies)
-            for(String key : this.cookies.keySet()){
-                cs.append(key).append('=').append(this.cookies.get(key)).append("; ");
+            synchronized (this) {
+                for(String key : this.cookies.keySet()){
+                    cs.append(key).append('=').append(this.cookies.get(key)).append("; ");
+                }
             }
 
         headers.put("Cookie", cs.toString());

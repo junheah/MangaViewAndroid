@@ -129,15 +129,20 @@ public class Search {
         try {
             ArrayList<Title> webtoonResults = new ArrayList<>();
             if(mode == 2) {
-                appendWebtoonResults(client, webtoonResults, "/ing?type1=genre&type2=" + percentEncode(query, StandardCharsets.UTF_8) + "&o=n", 80);
-                appendWebtoonResults(client, webtoonResults, "/end?type1=genre&type2=" + percentEncode(query, StandardCharsets.UTF_8) + "&o=n", 80);
+                appendWebtoonResults(client, webtoonResults, "/ing?type1=genre&type2=" + percentEncode(query, Charset.forName("EUC-KR")) + "&o=n", 80);
+                appendWebtoonResults(client, webtoonResults, "/end?type1=genre&type2=" + percentEncode(query, Charset.forName("EUC-KR")) + "&o=n", 80);
             } else if(mode == 4) {
-                String day = webtoonDay(query);
-                if(day.length() > 0) {
-                    appendWebtoonResults(client, webtoonResults, "/ing?type1=day&type2=" + day + "&o=n", 80);
-                    appendWebtoonResults(client, webtoonResults, "/end?type1=day&type2=" + day + "&o=n", 80);
+                String status = webtoonStatus(query);
+                if(status.length() > 0) {
+                    appendWebtoonResults(client, webtoonResults, status + "?type1=day&type2=recent&o=n", 80);
                 } else {
-                    appendWebtoonResults(client, webtoonResults, "/search.html?q=" + percentEncode(query, Charset.forName("EUC-KR")), 80);
+                    String day = webtoonDay(query);
+                    if(day.length() > 0) {
+                        appendWebtoonResults(client, webtoonResults, "/ing?type1=day&type2=" + day + "&o=n", 80);
+                        appendWebtoonResults(client, webtoonResults, "/end?type1=day&type2=" + day + "&o=n", 80);
+                    } else {
+                        appendWebtoonResults(client, webtoonResults, "/search.html?q=" + percentEncode(query, Charset.forName("EUC-KR")), 80);
+                    }
                 }
             } else {
                 appendWebtoonResults(client, webtoonResults, "/search.html?q=" + percentEncode(query, Charset.forName("EUC-KR")), 80);
@@ -177,6 +182,14 @@ public class Search {
                 encoded.append('%').append(String.format("%02X", c));
         }
         return encoded.toString();
+    }
+
+    private static String webtoonStatus(String value) {
+        if(value == null) return "";
+        String q = value.trim().toLowerCase();
+        if(q.equals("연재") || q.equals("연재중") || q.equals("ing") || q.equals("ongoing")) return "/ing";
+        if(q.equals("완결") || q.equals("완결웹툰") || q.equals("end") || q.equals("completed") || q.equals("complete")) return "/end";
+        return "";
     }
 
     private static String webtoonDay(String value) {
