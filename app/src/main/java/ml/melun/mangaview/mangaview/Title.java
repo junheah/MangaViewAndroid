@@ -42,6 +42,10 @@ public class Title extends MTitle {
     }
 
     public String getUrl(){
+        if(isComicWolfSource())
+            return "/cl?toon=" + id;
+        if(isWebtoonWolfSource())
+            return "/list?toon=" + id;
         return '/'+baseModeStr(baseMode)+'/'+ id;
     }
 
@@ -66,6 +70,10 @@ public class Title extends MTitle {
     }
 
     public int fetchEps(CustomHttpClient client) {
+        if(isComicWolfSource())
+            return fetchWolfEps(client, "/cl?toon=", "/cv?toon=");
+        if(isWebtoonWolfSource())
+            return fetchWolfEps(client);
 
         try {
             Response r = client.mget('/'+baseModeStr(baseMode)+'/'+ id);
@@ -156,6 +164,68 @@ public class Title extends MTitle {
                 }
             }catch (Exception e){e.printStackTrace();}
             r.close();
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+        return LOAD_OK;
+    }
+
+    private int fetchWolfEps(CustomHttpClient client) {
+        return fetchWolfEps(client, "/list?toon=", "/view?toon=");
+    }
+
+    private int fetchWolfEps(CustomHttpClient client, String listPath, String viewPath) {
+        try {
+            Response r = client.mget(listPath + id);
+            String body = r.body().string();
+            r.close();
+            Document d = Jsoup.parse(body);
+
+            try {
+                Element metaTitle = d.selectFirst("meta[property=og:title]");
+                if(metaTitle != null)
+                    name = metaTitle.attr("content");
+            }catch (Exception e){}
+
+            try {
+                Element metaDescription = d.selectFirst("meta[name=description]");
+                if(metaDescription != null)
+                    release = metaDescription.attr("content");
+            }catch (Exception e){}
+
+            try {
+                Element img = d.selectFirst("section.webtoon-body img[src*=/" + id + "/], section.webtoon-body img[data-original*=/" + id + "/]");
+                if(img == null)
+                    img = d.selectFirst("div.img-box img");
+                if(img != null) {
+                    thumb = img.hasAttr("data-original") ? img.attr("data-original") : img.attr("src");
+                }
+            }catch (Exception e){}
+
+            eps = new ArrayList<>();
+            for(Element e : d.select("a[href^=\"" + viewPath + id + "\"]")) {
+                String href = e.attr("href");
+                int epId = MainPageWebtoon.getQueryInt(href, "num");
+                if(epId <= 0) continue;
+                String epTitle = "";
+                Element subject = e.selectFirst(".subject");
+                if(subject != null)
+                    epTitle = subject.ownText().replace("\u00a0", " ").trim();
+                if(epTitle.length() == 0)
+                    epTitle = e.ownText().replace("\u00a0", " ").trim();
+                if(epTitle.length() == 0)
+                    epTitle = MainPageWebtoon.getQueryString(href, "title");
+
+                String date = "";
+                Element dateElement = e.selectFirst("span.date, div.date, span:last-child");
+                if(dateElement != null)
+                    date = dateElement.ownText();
+
+                Manga tmp = new Manga(epId, epTitle, date, baseMode);
+                tmp.setMode(0);
+                tmp.setTitle(this);
+                eps.add(tmp);
+            }
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -253,5 +323,12 @@ public class Title extends MTitle {
         return !isInteger(release);
     }
 
-}
+    private boolean isWebtoonWolfSource() {
+        return baseMode == base_webtoon;
+    }
 
+    private boolean isComicWolfSource() {
+        return baseMode == base_comic;
+    }
+
+}

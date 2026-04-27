@@ -87,17 +87,22 @@ public class Preference {
             pageRtl = sharedPref.getBoolean("pageRtl",false);
             dataSave = sharedPref.getBoolean("dataSave", false);
             startTab = sharedPref.getInt("startTab", 0);
-            defUrl = sharedPref.getString("defUrl", DEFAULT_COMIC_URL);
-            url = sharedPref.getString("url", DEFAULT_COMIC_URL);
-            webtoonUrl = sharedPref.getString("webtoonUrl", WEBTOON_URL);
+            defUrl = normalizeComicUrl(sharedPref.getString("defUrl", DEFAULT_COMIC_URL));
+            url = normalizeComicUrl(sharedPref.getString("url", DEFAULT_COMIC_URL));
+            webtoonUrl = normalizeWebtoonUrl(sharedPref.getString("webtoonUrl", WEBTOON_URL));
             stretch = sharedPref.getBoolean("stretch", false);
             leftRight = sharedPref.getBoolean("leftRight", false);
             login = gson.fromJson(sharedPref.getString("login","{}"),new TypeToken<Login>(){}.getType());
-            autoUrl = sharedPref.getBoolean("autoUrl", true);
+            autoUrl = false;
             doublep = sharedPref.getBoolean("doublep", false);
             doublepReverse = sharedPref.getBoolean("doublepReverse", false);
             pageControlButtonOffset = sharedPref.getFloat("pageControlButtonOffset", -1);
             baseMode = sharedPref.getInt("baseMode", base_comic);
+            prefsEditor.putString("defUrl", defUrl)
+                    .putString("url", url)
+                    .putString("webtoonUrl", webtoonUrl)
+                    .putBoolean("autoUrl", false)
+                    .apply();
 //            if(login != null && login.isValid()){
 //                setSession(login.getCookie());
 //            }
@@ -111,6 +116,32 @@ public class Preference {
         return baseModeStr(this.baseMode);
     }
 
+    private String normalizeComicUrl(String sourceUrl) {
+        if(sourceUrl == null || sourceUrl.trim().length() == 0)
+            return DEFAULT_COMIC_URL;
+        String normalized = sourceUrl.trim();
+        while(normalized.endsWith("/"))
+            normalized = normalized.substring(0, normalized.length() - 1);
+        if(normalized.contains("manatoki"))
+            return DEFAULT_COMIC_URL;
+        if(normalized.equals(WEBTOON_URL))
+            return DEFAULT_COMIC_URL;
+        return normalized;
+    }
+
+    private String normalizeWebtoonUrl(String sourceUrl) {
+        if(sourceUrl == null || sourceUrl.trim().length() == 0)
+            return WEBTOON_URL;
+        String normalized = sourceUrl.trim();
+        while(normalized.endsWith("/"))
+            normalized = normalized.substring(0, normalized.length() - 1);
+        if(normalized.contains("manatoki"))
+            return WEBTOON_URL;
+        if(normalized.endsWith("/cm"))
+            return normalized.substring(0, normalized.length() - 3);
+        return normalized;
+    }
+
     public int getBaseMode(){
         return this.baseMode;
     }
@@ -122,8 +153,8 @@ public class Preference {
     }
 
     public void setDefUrl(String defUrl){
-        this.defUrl = defUrl;
-        prefsEditor.putString("defUrl", defUrl);
+        this.defUrl = normalizeComicUrl(defUrl);
+        prefsEditor.putString("defUrl", this.defUrl);
         prefsEditor.commit();
     }
 
@@ -166,8 +197,8 @@ public class Preference {
     }
 
     public void setUrl(String url) {
-        this.url = url;
-        prefsEditor.putString("url", url);
+        this.url = normalizeComicUrl(url);
+        prefsEditor.putString("url", this.url);
         prefsEditor.commit();
     }
 
@@ -176,8 +207,8 @@ public class Preference {
     }
 
     public void setWebtoonUrl(String webtoonUrl) {
-        this.webtoonUrl = webtoonUrl;
-        prefsEditor.putString("webtoonUrl", webtoonUrl);
+        this.webtoonUrl = normalizeWebtoonUrl(webtoonUrl);
+        prefsEditor.putString("webtoonUrl", this.webtoonUrl);
         prefsEditor.commit();
     }
 

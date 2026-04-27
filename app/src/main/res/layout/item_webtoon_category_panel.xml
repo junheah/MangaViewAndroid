@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="웹툰 분류"
+        android:text="작품 분류"
         android:textSize="18sp"
         android:textStyle="bold" />
 

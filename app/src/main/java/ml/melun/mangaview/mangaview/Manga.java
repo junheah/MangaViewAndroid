@@ -40,6 +40,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 public class Manga {
     int baseMode = base_comic;
+    int titleId = -1;
 
     public Manga(int i, String n, String d, int baseMode) {
         id = i;
@@ -86,6 +87,11 @@ public class Manga {
     }
 
     public int fetch(CustomHttpClient client, boolean doLogin, Map<String, String> cookies) {
+        if(isComicWolfSource())
+            return fetchWolf(client, "/cv?toon=", "/cv?toon=");
+        if(isWebtoonWolfSource())
+            return fetchWolf(client, "/view?toon=", "/view?toon=");
+
         mode = 0;
         imgs = new ArrayList<>();
         eps = new ArrayList<>();
@@ -156,7 +162,7 @@ public class Manga {
                                 if (!img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
                                     flag = true;
                                     if (img.startsWith("/"))
-                                        imgs.add(client.getUrl() + img);
+                                        imgs.add(client.getUrl(baseMode) + img);
                                     else
                                         imgs.add(img);
                                 }
@@ -166,7 +172,7 @@ public class Manga {
                             String img = e.attr("src");
                             if (!img.isEmpty() && !img.contains("blank") && !img.contains("loading")) {
                                 if (img.startsWith("/"))
-                                    imgs.add(client.getUrl() + img);
+                                    imgs.add(client.getUrl(baseMode) + img);
                                 else
                                     imgs.add(img);
                             }
@@ -206,6 +212,50 @@ public class Manga {
                 r.close();
             }
             tries++;
+        }
+        return LOAD_OK;
+    }
+
+    private int fetchWolf(CustomHttpClient client, String viewPath, String epPath) {
+        mode = 0;
+        imgs = new ArrayList<>();
+        eps = new ArrayList<>();
+        comments = new ArrayList<>();
+        bcomments = new ArrayList<>();
+
+        try {
+            int titleId = this.titleId;
+            if(titleId <= 0 && title != null)
+                titleId = title.getId();
+            if(titleId <= 0)
+                return LOAD_OK;
+
+            Response r = client.mget(viewPath + titleId + "&num=" + id);
+            String body = r.body().string();
+            r.close();
+            Document d = Jsoup.parse(body);
+
+            try {
+                Element header = d.selectFirst("div.image-view h2 span");
+                if(header != null)
+                    name = header.ownText();
+            }catch (Exception e){}
+
+            for(Element img : d.select("div.image-view img.v-img")) {
+                String src = img.attr("data-original");
+                if(src == null || src.length() == 0)
+                    src = img.attr("src");
+                if(src.length() > 0 && !src.contains("sprite.png") && !src.contains("loading"))
+                    imgs.add(src);
+            }
+
+            for(Element link : d.select("section.webtoon-bottom a[href^=\"" + epPath + titleId + "\"]")) {
+                int epId = MainPageWebtoon.getQueryInt(link.attr("href"), "num");
+                if(epId > 0)
+                    eps.add(new Manga(epId, link.ownText(), "", baseMode));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return LOAD_OK;
     }
@@ -311,6 +361,8 @@ public class Manga {
 
     public void setTitle(Title title) {
         this.title = title;
+        if(title != null)
+            titleId = title.getId();
     }
 
     @Override
@@ -344,7 +396,29 @@ public class Manga {
     }
 
     public String getUrl() {
+        if(isComicWolfSource()) {
+            int tid = titleId;
+            if(tid <= 0 && title != null)
+                tid = title.getId();
+            if(tid > 0)
+                return "/cv?toon=" + tid + "&num=" + id;
+        }
+        if(isWebtoonWolfSource()) {
+            int tid = titleId;
+            if(tid <= 0 && title != null)
+                tid = title.getId();
+            if(tid > 0)
+                return "/view?toon=" + tid + "&num=" + id;
+        }
         return '/' + baseModeStr(baseMode) + '/' + id;
+    }
+
+    private boolean isWebtoonWolfSource() {
+        return baseMode == MTitle.base_webtoon;
+    }
+
+    private boolean isComicWolfSource() {
+        return baseMode == base_comic;
     }
 
     public boolean useBookmark() {
@@ -398,7 +472,7 @@ public class Manga {
     List<Comment> comments, bcomments;
     String offlinePath;
     String thumb;
-    Title title;
+    transient Title title;
     String date;
     int seed;
     int mode;
@@ -409,4 +483,3 @@ public class Manga {
         void setMessage(String msg);
     }
 }
-

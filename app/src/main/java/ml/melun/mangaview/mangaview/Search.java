@@ -14,6 +14,7 @@ import java.util.Set;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 
@@ -44,6 +45,8 @@ public class Search {
         if(!last) {
             if(baseMode == base_webtoon)
                 return fetchWebtoon(client);
+            if(baseMode == base_comic)
+                return fetchComic(client);
             try {
                 String searchUrl = "";
                 switch(mode){
@@ -160,6 +163,33 @@ public class Search {
         }
     }
 
+    private int fetchComic(CustomHttpClient client) {
+        try {
+            ArrayList<Title> comicResults = new ArrayList<>();
+            if(mode == 2) {
+                appendWebtoonResults(client, comicResults, "/cm?type1=genre&type2=" + percentEncode(query, Charset.forName("EUC-KR")) + "&o=n", 120);
+            } else if(mode == 4) {
+                String type = comicType(query);
+                if(type.length() > 0)
+                    appendWebtoonResults(client, comicResults, "/cm?type1=complete&type2=" + type + "&o=n", 120);
+                else
+                    appendWebtoonResults(client, comicResults, "/search.html?q=" + percentEncode(query, Charset.forName("EUC-KR")), 120);
+            } else {
+                appendWebtoonResults(client, comicResults, "/search.html?q=" + percentEncode(query, Charset.forName("EUC-KR")), 120);
+            }
+
+            Set<Integer> seen = new HashSet<>();
+            for(Title title : comicResults)
+                if(seen.add(title.getId()))
+                    result.add(title);
+            last = true;
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 1;
+        }
+    }
+
     private void appendWebtoonResults(CustomHttpClient client, ArrayList<Title> target, String path, int limit) throws Exception {
         Response response = client.mget(path, true, null);
         String body = response.body().string();
@@ -203,6 +233,19 @@ public class Search {
         if(q.equals("토") || q.equals("토요") || q.equals("토요일") || q.equals("sat") || q.equals("saturday")) return "sat";
         if(q.equals("일") || q.equals("일요") || q.equals("일요일") || q.equals("sun") || q.equals("sunday")) return "sun";
         if(q.equals("최신") || q.equals("recent")) return "recent";
+        return "";
+    }
+
+    private static String comicType(String value) {
+        if(value == null) return "";
+        String q = value.trim().toLowerCase();
+        if(q.equals("recent") || q.equals("최신")) return "recent";
+        if(q.equals("weekly") || q.equals("주간")) return "10";
+        if(q.equals("biweekly") || q.equals("격주")) return "11";
+        if(q.equals("monthly") || q.equals("월간")) return "12";
+        if(q.equals("oneshot") || q.equals("단편")) return "14";
+        if(q.equals("completed") || q.equals("complete") || q.equals("완결")) return "16";
+        if(q.equals("book") || q.equals("단행본")) return "15";
         return "";
     }
 

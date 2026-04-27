@@ -35,7 +35,7 @@ import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 public class MainMain extends Fragment{
 
     RecyclerView mainRecycler;
-    MainAdapter mainadapter;
+    MainWebtoonAdapter mainComicAdapter;
     MainWebtoonAdapter mainWebtoonAdapter;
     Fragment fragment;
     boolean wait = false;
@@ -106,7 +106,7 @@ public class MainMain extends Fragment{
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if(tab.getPosition() == COMIC_TAB){
-                    mainRecycler.setAdapter(mainadapter);
+                    mainRecycler.setAdapter(mainComicAdapter);
                     p.setBaseMode(base_comic);
                     fetchComic();
                 }else if(tab.getPosition() == WEBTOON_TAB){
@@ -200,14 +200,14 @@ public class MainMain extends Fragment{
             }
         };
 
-        mainadapter = new MainAdapter(getContext());
-        mainadapter.setMainClickListener(listener);
+        mainComicAdapter = new MainWebtoonAdapter(getContext(), base_comic);
+        mainComicAdapter.setListener(listener);
 
         mainWebtoonAdapter = new MainWebtoonAdapter(getContext());
         mainWebtoonAdapter.setListener(listener);
 
         if(p.getBaseMode() == base_comic)
-            mainRecycler.setAdapter(mainadapter);
+            mainRecycler.setAdapter(mainComicAdapter);
         else
             mainRecycler.setAdapter(mainWebtoonAdapter);
 
@@ -224,9 +224,9 @@ public class MainMain extends Fragment{
     }
 
     private void fetchComic() {
-        if(mainadapter != null && !comicFetched) {
+        if(mainComicAdapter != null && !comicFetched) {
             comicFetched = true;
-            mainadapter.fetch();
+            mainComicAdapter.fetch();
         }
     }
 

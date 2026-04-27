@@ -32,7 +32,7 @@ import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 
 public class CustomHttpClient {
-    public static final String DEFAULT_COMIC_URL = "https://manatoki469.net";
+    public static final String DEFAULT_COMIC_URL = "https://wfwf449.com/cm";
     public static final String WEBTOON_URL = "https://wfwf449.com";
     public OkHttpClient client;
     Map<String, String> cookies;
@@ -212,7 +212,7 @@ public class CustomHttpClient {
     private String getBaseUrl(String path){
         if(isWebtoonPath(path))
             return getWebtoonUrl();
-        return getComicUrl();
+        return getRootUrl(getComicUrl());
     }
 
     private boolean isWebtoonPath(String path){
@@ -226,6 +226,13 @@ public class CustomHttpClient {
                 || path.startsWith("/view?toon=")
                 || path.startsWith("/search.html")
                 || path.contains("bo_table=webtoon");
+    }
+
+    private String getRootUrl(String url){
+        String trimmed = trimTrailingSlash(url);
+        if(trimmed.endsWith("/cm"))
+            return trimmed.substring(0, trimmed.length() - 3);
+        return trimmed;
     }
 
     private String trimTrailingSlash(String url){

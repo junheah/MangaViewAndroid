@@ -341,56 +341,23 @@ public class SettingsActivity extends AppCompatActivity {
     public static void urlSettingPopup(Context context, Preference p){
         final LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
-        final LinearLayout switch_layout = new LinearLayout(context);
-        switch_layout.setOrientation(LinearLayout.HORIZONTAL);
-        switch_layout.setGravity(Gravity.RIGHT);
-        switch_layout.setPadding(0,0,10,0);
-        final TextView definputtext = new TextView(context);
         final EditText definput = new EditText(context);
+        final EditText webtoonInput = new EditText(context);
         final TextView inputtext = new TextView(context);
-        final EditText input = new EditText(context);
-        final TextView toggle_lbl = new TextView(context);
-        toggle_lbl.setText("URL 자동 설정");
-        final Switch toggle = new Switch(context);
+        final TextView webtoonText = new TextView(context);
 
-        definputtext.setText("기본 URL (숫자 없는 주소):");
-        inputtext.setText("URL:");
+        inputtext.setText("사이트 URL:");
 
-        switch_layout.addView(toggle_lbl);
-        switch_layout.addView(toggle);
-        layout.addView(definputtext);
-        layout.addView(definput);
+        inputtext.setText("만화책 URL:");
         layout.addView(inputtext);
-        layout.addView(input);
-        layout.addView(switch_layout);
-
-        toggle.setOnCheckedChangeListener((compoundButton, b) -> {
-            if(b){
-                definput.setEnabled(true);
-                input.setEnabled(false);
-                input.setText("...");
-            }else{
-                definput.setEnabled(false);
-                input.setEnabled(true);
-                input.setText(p.getUrl());
-            }
-        });
-
-        toggle.setChecked(p.getAutoUrl());
-        if(toggle.isChecked()){
-            definput.setEnabled(true);
-            input.setEnabled(false);
-            input.setText("...");
-        }else{
-            definput.setEnabled(false);
-            input.setEnabled(true);
-            input.setText(p.getUrl());
-        }
-
-        input.setText(p.getUrl());
-        input.setHint(p.getUrl());
         definput.setText(p.getDefUrl());
         definput.setHint(p.getDefUrl());
+        layout.addView(definput);
+        webtoonText.setText("웹툰 URL:");
+        layout.addView(webtoonText);
+        webtoonInput.setText(p.getWebtoonUrl());
+        webtoonInput.setHint(p.getWebtoonUrl());
+        layout.addView(webtoonInput);
 
         AlertDialog.Builder builder;
         if(p.getDarkTheme()) builder = new AlertDialog.Builder(context,R.style.darkDialog);
@@ -398,22 +365,12 @@ public class SettingsActivity extends AppCompatActivity {
         builder.setTitle("URL 설정")
                 .setView(layout)
                 .setPositiveButton("설정", (dialog, button) -> {
-                    if(toggle.isChecked()){
-                        // 자동 설정
-                        if(definput.getText().length()>0)
-                            p.setDefUrl(definput.getText().toString());
-                        else
-                            p.setDefUrl(definput.getHint().toString());
-                        p.setAutoUrl(true);
-                        new UrlUpdater(context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    }else {
-                        // 수동 설정
-                        p.setAutoUrl(false);
-                        if (input.getText().length() > 0)
-                            p.setUrl(input.getText().toString());
-                        else
-                            p.setUrl(input.getHint().toString());
-                    }
+                    String url = definput.getText().length() > 0 ? definput.getText().toString() : definput.getHint().toString();
+                    String webtoonUrl = webtoonInput.getText().length() > 0 ? webtoonInput.getText().toString() : webtoonInput.getHint().toString();
+                    p.setAutoUrl(false);
+                    p.setDefUrl(url);
+                    p.setUrl(url);
+                    p.setWebtoonUrl(webtoonUrl);
                 })
                 .setNegativeButton("취소", (dialog, button) -> {
                     //do nothing

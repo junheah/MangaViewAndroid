@@ -32,6 +32,7 @@ import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int GROUP = 23;
@@ -47,13 +48,19 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     List<Ranking<?>> dataSet;
     List<Object> rows;
     MainAdapter.onItemClick listener;
+    int baseMode;
 
     public MainWebtoonAdapter(Context context){
+        this(context, base_webtoon);
+    }
+
+    public MainWebtoonAdapter(Context context, int baseMode){
         this.context = context;
+        this.baseMode = baseMode;
         this.dark = p.getDarkTheme();
         this.save = p.getDataSave();
         inflater = LayoutInflater.from(context);
-        dataSet = MainPageWebtoon.getBlankDataSet();
+        dataSet = MainPageWebtoon.getBlankDataSet(baseMode);
         rows = buildRows(dataSet, true);
         setHasStableIds(false);
     }
@@ -63,7 +70,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     public void setLoading(){
-        dataSet = MainPageWebtoon.getBlankDataSet();
+        dataSet = MainPageWebtoon.getBlankDataSet(baseMode);
         rows = buildRows(dataSet, true);
         notifyDataSetChanged();
     }
@@ -314,7 +321,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private class Fetcher extends AsyncTask<Void, Integer, MainPageWebtoon> {
         @Override
         protected MainPageWebtoon doInBackground(Void... params) {
-            return new MainPageWebtoon(httpClient);
+            return new MainPageWebtoon(httpClient, baseMode);
         }
 
         @Override
@@ -322,7 +329,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super.onPostExecute(main);
             dataSet = main.getDataSet();
             if(dataSet == null)
-                dataSet = MainPageWebtoon.getBlankDataSet();
+                dataSet = MainPageWebtoon.getBlankDataSet(baseMode);
 
             boolean hasAnyResult = false;
             for(Ranking<?> r : dataSet)

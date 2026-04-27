@@ -73,6 +73,8 @@ import static ml.melun.mangaview.Utils.writePreferenceToFile;
 import static ml.melun.mangaview.activity.FirstTimeActivity.RESULT_EULA_AGREE;
 import static ml.melun.mangaview.activity.FolderSelectActivity.MODE_FILE_SAVE;
 import static ml.melun.mangaview.activity.SettingsActivity.RESULT_NEED_RESTART;
+import static ml.melun.mangaview.mangaview.CustomHttpClient.DEFAULT_COMIC_URL;
+import static ml.melun.mangaview.mangaview.CustomHttpClient.WEBTOON_URL;
 
 
 
@@ -127,8 +129,17 @@ public class MainActivity extends AppCompatActivity
 
         //check prefs
         if (p.getSharedPref().getLong("eula2", -1)<0) {
-            startActivityForResult(new Intent(context, FirstTimeActivity.class), FIRST_TIME_ACTIVITY);
-        } else if (Migrator.running) {
+            p.setDefUrl(DEFAULT_COMIC_URL);
+            p.setUrl(DEFAULT_COMIC_URL);
+            p.setWebtoonUrl(WEBTOON_URL);
+            p.setAutoUrl(false);
+            p.getSharedPref().edit()
+                    .putLong("eula2", System.currentTimeMillis())
+                    .putBoolean("manamoa", false)
+                    .apply();
+        }
+
+        if (Migrator.running) {
             ProgressDialog mpd;
             if (p.getDarkTheme()) mpd = new ProgressDialog(context, R.style.darkDialog);
             else mpd = new ProgressDialog(context);
@@ -311,8 +322,7 @@ public class MainActivity extends AppCompatActivity
         // savedInstanceState
 
 
-        //check for update, notices
-        new CheckInfo(context,httpClient, true).all(false);
+        // First launch should go straight into the app without notice/update popups.
 
     }
 

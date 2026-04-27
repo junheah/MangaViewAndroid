@@ -17,10 +17,12 @@ import java.util.concurrent.Future;
 
 import okhttp3.Response;
 
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class MainPageWebtoon {
     String baseUrl;
+    int baseMode;
 
     public static final String ING_RECENT = "연재|최신 업데이트";
     public static final String ING_ACTION = "연재|액션";
@@ -53,14 +55,32 @@ public class MainPageWebtoon {
             {END_MARTIAL, genrePath("/end", "무협")}
     };
 
+    private static final String[][] COMIC_SECTIONS = {
+            {"만화책|최신 업데이트", "/cm?type1=complete&type2=recent&o=n"},
+            {"만화책|주간", "/cm?type1=complete&type2=10&o=n"},
+            {"만화책|완결", "/cm?type1=complete&type2=16&o=n"},
+            {"만화책|단행본", "/cm?type1=complete&type2=15&o=n"},
+            {"만화책|액션", comicGenrePath("액션")},
+            {"만화책|판타지", comicGenrePath("판타지")},
+            {"만화책|드라마", comicGenrePath("드라마")},
+            {"만화책|로맨스", comicGenrePath("로맨스")},
+            {"만화책|이세계", comicGenrePath("이세계")},
+            {"만화책|학원", comicGenrePath("학원")}
+    };
+
     List<Ranking<?>> dataSet;
 
     public MainPageWebtoon(CustomHttpClient client){
+        this(client, base_webtoon);
+    }
+
+    public MainPageWebtoon(CustomHttpClient client, int baseMode){
+        this.baseMode = baseMode;
         fetch(client);
     }
 
     public String getUrl(CustomHttpClient client){
-        this.baseUrl = client.getUrl(base_webtoon);
+        this.baseUrl = client.getUrl(baseMode);
         return this.baseUrl;
     }
 
@@ -70,10 +90,11 @@ public class MainPageWebtoon {
                 return;
         try {
             dataSet = new ArrayList<>();
-            ExecutorService executor = Executors.newFixedThreadPool(Math.min(4, SECTIONS.length));
+            String[][] sections = getSections();
+            ExecutorService executor = Executors.newFixedThreadPool(Math.min(4, sections.length));
             List<Future<Ranking<?>>> futures = new ArrayList<>();
-            for(String[] section : SECTIONS) {
-                Callable<Ranking<?>> task = () -> parseWolfTitle(client, section[0], section[1], base_webtoon);
+            for(String[] section : sections) {
+                Callable<Ranking<?>> task = () -> parseWolfTitle(client, section[0], section[1], baseMode);
                 futures.add(executor.submit(task));
             }
             for(Future<Ranking<?>> future : futures)
@@ -82,6 +103,12 @@ public class MainPageWebtoon {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private String[][] getSections(){
+        if(baseMode == base_comic)
+            return COMIC_SECTIONS;
+        return SECTIONS;
     }
 
     public Ranking<Title> parseWolfTitle(CustomHttpClient client, String title, String path, int baseMode){
@@ -101,6 +128,10 @@ public class MainPageWebtoon {
 
     private static String genrePath(String statusPath, String genre) {
         return statusPath + "?type1=genre&type2=" + percentEncode(genre, Charset.forName("EUC-KR")) + "&o=n";
+    }
+
+    private static String comicGenrePath(String genre) {
+        return "/cm?type1=genre&type2=" + percentEncode(genre, Charset.forName("EUC-KR")) + "&o=n";
     }
 
     private static String percentEncode(String value, Charset charset) {
@@ -223,8 +254,13 @@ public class MainPageWebtoon {
     }
 
     public static List<Ranking<?>> getBlankDataSet(){
+        return getBlankDataSet(base_webtoon);
+    }
+
+    public static List<Ranking<?>> getBlankDataSet(int baseMode){
         List<Ranking<?>> dataset = new ArrayList<>();
-        for(String[] section : SECTIONS)
+        String[][] sections = baseMode == base_comic ? COMIC_SECTIONS : SECTIONS;
+        for(String[] section : sections)
             dataset.add(new Ranking<>(section[0]));
         return dataset;
     }
