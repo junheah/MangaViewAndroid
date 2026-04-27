@@ -205,6 +205,7 @@ public class ViewerActivity extends AppCompatActivity {
 
             @Override
             public void updateInfo(Manga m) {
+                manga = m;
                 updateIntent(m);
                 refreshToolbar(m);
             }

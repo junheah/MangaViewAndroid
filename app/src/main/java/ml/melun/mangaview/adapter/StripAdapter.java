@@ -436,6 +436,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     PageItem current;
+    int currentMangaId = -1;
 
     boolean needUpdate = true;
 
@@ -459,8 +460,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             }
             p.setBookmark(title, pi.manga.getId());
-            if(needUpdate){
+            if(needUpdate || currentMangaId != pi.manga.getId()){
                 needUpdate = false;
+                currentMangaId = pi.manga.getId();
                 callback.updateInfo(pi.manga);
             }
         } else if(type == INFO){
