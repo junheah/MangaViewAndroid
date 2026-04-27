@@ -101,8 +101,23 @@ public class ViewerActivity extends AppCompatActivity {
     boolean topPullTriggered = false;
     boolean topPullEligible = false;
     boolean topPullInProgress = false;
+    int previousPullDistancePx = 0;
     int previousBoundaryRequestedFromId = -1;
     boolean previousEpisodePositioning = false;
+
+    private static class PageAnchor {
+        final int mangaId;
+        final int index;
+        final int side;
+        final int top;
+
+        PageAnchor(PageItem page, int top) {
+            this.mangaId = page.manga.getId();
+            this.index = page.index;
+            this.side = page.side;
+            this.top = top;
+        }
+    }
 
 
     @Override
@@ -661,8 +676,10 @@ public class ViewerActivity extends AppCompatActivity {
                 topPullTriggered = false;
                 topPullEligible = isAtViewerTop();
                 topPullInProgress = true;
+                previousPullDistancePx = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
+                previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
                 if(topPullTriggered || previousEpisodeBoundaryLoading)
                     return;
                 if(!topPullEligible && isAtViewerTop()) {
@@ -682,6 +699,7 @@ public class ViewerActivity extends AppCompatActivity {
                 boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
                 boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop)
                         && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
+                previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
@@ -873,8 +891,11 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         strip.post(() -> {
             if(stripAdapter != null && !isFinishing()) {
-                if(!stripAdapter.hasMangaLoaded(target))
+                PageAnchor anchor = captureFirstVisiblePageAnchor();
+                if(!stripAdapter.hasMangaLoaded(target)) {
                     stripAdapter.appendManga(target);
+                    restorePageAnchor(anchor);
+                }
                 if(afterAppend != null)
                     afterAppend.run();
             }
@@ -886,26 +907,51 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         strip.post(() -> {
             if(stripAdapter != null && !isFinishing()) {
-                boolean callbackDeferred = false;
                 if(!stripAdapter.hasMangaLoaded(target)) {
-                    int first = manager == null ? RecyclerView.NO_POSITION : manager.findFirstVisibleItemPosition();
-                    View firstView = manager == null || first == RecyclerView.NO_POSITION ? null : manager.findViewByPosition(first);
-                    int firstOffset = firstView == null ? 0 : firstView.getTop();
-                    int inserted = stripAdapter.insertManga(target);
-                    if(manager != null && inserted > 0 && first != RecyclerView.NO_POSITION) {
-                        int anchor = Math.min(first + inserted, stripAdapter.getItemCount() - 1);
-                        manager.scrollToPositionWithOffset(anchor, firstOffset);
-                        callbackDeferred = true;
-                        strip.post(() -> {
-                            if(afterInsert != null)
-                                afterInsert.run();
-                        });
-                    }
+                    PageAnchor anchor = captureFirstVisiblePageAnchor();
+                    stripAdapter.insertManga(target);
+                    restorePageAnchor(anchor, previousPullDistancePx);
+                    previousPullDistancePx = 0;
                 }
-                if(!callbackDeferred && afterInsert != null)
+                if(afterInsert != null)
                     afterInsert.run();
             }
         });
+    }
+
+    private PageAnchor captureFirstVisiblePageAnchor() {
+        if(manager == null || stripAdapter == null || stripAdapter.getItems() == null)
+            return null;
+        int first = manager.findFirstVisibleItemPosition();
+        int last = manager.findLastVisibleItemPosition();
+        if(first == RecyclerView.NO_POSITION || last == RecyclerView.NO_POSITION)
+            return null;
+        List<Object> items = stripAdapter.getItems();
+        int max = Math.min(last, items.size() - 1);
+        for(int position = Math.max(0, first); position <= max; position++) {
+            Object item = items.get(position);
+            if(item instanceof PageItem) {
+                PageItem page = (PageItem)item;
+                if(page.manga == null)
+                    continue;
+                View view = manager.findViewByPosition(position);
+                if(view != null)
+                    return new PageAnchor(page, view.getTop());
+            }
+        }
+        return null;
+    }
+
+    private void restorePageAnchor(PageAnchor anchor) {
+        restorePageAnchor(anchor, 0);
+    }
+
+    private void restorePageAnchor(PageAnchor anchor, int extraTopOffset) {
+        if(anchor == null || manager == null || stripAdapter == null)
+            return;
+        int position = stripAdapter.findPagePosition(anchor.mangaId, anchor.index, anchor.side);
+        if(position != RecyclerView.NO_POSITION)
+            manager.scrollToPositionWithOffset(position, anchor.top + extraTopOffset);
     }
 
     private void cancelActiveEpisodeLoader() {
