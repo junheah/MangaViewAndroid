@@ -100,6 +100,9 @@ public class ViewerActivity extends AppCompatActivity {
     float topPullStartY = 0;
     boolean topPullTriggered = false;
     boolean topPullEligible = false;
+    boolean topPullInProgress = false;
+    int pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
+    Manga pendingPreviousJumpManga = null;
 
 
     @Override
@@ -650,6 +653,7 @@ public class ViewerActivity extends AppCompatActivity {
                 topPullStartY = event.getY();
                 topPullTriggered = false;
                 topPullEligible = isAtViewerTop();
+                topPullInProgress = true;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(topPullTriggered || previousEpisodeBoundaryLoading)
@@ -669,8 +673,10 @@ public class ViewerActivity extends AppCompatActivity {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
+                runPendingPreviousJump();
                 break;
         }
     }
@@ -691,8 +697,7 @@ public class ViewerActivity extends AppCompatActivity {
         int loadedPosition = stripAdapter.findLastPagePosition(target);
         if(loadedPosition != RecyclerView.NO_POSITION) {
             if(jumpToEpisode) {
-                strip.smoothScrollToPosition(loadedPosition);
-                clearProgrammaticPreviousJumpBookmark(target);
+                schedulePreviousJump(target, loadedPosition);
             }
             return;
         }
@@ -715,8 +720,7 @@ public class ViewerActivity extends AppCompatActivity {
                 strip.post(() -> {
                     int position = stripAdapter.findLastPagePosition(m);
                     if(shouldJump && position != RecyclerView.NO_POSITION) {
-                        strip.smoothScrollToPosition(position);
-                        clearProgrammaticPreviousJumpBookmark(m);
+                        schedulePreviousJump(m, position);
                     }
                 });
             }
@@ -725,6 +729,28 @@ public class ViewerActivity extends AppCompatActivity {
             public void nextLoaded(Manga m) {
             }
         }, page.manga);
+    }
+
+    private void schedulePreviousJump(Manga m, int position) {
+        pendingPreviousJumpManga = m;
+        pendingPreviousJumpPosition = position;
+        if(!topPullInProgress)
+            runPendingPreviousJump();
+    }
+
+    private void runPendingPreviousJump() {
+        if(strip == null || pendingPreviousJumpPosition == RecyclerView.NO_POSITION)
+            return;
+        Manga target = pendingPreviousJumpManga;
+        int position = pendingPreviousJumpPosition;
+        pendingPreviousJumpManga = null;
+        pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
+        strip.postDelayed(() -> {
+            if(strip != null && stripAdapter != null && !isFinishing()) {
+                strip.smoothScrollToPosition(position);
+                clearProgrammaticPreviousJumpBookmark(target);
+            }
+        }, 80);
     }
 
     private void clearProgrammaticPreviousJumpBookmark(Manga m) {
