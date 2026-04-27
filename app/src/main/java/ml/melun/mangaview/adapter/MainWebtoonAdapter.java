@@ -513,7 +513,8 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         protected void onPostExecute(Boolean hasAnyResult) {
             super.onPostExecute(hasAnyResult);
-            fetcher = null;
+            if(fetcher == this)
+                fetcher = null;
             if(!hasAnyResult) {
                 if(listener != null)
                     listener.captchaCallback();
@@ -526,7 +527,8 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         protected void onCancelled(Boolean result) {
             super.onCancelled(result);
-            fetcher = null;
+            if(fetcher == this)
+                fetcher = null;
         }
     }
 }
