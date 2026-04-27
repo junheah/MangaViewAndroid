@@ -19,6 +19,8 @@ import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 import static ml.melun.mangaview.mangaview.MTitle.baseModeStr;
 
 public class Search {
+    private static final long PAGE_CACHE_TTL_MS = 2 * 60 * 1000L;
+
     int baseMode;
     private final String query;
     Boolean last = false;
@@ -195,22 +197,16 @@ public class Search {
     }
 
     private void appendWebtoonResults(CustomHttpClient client, ArrayList<Title> target, String path, int limit) throws Exception {
-        Response response = client.mget(path, true, null);
-        String body = response.body().string();
-        int code = response.code();
-        response.close();
-        if(code >= 400)
-            throw new Exception("Webtoon search failed: " + code);
-        Document d = Jsoup.parse(body);
+        CustomHttpClient.PageResponse page = client.mgetCachedPage(path, PAGE_CACHE_TTL_MS);
+        if(page.code >= 400)
+            throw new Exception("Webtoon search failed: " + page.code);
+        Document d = Jsoup.parse(page.body);
         ArrayList<Title> parsed = MainPageWebtoon.parseWolfTitles(d, baseMode, limit);
         if(parsed.size() == 0 && client.resolveWfwfDomainNow()) {
-            response = client.mget(path, true, null);
-            body = response.body().string();
-            code = response.code();
-            response.close();
-            if(code >= 400)
-                throw new Exception("Webtoon search failed: " + code);
-            parsed = MainPageWebtoon.parseWolfTitles(Jsoup.parse(body), baseMode, limit);
+            page = client.mgetCachedPage(path, PAGE_CACHE_TTL_MS);
+            if(page.code >= 400)
+                throw new Exception("Webtoon search failed: " + page.code);
+            parsed = MainPageWebtoon.parseWolfTitles(Jsoup.parse(page.body), baseMode, limit);
         }
         target.addAll(parsed);
     }

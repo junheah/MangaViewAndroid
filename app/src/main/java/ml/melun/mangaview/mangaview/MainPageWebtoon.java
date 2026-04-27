@@ -25,6 +25,7 @@ public class MainPageWebtoon {
     int baseMode;
 
     private static final int MAIN_SECTION_LIMIT = 10;
+    private static final long PAGE_CACHE_TTL_MS = 2 * 60 * 1000L;
 
     private static final String[] WEBTOON_STATUS = {"ing", "end"};
     private static final String[] WEBTOON_STATUS_LABELS = {"연재웹툰", "완결웹툰"};
@@ -91,10 +92,8 @@ public class MainPageWebtoon {
         Ranking<Title> ranking = new Ranking<>(title);
         boolean retried = false;
         try{
-            Response r = client.mget(path);
-            String body = r.body().string();
-            r.close();
-            Document d = Jsoup.parse(body);
+            CustomHttpClient.PageResponse page = client.mgetCachedPage(path, PAGE_CACHE_TTL_MS);
+            Document d = Jsoup.parse(page.body);
             for(Title webtoon : parseWolfTitles(d, baseMode, MAIN_SECTION_LIMIT))
                 ranking.add(webtoon);
             if(ranking.size() == 0 && !retried && client.resolveWfwfDomainNow()) {

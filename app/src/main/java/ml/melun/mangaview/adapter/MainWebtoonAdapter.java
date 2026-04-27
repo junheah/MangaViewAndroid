@@ -174,6 +174,10 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
 
         void bind() {
+            Object tag = filterSections.getTag();
+            if(tag instanceof Integer && ((Integer) tag) == baseMode && filterSections.getChildCount() > 0)
+                return;
+            filterSections.setTag(baseMode);
             statusFilters.setVisibility(View.GONE);
             genreFilters.setVisibility(View.GONE);
             filterSections.removeAllViews();
@@ -291,7 +295,11 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 if(listener != null && name.path.length() > 0)
                     listener.clickedCategoryPath(name.title, name.path);
             });
-            list.setAdapter(new WebtoonCardAdapter(section));
+            RecyclerView.Adapter adapter = list.getAdapter();
+            if(adapter instanceof WebtoonCardAdapter)
+                ((WebtoonCardAdapter) adapter).setItems(section);
+            else
+                list.setAdapter(new WebtoonCardAdapter(section));
         }
     }
 
@@ -300,6 +308,11 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         WebtoonCardAdapter(List<?> items) {
             this.items = items;
+        }
+
+        void setItems(List<?> items) {
+            this.items = items;
+            notifyDataSetChanged();
         }
 
         @NonNull

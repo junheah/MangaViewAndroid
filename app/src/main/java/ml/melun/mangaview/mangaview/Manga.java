@@ -39,6 +39,8 @@ import androidx.documentfile.provider.DocumentFile;
      */
 
 public class Manga {
+    private static final long PAGE_CACHE_TTL_MS = 60 * 1000L;
+
     int baseMode = base_comic;
     int titleId = -1;
 
@@ -230,10 +232,8 @@ public class Manga {
             if(titleId <= 0)
                 return LOAD_OK;
 
-            Response r = client.mget(viewPath + titleId + "&num=" + id);
-            String body = r.body().string();
-            r.close();
-            Document d = Jsoup.parse(body);
+            CustomHttpClient.PageResponse page = client.mgetCachedPage(viewPath + titleId + "&num=" + id, PAGE_CACHE_TTL_MS);
+            Document d = Jsoup.parse(page.body);
 
             try {
                 Element header = d.selectFirst("div.image-view h2 span");

@@ -35,6 +35,7 @@ public class Title extends MTitle {
     public static final int BATTERY_FULL = 4;
     public static final int LOAD_OK = 0;
     public static final int LOAD_CAPTCHA = 1;
+    private static final long PAGE_CACHE_TTL_MS = 2 * 60 * 1000L;
 
 
     public Title(String n, String t, String a, List<String> tg, String r, int id, int baseMode) {
@@ -176,10 +177,8 @@ public class Title extends MTitle {
 
     private int fetchWolfEps(CustomHttpClient client, String listPath, String viewPath) {
         try {
-            Response r = client.mget(listPath + id);
-            String body = r.body().string();
-            r.close();
-            Document d = Jsoup.parse(body);
+            CustomHttpClient.PageResponse page = client.mgetCachedPage(listPath + id, PAGE_CACHE_TTL_MS);
+            Document d = Jsoup.parse(page.body);
 
             try {
                 Element metaTitle = d.selectFirst("meta[property=og:title]");

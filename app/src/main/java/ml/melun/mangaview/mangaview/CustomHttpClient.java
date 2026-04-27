@@ -12,6 +12,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -36,9 +37,11 @@ public class CustomHttpClient {
     public static final String WEBTOON_URL = "https://wfwf449.com";
     private static final long WFWF_DOMAIN_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000L;
     private static final long COOKIE_SYNC_INTERVAL_MS = 30 * 1000L;
+    private static final int PAGE_CACHE_MAX_ENTRIES = 80;
     public OkHttpClient client;
     Map<String, String> cookies;
     Map<String, Long> cookieSyncAt;
+    Map<String, CachedPage> pageCache;
     private Context context;
     public String agent = "Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36";
 
@@ -47,6 +50,12 @@ public class CustomHttpClient {
         this.context = context.getApplicationContext();
         this.cookies = new HashMap<>();
         this.cookieSyncAt = new HashMap<>();
+        this.pageCache = new LinkedHashMap<String, CachedPage>(PAGE_CACHE_MAX_ENTRIES, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<String, CachedPage> eldest) {
+                return size() > PAGE_CACHE_MAX_ENTRIES;
+            }
+        };
         loadSavedCookies();
         try {
             this.agent = WebSettings.getDefaultUserAgent(this.context);
@@ -229,6 +238,7 @@ public class CustomHttpClient {
             p.setUrl(resolved + "/cm");
             p.setDefUrl(resolved + "/cm");
             resetCookie();
+            clearPageCache();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -241,6 +251,35 @@ public class CustomHttpClient {
     }
     public Response mget(String url){
         return mget(url,true);
+    }
+
+    public PageResponse mgetCachedPage(String url, long ttlMillis) throws Exception {
+        ensureWfwfDomain(false);
+        String normalized = normalizePath(url);
+        String cacheKey = getBaseUrl(normalized) + normalized;
+        long now = System.currentTimeMillis();
+        synchronized (this) {
+            CachedPage cached = pageCache.get(cacheKey);
+            if(cached != null && now - cached.time < ttlMillis)
+                return new PageResponse(cached.code, cached.body, true);
+        }
+
+        Response response = mget(normalized, true, null);
+        if(response == null)
+            throw new Exception("Request failed: " + normalized);
+        int code = response.code();
+        String body = response.body() == null ? "" : response.body().string();
+        response.close();
+        if(code >= 200 && code < 400 && body.length() > 0 && looksCacheable(body)) {
+            synchronized (this) {
+                pageCache.put(cacheKey, new CachedPage(code, body, now));
+            }
+        }
+        return new PageResponse(code, body, false);
+    }
+
+    public synchronized void clearPageCache() {
+        pageCache.clear();
     }
 
 
@@ -309,6 +348,7 @@ public class CustomHttpClient {
         ensureWfwfDomain(false);
         if(customCookie==null)
             customCookie = new HashMap<>();
+        url = normalizePath(url);
 //        if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
 //            customCookie.put("PHPSESSID", p.getLogin().cookie);
 //        }
@@ -337,8 +377,6 @@ public class CustomHttpClient {
         headers.put("User-Agent", agent);
         headers.put("Referer", baseUrl);
 
-        if(!url.startsWith("/"))
-            url = "/" + url;
         Response response = get(baseUrl + url, headers);
         if(shouldRetryWithResolvedDomain(response)) {
             if(response != null)
@@ -356,6 +394,45 @@ public class CustomHttpClient {
             return true;
         int code = response.code();
         return code == 301 || code == 302 || code == 403 || code == 404 || code >= 500;
+    }
+
+    private String normalizePath(String url) {
+        if(url == null || url.length() == 0)
+            return "/";
+        return url.startsWith("/") ? url : "/" + url;
+    }
+
+    private boolean looksCacheable(String body) {
+        String lower = body.toLowerCase();
+        return lower.contains("webtoon-list")
+                || lower.contains("searchitem")
+                || lower.contains("toon=")
+                || lower.contains("image-view")
+                || lower.contains("webtoon-body");
+    }
+
+    public static class PageResponse {
+        public final int code;
+        public final String body;
+        public final boolean fromCache;
+
+        PageResponse(int code, String body, boolean fromCache) {
+            this.code = code;
+            this.body = body;
+            this.fromCache = fromCache;
+        }
+    }
+
+    private static class CachedPage {
+        final int code;
+        final String body;
+        final long time;
+
+        CachedPage(int code, String body, long time) {
+            this.code = code;
+            this.body = body;
+            this.time = time;
+        }
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){
