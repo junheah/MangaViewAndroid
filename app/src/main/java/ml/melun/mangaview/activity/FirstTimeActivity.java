@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import ml.melun.mangaview.CheckInfo;
 import ml.melun.mangaview.R;
 import ml.melun.mangaview.UrlUpdater;
+import ml.melun.mangaview.mangaview.WfwfDomainResolver;
 
 import static ml.melun.mangaview.CheckInfo.COLOR_DARK;
 import static ml.melun.mangaview.MainApplication.httpClient;
@@ -104,8 +105,15 @@ public class FirstTimeActivity extends AppCompatActivity {
     private void acceptDirectUrl(String url){
         if(pd.isShowing())
             pd.dismiss();
-        p.setDefUrl(url);
-        p.setUrl(url);
+        String root = WfwfDomainResolver.toRoot(url);
+        if(WfwfDomainResolver.isWfwfUrl(root)) {
+            p.setWebtoonUrl(root);
+            p.setDefUrl(root + "/cm");
+            p.setUrl(root + "/cm");
+        } else {
+            p.setDefUrl(url);
+            p.setUrl(url);
+        }
         p.setAutoUrl(false);
         long time = System.currentTimeMillis();
         p.getSharedPref().edit().putLong("eula2", time).apply();

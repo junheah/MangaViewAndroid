@@ -9,6 +9,8 @@ import java.util.Map;
 
 import okhttp3.Response;
 
+import ml.melun.mangaview.mangaview.WfwfDomainResolver;
+
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
 
@@ -38,7 +40,14 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
     protected Boolean fetch(){
         try {
             Map<String, String> headers = new HashMap<>();
-            headers.put("User-Agent", "Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30");
+            headers.put("User-Agent", httpClient.agent);
+            String root = WfwfDomainResolver.toRoot(fetchUrl);
+            if(WfwfDomainResolver.isWfwfUrl(root)) {
+                headers.put("Referer", root);
+                result = WfwfDomainResolver.resolve(httpClient.client, root, headers);
+                return result != null;
+            }
+
             Response r = httpClient.get(fetchUrl, headers);
             if (r.code() == 302) {
                 result = r.header("Location");
@@ -57,7 +66,16 @@ public class UrlUpdater extends AsyncTask<Void, Void, Boolean> {
 
     protected void onPostExecute(Boolean r) {
         if(r && result !=null){
-            p.setUrl(result);
+            if(WfwfDomainResolver.isWfwfUrl(WfwfDomainResolver.toRoot(result))) {
+                String root = WfwfDomainResolver.toRoot(result);
+                p.setWebtoonUrl(root);
+                p.setDefUrl(root + "/cm");
+                p.setUrl(root + "/cm");
+                httpClient.resetCookie();
+                httpClient.clearPageCache();
+            } else {
+                p.setUrl(result);
+            }
             if(!silent)Toast.makeText(c, "자동 URL 설정 완료!", Toast.LENGTH_SHORT).show();
             if(callback!=null) callback.callback(true);
         }else{

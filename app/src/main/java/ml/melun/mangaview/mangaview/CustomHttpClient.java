@@ -271,6 +271,7 @@ public class CustomHttpClient {
         String body = response.body() == null ? "" : response.body().string();
         response.close();
         if(code >= 200 && code < 400 && body.length() > 0 && looksCacheable(body)) {
+            cacheKey = getBaseUrl(normalized) + normalized;
             synchronized (this) {
                 pageCache.put(cacheKey, new CachedPage(code, body, now));
             }
