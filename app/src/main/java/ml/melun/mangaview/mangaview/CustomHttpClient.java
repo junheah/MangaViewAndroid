@@ -370,8 +370,6 @@ public class CustomHttpClient {
         if(cbuilder.length()>2)
             cbuilder.delete(cbuilder.length()-2,cbuilder.length());
 
-        System.out.println("ppppcookie: "+cbuilder.toString());
-
         Map<String, String> headers = new HashMap<>();
         headers.put("Cookie", cbuilder.toString());
         headers.put("User-Agent", agent);

@@ -49,6 +49,7 @@ public class MainSearch extends Fragment {
     Spinner searchMode, baseMode;
     TitleAdapter searchAdapter;
     Search search;
+    SearchManga searchTask;
     Fragment fragment;
     LinearLayoutCompat optionsPanel;
     String prequery = null;
@@ -118,8 +119,10 @@ public class MainSearch extends Fragment {
             if(search==null) swipe.setRefreshing(false);
             else {
                 if (!search.isLast()) {
-                    SearchManga sm = new SearchManga();
-                    sm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    if(searchTask == null) {
+                        searchTask = new SearchManga(search);
+                        searchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    }
                 } else swipe.setRefreshing(false);
             }
         });
@@ -151,7 +154,10 @@ public class MainSearch extends Fragment {
             if(searchAdapter != null) searchAdapter.removeAll();
             else searchAdapter = new TitleAdapter(getContext());
             search = new Search(query,searchMode.getSelectedItemPosition(), baseMode.getSelectedItemPosition()+1);
-            new SearchManga().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            if(searchTask != null)
+                searchTask.cancel(true);
+            searchTask = new SearchManga(search);
+            searchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -163,23 +169,40 @@ public class MainSearch extends Fragment {
             searchSubmit();
     }
 
+    @Override
+    public void onDestroyView() {
+        if(searchTask != null)
+            searchTask.cancel(true);
+        super.onDestroyView();
+    }
+
     private class SearchManga extends AsyncTask<String,String,Integer>{
+        private final Search targetSearch;
+
+        SearchManga(Search targetSearch) {
+            this.targetSearch = targetSearch;
+        }
+
         protected void onPreExecute(){
             super.onPreExecute();
         }
         protected Integer doInBackground(String... params){
-            return search.fetch(httpClient);
+            return targetSearch.fetch(httpClient);
         }
         @Override
         protected void onPostExecute(Integer res){
             super.onPostExecute(res);
+            if(searchTask == this)
+                searchTask = null;
+            if(isCancelled() || targetSearch != search || getContext() == null)
+                return;
             if(res != 0){
                 // error
                 Utils.showCaptchaPopup(getContext(), 4, fragment, p);
             }
 
             if(searchAdapter.getItemCount()==0) {
-                searchAdapter.addData(search.getResult());
+                searchAdapter.addData(targetSearch.getResult());
                 searchResult.setAdapter(searchAdapter);
                 searchAdapter.setClickListener(new TitleAdapter.ItemClickListener() {
                     @Override
@@ -200,7 +223,7 @@ public class MainSearch extends Fragment {
 
                     @Override
                     public void onResumeClick(int position, int id) {
-                        openViewer(getContext(),new Manga(id,"","", search.getBaseMode()),-1);
+                        openViewer(getContext(),new Manga(id,"","", targetSearch.getBaseMode()),-1);
                     }
 
                     @Override
@@ -211,7 +234,7 @@ public class MainSearch extends Fragment {
                     }
                 });
             }else{
-                searchAdapter.addData(search.getResult());
+                searchAdapter.addData(targetSearch.getResult());
             }
 
             if(searchAdapter.getItemCount()>0) {
@@ -221,6 +244,16 @@ public class MainSearch extends Fragment {
             }
 
             swipe.setRefreshing(false);
+        }
+
+        @Override
+        protected void onCancelled(Integer res) {
+            super.onCancelled(res);
+            if(searchTask == this) {
+                searchTask = null;
+                if(swipe != null)
+                    swipe.setRefreshing(false);
+            }
         }
     }
 }

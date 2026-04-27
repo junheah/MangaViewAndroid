@@ -275,18 +275,21 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     void loadManga(Manga m, LoadMangaCallback callback){
-        if(m!=null) {
-            if(title != null)
-                m.setTitle(title);
-            this.manga = m;
-            loadImages l = new loadImages(m, callback,true);
-            l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+        if(m == null)
+            return;
+        if(title != null)
+            m.setTitle(title);
+        this.manga = m;
+        if(loader != null)
+            loader.cancel(true);
+        loader = new loadImages(m, callback,true);
+        loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     void loadManga(Manga m){
         if(m == null){
             showPopup(context, "오류", "만화를 불러 오던중 오류가 발생했습니다.", (dialog, which) -> ViewerActivity.this.finish(), dialog -> ViewerActivity.this.finish());
+            return;
         }
         if(stripAdapter!=null) stripAdapter.removeAll();
         if(m.isOnline()) {
@@ -426,6 +429,10 @@ public class ViewerActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if(onBack != null) {
+            onBack.run();
+            return;
+        }
         super.onBackPressed();
     }
 
@@ -476,8 +483,14 @@ public class ViewerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Integer res) {
+            if(isCancelled() || isFinishing())
+                return;
+            if(loader == this)
+                loader = null;
             if(res == LOAD_CAPTCHA){
                 //캡차 처리 팝업
+                if(lockui) lockUi(false);
+                resetOnBackPressed();
                 showTokiCaptchaPopup(context, p);
                 return;
             }
@@ -488,6 +501,16 @@ public class ViewerActivity extends AppCompatActivity {
             super.onPostExecute(res);
             resetOnBackPressed();
             callback.post(m);
+        }
+
+        @Override
+        protected void onCancelled(Integer res) {
+            super.onCancelled(res);
+            if(loader == this) {
+                loader = null;
+                if(lockui) lockUi(false);
+                resetOnBackPressed();
+            }
         }
     }
 
@@ -577,6 +600,13 @@ public class ViewerActivity extends AppCompatActivity {
         if (resultCode == RESULT_CAPTCHA) {
             refresh();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(loader != null)
+            loader.cancel(true);
+        super.onDestroy();
     }
 
     public interface InfiniteScrollCallback{

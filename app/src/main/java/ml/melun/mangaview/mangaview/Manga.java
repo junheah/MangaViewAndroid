@@ -118,8 +118,6 @@ public class Manga {
 
                 Document d = Jsoup.parse(body);
 
-                System.out.println(body);
-
                 //name
                 name = d.selectFirst("div.toon-title").ownText();
 

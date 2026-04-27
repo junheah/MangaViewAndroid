@@ -77,6 +77,8 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         public Manga next;
         public Manga prev;
+        boolean nextRequested;
+        boolean prevRequested;
     }
 
     @Override
@@ -114,7 +116,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         List<String> imgs = m.getImgs(mainContext);
         for(int i=imgs.size()-1; i>=0; i--){
             if(autoCut)
-                items.add(new PageItem(0,imgs.get(i),m,PageItem.SECOND));
+                items.add(0, new PageItem(i,imgs.get(i),m,PageItem.SECOND));
             items.add(0,new PageItem(i,imgs.get(i),m));
         }
         items.add(0, new InfoItem(null, m));
@@ -143,19 +145,21 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void popLast(){
-        int rsize = 0;
-        items.remove(items.size()-1);
-        for(int i=items.size()-2; i>=0; i--){
+        int originalSize = items.size();
+        int rsize = -1;
+        for(int i=originalSize-2; i>=0; i--){
             if(items.get(i) instanceof InfoItem){
                 rsize = i;
                 break;
             }
         }
-        if (items.size() > rsize + 1) {
-            items.subList(rsize + 1, items.size()).clear();
+        if (rsize >= 0 && originalSize > rsize + 1) {
+            int removeStart = rsize + 1;
+            int removeCount = originalSize - removeStart;
+            items.subList(removeStart, originalSize).clear();
+            count--;
+            notifyItemRangeRemoved(removeStart, removeCount);
         }
-        count--;
-        notifyItemRangeRemoved(rsize+1,items.size()-rsize);
     }
 
     // data is passed into the constructor
@@ -228,8 +232,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }else if(type == INFO){
             //INFO
             ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
-            Manga prev = ((InfoItem)items.get(pos)).prev;
-            Manga next = ((InfoItem)items.get(pos)).next;
+            InfoItem info = (InfoItem)items.get(pos);
+            Manga prev = info.prev;
+            Manga next = info.next;
 
             if(prev == null){
                 prev = next.prevEp();
@@ -255,15 +260,17 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             };
 
             Manga m;
-            if(pos == 0){
+            if(pos == 0 && !info.prevRequested){
+                info.prevRequested = true;
                 ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
                 m = callback.prevEp(r, next);
-                ((InfoItem)items.get(pos)).prev = m;
+                info.prev = m;
                 ((InfoViewHolder) holder).prevInfo.setText(m==null? "첫 화":"이전 화");
-            }else if(pos == items.size()-1){
+            }else if(pos == items.size()-1 && !info.nextRequested){
+                info.nextRequested = true;
                 ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
                 m = callback.nextEp(r, prev);
-                ((InfoItem)items.get(pos)).next = m;
+                info.next = m;
                 ((InfoViewHolder) holder).nextInfo.setText(m==null? "마지막 화":"다음 화");
             }
         }
