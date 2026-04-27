@@ -274,6 +274,8 @@ public class ViewerActivity extends AppCompatActivity {
 
     void loadManga(Manga m, LoadMangaCallback callback){
         if(m!=null) {
+            if(title != null)
+                m.setTitle(title);
             this.manga = m;
             loadImages l = new loadImages(m, callback,true);
             l.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);

@@ -249,15 +249,38 @@ public class Manga {
                     imgs.add(src);
             }
 
-            for(Element link : d.select("section.webtoon-bottom a[href^=\"" + epPath + titleId + "\"]")) {
-                int epId = MainPageWebtoon.getQueryInt(link.attr("href"), "num");
-                if(epId > 0)
-                    eps.add(new Manga(epId, link.ownText(), "", baseMode));
+            if(title != null && title.getEps() != null && title.getEps().size() > 0) {
+                eps = title.getEps();
+                for(Manga ep : eps) {
+                    ep.setMode(0);
+                    ep.setTitle(title);
+                    ep.setTitleId(titleId);
+                }
+            } else {
+                Manga next = wolfEpisode(d.selectFirst("section.webtoon-bottom li.next a[href^=\"" + epPath + titleId + "\"]"), titleId);
+                Manga prev = wolfEpisode(d.selectFirst("section.webtoon-bottom li.prev a[href^=\"" + epPath + titleId + "\"]"), titleId);
+                if(next != null)
+                    eps.add(next);
+                eps.add(this);
+                if(prev != null)
+                    eps.add(prev);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return LOAD_OK;
+    }
+
+    private Manga wolfEpisode(Element link, int titleId) {
+        if(link == null) return null;
+        int epId = MainPageWebtoon.getQueryInt(link.attr("href"), "num");
+        if(epId <= 0) return null;
+        String epTitle = link.ownText().replace("\u00a0", " ").trim();
+        Manga manga = new Manga(epId, epTitle, "", baseMode);
+        manga.setMode(0);
+        manga.setTitle(title);
+        manga.setTitleId(titleId);
+        return manga;
     }
 
     private Comment parseComment(Element e) {
@@ -363,6 +386,10 @@ public class Manga {
         this.title = title;
         if(title != null)
             titleId = title.getId();
+    }
+
+    public void setTitleId(int titleId) {
+        this.titleId = titleId;
     }
 
     @Override
