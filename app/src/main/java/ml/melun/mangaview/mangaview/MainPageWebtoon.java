@@ -42,6 +42,20 @@ public class MainPageWebtoon {
 
     private static final int MAIN_SECTION_LIMIT = 10;
 
+    private static final String ORDER_POPULAR = "정렬|인기순|/cm?type1=complete&type2=recent&o=f";
+    private static final String ORDER_RECENT = "정렬|최신순|/cm?type1=complete&type2=recent&o=n";
+    private static final String DAY_RECENT = "연재일|최신|/cm?type1=complete&type2=recent&o=n";
+    private static final String DAY_WEEKLY = "연재일|주간|/cm?type1=complete&type2=10&o=n";
+    private static final String DAY_BIWEEKLY = "연재일|격주|/cm?type1=complete&type2=11&o=n";
+    private static final String DAY_MONTHLY = "연재일|월간|/cm?type1=complete&type2=12&o=n";
+    private static final String DAY_ONESHOT = "연재일|단편|/cm?type1=complete&type2=14&o=n";
+    private static final String DAY_COMPLETE = "연재일|완결|/cm?type1=complete&type2=16&o=n";
+    private static final String DAY_BOOK = "연재일|단행본|/cm?type1=complete&type2=15&o=n";
+    private static final String DAY_IRREGULAR = "연재일|비정기|/cm?type1=complete&type2=13&o=n";
+    private static final String DAY_UNSORTED = "연재일|미분류|/cm?type1=complete&type2=20&o=n";
+    private static final String ALPHABET_AZ = "작품별|A-Z|/cm?type1=alphabet&type2=a&o=n";
+    private static final String ALPHABET_NUMBER = "작품별|0-9|/cm?type1=alphabet&type2=0&o=n";
+
     private static final String[][] SECTIONS = {
             {ING_RECENT, "/ing?type1=day&type2=recent&o=n"},
             {ING_ACTION, genrePath("/ing", "액션")},
@@ -56,16 +70,84 @@ public class MainPageWebtoon {
     };
 
     private static final String[][] COMIC_SECTIONS = {
-            {"만화책|최신 업데이트", "/cm?type1=complete&type2=recent&o=n"},
-            {"만화책|주간", "/cm?type1=complete&type2=10&o=n"},
-            {"만화책|완결", "/cm?type1=complete&type2=16&o=n"},
-            {"만화책|단행본", "/cm?type1=complete&type2=15&o=n"},
-            {"만화책|액션", comicGenrePath("액션")},
-            {"만화책|판타지", comicGenrePath("판타지")},
-            {"만화책|드라마", comicGenrePath("드라마")},
-            {"만화책|로맨스", comicGenrePath("로맨스")},
-            {"만화책|이세계", comicGenrePath("이세계")},
-            {"만화책|학원", comicGenrePath("학원")}
+            splitSection(DAY_RECENT),
+            splitSection(DAY_WEEKLY),
+            splitSection(DAY_BIWEEKLY),
+            splitSection(DAY_MONTHLY),
+            splitSection(DAY_ONESHOT),
+            splitSection(DAY_COMPLETE),
+            splitSection(DAY_BOOK),
+            splitSection(DAY_IRREGULAR),
+            splitSection(DAY_UNSORTED),
+            comicSection("장르별", "17"),
+            comicSection("장르별", "드라마"),
+            comicSection("장르별", "액션"),
+            comicSection("장르별", "SF"),
+            comicSection("장르별", "TS"),
+            comicSection("장르별", "개그"),
+            comicSection("장르별", "게임"),
+            comicSection("장르별", "공포"),
+            comicSection("장르별", "도박"),
+            comicSection("장르별", "호러"),
+            comicSection("장르별", "라노벨"),
+            comicSection("장르별", "러브코미디"),
+            comicSection("장르별", "로맨스"),
+            comicSection("장르별", "먹방"),
+            comicSection("장르별", "미스터리"),
+            comicSection("장르별", "백합"),
+            comicSection("장르별", "붕탁"),
+            comicSection("장르별", "성인"),
+            comicSection("장르별", "순정"),
+            comicSection("장르별", "스릴러"),
+            comicSection("장르별", "스포츠"),
+            comicSection("장르별", "시대"),
+            comicSection("장르별", "학원"),
+            comicSection("장르별", "BL"),
+            comicSection("장르별", "여장"),
+            comicSection("장르별", "역사"),
+            comicSection("장르별", "요리"),
+            comicSection("장르별", "음악"),
+            comicSection("장르별", "이세계"),
+            comicSection("장르별", "일상"),
+            comicSection("장르별", "전생"),
+            comicSection("장르별", "추리"),
+            comicAlphabetSection("ㄱ"),
+            comicAlphabetSection("ㄴ"),
+            comicAlphabetSection("ㄷ"),
+            comicAlphabetSection("ㄹ"),
+            comicAlphabetSection("ㅁ"),
+            comicAlphabetSection("ㅂ"),
+            comicAlphabetSection("ㅅ"),
+            comicAlphabetSection("ㅇ"),
+            comicAlphabetSection("ㅈ"),
+            comicAlphabetSection("ㅊ"),
+            comicAlphabetSection("ㅋ"),
+            comicAlphabetSection("ㅌ"),
+            comicAlphabetSection("ㅍ"),
+            comicAlphabetSection("ㅎ"),
+            splitSection(ALPHABET_AZ),
+            splitSection(ALPHABET_NUMBER)
+    };
+
+    public static final String[][] COMIC_FILTER_GROUPS = {
+            {ORDER_POPULAR, ORDER_RECENT},
+            {DAY_RECENT, DAY_WEEKLY, DAY_BIWEEKLY, DAY_MONTHLY, DAY_ONESHOT, DAY_COMPLETE, DAY_BOOK, DAY_IRREGULAR, DAY_UNSORTED},
+            {
+                    comicFilter("장르별", "17"), comicFilter("장르별", "드라마"), comicFilter("장르별", "액션"), comicFilter("장르별", "SF"),
+                    comicFilter("장르별", "TS"), comicFilter("장르별", "개그"), comicFilter("장르별", "게임"), comicFilter("장르별", "공포"),
+                    comicFilter("장르별", "도박"), comicFilter("장르별", "호러"), comicFilter("장르별", "라노벨"), comicFilter("장르별", "러브코미디"),
+                    comicFilter("장르별", "로맨스"), comicFilter("장르별", "먹방"), comicFilter("장르별", "미스터리"), comicFilter("장르별", "백합"),
+                    comicFilter("장르별", "붕탁"), comicFilter("장르별", "성인"), comicFilter("장르별", "순정"), comicFilter("장르별", "스릴러"),
+                    comicFilter("장르별", "스포츠"), comicFilter("장르별", "시대"), comicFilter("장르별", "학원"), comicFilter("장르별", "BL"),
+                    comicFilter("장르별", "여장"), comicFilter("장르별", "역사"), comicFilter("장르별", "요리"), comicFilter("장르별", "음악"),
+                    comicFilter("장르별", "이세계"), comicFilter("장르별", "일상"), comicFilter("장르별", "전생"), comicFilter("장르별", "추리")
+            },
+            {
+                    comicAlphabetFilter("ㄱ"), comicAlphabetFilter("ㄴ"), comicAlphabetFilter("ㄷ"), comicAlphabetFilter("ㄹ"),
+                    comicAlphabetFilter("ㅁ"), comicAlphabetFilter("ㅂ"), comicAlphabetFilter("ㅅ"), comicAlphabetFilter("ㅇ"),
+                    comicAlphabetFilter("ㅈ"), comicAlphabetFilter("ㅊ"), comicAlphabetFilter("ㅋ"), comicAlphabetFilter("ㅌ"),
+                    comicAlphabetFilter("ㅍ"), comicAlphabetFilter("ㅎ"), ALPHABET_AZ, ALPHABET_NUMBER
+            }
     };
 
     List<Ranking<?>> dataSet;
@@ -132,6 +214,31 @@ public class MainPageWebtoon {
 
     private static String comicGenrePath(String genre) {
         return "/cm?type1=genre&type2=" + percentEncode(genre, Charset.forName("EUC-KR")) + "&o=n";
+    }
+
+    private static String comicAlphabetPath(String value) {
+        return "/cm?type1=alphabet&type2=" + percentEncode(value, Charset.forName("EUC-KR")) + "&o=n";
+    }
+
+    private static String comicFilter(String group, String label) {
+        return group + "|" + label + "|" + comicGenrePath(label);
+    }
+
+    private static String comicAlphabetFilter(String label) {
+        return "작품별|" + label + "|" + comicAlphabetPath(label);
+    }
+
+    private static String[] comicSection(String group, String label) {
+        return new String[]{group + "|" + label + "|" + comicGenrePath(label), comicGenrePath(label)};
+    }
+
+    private static String[] comicAlphabetSection(String label) {
+        return new String[]{"작품별|" + label + "|" + comicAlphabetPath(label), comicAlphabetPath(label)};
+    }
+
+    private static String[] splitSection(String raw) {
+        String[] parts = raw.split("\\|", 3);
+        return new String[]{raw, parts.length > 2 ? parts[2] : ""};
     }
 
     private static String percentEncode(String value, Charset charset) {

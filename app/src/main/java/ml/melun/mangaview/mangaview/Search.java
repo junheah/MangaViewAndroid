@@ -166,7 +166,9 @@ public class Search {
     private int fetchComic(CustomHttpClient client) {
         try {
             ArrayList<Title> comicResults = new ArrayList<>();
-            if(mode == 2) {
+            if(mode == 8) {
+                appendWebtoonResults(client, comicResults, query, 0);
+            } else if(mode == 2) {
                 appendWebtoonResults(client, comicResults, "/cm?type1=genre&type2=" + percentEncode(query, Charset.forName("EUC-KR")) + "&o=n", 120);
             } else if(mode == 4) {
                 String type = comicType(query);

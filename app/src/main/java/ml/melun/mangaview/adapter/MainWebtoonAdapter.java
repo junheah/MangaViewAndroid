@@ -32,6 +32,7 @@ import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
 public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -140,19 +141,21 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private SectionName parseSectionName(String raw) {
         if(raw == null)
-            return new SectionName("웹툰", "");
-        int divider = raw.indexOf('|');
-        if(divider < 0)
-            return new SectionName("웹툰", raw);
-        return new SectionName(raw.substring(0, divider), raw.substring(divider + 1));
+            return new SectionName("작품", "", "");
+        String[] parts = raw.split("\\|", 3);
+        if(parts.length == 1)
+            return new SectionName("작품", raw, "");
+        return new SectionName(parts[0], parts.length > 1 ? parts[1] : "", parts.length > 2 ? parts[2] : "");
     }
 
     static class SectionName {
         String group;
         String title;
-        SectionName(String group, String title) {
+        String path;
+        SectionName(String group, String title, String path) {
             this.group = group;
             this.title = title;
+            this.path = path;
         }
     }
 
@@ -160,16 +163,27 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     class CategoryHolder extends RecyclerView.ViewHolder {
+        ViewGroup filterSections;
         ViewGroup statusFilters;
         ViewGroup genreFilters;
 
         CategoryHolder(View itemView) {
             super(itemView);
+            filterSections = itemView.findViewById(R.id.webtoon_filter_sections);
             statusFilters = itemView.findViewById(R.id.webtoon_status_filters);
             genreFilters = itemView.findViewById(R.id.webtoon_genre_filters);
         }
 
         void bind() {
+            filterSections.removeAllViews();
+            if(baseMode == base_comic) {
+                statusFilters.setVisibility(View.GONE);
+                genreFilters.setVisibility(View.GONE);
+                bindComicFilters();
+                return;
+            }
+            statusFilters.setVisibility(View.VISIBLE);
+            genreFilters.setVisibility(View.VISIBLE);
             bindFilterRow(statusFilters, STATUS_FILTERS, label -> {
                 if(listener != null)
                     listener.clickedRelease(label);
@@ -178,6 +192,42 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 if(listener != null)
                     listener.clickedGenre(label);
             });
+        }
+
+        void bindComicFilters() {
+            for(String[] group : MainPageWebtoon.COMIC_FILTER_GROUPS) {
+                if(group.length == 0)
+                    continue;
+                SectionName groupName = parseSectionName(group[0]);
+                TextView label = new TextView(context);
+                label.setText(groupName.group);
+                label.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                label.setTextSize(14);
+                label.setPadding(0, dp(10), 0, dp(6));
+                filterSections.addView(label);
+
+                LinearLayout row = new LinearLayout(context);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                filterSections.addView(row);
+                int used = 0;
+                int max = context.getResources().getDisplayMetrics().widthPixels - dp(40);
+                for(String item : group) {
+                    SectionName filter = parseSectionName(item);
+                    TextView chip = createFilterChip(filter.title, clicked -> {
+                        if(listener != null)
+                            listener.clickedCategoryPath(filter.title, filter.path);
+                    });
+                    int width = estimateChipWidth(filter.title);
+                    if(used > 0 && used + width > max) {
+                        row = new LinearLayout(context);
+                        row.setOrientation(LinearLayout.HORIZONTAL);
+                        filterSections.addView(row);
+                        used = 0;
+                    }
+                    row.addView(chip);
+                    used += width;
+                }
+            }
         }
 
         void bindFilterRow(ViewGroup container, String[] labels, FilterClick click) {
@@ -197,9 +247,13 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             chip.setBackground(filterBackground());
             chip.setOnClickListener(v -> click.onClick(label));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(34));
-            params.setMargins(0, 0, dp(8), 0);
+            params.setMargins(0, 0, dp(8), dp(8));
             chip.setLayoutParams(params);
             return chip;
+        }
+
+        int estimateChipWidth(String label) {
+            return dp(32 + Math.max(2, label == null ? 2 : label.length()) * 15);
         }
 
         GradientDrawable filterBackground() {
@@ -251,7 +305,11 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void bind(Ranking<?> section) {
             SectionName name = parseSectionName(section.getName());
             title.setText(name.title);
-            count.setText(section.size() > 0 ? section.size() + "개" : "");
+            count.setText("전체보기");
+            count.setOnClickListener(v -> {
+                if(listener != null && name.path.length() > 0)
+                    listener.clickedCategoryPath(name.title, name.path);
+            });
             list.setAdapter(new WebtoonCardAdapter(section));
         }
     }

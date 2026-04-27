@@ -380,6 +380,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         void captchaCallback();
         void clickedSearch(String query);
         void clickedRetry();
+        void clickedCategoryPath(String title, String path);
     }
 
     private class MainFetcher extends AsyncTask<Void, Integer, MainPage> {
@@ -473,5 +474,4 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 }
-
 

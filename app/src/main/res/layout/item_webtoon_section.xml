@@ -28,6 +28,10 @@
             android:id="@+id/webtoon_section_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
             android:textColor="@android:color/darker_gray"
             android:textSize="12sp" />
 

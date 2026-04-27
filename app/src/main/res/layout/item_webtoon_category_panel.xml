@@ -16,6 +16,13 @@
         android:textStyle="bold" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/webtoon_filter_sections"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="8dp" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/webtoon_status_filters"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

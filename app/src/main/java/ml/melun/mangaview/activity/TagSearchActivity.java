@@ -65,6 +65,7 @@ public class TagSearchActivity extends AppCompatActivity {
         Intent i = getIntent();
         query = i.getStringExtra("query");
         mode = i.getIntExtra("mode",0);
+        String title = i.getStringExtra("title");
         swipe = this.findViewById(R.id.tagSearchSwipe);
         baseMode = i.getIntExtra("baseMode", base_comic);
 
@@ -93,6 +94,8 @@ public class TagSearchActivity extends AppCompatActivity {
                 break;
         }
 
+        if(mode == 8)
+            ab.setTitle(title == null ? "분류" : title);
         ab.setDisplayHomeAsUpEnabled(true);
         swipe.setRefreshing(true);
 

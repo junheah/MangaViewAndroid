@@ -198,6 +198,16 @@ public class MainMain extends Fragment{
             public void clickedRetry() {
                 mainWebtoonAdapter.fetch();
             }
+
+            @Override
+            public void clickedCategoryPath(String title, String path) {
+                Intent i = new Intent(getContext(), TagSearchActivity.class);
+                i.putExtra("query", path);
+                i.putExtra("title", title);
+                i.putExtra("mode", 8);
+                i.putExtra("baseMode", p.getBaseMode());
+                startActivity(i);
+            }
         };
 
         mainComicAdapter = new MainWebtoonAdapter(getContext(), base_comic);
