@@ -91,6 +91,7 @@ public class ViewerActivity extends AppCompatActivity {
     InfiniteScrollCallback infiniteScrollCallback;
     loadImages loader;
     prefetchImages nextPrefetcher;
+    prefetchImages previousPrefetcher;
     boolean previousEpisodeBoundaryLoading = false;
     boolean nextEpisodeBoundaryLoading = false;
     boolean previousEpisodeBoundaryJumpPending = false;
@@ -374,6 +375,7 @@ public class ViewerActivity extends AppCompatActivity {
             bookmarkRefresh(m);
             refreshToolbar(m);
             updateIntent(m);
+            prefetchPreviousEpisode(m);
             prefetchNextEpisode(m);
 
         }catch (Exception e){
@@ -568,9 +570,15 @@ public class ViewerActivity extends AppCompatActivity {
 
     private class prefetchImages extends AsyncTask<Void, Void, Integer> {
         Manga target;
+        boolean previous;
 
         prefetchImages(Manga target) {
+            this(target, false);
+        }
+
+        prefetchImages(Manga target, boolean previous) {
             this.target = target;
+            this.previous = previous;
         }
 
         @Override
@@ -584,12 +592,20 @@ public class ViewerActivity extends AppCompatActivity {
         protected void onPostExecute(Integer result) {
             if(nextPrefetcher == this)
                 nextPrefetcher = null;
+            if(previousPrefetcher == this)
+                previousPrefetcher = null;
             if(isCancelled() || isFinishing() || result == LOAD_CAPTCHA || !hasLoadedImages(target))
                 return;
-            preloadFirstPages(target);
-            if(stripAdapter != null && manager != null
+            if(previous) {
+                preloadLastPages(target);
+                if(stripAdapter != null && manager != null && !stripAdapter.hasMangaLoaded(target))
+                    insertMangaWhenIdle(target, null);
+            } else {
+                preloadFirstPages(target);
+                if(stripAdapter != null && manager != null
                     && shouldAttachNextEpisodeAhead(manager.findLastVisibleItemPosition(), manager.getItemCount()))
-                attachNextEpisode(false);
+                    attachNextEpisode(false);
+            }
         }
 
         @Override
@@ -597,6 +613,8 @@ public class ViewerActivity extends AppCompatActivity {
             super.onCancelled(result);
             if(nextPrefetcher == this)
                 nextPrefetcher = null;
+            if(previousPrefetcher == this)
+                previousPrefetcher = null;
         }
     }
 
@@ -859,6 +877,23 @@ public class ViewerActivity extends AppCompatActivity {
         nextPrefetcher.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    private void prefetchPreviousEpisode(Manga current) {
+        if(previousPrefetcher != null) {
+            previousPrefetcher.cancel(true);
+            previousPrefetcher = null;
+        }
+        if(current == null || !current.isOnline() || eps == null || stripAdapter == null)
+            return;
+        int index = eps.indexOf(current);
+        if(index < 0 || index >= eps.size() - 1)
+            return;
+        Manga target = eps.get(index + 1);
+        if(stripAdapter.hasMangaLoaded(target))
+            return;
+        previousPrefetcher = new prefetchImages(target, true);
+        previousPrefetcher.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     private boolean hasLoadedImages(Manga target) {
         try {
             if(target == null)
@@ -876,6 +911,19 @@ public class ViewerActivity extends AppCompatActivity {
         List<String> images = target.getImgs(context);
         int limit = Math.min(NEXT_EPISODE_PRELOAD_LIMIT, images.size());
         for(int i = 0; i < limit; i++)
+            Glide.with(context)
+                    .asBitmap()
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                    .load(Utils.getGlideUrl(images.get(i), target.getBaseMode()))
+                    .preload();
+    }
+
+    private void preloadLastPages(Manga target) {
+        if(target == null || !target.isOnline())
+            return;
+        List<String> images = target.getImgs(context);
+        int start = Math.max(0, images.size() - NEXT_EPISODE_PRELOAD_LIMIT);
+        for(int i = images.size() - 1; i >= start; i--)
             Glide.with(context)
                     .asBitmap()
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
@@ -949,6 +997,8 @@ public class ViewerActivity extends AppCompatActivity {
             loader.cancel(true);
         if(nextPrefetcher != null)
             nextPrefetcher.cancel(true);
+        if(previousPrefetcher != null)
+            previousPrefetcher.cancel(true);
         super.onDestroy();
     }
 
