@@ -90,9 +90,17 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void appendManga(Manga m){
         if(items == null)
             items = new ArrayList<>();
-        int prevsize = items.size();
-        if(items.size() == 0)
+        int insertStart = items.size();
+        boolean fullRefresh = false;
+        if(items.size() == 0) {
             items.add(new InfoItem(m.prevEp(), m));
+            insertStart = 0;
+        } else if(items.get(items.size() - 1) instanceof InfoItem) {
+            int removedPosition = items.size() - 1;
+            items.remove(removedPosition);
+            insertStart = removedPosition;
+            fullRefresh = true;
+        }
         List<String> imgs = m.getImgs(mainContext);
         for(int i=0; i<imgs.size(); i++){
             items.add(new PageItem(i,imgs.get(i),m));
@@ -100,7 +108,10 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 items.add(new PageItem(i,imgs.get(i),m,PageItem.SECOND));
         }
         items.add(new InfoItem(m, m.nextEp()));
-        notifyItemRangeInserted(prevsize, items.size()-prevsize);
+        if(fullRefresh)
+            notifyDataSetChanged();
+        else
+            notifyItemRangeInserted(insertStart, items.size()-insertStart);
         count++;
         if(count>MaxStackSize){
             popFirst();
@@ -113,16 +124,21 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return 0;
         }
         int prevsize = items.size();
-        List<String> imgs = m.getImgs(mainContext);
-        for(int i=imgs.size()-1; i>=0; i--){
-            if(autoCut)
-                items.add(0, new PageItem(i,imgs.get(i),m,PageItem.SECOND));
-            items.add(0,new PageItem(i,imgs.get(i),m));
+        if(items.get(0) instanceof InfoItem) {
+            items.remove(0);
         }
-        items.add(0, new InfoItem(null, m));
+        List<Object> insertedItems = new ArrayList<>();
+        insertedItems.add(new InfoItem(m.prevEp(), m));
+        List<String> imgs = m.getImgs(mainContext);
+        for(int i=0; i<imgs.size(); i++){
+            insertedItems.add(new PageItem(i,imgs.get(i),m));
+            if(autoCut)
+                insertedItems.add(new PageItem(i,imgs.get(i),m,PageItem.SECOND));
+        }
+        items.addAll(0, insertedItems);
 
         int inserted = items.size()-prevsize;
-        notifyItemRangeInserted(0, inserted);
+        notifyDataSetChanged();
         count++;
 
         if(count>MaxStackSize){
@@ -162,36 +178,107 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void popFirst(){
-        int size = 0;
-        for(int i=1; i<items.size(); i++){
-            if(items.get(i) instanceof InfoItem){
-                size = i;
-                break;
-            }
-        }
-        if (size > 0) {
-            items.subList(0, size).clear();
-        }
+        int size = firstMangaEndPosition();
+        if(size <= 0)
+            return;
+        items.subList(0, size).clear();
         count--;
         notifyItemRangeRemoved(0,size);
+        Manga first = firstManga();
+        if(first != null) {
+            items.add(0, new InfoItem(first.prevEp(), first));
+            notifyItemInserted(0);
+        }
     }
 
     public void popLast(){
         int originalSize = items.size();
-        int rsize = -1;
-        for(int i=originalSize-2; i>=0; i--){
-            if(items.get(i) instanceof InfoItem){
-                rsize = i;
+        int removeStart = lastMangaStartPosition();
+        if(removeStart == RecyclerView.NO_POSITION)
+            return;
+        int removeCount = originalSize - removeStart;
+        items.subList(removeStart, originalSize).clear();
+        count--;
+        notifyItemRangeRemoved(removeStart, removeCount);
+        Manga last = lastManga();
+        if(last != null) {
+            int insertPosition = items.size();
+            items.add(new InfoItem(last, last.nextEp()));
+            notifyItemInserted(insertPosition);
+        }
+    }
+
+    private int firstMangaEndPosition() {
+        if(items == null || items.size() == 0)
+            return RecyclerView.NO_POSITION;
+        int index = 0;
+        if(items.get(index) instanceof InfoItem)
+            index++;
+        Manga first = null;
+        while(index < items.size()) {
+            Object item = items.get(index);
+            if(item instanceof PageItem) {
+                first = ((PageItem)item).manga;
                 break;
             }
+            index++;
         }
-        if (rsize >= 0 && originalSize > rsize + 1) {
-            int removeStart = rsize + 1;
-            int removeCount = originalSize - removeStart;
-            items.subList(removeStart, originalSize).clear();
-            count--;
-            notifyItemRangeRemoved(removeStart, removeCount);
+        if(first == null)
+            return RecyclerView.NO_POSITION;
+        while(index < items.size()) {
+            Object item = items.get(index);
+            if(!(item instanceof PageItem) || !sameManga(((PageItem)item).manga, first))
+                break;
+            index++;
         }
+        return index;
+    }
+
+    private int lastMangaStartPosition() {
+        if(items == null || items.size() == 0)
+            return RecyclerView.NO_POSITION;
+        int index = items.size() - 1;
+        if(items.get(index) instanceof InfoItem)
+            index--;
+        Manga last = null;
+        while(index >= 0) {
+            Object item = items.get(index);
+            if(item instanceof PageItem) {
+                last = ((PageItem)item).manga;
+                break;
+            }
+            index--;
+        }
+        if(last == null)
+            return RecyclerView.NO_POSITION;
+        while(index >= 0) {
+            Object item = items.get(index);
+            if(!(item instanceof PageItem) || !sameManga(((PageItem)item).manga, last))
+                break;
+            index--;
+        }
+        return index + 1;
+    }
+
+    private Manga firstManga() {
+        if(items == null)
+            return null;
+        for(Object item : items) {
+            if(item instanceof PageItem)
+                return ((PageItem)item).manga;
+        }
+        return null;
+    }
+
+    private Manga lastManga() {
+        if(items == null)
+            return null;
+        for(int i=items.size()-1; i>=0; i--) {
+            Object item = items.get(i);
+            if(item instanceof PageItem)
+                return ((PageItem)item).manga;
+        }
+        return null;
     }
 
     // data is passed into the constructor

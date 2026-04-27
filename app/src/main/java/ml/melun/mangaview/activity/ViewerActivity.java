@@ -101,8 +101,6 @@ public class ViewerActivity extends AppCompatActivity {
     boolean topPullTriggered = false;
     boolean topPullEligible = false;
     boolean topPullInProgress = false;
-    int pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
-    Manga pendingPreviousJumpManga = null;
     int previousBoundaryRequestedFromId = -1;
     boolean previousEpisodePositioning = false;
 
@@ -590,8 +588,7 @@ public class ViewerActivity extends AppCompatActivity {
                 return;
             preloadFirstPages(target);
             if(stripAdapter != null && manager != null
-                    && manager.getItemCount() > NEXT_EPISODE_PRELOAD_LIMIT
-                    && manager.findLastVisibleItemPosition() >= manager.getItemCount() - NEXT_EPISODE_PRELOAD_LIMIT)
+                    && shouldAttachNextEpisodeAhead(manager.findLastVisibleItemPosition(), manager.getItemCount()))
                 attachNextEpisode(false);
         }
 
@@ -642,10 +639,17 @@ public class ViewerActivity extends AppCompatActivity {
         if(first > 0) {
             previousBoundaryRequestedFromId = -1;
         }
-        if(total > NEXT_EPISODE_PRELOAD_LIMIT && last >= total - NEXT_EPISODE_PRELOAD_LIMIT)
+        if(shouldAttachNextEpisodeAhead(last, total))
             attachNextEpisode(false);
         if(last >= total - 2 || !strip.canScrollVertically(1))
             attachNextEpisode(true);
+    }
+
+    private boolean shouldAttachNextEpisodeAhead(int lastVisiblePosition, int totalItems) {
+        if(totalItems <= 0 || lastVisiblePosition == RecyclerView.NO_POSITION)
+            return false;
+        int preloadWindow = Math.min(NEXT_EPISODE_PRELOAD_LIMIT, Math.max(2, totalItems / 2));
+        return lastVisiblePosition >= totalItems - preloadWindow;
     }
 
     private void handlePreviousEpisodePull(MotionEvent event) {
@@ -669,20 +673,20 @@ public class ViewerActivity extends AppCompatActivity {
                 float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
                 if(event.getY() - topPullStartY >= threshold) {
                     topPullTriggered = true;
+                    attachPreviousEpisode(false);
                 }
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 float releaseThreshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
                 boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
-                boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop) && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
+                boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop)
+                        && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
                 if(shouldLoadPrevious)
                     attachPreviousEpisode(true);
-                else
-                    runPendingPreviousJump();
                 break;
         }
     }
@@ -705,6 +709,8 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     private void attachPreviousEpisode(boolean jumpToEpisode) {
+        if(previousEpisodePositioning && !previousEpisodeBoundaryLoading)
+            return;
         PageItem page = stripAdapter.getCurrentVisiblePage();
         if(page == null || page.manga == null || !page.manga.isOnline())
             return;
@@ -714,19 +720,16 @@ public class ViewerActivity extends AppCompatActivity {
         int loadedPosition = stripAdapter.findLastPagePosition(target);
         if(loadedPosition != RecyclerView.NO_POSITION) {
             previousBoundaryRequestedFromId = -1;
-            if(jumpToEpisode) {
-                schedulePreviousJump(target, loadedPosition);
-            }
             return;
         }
-        if(previousBoundaryRequestedFromId == page.manga.getId())
-            return;
         if(previousEpisodeBoundaryLoading)
         {
             if(jumpToEpisode)
                 previousEpisodeBoundaryJumpPending = true;
             return;
         }
+        if(previousBoundaryRequestedFromId == page.manga.getId())
+            return;
         previousBoundaryRequestedFromId = page.manga.getId();
         previousEpisodeBoundaryJumpPending = jumpToEpisode;
         previousEpisodeBoundaryLoading = true;
@@ -744,10 +747,8 @@ public class ViewerActivity extends AppCompatActivity {
                     int position = stripAdapter.findLastPagePosition(m);
                     if(shouldJump && position != RecyclerView.NO_POSITION) {
                         previousBoundaryRequestedFromId = -1;
-                        schedulePreviousJump(m, position);
-                    } else if(shouldJump) {
-                        previousEpisodePositioning = false;
                     }
+                    previousEpisodePositioning = false;
                 });
             }
 
@@ -755,89 +756,6 @@ public class ViewerActivity extends AppCompatActivity {
             public void nextLoaded(Manga m) {
             }
         }, page.manga);
-    }
-
-    private void schedulePreviousJump(Manga m, int position) {
-        previousEpisodePositioning = true;
-        pendingPreviousJumpManga = m;
-        pendingPreviousJumpPosition = position;
-        if(!topPullInProgress)
-            runPendingPreviousJump();
-        else if(strip != null)
-            strip.postDelayed(this::runPendingPreviousJump, 60);
-    }
-
-    private void runPendingPreviousJump() {
-        if(strip == null || pendingPreviousJumpPosition == RecyclerView.NO_POSITION)
-            return;
-        Manga target = pendingPreviousJumpManga;
-        int requestedPosition = pendingPreviousJumpPosition;
-        pendingPreviousJumpManga = null;
-        pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
-        strip.postDelayed(() -> {
-            if(strip != null && manager != null && stripAdapter != null && !isFinishing()) {
-                int position = stripAdapter.findLastPagePosition(target);
-                if(position == RecyclerView.NO_POSITION && requestedPosition >= 0 && requestedPosition < stripAdapter.getItemCount())
-                    position = requestedPosition;
-                if(position == RecyclerView.NO_POSITION) {
-                    previousEpisodePositioning = false;
-                    return;
-                }
-                previousEpisodePositioning = true;
-                strip.stopScroll();
-                strip.postOnAnimation(() -> {
-                    if(strip != null && manager != null && stripAdapter != null && !isFinishing()) {
-                        int stablePosition = stripAdapter.findLastPagePosition(target);
-                        if(stablePosition == RecyclerView.NO_POSITION && requestedPosition >= 0 && requestedPosition < stripAdapter.getItemCount())
-                            stablePosition = requestedPosition;
-                        if(stablePosition != RecyclerView.NO_POSITION) {
-                            strip.stopScroll();
-                            smoothScrollIntoPreviousEpisode(stablePosition);
-                        } else {
-                            previousEpisodePositioning = false;
-                        }
-                    } else {
-                        previousEpisodePositioning = false;
-                    }
-                });
-                manga = target;
-                updateIntent(target);
-                refreshToolbar(target);
-                clearProgrammaticPreviousJumpBookmark(target);
-            } else {
-                previousEpisodePositioning = false;
-            }
-        }, 140);
-    }
-
-    private void smoothScrollIntoPreviousEpisode(int targetPosition) {
-        int step = Math.max(1, (int)(24 * getResources().getDisplayMetrics().density));
-        int maxDistance = Math.max(strip.getHeight() * 2, step);
-        animatePreviousScroll(targetPosition, maxDistance, step);
-    }
-
-    private void animatePreviousScroll(int targetPosition, int remainingDistance, int step) {
-        if(strip == null || manager == null || stripAdapter == null || isFinishing()) {
-            previousEpisodePositioning = false;
-            return;
-        }
-        int first = manager.findFirstVisibleItemPosition();
-        if(first <= targetPosition || remainingDistance <= 0) {
-            previousEpisodePositioning = false;
-            return;
-        }
-        int distance = Math.min(step, remainingDistance);
-        strip.scrollBy(0, -distance);
-        strip.postOnAnimation(() -> animatePreviousScroll(targetPosition, remainingDistance - distance, step));
-    }
-
-    private void clearProgrammaticPreviousJumpBookmark(Manga m) {
-        if(m == null || strip == null)
-            return;
-        strip.postDelayed(() -> {
-            if(!isFinishing())
-                p.removeViewerBookmark(m);
-        }, 250);
     }
 
     private void attachNextEpisode(boolean jumpToEpisode) {
@@ -978,14 +896,10 @@ public class ViewerActivity extends AppCompatActivity {
                         int anchor = Math.min(first + inserted, stripAdapter.getItemCount() - 1);
                         manager.scrollToPositionWithOffset(anchor, firstOffset);
                         callbackDeferred = true;
-                        strip.postDelayed(() -> {
-                            if(manager != null && stripAdapter != null && !isFinishing())
-                                manager.scrollToPositionWithOffset(anchor, firstOffset);
-                            strip.postDelayed(() -> {
-                                if(afterInsert != null)
-                                    afterInsert.run();
-                            }, 40);
-                        }, 90);
+                        strip.post(() -> {
+                            if(afterInsert != null)
+                                afterInsert.run();
+                        });
                     }
                 }
                 if(!callbackDeferred && afterInsert != null)
