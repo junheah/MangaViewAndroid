@@ -157,21 +157,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return RecyclerView.NO_POSITION;
     }
 
-    public int findPagePosition(int mangaId, int pageIndex, int side) {
-        if(items == null)
-            return RecyclerView.NO_POSITION;
-        for(int i = 0; i < items.size(); i++) {
-            Object item = items.get(i);
-            if(item instanceof PageItem) {
-                PageItem page = (PageItem)item;
-                if(page.manga != null && page.manga.getId() == mangaId
-                        && page.index == pageIndex && page.side == side)
-                    return i;
-            }
-        }
-        return RecyclerView.NO_POSITION;
-    }
-
     private boolean sameManga(Manga a, Manga b) {
         return a != null && b != null && a.getId() == b.getId();
     }

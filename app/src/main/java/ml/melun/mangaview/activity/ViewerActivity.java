@@ -101,23 +101,8 @@ public class ViewerActivity extends AppCompatActivity {
     boolean topPullTriggered = false;
     boolean topPullEligible = false;
     boolean topPullInProgress = false;
-    int previousPullRevealPx = 0;
     int previousBoundaryRequestedFromId = -1;
     boolean previousEpisodePositioning = false;
-
-    private static class PageAnchor {
-        final int mangaId;
-        final int index;
-        final int side;
-        final int top;
-
-        PageAnchor(PageItem page, int top) {
-            this.mangaId = page.manga.getId();
-            this.index = page.index;
-            this.side = page.side;
-            this.top = top;
-        }
-    }
 
 
     @Override
@@ -676,10 +661,8 @@ public class ViewerActivity extends AppCompatActivity {
                 topPullTriggered = false;
                 topPullEligible = isAtViewerTop();
                 topPullInProgress = true;
-                previousPullRevealPx = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
-                previousPullRevealPx = previousEpisodeRevealOffset(event);
                 if(topPullTriggered || previousEpisodeBoundaryLoading)
                     return;
                 if(!topPullEligible && isAtViewerTop()) {
@@ -699,7 +682,6 @@ public class ViewerActivity extends AppCompatActivity {
                 boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
                 boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop)
                         && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
-                previousPullRevealPx = previousEpisodeRevealOffset(event);
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
@@ -707,12 +689,6 @@ public class ViewerActivity extends AppCompatActivity {
                     attachPreviousEpisode(true);
                 break;
         }
-    }
-
-    private int previousEpisodeRevealOffset(MotionEvent event) {
-        int pullDistance = Math.max(0, (int)(event.getY() - topPullStartY));
-        int maxReveal = (int)(PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density);
-        return Math.min(pullDistance, maxReveal);
     }
 
     private boolean isAtViewerTop() {
@@ -897,11 +873,8 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         strip.post(() -> {
             if(stripAdapter != null && !isFinishing()) {
-                PageAnchor anchor = captureFirstVisiblePageAnchor();
-                if(!stripAdapter.hasMangaLoaded(target)) {
+                if(!stripAdapter.hasMangaLoaded(target))
                     stripAdapter.appendManga(target);
-                    restorePageAnchor(anchor);
-                }
                 if(afterAppend != null)
                     afterAppend.run();
             }
@@ -913,51 +886,12 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         strip.post(() -> {
             if(stripAdapter != null && !isFinishing()) {
-                if(!stripAdapter.hasMangaLoaded(target)) {
-                    PageAnchor anchor = captureFirstVisiblePageAnchor();
+                if(!stripAdapter.hasMangaLoaded(target))
                     stripAdapter.insertManga(target);
-                    restorePageAnchor(anchor, previousPullRevealPx);
-                    previousPullRevealPx = 0;
-                }
                 if(afterInsert != null)
                     afterInsert.run();
             }
         });
-    }
-
-    private PageAnchor captureFirstVisiblePageAnchor() {
-        if(manager == null || stripAdapter == null || stripAdapter.getItems() == null)
-            return null;
-        int first = manager.findFirstVisibleItemPosition();
-        int last = manager.findLastVisibleItemPosition();
-        if(first == RecyclerView.NO_POSITION || last == RecyclerView.NO_POSITION)
-            return null;
-        List<Object> items = stripAdapter.getItems();
-        int max = Math.min(last, items.size() - 1);
-        for(int position = Math.max(0, first); position <= max; position++) {
-            Object item = items.get(position);
-            if(item instanceof PageItem) {
-                PageItem page = (PageItem)item;
-                if(page.manga == null)
-                    continue;
-                View view = manager.findViewByPosition(position);
-                if(view != null)
-                    return new PageAnchor(page, view.getTop());
-            }
-        }
-        return null;
-    }
-
-    private void restorePageAnchor(PageAnchor anchor) {
-        restorePageAnchor(anchor, 0);
-    }
-
-    private void restorePageAnchor(PageAnchor anchor, int extraTopOffset) {
-        if(anchor == null || manager == null || stripAdapter == null)
-            return;
-        int position = stripAdapter.findPagePosition(anchor.mangaId, anchor.index, anchor.side);
-        if(position != RecyclerView.NO_POSITION)
-            manager.scrollToPositionWithOffset(position, anchor.top + extraTopOffset);
     }
 
     private void cancelActiveEpisodeLoader() {
