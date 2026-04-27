@@ -107,10 +107,10 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-    public void insertManga(Manga m){
+    public int insertManga(Manga m){
         if(items == null || items.size() == 0) {
             appendManga(m);
-            return;
+            return 0;
         }
         int prevsize = items.size();
         List<String> imgs = m.getImgs(mainContext);
@@ -121,12 +121,14 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
         items.add(0, new InfoItem(null, m));
 
-        notifyItemRangeInserted(0, items.size()-prevsize);
+        int inserted = items.size()-prevsize;
+        notifyItemRangeInserted(0, inserted);
         count++;
 
         if(count>MaxStackSize){
             popLast();
         }
+        return inserted;
     }
 
     public int findLastPagePosition(Manga m) {
