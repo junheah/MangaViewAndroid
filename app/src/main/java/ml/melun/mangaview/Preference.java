@@ -338,10 +338,15 @@ public class Preference {
     }
 
     public void setBookmark(Title title, int id){
+        if(title == null)
+            return;
         int titleId = title.getId();
         if(titleId>0) {
+            String key = title.getBaseMode() + "." + title.getId();
             try {
-                bookmark.put(title.getBaseMode() + "." + title.getId(), id);
+                if(bookmark.has(key) && bookmark.getInt(key) == id)
+                    return;
+                bookmark.put(key, id);
             } catch (Exception e) {
                 //
             }
@@ -365,16 +370,20 @@ public class Preference {
         int titleId = title.getId();
         if(titleId>0) {
             try {
-                bookmark.remove(title.getBaseMode()+"."+titleId);
+                String key = title.getBaseMode()+"."+titleId;
+                if(!bookmark.has(key))
+                    return;
+                bookmark.remove(key);
             } catch (Exception e) {
                 //
             }
+            writeBookmark();
         }
     }
 
     public void writeBookmark(){
         prefsEditor.putString("bookmark2", bookmark.toString());
-        prefsEditor.commit();
+        prefsEditor.apply();
     }
 
     public void resetBookmark(){
@@ -405,8 +414,11 @@ public class Preference {
     public void setViewerBookmark(Manga m,int index){
         if(m.getId()>-1) {
             if (index > 0) {
+                String key = m.getBaseMode() + "."+m.getId();
                 try {
-                    pagebookmark.put(m.getBaseMode() + "."+m.getId(), index);
+                    if(pagebookmark.has(key) && pagebookmark.getInt(key) == index)
+                        return;
+                    pagebookmark.put(key, index);
                 } catch (Exception e) {
                     //
                 }
@@ -425,7 +437,10 @@ public class Preference {
         return 0;
     }
     public void removeViewerBookmark(Manga m){
-        pagebookmark.remove(m.getBaseMode()+"."+m.getId());
+        String key = m.getBaseMode()+"."+m.getId();
+        if(!pagebookmark.has(key))
+            return;
+        pagebookmark.remove(key);
         writeViewerBookmark();
     }
     public void resetViewerBookmark(){
@@ -436,7 +451,7 @@ public class Preference {
     }
     private void writeViewerBookmark(){
         prefsEditor.putString("bookmark", pagebookmark.toString());
-        prefsEditor.commit();
+        prefsEditor.apply();
     }
 
     public boolean toggleFavorite(Title tmp, int position){

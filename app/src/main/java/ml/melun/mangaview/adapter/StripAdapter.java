@@ -248,12 +248,16 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             ViewerActivity.InfiniteLoadCallback r = new ViewerActivity.InfiniteLoadCallback() {
                 @Override
                 public void prevLoaded(Manga m) {
+                    if(!isInfoHolderStillBound(holder, info))
+                        return;
                     ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
                     ((InfoViewHolder) holder).prevInfo.setText(m==null?"오류":m.getName());
                 }
 
                 @Override
                 public void nextLoaded(Manga m) {
+                    if(!isInfoHolderStillBound(holder, info))
+                        return;
                     ((InfoViewHolder) holder).loading.setVisibility(View.INVISIBLE);
                     ((InfoViewHolder) holder).nextInfo.setText(m==null?"오류":m.getName());
                 }
@@ -371,6 +375,13 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 && items.get(position) == item;
     }
 
+    private boolean isInfoHolderStillBound(RecyclerView.ViewHolder holder, InfoItem item) {
+        int position = holder.getAdapterPosition();
+        return position != RecyclerView.NO_POSITION
+                && position < items.size()
+                && items.get(position) == item;
+    }
+
     private void preloadAhead(int adapterPosition) {
         int preloaded = 0;
         for(int i = adapterPosition + 1; i < items.size() && preloaded < PRELOAD_AHEAD_COUNT; i++) {
@@ -453,7 +464,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             refresh = itemView.findViewById(R.id.refreshButton);
             refresh.setOnClickListener(v -> {
                 //refresh image
-                notifyItemChanged(getAdapterPosition());
+                int position = getAdapterPosition();
+                if(position != RecyclerView.NO_POSITION)
+                    notifyItemChanged(position);
             });
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
