@@ -147,13 +147,8 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
             contentRows.add(section);
         }
-        if(!includeEmpty && contentRows.size() > 0) {
-            result.addAll(contentRows);
-            result.add(new CategoryPanel());
-        } else {
-            result.add(new CategoryPanel());
-            result.addAll(contentRows);
-        }
+        result.add(new CategoryPanel());
+        result.addAll(contentRows);
         return result;
     }
 
