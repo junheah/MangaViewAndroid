@@ -668,23 +668,24 @@ public class ViewerActivity extends AppCompatActivity {
                 float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
                 if(event.getY() - topPullStartY >= threshold) {
                     topPullTriggered = true;
-                    attachPreviousEpisode(true);
                 }
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                boolean shouldLoadPrevious = topPullTriggered && !previousEpisodeBoundaryLoading;
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
-                runPendingPreviousJump();
+                if(shouldLoadPrevious)
+                    attachPreviousEpisode(true);
+                else
+                    runPendingPreviousJump();
                 break;
         }
     }
 
     private boolean isAtViewerTop() {
-        return manager != null
-                && strip != null
-                && manager.findFirstVisibleItemPosition() <= 1;
+        return strip != null && !strip.canScrollVertically(-1);
     }
 
     private void attachPreviousEpisode(boolean jumpToEpisode) {
@@ -747,6 +748,7 @@ public class ViewerActivity extends AppCompatActivity {
         pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
         strip.postDelayed(() -> {
             if(strip != null && stripAdapter != null && !isFinishing()) {
+                strip.stopScroll();
                 strip.smoothScrollToPosition(position);
                 clearProgrammaticPreviousJumpBookmark(target);
             }
