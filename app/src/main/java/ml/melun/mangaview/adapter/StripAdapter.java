@@ -296,12 +296,6 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Manga m;
             if(pos == 0){
                 return;
-            }else if(false && pos == 0 && !info.prevRequested){
-                info.prevRequested = true;
-                ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
-                m = callback.prevEp(r, next);
-                info.prev = m;
-                ((InfoViewHolder) holder).prevInfo.setText(m==null? "첫 화":"이전 화");
             }else if(pos == items.size()-1 && !info.nextRequested){
                 info.nextRequested = true;
                 ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);

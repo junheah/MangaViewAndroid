@@ -18,9 +18,11 @@ import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -103,6 +105,9 @@ public class ViewerActivity extends AppCompatActivity {
     boolean topPullInProgress = false;
     int pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
     Manga pendingPreviousJumpManga = null;
+    Manga pendingPreviousAnchorManga = null;
+    int previousBoundaryRequestedFromId = -1;
+    boolean previousEpisodePositioning = false;
 
 
     @Override
@@ -640,13 +645,17 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     private void loadEpisodeAtBoundaryIfNeeded() {
-        if(strip == null || manager == null || stripAdapter == null || manager.getItemCount() == 0)
+        if(strip == null || manager == null || stripAdapter == null || manager.getItemCount() == 0 || previousEpisodePositioning)
             return;
         int first = manager.findFirstVisibleItemPosition();
         int last = manager.findLastVisibleItemPosition();
         int total = manager.getItemCount();
-        if(first <= 0 && !previousEpisodeBoundaryLoading)
+        if(first <= 0 && !previousEpisodeBoundaryLoading) {
             attachPreviousEpisode(true);
+            return;
+        } else if(first > 0) {
+            previousBoundaryRequestedFromId = -1;
+        }
         if(last >= total - 12)
             attachNextEpisode(false);
         if(last >= total - 2 || !strip.canScrollVertically(1))
@@ -680,7 +689,7 @@ public class ViewerActivity extends AppCompatActivity {
             case MotionEvent.ACTION_CANCEL:
                 float releaseThreshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
                 boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
-                boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop) && !previousEpisodeBoundaryLoading;
+                boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop) && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
@@ -718,17 +727,21 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         int loadedPosition = stripAdapter.findLastPagePosition(target);
         if(loadedPosition != RecyclerView.NO_POSITION) {
+            previousBoundaryRequestedFromId = -1;
             if(jumpToEpisode) {
-                schedulePreviousJump(target, loadedPosition);
+                schedulePreviousJump(target, loadedPosition, page.manga);
             }
             return;
         }
+        if(previousBoundaryRequestedFromId == page.manga.getId())
+            return;
         if(previousEpisodeBoundaryLoading)
         {
             if(jumpToEpisode)
                 previousEpisodeBoundaryJumpPending = true;
             return;
         }
+        previousBoundaryRequestedFromId = page.manga.getId();
         previousEpisodeBoundaryJumpPending = jumpToEpisode;
         previousEpisodeBoundaryLoading = true;
         infiniteScrollCallback.prevEp(new InfiniteLoadCallback() {
@@ -742,7 +755,8 @@ public class ViewerActivity extends AppCompatActivity {
                 strip.post(() -> {
                     int position = stripAdapter.findLastPagePosition(m);
                     if(shouldJump && position != RecyclerView.NO_POSITION) {
-                        schedulePreviousJump(m, position);
+                        previousBoundaryRequestedFromId = -1;
+                        schedulePreviousJump(m, position, page.manga);
                     }
                 });
             }
@@ -753,33 +767,82 @@ public class ViewerActivity extends AppCompatActivity {
         }, page.manga);
     }
 
-    private void schedulePreviousJump(Manga m, int position) {
+    private void schedulePreviousJump(Manga m, int position, Manga anchor) {
+        previousEpisodePositioning = true;
         pendingPreviousJumpManga = m;
+        pendingPreviousAnchorManga = anchor;
         pendingPreviousJumpPosition = position;
         if(!topPullInProgress)
             runPendingPreviousJump();
+        else if(strip != null)
+            strip.postDelayed(this::runPendingPreviousJump, 60);
     }
 
     private void runPendingPreviousJump() {
         if(strip == null || pendingPreviousJumpPosition == RecyclerView.NO_POSITION)
             return;
         Manga target = pendingPreviousJumpManga;
+        Manga anchor = pendingPreviousAnchorManga;
+        int requestedPosition = pendingPreviousJumpPosition;
         pendingPreviousJumpManga = null;
+        pendingPreviousAnchorManga = null;
         pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
-        strip.postDelayed(() -> {
+        strip.post(() -> {
             if(strip != null && manager != null && stripAdapter != null && !isFinishing()) {
                 int position = stripAdapter.findLastPagePosition(target);
-                if(position == RecyclerView.NO_POSITION)
+                if(position == RecyclerView.NO_POSITION && requestedPosition >= 0 && requestedPosition < stripAdapter.getItemCount())
+                    position = requestedPosition;
+                if(position == RecyclerView.NO_POSITION) {
+                    previousEpisodePositioning = false;
                     return;
+                }
+                previousEpisodePositioning = true;
                 strip.stopScroll();
-                int boundaryPosition = Math.min(position + 1, stripAdapter.getItemCount() - 1);
-                manager.scrollToPositionWithOffset(boundaryPosition, strip.getHeight());
+                int anchorPosition = stripAdapter.findFirstPagePosition(anchor);
+                if(anchorPosition != RecyclerView.NO_POSITION)
+                    manager.scrollToPositionWithOffset(anchorPosition, 0);
+                else
+                    manager.scrollToPositionWithOffset(Math.min(position + 1, stripAdapter.getItemCount() - 1), 0);
+                strip.postOnAnimation(() -> {
+                    if(strip != null && manager != null && stripAdapter != null && !isFinishing()) {
+                        int stablePosition = stripAdapter.findLastPagePosition(target);
+                        if(stablePosition == RecyclerView.NO_POSITION && requestedPosition >= 0 && requestedPosition < stripAdapter.getItemCount())
+                            stablePosition = requestedPosition;
+                        if(stablePosition != RecyclerView.NO_POSITION) {
+                            strip.stopScroll();
+                            smoothScrollToPreviousPosition(stablePosition);
+                        }
+                    }
+                    if(strip != null) {
+                        strip.postDelayed(() -> previousEpisodePositioning = false, 900);
+                    } else {
+                        previousEpisodePositioning = false;
+                    }
+                });
                 manga = target;
                 updateIntent(target);
                 refreshToolbar(target);
                 clearProgrammaticPreviousJumpBookmark(target);
+            } else {
+                previousEpisodePositioning = false;
             }
-        }, 80);
+        });
+    }
+
+    private void smoothScrollToPreviousPosition(int position) {
+        LinearSmoothScroller scroller = new LinearSmoothScroller(context) {
+            @Override
+            protected int getVerticalSnapPreference() {
+                return SNAP_TO_START;
+            }
+
+            @Override
+            protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+                return 90f / displayMetrics.densityDpi;
+            }
+        };
+        scroller.setTargetPosition(position);
+        manager.startSmoothScroll(scroller);
     }
 
     private void clearProgrammaticPreviousJumpBookmark(Manga m) {
