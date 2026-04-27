@@ -101,7 +101,7 @@ public class ViewerActivity extends AppCompatActivity {
     boolean topPullTriggered = false;
     boolean topPullEligible = false;
     boolean topPullInProgress = false;
-    int previousPullDistancePx = 0;
+    int previousPullRevealPx = 0;
     int previousBoundaryRequestedFromId = -1;
     boolean previousEpisodePositioning = false;
 
@@ -676,10 +676,10 @@ public class ViewerActivity extends AppCompatActivity {
                 topPullTriggered = false;
                 topPullEligible = isAtViewerTop();
                 topPullInProgress = true;
-                previousPullDistancePx = 0;
+                previousPullRevealPx = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
-                previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
+                previousPullRevealPx = previousEpisodeRevealOffset(event);
                 if(topPullTriggered || previousEpisodeBoundaryLoading)
                     return;
                 if(!topPullEligible && isAtViewerTop()) {
@@ -699,7 +699,7 @@ public class ViewerActivity extends AppCompatActivity {
                 boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
                 boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop)
                         && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
-                previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
+                previousPullRevealPx = previousEpisodeRevealOffset(event);
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
@@ -707,6 +707,12 @@ public class ViewerActivity extends AppCompatActivity {
                     attachPreviousEpisode(true);
                 break;
         }
+    }
+
+    private int previousEpisodeRevealOffset(MotionEvent event) {
+        int pullDistance = Math.max(0, (int)(event.getY() - topPullStartY));
+        int maxReveal = (int)(PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density);
+        return Math.min(pullDistance, maxReveal);
     }
 
     private boolean isAtViewerTop() {
@@ -910,8 +916,8 @@ public class ViewerActivity extends AppCompatActivity {
                 if(!stripAdapter.hasMangaLoaded(target)) {
                     PageAnchor anchor = captureFirstVisiblePageAnchor();
                     stripAdapter.insertManga(target);
-                    restorePageAnchor(anchor, previousPullDistancePx);
-                    previousPullDistancePx = 0;
+                    restorePageAnchor(anchor, previousPullRevealPx);
+                    previousPullRevealPx = 0;
                 }
                 if(afterInsert != null)
                     afterInsert.run();
