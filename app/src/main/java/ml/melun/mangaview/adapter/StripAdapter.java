@@ -294,7 +294,9 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             };
 
             Manga m;
-            if(pos == 0 && !info.prevRequested){
+            if(pos == 0){
+                return;
+            }else if(false && pos == 0 && !info.prevRequested){
                 info.prevRequested = true;
                 ((InfoViewHolder) holder).loading.setVisibility(View.VISIBLE);
                 m = callback.prevEp(r, next);
@@ -315,6 +317,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     void glideBind(ImgViewHolder holder, int pos){
         PageItem item = ((PageItem)items.get(pos));
         Object url = getImageModel(item);
+        holder.frame.setMinimumHeight(Math.max(width, 1));
         if (autoCut) {
             //set image to holder view
             Glide.with(holder.frame)
@@ -327,6 +330,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         public void onResourceReady(@NonNull Bitmap bitmap, Transition<? super Bitmap> transition) {
                             if(!isHolderStillBound(holder, item))
                                 return;
+                            holder.frame.setMinimumHeight(0);
                             bitmap = d.decode(bitmap, width);
                             int width = bitmap.getWidth();
                             int height = bitmap.getHeight();
@@ -354,12 +358,14 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) {
+                            holder.frame.setMinimumHeight(Math.max(width, 1));
                             holder.frame.setImageDrawable(placeholder);
                             holder.refresh.setVisibility(View.VISIBLE);
                         }
 
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            holder.frame.setMinimumHeight(Math.max(width, 1));
                             holder.frame.setImageResource(R.drawable.placeholder);
                             holder.refresh.setVisibility(View.VISIBLE);
                         }
@@ -374,6 +380,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             if(!isHolderStillBound(holder, item))
                                 return;
+                            holder.frame.setMinimumHeight(0);
                             resource = d.decode(resource, width);
                             holder.frame.setImageBitmap(resource);
                             holder.refresh.setVisibility(View.GONE);
@@ -381,12 +388,14 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) {
+                            holder.frame.setMinimumHeight(Math.max(width, 1));
                             holder.frame.setImageDrawable(placeholder);
                             holder.refresh.setVisibility(View.VISIBLE);
                         }
 
                         @Override
                         public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            holder.frame.setMinimumHeight(Math.max(width, 1));
                             holder.frame.setImageResource(R.drawable.placeholder);
                             holder.refresh.setVisibility(View.VISIBLE);
                         }

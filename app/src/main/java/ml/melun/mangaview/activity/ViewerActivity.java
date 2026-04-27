@@ -283,6 +283,10 @@ public class ViewerActivity extends AppCompatActivity {
                     handlePreviousEpisodePull(event);
                 }
             });
+            strip.setOnTouchListener((view, event) -> {
+                handlePreviousEpisodePull(event);
+                return false;
+            });
 
         }catch(Exception e){
             e.printStackTrace();
@@ -638,8 +642,11 @@ public class ViewerActivity extends AppCompatActivity {
     private void loadEpisodeAtBoundaryIfNeeded() {
         if(strip == null || manager == null || stripAdapter == null || manager.getItemCount() == 0)
             return;
+        int first = manager.findFirstVisibleItemPosition();
         int last = manager.findLastVisibleItemPosition();
         int total = manager.getItemCount();
+        if(first <= 0 && !previousEpisodeBoundaryLoading)
+            attachPreviousEpisode(true);
         if(last >= total - 12)
             attachNextEpisode(false);
         if(last >= total - 2 || !strip.canScrollVertically(1))
@@ -661,8 +668,6 @@ public class ViewerActivity extends AppCompatActivity {
                     return;
                 if(!topPullEligible && isAtViewerTop()) {
                     topPullEligible = true;
-                    topPullStartY = event.getY();
-                    return;
                 }
                 if(!topPullEligible)
                     return;
@@ -673,7 +678,9 @@ public class ViewerActivity extends AppCompatActivity {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                boolean shouldLoadPrevious = topPullTriggered && !previousEpisodeBoundaryLoading;
+                float releaseThreshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
+                boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
+                boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop) && !previousEpisodeBoundaryLoading;
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
@@ -686,7 +693,20 @@ public class ViewerActivity extends AppCompatActivity {
     }
 
     private boolean isAtViewerTop() {
-        return strip != null && !strip.canScrollVertically(-1);
+        if(strip == null)
+            return false;
+        if(!strip.canScrollVertically(-1))
+            return true;
+        if(stripAdapter == null || manager == null)
+            return false;
+        PageItem page = stripAdapter.getCurrentVisiblePage();
+        if(page == null || page.manga == null || page.index != 0)
+            return false;
+        int firstPagePosition = stripAdapter.findFirstPagePosition(page.manga);
+        if(firstPagePosition == RecyclerView.NO_POSITION)
+            return false;
+        View firstPage = manager.findViewByPosition(firstPagePosition);
+        return firstPage != null && firstPage.getTop() >= 0;
     }
 
     private void attachPreviousEpisode(boolean jumpToEpisode) {
@@ -744,13 +764,19 @@ public class ViewerActivity extends AppCompatActivity {
         if(strip == null || pendingPreviousJumpPosition == RecyclerView.NO_POSITION)
             return;
         Manga target = pendingPreviousJumpManga;
-        int position = pendingPreviousJumpPosition;
         pendingPreviousJumpManga = null;
         pendingPreviousJumpPosition = RecyclerView.NO_POSITION;
         strip.postDelayed(() -> {
-            if(strip != null && stripAdapter != null && !isFinishing()) {
+            if(strip != null && manager != null && stripAdapter != null && !isFinishing()) {
+                int position = stripAdapter.findLastPagePosition(target);
+                if(position == RecyclerView.NO_POSITION)
+                    return;
                 strip.stopScroll();
-                strip.smoothScrollToPosition(position);
+                int boundaryPosition = Math.min(position + 1, stripAdapter.getItemCount() - 1);
+                manager.scrollToPositionWithOffset(boundaryPosition, strip.getHeight());
+                manga = target;
+                updateIntent(target);
+                refreshToolbar(target);
                 clearProgrammaticPreviousJumpBookmark(target);
             }
         }, 80);
