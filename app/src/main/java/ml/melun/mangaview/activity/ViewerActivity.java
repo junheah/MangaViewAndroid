@@ -101,12 +101,6 @@ public class ViewerActivity extends AppCompatActivity {
     boolean topPullTriggered = false;
     boolean topPullEligible = false;
     boolean topPullInProgress = false;
-    int previousPullDistancePx = 0;
-    float bottomPullStartY = 0;
-    boolean bottomPullTriggered = false;
-    boolean bottomPullEligible = false;
-    boolean bottomPullInProgress = false;
-    int nextPullDistancePx = 0;
     int previousBoundaryRequestedFromId = -1;
     boolean previousEpisodePositioning = false;
 
@@ -281,7 +275,6 @@ public class ViewerActivity extends AppCompatActivity {
             });
             strip.setOnTouchListener((view, event) -> {
                 handlePreviousEpisodePull(event);
-                handleNextEpisodePull(event);
                 return false;
             });
 
@@ -646,16 +639,25 @@ public class ViewerActivity extends AppCompatActivity {
         if(first > 0) {
             previousBoundaryRequestedFromId = -1;
         }
+        if(shouldAttachPreviousEpisodeAhead(first, total))
+            attachPreviousEpisode(false);
         if(shouldAttachNextEpisodeAhead(last, total))
             attachNextEpisode(false);
         if(last >= total - 2 || !strip.canScrollVertically(1))
             attachNextEpisode(true);
     }
 
+    private boolean shouldAttachPreviousEpisodeAhead(int firstVisiblePosition, int totalItems) {
+        if(totalItems <= 0 || firstVisiblePosition == RecyclerView.NO_POSITION)
+            return false;
+        int preloadWindow = Math.min(NEXT_EPISODE_PRELOAD_LIMIT, Math.max(3, totalItems / 3));
+        return firstVisiblePosition <= preloadWindow;
+    }
+
     private boolean shouldAttachNextEpisodeAhead(int lastVisiblePosition, int totalItems) {
         if(totalItems <= 0 || lastVisiblePosition == RecyclerView.NO_POSITION)
             return false;
-        int preloadWindow = Math.min(NEXT_EPISODE_PRELOAD_LIMIT, Math.max(2, totalItems / 2));
+        int preloadWindow = Math.min(NEXT_EPISODE_PRELOAD_LIMIT, Math.max(4, (totalItems * 2) / 3));
         return lastVisiblePosition >= totalItems - preloadWindow;
     }
 
@@ -668,7 +670,6 @@ public class ViewerActivity extends AppCompatActivity {
                 topPullTriggered = false;
                 topPullEligible = isAtViewerTop();
                 topPullInProgress = true;
-                previousPullDistancePx = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(!topPullEligible && isAtViewerTop()) {
@@ -677,7 +678,6 @@ public class ViewerActivity extends AppCompatActivity {
                 }
                 if(!topPullEligible)
                     return;
-                previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
                 if(topPullTriggered || previousEpisodeBoundaryLoading)
                     return;
                 float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
@@ -694,8 +694,6 @@ public class ViewerActivity extends AppCompatActivity {
                     topPullEligible = true;
                     topPullStartY = event.getY();
                 }
-                if(topPullEligible)
-                    previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
                 boolean releasePulledFromTop = topPullEligible && event.getY() - topPullStartY >= releaseThreshold && atTopOnRelease;
                 boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop)
                         && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
@@ -704,55 +702,6 @@ public class ViewerActivity extends AppCompatActivity {
                 topPullEligible = false;
                 if(shouldLoadPrevious)
                     attachPreviousEpisode(true);
-                break;
-        }
-    }
-
-    private void handleNextEpisodePull(MotionEvent event) {
-        if(strip == null || manager == null || stripAdapter == null)
-            return;
-        switch(event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
-                bottomPullStartY = event.getY();
-                bottomPullTriggered = false;
-                bottomPullEligible = isAtViewerBottom();
-                bottomPullInProgress = true;
-                nextPullDistancePx = 0;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if(!bottomPullEligible && isAtViewerBottom()) {
-                    bottomPullEligible = true;
-                    bottomPullStartY = event.getY();
-                }
-                if(!bottomPullEligible)
-                    return;
-                nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
-                if(bottomPullTriggered || nextEpisodeBoundaryLoading)
-                    return;
-                float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
-                if(bottomPullStartY - event.getY() >= threshold) {
-                    bottomPullTriggered = true;
-                    attachNextEpisode(false);
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                float releaseThreshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
-                boolean atBottomOnRelease = isAtViewerBottom();
-                if(!bottomPullEligible && atBottomOnRelease) {
-                    bottomPullEligible = true;
-                    bottomPullStartY = event.getY();
-                }
-                if(bottomPullEligible)
-                    nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
-                boolean releasePulledFromBottom = bottomPullEligible && bottomPullStartY - event.getY() >= releaseThreshold && atBottomOnRelease;
-                boolean shouldLoadNext = (bottomPullTriggered || releasePulledFromBottom)
-                        && !nextEpisodeBoundaryLoading && !previousEpisodePositioning;
-                bottomPullInProgress = false;
-                bottomPullTriggered = false;
-                bottomPullEligible = false;
-                if(shouldLoadNext)
-                    attachNextEpisode(true);
                 break;
         }
     }
@@ -772,26 +721,6 @@ public class ViewerActivity extends AppCompatActivity {
             return false;
         View firstPage = manager.findViewByPosition(firstPagePosition);
         return firstPage != null && firstPage.getTop() >= 0;
-    }
-
-    private boolean isAtViewerBottom() {
-        if(strip == null)
-            return false;
-        if(!strip.canScrollVertically(1))
-            return true;
-        if(stripAdapter == null || manager == null)
-            return false;
-        PageItem page = stripAdapter.getCurrentVisiblePage();
-        if(page == null || page.manga == null)
-            return false;
-        List<String> images = page.manga.getImgs(context);
-        if(images == null || page.index != images.size() - 1)
-            return false;
-        int lastPagePosition = stripAdapter.findLastPagePosition(page.manga);
-        if(lastPagePosition == RecyclerView.NO_POSITION)
-            return false;
-        View lastPage = manager.findViewByPosition(lastPagePosition);
-        return lastPage != null && lastPage.getBottom() <= strip.getHeight();
     }
 
     private void attachPreviousEpisode(boolean jumpToEpisode) {
@@ -961,7 +890,6 @@ public class ViewerActivity extends AppCompatActivity {
             if(stripAdapter != null && !isFinishing()) {
                 if(!stripAdapter.hasMangaLoaded(target)) {
                     stripAdapter.appendManga(target);
-                    applyPendingBoundaryScroll(false);
                 }
                 if(afterAppend != null)
                     afterAppend.run();
@@ -976,25 +904,10 @@ public class ViewerActivity extends AppCompatActivity {
             if(stripAdapter != null && !isFinishing()) {
                 if(!stripAdapter.hasMangaLoaded(target)) {
                     stripAdapter.insertManga(target);
-                    applyPendingBoundaryScroll(true);
                 }
                 if(afterInsert != null)
                     afterInsert.run();
             }
-        });
-    }
-
-    private void applyPendingBoundaryScroll(boolean previous) {
-        if(strip == null)
-            return;
-        int distance = previous ? previousPullDistancePx : nextPullDistancePx;
-        previousPullDistancePx = 0;
-        nextPullDistancePx = 0;
-        if(distance <= 0)
-            return;
-        strip.post(() -> {
-            if(!isFinishing())
-                strip.scrollBy(0, previous ? -distance : distance);
         });
     }
 

@@ -46,7 +46,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     Decoder d;
     int width;
     int count = 0;
-    final static int MaxStackSize = 2;
+    final static int MaxStackSize = 3;
     private static final int PRELOAD_AHEAD_COUNT = 3;
     ViewerActivity.InfiniteScrollCallback callback;
     Title title;
