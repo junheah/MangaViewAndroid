@@ -21,7 +21,9 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static ml.melun.mangaview.MainApplication.p;
 import static ml.melun.mangaview.Utils.getGlideUrl;
@@ -48,8 +50,10 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     int count = 0;
     final static int MaxStackSize = 2;
     private static final int PRELOAD_AHEAD_COUNT = 3;
+    private static final int NEXT_EPISODE_ATTACH_THRESHOLD = 3;
     ViewerActivity.InfiniteScrollCallback callback;
     Title title;
+    private final Set<Integer> nextAttachRequested = new HashSet<>();
 
     List<Object> items;
 
@@ -420,6 +424,7 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             PageItem pi = (PageItem) items.get(layoutPos);
             current = pi;
             preloadAhead(layoutPos);
+            requestNextEpisodeBeforeEnd(pi);
             if(pi.manga.useBookmark()){
                 int index = pi.index;
                 if (index == 0) {
@@ -436,6 +441,27 @@ public class StripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else if(type == INFO){
             needUpdate = true;
         }
+    }
+
+    private void requestNextEpisodeBeforeEnd(PageItem item) {
+        if(callback == null || item == null || item.side != PageItem.FIRST || !item.manga.isOnline())
+            return;
+        List<String> images = item.manga.getImgs(mainContext);
+        if(images == null || images.size() == 0)
+            return;
+        if(item.index < Math.max(0, images.size() - NEXT_EPISODE_ATTACH_THRESHOLD))
+            return;
+        if(item.manga.nextEp() == null || !nextAttachRequested.add(item.manga.getId()))
+            return;
+        callback.nextEp(new ViewerActivity.InfiniteLoadCallback() {
+            @Override
+            public void prevLoaded(Manga m) {
+            }
+
+            @Override
+            public void nextLoaded(Manga m) {
+            }
+        }, item.manga);
     }
 //
 //    @Override

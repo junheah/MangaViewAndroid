@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.Nullable;
@@ -89,6 +90,7 @@ public class ViewerActivity extends AppCompatActivity {
     InfiniteScrollCallback infiniteScrollCallback;
     loadImages loader;
     prefetchImages nextPrefetcher;
+    private static final int NEXT_EPISODE_PRELOAD_LIMIT = 12;
 
 
     @Override
@@ -160,6 +162,7 @@ public class ViewerActivity extends AppCompatActivity {
                 if(i>0) {
                     Manga target = eps.get(i - 1);
                     if(hasLoadedImages(target)) {
+                        preloadFirstPages(target);
                         appendMangaWhenIdle(target);
                         callback.nextLoaded(target);
                         prefetchNextEpisode(target);
@@ -651,9 +654,11 @@ public class ViewerActivity extends AppCompatActivity {
         if(target == null || !target.isOnline())
             return;
         List<String> images = target.getImgs(context);
-        int limit = Math.min(4, images.size());
+        int limit = Math.min(NEXT_EPISODE_PRELOAD_LIMIT, images.size());
         for(int i = 0; i < limit; i++)
             Glide.with(context)
+                    .asBitmap()
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .load(Utils.getGlideUrl(images.get(i), target.getBaseMode()))
                     .preload();
     }
