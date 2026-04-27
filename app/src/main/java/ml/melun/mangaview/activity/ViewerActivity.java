@@ -90,6 +90,10 @@ public class ViewerActivity extends AppCompatActivity {
     InfiniteScrollCallback infiniteScrollCallback;
     loadImages loader;
     prefetchImages nextPrefetcher;
+    boolean previousEpisodeBoundaryLoading = false;
+    boolean nextEpisodeBoundaryLoading = false;
+    boolean previousEpisodeBoundaryJumpPending = false;
+    boolean nextEpisodeBoundaryJumpPending = false;
     private static final int NEXT_EPISODE_PRELOAD_LIMIT = 12;
 
 
@@ -240,6 +244,14 @@ public class ViewerActivity extends AppCompatActivity {
                     if(strip.getLayoutManager().getItemCount()>0 && newState == RecyclerView.SCROLL_STATE_DRAGGING && toolbarshow) {
                         toggleToolbar();
                     }
+                    if(newState == RecyclerView.SCROLL_STATE_IDLE)
+                        loadEpisodeAtBoundaryIfNeeded();
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    loadEpisodeAtBoundaryIfNeeded();
                 }
             });
 
@@ -552,6 +564,8 @@ public class ViewerActivity extends AppCompatActivity {
             if(isCancelled() || isFinishing() || result == LOAD_CAPTCHA || !hasLoadedImages(target))
                 return;
             preloadFirstPages(target);
+            if(stripAdapter != null && manager != null && manager.findLastVisibleItemPosition() >= manager.getItemCount() - 12)
+                attachNextEpisode(false);
         }
 
         @Override
@@ -590,6 +604,104 @@ public class ViewerActivity extends AppCompatActivity {
         strip.setAdapter(stripAdapter);
         // show/hide toolbar
         stripAdapter.setClickListener(this::toggleToolbar);
+    }
+
+    private void loadEpisodeAtBoundaryIfNeeded() {
+        if(strip == null || manager == null || stripAdapter == null || manager.getItemCount() == 0)
+            return;
+        int first = manager.findFirstVisibleItemPosition();
+        int last = manager.findLastVisibleItemPosition();
+        int total = manager.getItemCount();
+        if(first <= 1 || !strip.canScrollVertically(-1))
+            attachPreviousEpisode(true);
+        if(last >= total - 12)
+            attachNextEpisode(false);
+        if(last >= total - 2 || !strip.canScrollVertically(1))
+            attachNextEpisode(true);
+    }
+
+    private void attachPreviousEpisode(boolean jumpToEpisode) {
+        PageItem page = stripAdapter.getCurrentVisiblePage();
+        if(page == null || page.manga == null || !page.manga.isOnline())
+            return;
+        Manga target = page.manga.prevEp();
+        if(target == null)
+            return;
+        int loadedPosition = stripAdapter.findLastPagePosition(target);
+        if(loadedPosition != RecyclerView.NO_POSITION) {
+            if(jumpToEpisode)
+                manager.scrollToPosition(loadedPosition);
+            return;
+        }
+        if(previousEpisodeBoundaryLoading)
+        {
+            if(jumpToEpisode)
+                previousEpisodeBoundaryJumpPending = true;
+            return;
+        }
+        previousEpisodeBoundaryJumpPending = jumpToEpisode;
+        previousEpisodeBoundaryLoading = true;
+        infiniteScrollCallback.prevEp(new InfiniteLoadCallback() {
+            @Override
+            public void prevLoaded(Manga m) {
+                previousEpisodeBoundaryLoading = false;
+                boolean shouldJump = jumpToEpisode || previousEpisodeBoundaryJumpPending;
+                previousEpisodeBoundaryJumpPending = false;
+                if(m == null || strip == null || stripAdapter == null || isFinishing())
+                    return;
+                strip.post(() -> {
+                    int position = stripAdapter.findLastPagePosition(m);
+                    if(shouldJump && position != RecyclerView.NO_POSITION)
+                        manager.scrollToPosition(position);
+                });
+            }
+
+            @Override
+            public void nextLoaded(Manga m) {
+            }
+        }, page.manga);
+    }
+
+    private void attachNextEpisode(boolean jumpToEpisode) {
+        PageItem page = stripAdapter.getCurrentVisiblePage();
+        if(page == null || page.manga == null || !page.manga.isOnline())
+            return;
+        Manga target = page.manga.nextEp();
+        if(target == null)
+            return;
+        int loadedPosition = stripAdapter.findFirstPagePosition(target);
+        if(loadedPosition != RecyclerView.NO_POSITION) {
+            if(jumpToEpisode)
+                manager.scrollToPosition(loadedPosition);
+            return;
+        }
+        if(nextEpisodeBoundaryLoading)
+        {
+            if(jumpToEpisode)
+                nextEpisodeBoundaryJumpPending = true;
+            return;
+        }
+        nextEpisodeBoundaryJumpPending = jumpToEpisode;
+        nextEpisodeBoundaryLoading = true;
+        infiniteScrollCallback.nextEp(new InfiniteLoadCallback() {
+            @Override
+            public void prevLoaded(Manga m) {
+            }
+
+            @Override
+            public void nextLoaded(Manga m) {
+                nextEpisodeBoundaryLoading = false;
+                boolean shouldJump = jumpToEpisode || nextEpisodeBoundaryJumpPending;
+                nextEpisodeBoundaryJumpPending = false;
+                if(m == null || strip == null || stripAdapter == null || isFinishing())
+                    return;
+                strip.post(() -> {
+                    int position = stripAdapter.findFirstPagePosition(m);
+                    if(shouldJump && position != RecyclerView.NO_POSITION)
+                        manager.scrollToPosition(position);
+                });
+            }
+        }, page.manga);
     }
 
     public void refreshToolbar(Manga m){
