@@ -92,7 +92,7 @@ public class ViewerActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("manga", new Gson().toJson(manga));
+        Utils.saveMangaState(outState, manga);
         super.onSaveInstanceState(outState);
     }
     @Override
@@ -188,8 +188,10 @@ public class ViewerActivity extends AppCompatActivity {
                 manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
                 }.getType());
             }else{
-                manga = new Gson().fromJson(savedInstanceState.getString("manga"), new TypeToken<Manga>() {
-                }.getType());
+                manga = Utils.restoreMangaState(savedInstanceState, title);
+                if(manga == null)
+                    manga = new Gson().fromJson(intent.getStringExtra("manga"), new TypeToken<Manga>() {
+                    }.getType());
             }
 
             toolbarTitle.setText(manga.getName());

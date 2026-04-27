@@ -20,6 +20,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -77,6 +78,13 @@ import static ml.melun.mangaview.activity.CaptchaActivity.REQUEST_CAPTCHA;
 import static ml.melun.mangaview.activity.SettingsActivity.urlSettingPopup;
 
 public class Utils {
+    private static final String MANGA_STATE_V2 = "manga_state_v2";
+    private static final String MANGA_ID = "manga_id";
+    private static final String MANGA_NAME = "manga_name";
+    private static final String MANGA_DATE = "manga_date";
+    private static final String MANGA_BASE_MODE = "manga_base_mode";
+    private static final String MANGA_MODE = "manga_mode";
+    private static final String MANGA_OFFLINE_PATH = "manga_offline_path";
 
     private static int captchaCount = 1;
 
@@ -185,6 +193,49 @@ public class Utils {
         }
         viewer.putExtra("manga",new Gson().toJson(manga));
         return viewer;
+    }
+
+    public static void saveMangaState(Bundle outState, Manga manga) {
+        if(outState == null || manga == null)
+            return;
+        outState.putBoolean(MANGA_STATE_V2, true);
+        outState.putInt(MANGA_ID, manga.getId());
+        outState.putString(MANGA_NAME, manga.getName());
+        outState.putString(MANGA_DATE, manga.getDate());
+        outState.putInt(MANGA_BASE_MODE, manga.getBaseMode());
+        outState.putInt(MANGA_MODE, manga.getMode());
+        outState.putString(MANGA_OFFLINE_PATH, manga.getOfflinePath());
+    }
+
+    public static Manga restoreMangaState(Bundle savedInstanceState, Title title) {
+        if(savedInstanceState == null || !savedInstanceState.getBoolean(MANGA_STATE_V2, false))
+            return null;
+        int id = savedInstanceState.getInt(MANGA_ID, -1);
+        int baseMode = savedInstanceState.getInt(MANGA_BASE_MODE,
+                title == null ? MTitle.base_comic : title.getBaseMode());
+        Manga restored = findSavedEpisode(title, id, baseMode);
+        if(restored == null) {
+            String name = savedInstanceState.getString(MANGA_NAME, "");
+            String date = savedInstanceState.getString(MANGA_DATE, "");
+            restored = new Manga(id, name == null ? "" : name, date == null ? "" : date, baseMode);
+        }
+        restored.setMode(savedInstanceState.getInt(MANGA_MODE, restored.getMode()));
+        String offlinePath = savedInstanceState.getString(MANGA_OFFLINE_PATH);
+        if(offlinePath != null)
+            restored.setOfflinePath(offlinePath);
+        if(title != null)
+            restored.setTitle(title);
+        return restored;
+    }
+
+    private static Manga findSavedEpisode(Title title, int id, int baseMode) {
+        if(title == null || title.getEps() == null)
+            return null;
+        for(Manga episode : title.getEps()) {
+            if(episode != null && episode.getId() == id && episode.getBaseMode() == baseMode)
+                return episode;
+        }
+        return null;
     }
     public static void showPopup(Context context, String title, String content, DialogInterface.OnClickListener clickListener, DialogInterface.OnCancelListener cancelListener){
         AlertDialog.Builder builder;
