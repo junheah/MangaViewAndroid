@@ -34,6 +34,7 @@ import static ml.melun.mangaview.Utils.CODE_SCOPED_STORAGE;
 public class CustomHttpClient {
     public static final String DEFAULT_COMIC_URL = "https://wfwf449.com/cm";
     public static final String WEBTOON_URL = "https://wfwf449.com";
+    private static final long WFWF_DOMAIN_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000L;
     public OkHttpClient client;
     Map<String, String> cookies;
     private Context context;
@@ -173,6 +174,42 @@ public class CustomHttpClient {
         return response;
     }
 
+    public boolean resolveWfwfDomainNow() {
+        return ensureWfwfDomain(true);
+    }
+
+    private boolean ensureWfwfDomain(boolean force) {
+        try {
+            String webtoonUrl = getWebtoonUrl();
+            String root = WfwfDomainResolver.toRoot(webtoonUrl);
+            if(!WfwfDomainResolver.isWfwfUrl(root))
+                return false;
+
+            SharedPreferences pref = context.getSharedPreferences("mangaView", Context.MODE_PRIVATE);
+            long now = System.currentTimeMillis();
+            long lastCheck = pref.getLong("wfwfDomainLastCheck", 0);
+            if(!force && now - lastCheck < WFWF_DOMAIN_CHECK_INTERVAL_MS)
+                return false;
+
+            pref.edit().putLong("wfwfDomainLastCheck", now).apply();
+            Map<String, String> headers = new HashMap<>();
+            headers.put("User-Agent", agent);
+            headers.put("Referer", root);
+            String resolved = WfwfDomainResolver.resolve(client, root, headers);
+            if(resolved == null || resolved.equals(root))
+                return false;
+
+            p.setWebtoonUrl(resolved);
+            p.setUrl(resolved + "/cm");
+            p.setDefUrl(resolved + "/cm");
+            resetCookie();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public Response mget(String url, Boolean doLogin){
         return mget(url, doLogin, new HashMap<>());
     }
@@ -243,6 +280,7 @@ public class CustomHttpClient {
 
 
     public Response mget(String url, Boolean doLogin, Map<String, String> customCookie){
+        ensureWfwfDomain(false);
         if(customCookie==null)
             customCookie = new HashMap<>();
 //        if(doLogin && p.getLogin() != null && p.getLogin().cookie != null && p.getLogin().cookie.length()>0){
@@ -275,7 +313,23 @@ public class CustomHttpClient {
 
         if(!url.startsWith("/"))
             url = "/" + url;
-        return get(baseUrl + url, headers);
+        Response response = get(baseUrl + url, headers);
+        if(shouldRetryWithResolvedDomain(response)) {
+            if(response != null)
+                response.close();
+            ensureWfwfDomain(true);
+            baseUrl = getBaseUrl(url);
+            headers.put("Referer", baseUrl);
+            response = get(baseUrl + url, headers);
+        }
+        return response;
+    }
+
+    private boolean shouldRetryWithResolvedDomain(Response response) {
+        if(response == null)
+            return true;
+        int code = response.code();
+        return code == 301 || code == 302 || code == 403 || code == 404 || code >= 500;
     }
 
     public Response post(String url, RequestBody body, Map<String,String> headers){

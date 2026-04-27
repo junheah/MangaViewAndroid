@@ -202,7 +202,17 @@ public class Search {
         if(code >= 400)
             throw new Exception("Webtoon search failed: " + code);
         Document d = Jsoup.parse(body);
-        target.addAll(MainPageWebtoon.parseWolfTitles(d, baseMode, limit));
+        ArrayList<Title> parsed = MainPageWebtoon.parseWolfTitles(d, baseMode, limit);
+        if(parsed.size() == 0 && client.resolveWfwfDomainNow()) {
+            response = client.mget(path, true, null);
+            body = response.body().string();
+            code = response.code();
+            response.close();
+            if(code >= 400)
+                throw new Exception("Webtoon search failed: " + code);
+            parsed = MainPageWebtoon.parseWolfTitles(Jsoup.parse(body), baseMode, limit);
+        }
+        target.addAll(parsed);
     }
 
     private static String percentEncode(String value, Charset charset) {

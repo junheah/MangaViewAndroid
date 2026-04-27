@@ -265,6 +265,8 @@ public class Manga {
                 if(prev != null)
                     eps.add(prev);
             }
+            if(imgs.size() == 0 && client.resolveWfwfDomainNow())
+                return fetchWolf(client, viewPath, epPath);
         } catch (Exception e) {
             e.printStackTrace();
         }

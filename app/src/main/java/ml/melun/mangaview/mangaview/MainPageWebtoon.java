@@ -89,6 +89,7 @@ public class MainPageWebtoon {
 
     public Ranking<Title> parseWolfTitle(CustomHttpClient client, String title, String path, int baseMode){
         Ranking<Title> ranking = new Ranking<>(title);
+        boolean retried = false;
         try{
             Response r = client.mget(path);
             String body = r.body().string();
@@ -96,9 +97,14 @@ public class MainPageWebtoon {
             Document d = Jsoup.parse(body);
             for(Title webtoon : parseWolfTitles(d, baseMode, MAIN_SECTION_LIMIT))
                 ranking.add(webtoon);
+            if(ranking.size() == 0 && !retried && client.resolveWfwfDomainNow()) {
+                retried = true;
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
+        if(retried)
+            return parseWolfTitle(client, title, path, baseMode);
         return ranking;
     }
 

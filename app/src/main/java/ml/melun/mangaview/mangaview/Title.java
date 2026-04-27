@@ -226,6 +226,8 @@ public class Title extends MTitle {
                 tmp.setTitle(this);
                 eps.add(tmp);
             }
+            if(eps.size() == 0 && client.resolveWfwfDomainNow())
+                return fetchWolfEps(client, listPath, viewPath);
         }catch(Exception e) {
             e.printStackTrace();
         }
