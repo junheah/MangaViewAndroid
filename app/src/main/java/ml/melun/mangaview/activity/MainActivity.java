@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -86,7 +85,6 @@ public class MainActivity extends AppCompatActivity
     int startTab;
     int currentTab = -1;
     private Context context;
-    MenuItem versionItem;
     String homeDirStr;
     Boolean dark;
     NavigationView navigationView;
@@ -285,17 +283,6 @@ public class MainActivity extends AppCompatActivity
 
         homeDirStr = p.getHomeDir();
 
-        // get app version
-        versionItem = navigationView.getMenu().findItem(R.id.nav_version_display);
-        int version = 0;
-        try{
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            version = pInfo.versionCode;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        versionItem.setTitle("v."+version);
-
         //check for permission
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(permissionCheck== PackageManager.PERMISSION_DENIED){
@@ -329,7 +316,7 @@ public class MainActivity extends AppCompatActivity
     public int getTabId(int i){
         switch(i){
             case 0:
-                return(R.id.nav_main);
+                return 0;
             case 1:
                 return(R.id.nav_search);
             case 2:
@@ -344,8 +331,6 @@ public class MainActivity extends AppCompatActivity
 
     public int getFragmentIndex(int i){
         switch(i){
-            case R.id.nav_main:
-                return 0;
             case R.id.nav_search:
                 return 1;
             case R.id.nav_recent:
@@ -356,6 +341,22 @@ public class MainActivity extends AppCompatActivity
                 return 4;
         }
         return -1;
+    }
+
+    private CharSequence getTabTitle(int index) {
+        if(index == 0)
+            return "메인";
+        MenuItem item = navigationView.getMenu().findItem(getTabId(index));
+        return item == null ? "" : item.getTitle();
+    }
+
+    private void syncNavigationSelection() {
+        Menu menu = navigationView.getMenu();
+        for(int i = 0; i < menu.size(); i++)
+            menu.getItem(i).setChecked(false);
+        MenuItem item = menu.findItem(getTabId(currentTab));
+        if(item != null)
+            item.setChecked(true);
     }
 
     @Override
@@ -424,8 +425,8 @@ public class MainActivity extends AppCompatActivity
                         .show();
             }else{
                 changeFragment(startTab);
-                navigationView.getMenu().getItem(startTab).setChecked(true);
-                toolbar.setTitle(navigationView.getMenu().findItem(getTabId(startTab)).getTitle());
+                syncNavigationSelection();
+                toolbar.setTitle(getTabTitle(startTab));
             }
         }
     }
@@ -455,6 +456,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     boolean changeFragment(int index){
+        if(index < 0)
+            return false;
         boolean change = !(currentTab >= 2 && index >= 2);
         int fragmentI = index>2 ? 2 : index;
         boolean res = false;
@@ -468,8 +471,8 @@ public class MainActivity extends AppCompatActivity
             }
             res = true;
         }
-        getSupportActionBar().setTitle(navigationView.getMenu().findItem(getTabId(currentTab)).getTitle());
-        navigationView.getMenu().getItem(currentTab).setChecked(true);
+        getSupportActionBar().setTitle(getTabTitle(currentTab));
+        syncNavigationSelection();
         return res;
     }
 

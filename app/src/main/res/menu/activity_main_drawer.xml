@@ -5,9 +5,6 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_main"
-            android:title="메인" />
-        <item
             android:id="@+id/nav_search"
             android:title="검색" />
         <item
@@ -15,38 +12,13 @@
             android:title="최근에 본 만화" />
         <item
             android:id="@+id/nav_favorite"
-            android:title="좋아요 한 만화"/>
+            android:title="좋아요 한 만화" />
         <item
             android:id="@+id/nav_download"
-            android:title="저장된 만화"/>
+            android:title="저장된 만화" />
+        <item
+            android:id="@+id/nav_settings"
+            android:title="설정" />
     </group>
-
-    <item android:title="기타">
-        <menu>
-            <item
-                android:id="@+id/nav_account"
-                android:title="계정">
-            </item>
-            <item
-                android:id="@+id/nav_update"
-                android:title="업데이트 확인" />
-            <item
-                android:id="@+id/nav_notice"
-                android:title="공지 사항" />
-            <item
-                android:id="@+id/nav_kakao"
-                android:title="오픈 카톡 참가" />
-            <item
-                android:id="@+id/nav_settings"
-                android:title="설정"/>
-            <item
-                android:id="@+id/nav_donate"
-                android:title="개발자 후원" />
-            <item
-                android:id="@+id/nav_version_display"
-                android:title="Version"
-                android:enabled="false"/>
-        </menu>
-    </item>
 
 </menu>

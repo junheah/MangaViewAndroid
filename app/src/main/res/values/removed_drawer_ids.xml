@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="nav_account" type="id" />
+    <item name="nav_update" type="id" />
+    <item name="nav_notice" type="id" />
+    <item name="nav_kakao" type="id" />
+    <item name="nav_donate" type="id" />
+</resources>
