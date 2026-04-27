@@ -149,12 +149,14 @@ public class ViewerActivity extends AppCompatActivity {
             public Manga prevEp(InfiniteLoadCallback callback, Manga curm) {
                 p.removeViewerBookmark(curm);
                 int i = eps.indexOf(curm);
-                if(i<eps.size()-1) {
-                    if(loader != null) loader.cancel(true);
+                if(i >= 0 && i<eps.size()-1) {
+                    cancelActiveEpisodeLoader();
                     loader = new loadImages(eps.get(i + 1), m -> {
-                        if (m.getImgs(context).size() > 0)
-                            insertMangaWhenIdle(m);
-                        callback.prevLoaded(m);
+                        if (m.getImgs(context).size() > 0) {
+                            insertMangaWhenIdle(m, () -> callback.prevLoaded(m));
+                        } else {
+                            callback.prevLoaded(m);
+                        }
                     },false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return eps.get(i + 1);
@@ -172,17 +174,23 @@ public class ViewerActivity extends AppCompatActivity {
                     Manga target = eps.get(i - 1);
                     if(hasLoadedImages(target)) {
                         preloadFirstPages(target);
-                        appendMangaWhenIdle(target);
-                        callback.nextLoaded(target);
-                        prefetchNextEpisode(target);
+                        appendMangaWhenIdle(target, () -> {
+                            callback.nextLoaded(target);
+                            prefetchNextEpisode(target);
+                        });
                         return target;
                     }
-                    if(loader != null) loader.cancel(true);
+                    cancelActiveEpisodeLoader();
                     loader = new loadImages(target, m -> {
-                        if (m.getImgs(context).size() > 0)
-                            appendMangaWhenIdle(m);
-                        callback.nextLoaded(m);
-                        prefetchNextEpisode(m);
+                        if (m.getImgs(context).size() > 0) {
+                            appendMangaWhenIdle(m, () -> {
+                                callback.nextLoaded(m);
+                                prefetchNextEpisode(m);
+                            });
+                        } else {
+                            callback.nextLoaded(m);
+                            prefetchNextEpisode(m);
+                        }
                     },false);
                     loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     return target;
@@ -626,7 +634,6 @@ public class ViewerActivity extends AppCompatActivity {
     private void loadEpisodeAtBoundaryIfNeeded() {
         if(strip == null || manager == null || stripAdapter == null || manager.getItemCount() == 0)
             return;
-        int first = manager.findFirstVisibleItemPosition();
         int last = manager.findLastVisibleItemPosition();
         int total = manager.getItemCount();
         if(last >= total - 12)
@@ -810,7 +817,10 @@ public class ViewerActivity extends AppCompatActivity {
 
     private boolean hasLoadedImages(Manga target) {
         try {
-            return target != null && target.getImgs(context) != null && target.getImgs(context).size() > 0;
+            if(target == null)
+                return false;
+            List<String> loadedImages = target.getImgs(context);
+            return loadedImages != null && loadedImages.size() > 0;
         } catch (Exception e) {
             return false;
         }
@@ -829,22 +839,39 @@ public class ViewerActivity extends AppCompatActivity {
                     .preload();
     }
 
-    private void appendMangaWhenIdle(Manga target) {
+    private void appendMangaWhenIdle(Manga target, Runnable afterAppend) {
         if(target == null || strip == null)
             return;
         strip.post(() -> {
-            if(stripAdapter != null && !isFinishing())
-                stripAdapter.appendManga(target);
+            if(stripAdapter != null && !isFinishing()) {
+                if(!stripAdapter.hasMangaLoaded(target))
+                    stripAdapter.appendManga(target);
+                if(afterAppend != null)
+                    afterAppend.run();
+            }
         });
     }
 
-    private void insertMangaWhenIdle(Manga target) {
+    private void insertMangaWhenIdle(Manga target, Runnable afterInsert) {
         if(target == null || strip == null)
             return;
         strip.post(() -> {
-            if(stripAdapter != null && !isFinishing())
-                stripAdapter.insertManga(target);
+            if(stripAdapter != null && !isFinishing()) {
+                if(!stripAdapter.hasMangaLoaded(target))
+                    stripAdapter.insertManga(target);
+                if(afterInsert != null)
+                    afterInsert.run();
+            }
         });
+    }
+
+    private void cancelActiveEpisodeLoader() {
+        if(loader != null)
+            loader.cancel(true);
+        previousEpisodeBoundaryLoading = false;
+        nextEpisodeBoundaryLoading = false;
+        previousEpisodeBoundaryJumpPending = false;
+        nextEpisodeBoundaryJumpPending = false;
     }
 
     @Override
