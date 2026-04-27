@@ -671,14 +671,14 @@ public class ViewerActivity extends AppCompatActivity {
                 previousPullDistancePx = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if(topPullEligible || isAtViewerTop())
-                    previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
-                if(topPullTriggered || previousEpisodeBoundaryLoading)
-                    return;
                 if(!topPullEligible && isAtViewerTop()) {
                     topPullEligible = true;
+                    topPullStartY = event.getY();
                 }
                 if(!topPullEligible)
+                    return;
+                previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
+                if(topPullTriggered || previousEpisodeBoundaryLoading)
                     return;
                 float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
                 if(event.getY() - topPullStartY >= threshold) {
@@ -689,11 +689,16 @@ public class ViewerActivity extends AppCompatActivity {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 float releaseThreshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
-                boolean releasePulledFromTop = event.getY() - topPullStartY >= releaseThreshold && isAtViewerTop();
+                boolean atTopOnRelease = isAtViewerTop();
+                if(!topPullEligible && atTopOnRelease) {
+                    topPullEligible = true;
+                    topPullStartY = event.getY();
+                }
+                if(topPullEligible)
+                    previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
+                boolean releasePulledFromTop = topPullEligible && event.getY() - topPullStartY >= releaseThreshold && atTopOnRelease;
                 boolean shouldLoadPrevious = (topPullTriggered || releasePulledFromTop)
                         && !previousEpisodeBoundaryLoading && !previousEpisodePositioning;
-                if(topPullEligible || isAtViewerTop())
-                    previousPullDistancePx = Math.max(previousPullDistancePx, Math.max(0, (int)(event.getY() - topPullStartY)));
                 topPullInProgress = false;
                 topPullTriggered = false;
                 topPullEligible = false;
@@ -715,15 +720,14 @@ public class ViewerActivity extends AppCompatActivity {
                 nextPullDistancePx = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
-                if(bottomPullEligible || isAtViewerBottom())
-                    nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
-                if(bottomPullTriggered || nextEpisodeBoundaryLoading)
-                    return;
                 if(!bottomPullEligible && isAtViewerBottom()) {
                     bottomPullEligible = true;
                     bottomPullStartY = event.getY();
                 }
                 if(!bottomPullEligible)
+                    return;
+                nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
+                if(bottomPullTriggered || nextEpisodeBoundaryLoading)
                     return;
                 float threshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
                 if(bottomPullStartY - event.getY() >= threshold) {
@@ -734,11 +738,16 @@ public class ViewerActivity extends AppCompatActivity {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 float releaseThreshold = PREVIOUS_EPISODE_PULL_THRESHOLD_DP * getResources().getDisplayMetrics().density;
-                boolean releasePulledFromBottom = bottomPullStartY - event.getY() >= releaseThreshold && isAtViewerBottom();
+                boolean atBottomOnRelease = isAtViewerBottom();
+                if(!bottomPullEligible && atBottomOnRelease) {
+                    bottomPullEligible = true;
+                    bottomPullStartY = event.getY();
+                }
+                if(bottomPullEligible)
+                    nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
+                boolean releasePulledFromBottom = bottomPullEligible && bottomPullStartY - event.getY() >= releaseThreshold && atBottomOnRelease;
                 boolean shouldLoadNext = (bottomPullTriggered || releasePulledFromBottom)
                         && !nextEpisodeBoundaryLoading && !previousEpisodePositioning;
-                if(bottomPullEligible || isAtViewerBottom())
-                    nextPullDistancePx = Math.max(nextPullDistancePx, Math.max(0, (int)(bottomPullStartY - event.getY())));
                 bottomPullInProgress = false;
                 bottomPullTriggered = false;
                 bottomPullEligible = false;
