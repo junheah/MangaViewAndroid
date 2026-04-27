@@ -249,7 +249,7 @@ public class ViewerActivity extends AppCompatActivity {
             }
             
             loadManga(manga);
-            //strip.setItemAnimator(null);
+            strip.setItemAnimator(null);
             strip.setOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -691,7 +691,7 @@ public class ViewerActivity extends AppCompatActivity {
         int loadedPosition = stripAdapter.findLastPagePosition(target);
         if(loadedPosition != RecyclerView.NO_POSITION) {
             if(jumpToEpisode) {
-                manager.scrollToPosition(loadedPosition);
+                strip.smoothScrollToPosition(loadedPosition);
                 clearProgrammaticPreviousJumpBookmark(target);
             }
             return;
@@ -715,7 +715,7 @@ public class ViewerActivity extends AppCompatActivity {
                 strip.post(() -> {
                     int position = stripAdapter.findLastPagePosition(m);
                     if(shouldJump && position != RecyclerView.NO_POSITION) {
-                        manager.scrollToPosition(position);
+                        strip.smoothScrollToPosition(position);
                         clearProgrammaticPreviousJumpBookmark(m);
                     }
                 });
@@ -745,8 +745,6 @@ public class ViewerActivity extends AppCompatActivity {
             return;
         int loadedPosition = stripAdapter.findFirstPagePosition(target);
         if(loadedPosition != RecyclerView.NO_POSITION) {
-            if(jumpToEpisode)
-                manager.scrollToPosition(loadedPosition);
             return;
         }
         if(nextEpisodeBoundaryLoading)
@@ -765,15 +763,9 @@ public class ViewerActivity extends AppCompatActivity {
             @Override
             public void nextLoaded(Manga m) {
                 nextEpisodeBoundaryLoading = false;
-                boolean shouldJump = jumpToEpisode || nextEpisodeBoundaryJumpPending;
                 nextEpisodeBoundaryJumpPending = false;
                 if(m == null || strip == null || stripAdapter == null || isFinishing())
                     return;
-                strip.post(() -> {
-                    int position = stripAdapter.findFirstPagePosition(m);
-                    if(shouldJump && position != RecyclerView.NO_POSITION)
-                        manager.scrollToPosition(position);
-                });
             }
         }, page.manga);
     }
