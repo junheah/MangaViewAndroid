@@ -26,6 +26,7 @@ import ml.melun.mangaview.R;
 import ml.melun.mangaview.mangaview.Manga;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getGlideUrl;
 import static ml.melun.mangaview.mangaview.MTitle.base_auto;
 
 public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -71,6 +72,11 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public long getItemId(int position) {
+        if(mData == null || position < 0 || position >= mData.size())
+            return RecyclerView.NO_ID;
+        Manga manga = mData.get(position);
+        if(manga.getId() > 0)
+            return (((long) manga.getBaseMode()) << 32) ^ manga.getId();
         return position;
     }
 
@@ -84,9 +90,11 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         viewHolder h = (viewHolder) holder;
-        h.title.setText(mData.get(position).getName());
-        String thumb = mData.get(position).getThumb();
+        Manga manga = mData.get(position);
+        h.title.setText(manga.getName());
+        String thumb = manga.getThumb();
         h.thumb.setColorFilter(null);
+        Glide.with(h.thumb).clear(h.thumb);
         if(thumb != null && thumb.length()==0)
             h.thumb.setImageResource(android.R.color.transparent);
         else if(thumb != null && thumb.equals("reload")) {
@@ -95,7 +103,7 @@ public class MainUpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }else if(save)
             h.thumb.setImageDrawable(ResourcesCompat.getDrawable(res, R.mipmap.ic_launcher, null));
         else
-            Glide.with(h.thumb).load(thumb).into(h.thumb);
+            Glide.with(h.thumb).load(getGlideUrl(thumb, manga.getBaseMode())).into(h.thumb);
     }
 
 

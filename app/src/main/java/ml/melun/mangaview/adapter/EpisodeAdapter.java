@@ -29,6 +29,7 @@ import ml.melun.mangaview.mangaview.Manga;
 import ml.melun.mangaview.mangaview.Title;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getGlideUrl;
 
 
 public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -105,20 +106,23 @@ public class EpisodeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             HeaderHolder h = (HeaderHolder) holder;
             String titles = this.title.getName();
             String thumb = this.title.getThumb();
+            if(thumb == null)
+                thumb = "";
             String release = this.title.getRelease();
             h.h_title.setText(titles);
             h.h_author.setText(this.title.getAuthor());
-            if(release != null || release.length()>0) h.h_release.setText(release);
+            if(release != null && release.length()>0) h.h_release.setText(release);
             else h.h_release.setText("");
             if(favorite) h.h_star_icon.setImageResource(R.drawable.ic_favorite);
             else h.h_star_icon.setImageResource(R.drawable.ic_favorite_border);
             if(bookmarked) h.h_bookmark_icon.setImageResource(R.drawable.ic_bookmark);
             else h.h_bookmark_icon.setImageResource(R.drawable.ic_bookmark_border);
-
-            if(!save) Glide.with(h.h_thumb)
-                    .load(thumb)
+            Glide.with(h.h_thumb).clear(h.h_thumb);
+            if(!save && thumb.length() > 0) Glide.with(h.h_thumb)
+                    .load(getGlideUrl(thumb, title.getBaseMode()))
                     .apply(new RequestOptions().dontTransform())
                     .into(h.h_thumb);
+            else h.h_thumb.setImageBitmap(null);
             if(mode == 0 || mode == 3)
                 h.h_star.setVisibility(View.VISIBLE);
             else

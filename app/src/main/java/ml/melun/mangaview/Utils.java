@@ -436,12 +436,45 @@ public class Utils {
     }
 
     public static GlideUrl getGlideUrl(String image){
-        String referer = image != null && image.contains(CustomHttpClient.WEBTOON_URL)
-                ? httpClient.getUrl(MTitle.base_webtoon)
-                : httpClient.getUrl(MTitle.base_comic);
-        GlideUrl url = new GlideUrl(image, new LazyHeaders.Builder()
+        return getGlideUrl(image, guessImageBaseMode(image));
+    }
+
+    public static GlideUrl getGlideUrl(String image, int baseMode){
+        String referer = httpClient.getUrl(baseMode);
+        String url = normalizeImageUrl(image, baseMode);
+        return new GlideUrl(url, new LazyHeaders.Builder()
                 .addHeader("Referer", referer)
                 .build());
+    }
+
+    private static int guessImageBaseMode(String image) {
+        if(image == null)
+            return MTitle.base_comic;
+        String lower = image.toLowerCase();
+        if(lower.contains("/webtoon") || lower.contains("webtoon"))
+            return MTitle.base_webtoon;
+        return MTitle.base_comic;
+    }
+
+    private static String normalizeImageUrl(String image, int baseMode) {
+        if(image == null)
+            return "";
+        String url = image.trim();
+        if(url.startsWith("//"))
+            return "https:" + url;
+        if(url.startsWith("/"))
+            return getSiteRoot(baseMode) + url;
+        if(!url.startsWith("http") && !url.contains("://"))
+            return getSiteRoot(baseMode) + "/" + url;
+        return url;
+    }
+
+    private static String getSiteRoot(int baseMode) {
+        String url = httpClient.getUrl(baseMode);
+        while(url.endsWith("/"))
+            url = url.substring(0, url.length() - 1);
+        if(url.endsWith("/cm"))
+            return url.substring(0, url.length() - 3);
         return url;
     }
 

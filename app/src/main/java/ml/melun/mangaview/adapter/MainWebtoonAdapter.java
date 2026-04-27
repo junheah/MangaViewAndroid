@@ -33,6 +33,7 @@ import ml.melun.mangaview.ui.NpaLinearLayoutManager;
 
 import static ml.melun.mangaview.MainApplication.httpClient;
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getGlideUrl;
 import static ml.melun.mangaview.mangaview.MTitle.base_comic;
 import static ml.melun.mangaview.mangaview.MTitle.base_webtoon;
 
@@ -284,6 +285,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             manager.setOrientation(RecyclerView.HORIZONTAL);
             list.setLayoutManager(manager);
             list.setNestedScrollingEnabled(false);
+            list.setHasFixedSize(true);
             list.setItemViewCacheSize(12);
         }
 
@@ -308,6 +310,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         WebtoonCardAdapter(List<?> items) {
             this.items = items;
+            setHasStableIds(true);
         }
 
         void setItems(List<?> items) {
@@ -340,7 +343,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 holder.thumb.setImageResource(R.mipmap.ic_launcher);
             } else {
                 Glide.with(holder.thumb)
-                        .load(thumb)
+                        .load(getGlideUrl(thumb, title.getBaseMode()))
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .override(dp(180), dp(220))
                         .thumbnail(0.25f)
@@ -358,6 +361,18 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         public int getItemCount() {
             return items == null ? 0 : items.size();
+        }
+
+        @Override
+        public long getItemId(int position) {
+            if(items == null || position < 0 || position >= items.size())
+                return RecyclerView.NO_ID;
+            Object item = items.get(position);
+            if(item instanceof Title) {
+                Title title = (Title) item;
+                return (((long) title.getBaseMode()) << 32) ^ title.getId();
+            }
+            return item.hashCode();
         }
 
         class CardHolder extends RecyclerView.ViewHolder {
@@ -392,7 +407,7 @@ public class MainWebtoonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 if(thumb == null || thumb.length() == 0)
                     continue;
                 Glide.with(context)
-                        .load(thumb)
+                        .load(getGlideUrl(thumb, ((Title) item).getBaseMode()))
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .override(dp(180), dp(220))
                         .preload();

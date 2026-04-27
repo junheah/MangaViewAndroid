@@ -22,6 +22,7 @@ import ml.melun.mangaview.mangaview.Title;
 import ml.melun.mangaview.mangaview.UpdatedManga;
 
 import static ml.melun.mangaview.MainApplication.p;
+import static ml.melun.mangaview.Utils.getGlideUrl;
 
 public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context context;
@@ -67,7 +68,9 @@ public class UpdatedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         UpdatedManga m = mData.get(position);
         h.text.setText(m.getName());
         h.date.setText(m.getDate());
-        if(m.getThumb().length()>1 && !save) Glide.with(h.thumb).load(m.getThumb()).into(h.thumb);
+        String thumb = m.getThumb();
+        Glide.with(h.thumb).clear(h.thumb);
+        if(thumb.length()>1 && !save) Glide.with(h.thumb).load(getGlideUrl(thumb, m.getBaseMode())).into(h.thumb);
         else h.thumb.setImageBitmap(null);
         if(save) h.thumb.setVisibility(View.GONE);
         if(p.getBookmark(m.getTitle())>0)
